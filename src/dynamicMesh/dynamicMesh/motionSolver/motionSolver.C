@@ -47,7 +47,7 @@ Foam::motionSolver::motionSolver(const polyMesh& mesh)
             "dynamicMeshDict",
             mesh.time().constant(),
             mesh,
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE
         )
     ),
@@ -67,7 +67,7 @@ Foam::autoPtr<Foam::motionSolver> Foam::motionSolver::New(const polyMesh& mesh)
             "dynamicMeshDict",
             mesh.time().constant(),
             mesh,
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE,
             false
         )
@@ -79,7 +79,7 @@ Foam::autoPtr<Foam::motionSolver> Foam::motionSolver::New(const polyMesh& mesh)
 
     Info << "Selecting motion solver: " << solverTypeName << endl;
 
-    dlLibraryTable::open
+    const_cast<Time&>(mesh.time()).libs().open
     (
         solverDict,
         "motionSolverLibs",

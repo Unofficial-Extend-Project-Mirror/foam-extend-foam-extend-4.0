@@ -47,10 +47,12 @@ laminar::laminar
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& phi,
-    const basicThermo& thermophysicalModel
+    const basicThermo& thermophysicalModel,
+    const word& turbulenceModelName,
+    const word& modelName
 )
 :
-    RASModel(typeName, rho, U, phi, thermophysicalModel)
+    RASModel(modelName, rho, U, phi, thermophysicalModel, turbulenceModelName)
 {}
 
 
@@ -72,6 +74,27 @@ tmp<volScalarField> laminar::mut() const
             ),
             mesh_,
             dimensionedScalar("mut", mu().dimensions(), 0.0)
+        )
+    );
+}
+
+
+tmp<volScalarField> laminar::alphat() const
+{
+    return tmp<volScalarField>
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "alphat",
+                runTime_.timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh_,
+            dimensionedScalar("alphat", alpha().dimensions(), 0.0)
         )
     );
 }

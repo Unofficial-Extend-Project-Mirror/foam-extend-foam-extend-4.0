@@ -29,8 +29,7 @@ Description
 
 SourceFiles
     ISstreamI.H
-    ISread.C
-    ISreadToken.C
+    ISstream.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -64,28 +63,19 @@ class ISstream
 
         char nextValid();
 
+        void readWordToken(token&);
 
     // Private Member Functions
 
+
+        //- Read a verbatim string (excluding block delimiters).
+        Istream& readVerbatim(string&);
+
+        //- Read a variable name (includes '{')
+        Istream& readVariable(string&);
+
         //- Disallow default bitwise assignment
         void operator=(const ISstream&);
-
-
-protected:
-
-    // Protected member functions
-
-        //- Return the stream reference
-        istream& stream()
-        {
-            return is_;
-        }
-
-        //- Return the const stream reference
-        const istream& stream() const
-        {
-            return is_;
-        }
 
 
 public:
@@ -103,10 +93,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~ISstream()
-        {}
+    //- Destructor
+    virtual ~ISstream()
+    {}
 
 
     // Member functions
@@ -135,6 +124,12 @@ public:
 
             //- Raw, low-level get character function.
             inline ISstream& get(char&);
+
+            //- Raw, low-level peek function.
+            //  Does not remove the character from the stream.
+            //  Returns the next character in the stream or EOF if the
+            //  end of file is read.
+            inline int peek();
 
             //- Raw, low-level getline into a string function.
             inline ISstream& getLine(string&);
@@ -179,6 +174,21 @@ public:
 
             //- Set flags of output stream
             virtual ios_base::fmtflags flags(const ios_base::fmtflags flags);
+
+
+        // STL stream
+
+            //- Access to underlying std::istream
+            virtual istream& stdStream()
+            {
+                return is_;
+            }
+
+            //- Const access to underlying std::istream
+            virtual const istream& stdStream() const
+            {
+                return is_;
+            }
 
 
         // Print

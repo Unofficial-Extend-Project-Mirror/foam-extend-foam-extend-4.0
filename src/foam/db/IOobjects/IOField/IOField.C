@@ -32,10 +32,28 @@ Foam::IOField<Type>::IOField(const IOobject& io)
 :
     regIOobject(io)
 {
+    // Temporary warning
     if
     (
-        io.readOpt() == IOobject::MUST_READ
+        io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+     || io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED
+    )
+    {
+        WarningIn("IOField::IOField(const IOobject&)")
+            << "IOField " << name()
+            << " constructed with IOobject::MUST_READ_IF_MODIFIED"
+            " but IOField does not support automatic rereading."
+            << endl;
+    }
+
+    if
+    (
+        (
+            io.readOpt() == IOobject::MUST_READ
+         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+        )
      || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
     )
     {
         readStream(typeName) >> *this;
@@ -49,10 +67,28 @@ Foam::IOField<Type>::IOField(const IOobject& io, const label size)
 :
     regIOobject(io)
 {
+    // Temporary warning
     if
     (
-        io.readOpt() == IOobject::MUST_READ
+        io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+     || io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED
+    )
+    {
+        WarningIn("IOField::IOField(const IOobject&, const label)")
+            << "IOField " << name()
+            << " constructed with IOobject::MUST_READ_IF_MODIFIED"
+            " but IOField does not support automatic rereading."
+            << endl;
+    }
+
+    if
+    (
+        (
+            io.readOpt() == IOobject::MUST_READ
+         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+        )
      || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
     )
     {
         readStream(typeName) >> *this;
@@ -70,10 +106,28 @@ Foam::IOField<Type>::IOField(const IOobject& io, const Field<Type>& f)
 :
     regIOobject(io)
 {
+    // Temporary warning
     if
     (
-        io.readOpt() == IOobject::MUST_READ
+        io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+     || io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED
+    )
+    {
+        WarningIn("IOField::IOField(const IOobject&, const Field<Type>&)")
+            << "IOField " << name()
+            << " constructed with IOobject::MUST_READ_IF_MODIFIED"
+            " but IOField does not support automatic rereading."
+            << endl;
+    }
+
+    if
+    (
+        (
+            io.readOpt() == IOobject::MUST_READ
+         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+        )
      || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
     )
     {
         readStream(typeName) >> *this;
@@ -91,12 +145,32 @@ Foam::IOField<Type>::IOField(const IOobject& io, const Xfer<Field<Type> >& f)
 :
     regIOobject(io)
 {
+    // Temporary warning
+    if
+    (
+        io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+     || io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED
+    )
+    {
+        WarningIn
+        (
+            "IOField::IOField(const IOobject&, const Xfer<Field<Type> >&)"
+        )   << "IOField " << name()
+            << " constructed with IOobject::MUST_READ_IF_MODIFIED"
+            " but IOField does not support automatic rereading."
+            << endl;
+    }
+
     Field<Type>::transfer(f());
 
     if
     (
-        io.readOpt() == IOobject::MUST_READ
+        (
+            io.readOpt() == IOobject::MUST_READ
+         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+        )
      || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
     )
     {
         readStream(typeName) >> *this;

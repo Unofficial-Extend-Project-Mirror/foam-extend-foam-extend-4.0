@@ -59,7 +59,7 @@ autoPtr<fluxCorrector> fluxCorrector::New
         word correctorTypeName(dict.lookup("fluxCorrector"));
 
         // Open any supplied libraries in dictionary
-        dlLibraryTable::open
+        const_cast<Time&>(mesh.thisDb().time()).libs().open
         (
             dict,
             "fluxCorrectorLibs",

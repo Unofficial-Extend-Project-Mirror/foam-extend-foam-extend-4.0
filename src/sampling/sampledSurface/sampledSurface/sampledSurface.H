@@ -57,6 +57,8 @@ SourceFiles
 #include "runTimeSelectionTables.H"
 #include "autoPtr.H"
 #include "volFieldsFwd.H"
+#include "surfaceFieldsFwd.H"
+#include "surfaceMesh.H"
 #include "polyMesh.H"
 #include "coordinateSystems.H"
 #include "interpolation.H"
@@ -81,7 +83,7 @@ class sampledSurface
         const polyMesh& mesh_;
 
         //- Do we intend to interpolate the information?
-        bool interpolate_;
+        const bool interpolate_;
 
 
     // Demand-driven data
@@ -98,6 +100,7 @@ class sampledSurface
         //- Total surface area
         mutable scalar area_;
 
+
     // Make geometric data
 
         //- Make Sf
@@ -108,6 +111,7 @@ class sampledSurface
 
         //- Make Cf
         void makeCf() const;
+
 
     // Service methods
 
@@ -135,11 +139,13 @@ class sampledSurface
         template<class ReturnType, class Type>
         tmp<Field<ReturnType> > project(const tmp<Field<Type> >&) const;
 
+
 protected:
 
     // Protected Member functions
 
         virtual void clearGeom() const;
+
 
 public:
 
@@ -147,7 +153,7 @@ public:
       TypeName("sampledSurface");
 
 
-    // Declare run-time constructor selection table
+    //- Declare run-time constructor selection table
 
         declareRunTimeSelectionTable
         (
@@ -192,7 +198,8 @@ public:
         sampledSurface
         (
             const word& name,
-            const polyMesh&
+            const polyMesh&,
+            const bool interpolate = false
         );
 
         //- Construct from dictionary
@@ -222,7 +229,7 @@ public:
         );
 
 
-    // Destructor
+    //- Destructor
 
         virtual ~sampledSurface();
 
@@ -311,6 +318,13 @@ public:
         //- Project field onto surface
         tmp<Field<vector> > project(const Field<tensor>&) const;
 
+        //- Interpolate from points to cell centre
+        template<class Type>
+        tmp<GeometricField<Type, fvPatchField, volMesh> > pointAverage
+        (
+            const GeometricField<Type, pointPatchField, pointMesh>& pfld
+        ) const;
+
         //- Sample field on surface
         virtual tmp<scalarField> sample
         (
@@ -341,6 +355,35 @@ public:
             const volTensorField&
         ) const = 0;
 
+        //- Surface sample field on surface
+        virtual tmp<scalarField> sample
+        (
+            const surfaceScalarField&
+        ) const;
+
+        //- Surface Sample field on surface
+        virtual tmp<vectorField> sample
+        (
+            const surfaceVectorField&
+        ) const;
+
+        //- Surface sample field on surface
+        virtual tmp<sphericalTensorField> sample
+        (
+            const surfaceSphericalTensorField&
+        ) const;
+
+        //- Surface sample field on surface
+        virtual tmp<symmTensorField> sample
+        (
+            const surfaceSymmTensorField&
+        ) const;
+
+        //- Surface sample field on surface
+        virtual tmp<tensorField> sample
+        (
+            const surfaceTensorField&
+        ) const;
 
         //- Interpolate field on surface
         virtual tmp<scalarField> interpolate

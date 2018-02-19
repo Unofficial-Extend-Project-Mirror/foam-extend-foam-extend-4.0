@@ -50,7 +50,7 @@ namespace Foam
 class OFstream;
 
 /*---------------------------------------------------------------------------*\
-                       Class OFstreamAllocator Declaration
+                      Class OFstreamAllocator Declaration
 \*---------------------------------------------------------------------------*/
 
 //- A std::ostream with ability to handle compressed files
@@ -71,22 +71,14 @@ class OFstreamAllocator
 
         );
 
-    // Destructor
+    //- Destructor
+    ~OFstreamAllocator();
 
-        ~OFstreamAllocator();
-
-
-public:
-
-    // Member functions
-
-        //- Access to underlying std::ostream
-        ostream& stdStream();
 };
 
 
 /*---------------------------------------------------------------------------*\
-                           Class OFstream Declaration
+                          Class OFstream Declaration
 \*---------------------------------------------------------------------------*/
 
 class OFstream
@@ -138,6 +130,15 @@ public:
             {
                 return pathname_;
             }
+
+
+        // STL stream
+
+            //- Access to underlying std::ostream
+            virtual ostream& stdStream();
+
+            //- Const access to underlying std::ostream
+            virtual const ostream& stdStream() const;
 
 
         // Print

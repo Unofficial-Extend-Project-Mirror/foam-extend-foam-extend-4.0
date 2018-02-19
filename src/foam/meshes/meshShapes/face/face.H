@@ -27,12 +27,16 @@ Class
 Description
     A face is a list of labels corresponding to mesh vertices.
 
+SeeAlso
+    Foam::triFace
+
 SourceFiles
     faceI.H
     face.C
     faceIntersection.C
     faceContactSphere.C
     faceAreaInContact.C
+    faceTemplates.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -46,6 +50,7 @@ SourceFiles
 #include "faceListFwd.H"
 #include "intersection.H"
 #include "pointHit.H"
+#include "ListListOps.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -340,6 +345,36 @@ public:
 
         friend Istream& operator>>(Istream&, face&);
 };
+
+
+//- Hash specialization to offset faces in ListListOps::combineOffset
+template<>
+class offsetOp<face>
+{
+
+public:
+
+    inline face operator()
+    (
+        const face& x,
+        const label offset
+    ) const
+    {
+        face result(x.size());
+
+        forAll(x, xI)
+        {
+            result[xI] = x[xI] + offset;
+        }
+        return result;
+    }
+};
+
+
+// Global functions
+
+//- Find the longest edge on a face. Face point labels index into pts.
+label longestEdge(const face& f, const pointField& pts);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

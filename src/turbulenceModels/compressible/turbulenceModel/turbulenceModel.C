@@ -26,6 +26,7 @@ License
 #include "turbulenceModel.H"
 #include "volFields.H"
 #include "surfaceFields.H"
+#include "fvcGrad.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -46,16 +47,30 @@ turbulenceModel::turbulenceModel
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& phi,
-    const basicThermo& thermophysicalModel
+    const basicThermo& thermophysicalModel,
+    const word& turbulenceModelName
 )
 :
+    regIOobject
+    (
+        IOobject
+        (
+            turbulenceModelName,
+            U.time().constant(),
+            U.db(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        )
+    ),
     runTime_(U.time()),
     mesh_(U.mesh()),
 
     rho_(rho),
     U_(U),
     phi_(phi),
-    thermophysicalModel_(thermophysicalModel)
+    thermophysicalModel_(thermophysicalModel),
+
+    y_(mesh_)
 {}
 
 
@@ -66,7 +81,8 @@ autoPtr<turbulenceModel> turbulenceModel::New
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& phi,
-    const basicThermo& thermophysicalModel
+    const basicThermo& thermophysicalModel,
+    const word& turbulenceModelName
 )
 {
     word modelName;
@@ -82,7 +98,7 @@ autoPtr<turbulenceModel> turbulenceModel::New
                 "turbulenceProperties",
                 U.time().constant(),
                 U.db(),
-                IOobject::MUST_READ,
+                IOobject::MUST_READ_IF_MODIFIED,
                 IOobject::NO_WRITE
             )
         );
@@ -111,15 +127,40 @@ autoPtr<turbulenceModel> turbulenceModel::New
 
     return autoPtr<turbulenceModel>
     (
-        cstrIter()(rho, U, phi, thermophysicalModel)
+        cstrIter()(rho, U, phi, thermophysicalModel, turbulenceModelName)
     );
 }
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+scalar turbulenceModel::yPlusLam(const scalar kappa, const scalar E) const
+{
+    scalar ypl = 11.0;
+
+    for (int i=0; i<10; i++)
+    {
+        ypl = log(E*ypl)/kappa;
+    }
+
+    return ypl;
+}
+
+
+tmp<volScalarField> turbulenceModel::rhoEpsilonEff() const
+{
+    tmp<volTensorField> tgradU = fvc::grad(U_);
+    return mu()*(tgradU() && dev(twoSymm(tgradU()))) + rho_*epsilon();
+}
+
+
 void turbulenceModel::correct()
-{}
+{
+    if (mesh_.changing())
+    {
+        y_.correct();
+    }
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -35,8 +35,16 @@ const Scalar pTraits<Scalar>::zero = 0.0;
 const Scalar pTraits<Scalar>::one = 1.0;
 const Scalar pTraits<Scalar>::min = -ScalarVGREAT;
 const Scalar pTraits<Scalar>::max = ScalarVGREAT;
+const Scalar pTraits<Scalar>::rootMin = -ScalarROOTVGREAT;
+const Scalar pTraits<Scalar>::rootMax = ScalarROOTVGREAT;
 
 const char* pTraits<Scalar>::componentNames[] = { "x" };
+
+pTraits<Scalar>::pTraits(const Scalar& p)
+:
+    p_(p)
+{}
+
 
 pTraits<Scalar>::pTraits(Istream& is)
 {
@@ -83,7 +91,7 @@ Istream& operator>>(Istream& is, Scalar& s)
     {
         is.setBad();
         FatalIOErrorIn("operator>>(Istream&, Scalar&)", is)
-            << "wrong token type - expected Scalar found " << t.info()
+            << "wrong token type - expected Scalar, found " << t.info()
             << exit(FatalIOError);
 
         return is;

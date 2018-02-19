@@ -88,7 +88,7 @@ inline Foam::scalar Foam::hPolynomialThermo<EquationOfState, PolySize>::cp
     const scalar T
 ) const
 {
-    return cpPolynomial_.evaluate(T);
+    return cpPolynomial_.value(T);
 }
 
 
@@ -98,7 +98,7 @@ inline Foam::scalar Foam::hPolynomialThermo<EquationOfState, PolySize>::h
     const scalar T
 ) const
 {
-    return hPolynomial_.evaluate(T);
+    return hPolynomial_.value(T);
 }
 
 
@@ -126,7 +126,7 @@ inline Foam::scalar Foam::hPolynomialThermo<EquationOfState, PolySize>::s
     const scalar T
 ) const
 {
-    return sPolynomial_.evaluate(T);
+    return sPolynomial_.value(T);
 }
 
 

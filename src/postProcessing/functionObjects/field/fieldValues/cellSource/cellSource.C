@@ -26,72 +26,101 @@ License
 #include "cellSource.H"
 #include "fvMesh.H"
 #include "volFields.H"
-#include "IOList.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
+    template<>
+    const char* NamedEnum<fieldValues::cellSource::sourceType, 2>::names[] =
+    {
+        "cellZone",
+        "all"
+    };
+
+
+    template<>
+    const char* NamedEnum<fieldValues::cellSource::operationType, 11>::names[] =
+    {
+        "none",
+        "sum",
+        "sumMag",
+        "average",
+        "weightedAverage",
+        "volAverage",
+        "weightedVolAverage",
+        "volIntegrate",
+        "min",
+        "max",
+        "CoV"
+    };
+
     namespace fieldValues
     {
         defineTypeNameAndDebug(cellSource, 0);
+        addToRunTimeSelectionTable(fieldValue, cellSource, dictionary);
     }
-
-    template<>
-    const char* NamedEnum<fieldValues::cellSource::sourceType, 1>::
-        names[] = {"cellZone"};
-
-    const NamedEnum<fieldValues::cellSource::sourceType, 1>
-        fieldValues::cellSource::sourceTypeNames_;
-
-    template<>
-    const char* NamedEnum<fieldValues::cellSource::operationType, 7>::
-        names[] =
-        {
-            "none", "sum", "volAverage",
-            "volIntegrate", "weightedAverage", "min", "max"
-        };
-
-    const NamedEnum<fieldValues::cellSource::operationType, 7>
-        fieldValues::cellSource::operationTypeNames_;
-
 }
+
+
+const Foam::NamedEnum<Foam::fieldValues::cellSource::sourceType, 2>
+    Foam::fieldValues::cellSource::sourceTypeNames_;
+
+const Foam::NamedEnum<Foam::fieldValues::cellSource::operationType, 11>
+    Foam::fieldValues::cellSource::operationTypeNames_;
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 void Foam::fieldValues::cellSource::setCellZoneCells()
 {
-    label zoneId = mesh().cellZones().findZoneID(sourceName_);
-
-    if (zoneId < 0)
+    switch (source_)
     {
-        FatalErrorIn("cellSource::cellSource::setCellZoneCells()")
-            << "Unknown cell zone name: " << sourceName_
-            << ". Valid cell zones are: " << mesh().cellZones().names()
-            << nl << exit(FatalError);
+        case stCellZone:
+        {
+            dict().lookup("sourceName") >> sourceName_;
+
+            label zoneId = mesh().cellZones().findZoneID(sourceName_);
+
+            if (zoneId < 0)
+            {
+                FatalErrorIn("cellSource::cellSource::setCellZoneCells()")
+                    << "Unknown cell zone name: " << sourceName_
+                    << ". Valid cell zones are: " << mesh().cellZones().names()
+                    << nl << exit(FatalError);
+            }
+
+            cellId_ = mesh().cellZones()[zoneId];
+            nCells_ = returnReduce(cellId_.size(), sumOp<label>());
+            break;
+        }
+
+        case stAll:
+        {
+            cellId_ = identity(mesh().nCells());
+            nCells_ = returnReduce(cellId_.size(), sumOp<label>());
+            break;
+        }
+
+        default:
+        {
+            FatalErrorIn("cellSource::setCellZoneCells()")
+               << "Unknown source type. Valid source types are:"
+                << sourceTypeNames_ << nl << exit(FatalError);
+        }
     }
-
-    const cellZone& cZone = mesh().cellZones()[zoneId];
-
-    cellId_.setSize(cZone.size());
-
-    label count = 0;
-    forAll(cZone, i)
-    {
-        label cellI = cZone[i];
-        cellId_[count] = cellI;
-        count++;
-    }
-
-    cellId_.setSize(count);
-    nCells_ = returnReduce(cellId_.size(), sumOp<label>());
 
     if (debug)
     {
-        Pout<< "Original cell zone size = " << cZone.size()
-            << ", new size = " << count << endl;
+        Pout<< "Selected source size = " << cellId_.size() << endl;
     }
+}
+
+
+Foam::scalar Foam::fieldValues::cellSource::volume() const
+{
+    return gSum(filterField(mesh().V()));
 }
 
 
@@ -99,69 +128,61 @@ void Foam::fieldValues::cellSource::setCellZoneCells()
 
 void Foam::fieldValues::cellSource::initialise(const dictionary& dict)
 {
-    switch (source_)
+    setCellZoneCells();
+
+    if (nCells_ == 0)
     {
-        case stCellZone:
-        {
-            setCellZoneCells();
-            break;
-        }
-        default:
-        {
-            FatalErrorIn("cellSource::initialise()")
-                << "Unknown source type. Valid source types are:"
-                << sourceTypeNames_ << nl << exit(FatalError);
-        }
+        WarningIn
+        (
+            "Foam::fieldValues::cellSource::initialise(const dictionary&)"
+        )   << type() << " " << name_ << ": "
+            << sourceTypeNames_[source_] << "(" << sourceName_ << "):" << nl
+            << "    Source has no cells - deactivating" << endl;
+
+        active_ = false;
+        return;
     }
 
-    Info<< type() << " " << name_ << ":" << nl
+    volume_ = volume();
+
+    Info<< type() << " " << name_ << ":"
+        << sourceTypeNames_[source_] << "(" << sourceName_ << "):" << nl
         << "    total cells  = " << nCells_ << nl
-        << "    total volume = " << gSum(filterField(mesh().V()))
+        << "    total volume = " << volume_
         << nl << endl;
 
-    if (operation_ == opWeightedAverage)
+    if (dict.readIfPresent("weightField", weightFieldName_))
     {
-        dict.lookup("weightField") >> weightFieldName_;
-        if
-        (
-            obr().foundObject<volScalarField>(weightFieldName_)
-        )
-        {
-            Info<< "    weight field = " << weightFieldName_;
-        }
-        else
-        {
-            FatalErrorIn("cellSource::initialise()")
-                << type() << " " << name_ << ": "
-                << sourceTypeNames_[source_] << "(" << sourceName_ << "):"
-                << nl << "    Weight field " << weightFieldName_
-                << " must be a " << volScalarField::typeName
-                << nl << exit(FatalError);
-        }
+        Info<< "    weight field = " << weightFieldName_;
     }
 
     Info<< nl << endl;
 }
 
 
-void Foam::fieldValues::cellSource::writeFileHeader()
+void Foam::fieldValues::cellSource::writeFileHeader(const label i)
 {
-    if (outputFilePtr_.valid())
+    writeCommented(file(), "Source : ");
+    file() << sourceTypeNames_[source_] << " " << sourceName_ << endl;
+    writeCommented(file(), "Cells  : ");
+    file() << nCells_ << endl;
+    writeCommented(file(), "Volume : ");
+    file() << volume_ << endl;
+
+    writeCommented(file(), "Time");
+    if (writeVolume_)
     {
-        outputFilePtr_()
-            << "# Source : " << sourceTypeNames_[source_] << " "
-            << sourceName_ <<  nl << "# Cells  : " << nCells_ << nl
-            << "# Time" << tab << "sum(V)";
-
-        forAll(fields_, i)
-        {
-            outputFilePtr_()
-                << tab << operationTypeNames_[operation_]
-                << "(" << fields_[i] << ")";
-        }
-
-        outputFilePtr_() << endl;
+        file() << tab << "Volume";
     }
+
+    forAll(fields_, i)
+    {
+        file()
+            << tab << operationTypeNames_[operation_]
+            << "(" << fields_[i] << ")";
+    }
+
+    file() << endl;
 }
 
 
@@ -175,11 +196,13 @@ Foam::fieldValues::cellSource::cellSource
     const bool loadFromFiles
 )
 :
-    fieldValue(name, obr, dict, loadFromFiles),
+    fieldValue(name, obr, dict, typeName, loadFromFiles),
     source_(sourceTypeNames_.read(dict.lookup("source"))),
     operation_(operationTypeNames_.read(dict.lookup("operation"))),
     nCells_(0),
-    cellId_()
+    cellId_(),
+    weightFieldName_("none"),
+    writeVolume_(dict.lookupOrDefault("writeVolume", false))
 {
     read(dict);
 }
@@ -213,32 +236,47 @@ void Foam::fieldValues::cellSource::write()
     {
         if (Pstream::master())
         {
-            outputFilePtr_()
-                << obr_.time().value() << tab
-                << sum(filterField(mesh().V()));
+            file() << obr_.time().value();
+        }
+
+        if (writeVolume_)
+        {
+            volume_ = volume();
+            if (Pstream::master())
+            {
+                file() << tab << volume_;
+            }
+            if (log_) Info<< "    total volume = " << volume_ << endl;
         }
 
         forAll(fields_, i)
         {
-            writeValues<scalar>(fields_[i]);
-            writeValues<vector>(fields_[i]);
-            writeValues<sphericalTensor>(fields_[i]);
-            writeValues<symmTensor>(fields_[i]);
-            writeValues<tensor>(fields_[i]);
+            const word& fieldName = fields_[i];
+            bool processed = false;
+
+            processed = processed || writeValues<scalar>(fieldName);
+            processed = processed || writeValues<vector>(fieldName);
+            processed = processed || writeValues<sphericalTensor>(fieldName);
+            processed = processed || writeValues<symmTensor>(fieldName);
+            processed = processed || writeValues<tensor>(fieldName);
+
+            if (!processed)
+            {
+                WarningIn("void Foam::fieldValues::cellSource::write()")
+                    << "Requested field " << fieldName
+                    << " not found in database and not processed"
+                    << endl;
+            }
         }
 
         if (Pstream::master())
         {
-            outputFilePtr_()<< endl;
+            file()<< endl;
         }
 
-        if (log_)
-        {
-            Info<< endl;
-        }
+        if (log_) Info<< endl;
     }
 }
 
 
 // ************************************************************************* //
-

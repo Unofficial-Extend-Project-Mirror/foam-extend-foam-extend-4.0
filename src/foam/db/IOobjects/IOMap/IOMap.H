@@ -75,9 +75,8 @@ public:
         IOMap(const IOobject&, const Xfer<Map<T> >&);
 
 
-    // Destructor
-
-        virtual ~IOMap();
+    //- Destructor
+    virtual ~IOMap();
 
 
     // Member functions

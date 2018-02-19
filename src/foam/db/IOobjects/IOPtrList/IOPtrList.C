@@ -35,8 +35,12 @@ Foam::IOPtrList<T>::IOPtrList(const IOobject& io, const INew& inewt)
 {
     if
     (
-        io.readOpt() == IOobject::MUST_READ
+        (
+            io.readOpt() == IOobject::MUST_READ
+         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+        )
      || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
     )
     {
         PtrList<T>::read(readStream(typeName), inewt);
@@ -52,8 +56,12 @@ Foam::IOPtrList<T>::IOPtrList(const IOobject& io)
 {
     if
     (
-        io.readOpt() == IOobject::MUST_READ
+        (
+            io.readOpt() == IOobject::MUST_READ
+         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+        )
      || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
     )
     {
         PtrList<T>::read(readStream(typeName), INew<T>());
@@ -84,8 +92,12 @@ Foam::IOPtrList<T>::IOPtrList(const IOobject& io, const PtrList<T>& list)
 {
     if
     (
-        io.readOpt() == IOobject::MUST_READ
+        (
+            io.readOpt() == IOobject::MUST_READ
+         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+        )
      || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
     )
     {
         PtrList<T>::read(readStream(typeName), INew<T>());
@@ -107,8 +119,12 @@ Foam::IOPtrList<T>::IOPtrList(const IOobject& io, const Xfer<PtrList<T> >& list)
 
     if
     (
-        io.readOpt() == IOobject::MUST_READ
+        (
+            io.readOpt() == IOobject::MUST_READ
+         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+        )
      || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
     )
     {
         PtrList<T>::read(readStream(typeName), INew<T>());

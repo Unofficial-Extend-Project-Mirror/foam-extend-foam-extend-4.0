@@ -114,7 +114,7 @@ private:
         void operator=(const decompositionMethod&);
 
         //- load missing libraries to avoid compile-time linking to external dependencies
-        static void loadExternalLibraries();
+        static void loadExternalLibraries(Time& time);
 
 public:
 

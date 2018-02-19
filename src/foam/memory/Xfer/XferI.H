@@ -23,19 +23,16 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-// * * * * * * * * * * * * * * * Static Members  * * * * * * * * * * * * * * //
-
-template<class T>
-const Foam::Xfer<T> Foam::Xfer<T>::zero;
-
+#include "nullObject.H"
 
 // * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * * //
 
 template<class T>
 inline const Foam::Xfer<T>& Foam::Xfer<T>::null()
 {
-    return zero;
+    return NullObjectRef<Xfer<T> >();
 }
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

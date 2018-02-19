@@ -59,7 +59,7 @@ void Foam::surfaceInterpolateFields::interpolateFields
 
             if (obr_.found(sName))
             {
-                Info<< "    a surfaceField " << sName << " already exists"
+                Info<< "        surface field " << sName << " already exists"
                     << endl;
             }
             else
@@ -68,7 +68,7 @@ void Foam::surfaceInterpolateFields::interpolateFields
                 sflds.setSize(sz+1);
                 sflds.set(sz, new sfType(sName, linearInterpolate(fld)));
 
-                Info<< "    interpolated " << fld.name() << " to create "
+                Info<< "        interpolated " << fld.name() << " to create "
                     << sflds[sz].name() << endl;
             }
         }

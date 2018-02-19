@@ -73,15 +73,16 @@ scalar nutkWallFunctionFvPatchScalarField::calcYPlusLam
 
 tmp<scalarField> nutkWallFunctionFvPatchScalarField::calcNut() const
 {
-    const label patchI = patch().index();
+    const label patchi = patch().index();
 
-    const RASModel& rasModel = db().lookupObject<RASModel>("RASProperties");
-    const scalarField& y = rasModel.y()[patchI];
-    const tmp<volScalarField> tk = rasModel.k();
+    const turbulenceModel& turbModel =
+        db().lookupObject<turbulenceModel>("turbulenceModel");
+    const scalarField& y = turbModel.y()[patchi];
+    const tmp<volScalarField> tk = turbModel.k();
     const volScalarField& k = tk();
-    const scalarField& nuw = rasModel.nu().boundaryField()[patchI];
+    const scalarField& nuw = turbModel.nu().boundaryField()[patchi];
 
-    const scalar Cmu25 = pow(Cmu_, 0.25);
+    const scalar Cmu25 = pow025(Cmu_);
 
     tmp<scalarField> tnutw(new scalarField(patch().size(), 0.0));
     scalarField& nutw = tnutw();
@@ -211,17 +212,18 @@ void nutkWallFunctionFvPatchScalarField::updateCoeffs()
 
 tmp<scalarField> nutkWallFunctionFvPatchScalarField::yPlus() const
 {
-    const label patchI = patch().index();
+    const label patchi = patch().index();
 
-    const RASModel& rasModel = db().lookupObject<RASModel>("RASProperties");
-    const scalarField& y = rasModel.y()[patchI];
+    const turbulenceModel& turbModel =
+        db().lookupObject<turbulenceModel>("turbulenceModel");
+    const scalarField& y = turbModel.y()[patchi];
 
-    const tmp<volScalarField> tk = rasModel.k();
+    const tmp<volScalarField> tk = turbModel.k();
     const volScalarField& k = tk();
-    const scalarField kwc = k.boundaryField()[patchI].patchInternalField();
-    const scalarField& nuw = rasModel.nu().boundaryField()[patchI];
+    const scalarField kwc = k.boundaryField()[patchi].patchInternalField();
+    const scalarField& nuw = turbModel.nu().boundaryField()[patchi];
 
-    return pow(Cmu_, 0.25)*y*sqrt(kwc)/nuw;
+    return pow025(Cmu_)*y*sqrt(kwc)/nuw;
 }
 
 

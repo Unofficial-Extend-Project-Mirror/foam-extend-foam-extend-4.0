@@ -149,10 +149,11 @@ SpalartAllmaras::SpalartAllmaras
     const volVectorField& U,
     const surfaceScalarField& phi,
     transportModel& transport,
+    const word& turbulenceModelName,
     const word& modelName
 )
 :
-    LESModel(modelName, U, phi, transport),
+    LESModel(modelName, U, phi, transport, turbulenceModelName),
 
     sigmaNut_
     (

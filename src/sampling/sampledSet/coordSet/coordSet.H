@@ -52,16 +52,38 @@ class coordSet
     public pointField
 {
 
+public:
+
+    // Public data types
+
+        //- Enumeration defining the output format for coordinates
+        enum coordFormat
+        {
+            XYZ,
+            X,
+            Y,
+            Z,
+            DISTANCE
+        };
+
+
+private:
+
+        //- String representation of coordFormat enums
+        static const NamedEnum<coordFormat, 5> coordFormatNames_;
+
+
 protected:
 
         //- Name
         const word name_;
 
         //- Axis write type
-        const word axis_;
+        const coordFormat axis_;
 
-        //- Reference point for "distance" write specifier.
-        point refPoint_;
+        //- Cumulative distance "distance" write specifier.
+        scalarList curveDist_;
+
 
 public:
 
@@ -81,16 +103,7 @@ public:
             const word& name,
             const word& axis,
             const List<point>& points,
-            const point& refPoint = point::zero
-        );
-
-        //- Construct from components
-        coordSet
-        (
-            const word& name,
-            const word& axis,
-            const scalarField& points,
-            const scalar refPoint = 0.0
+            const scalarList& curveDist
         );
 
 
@@ -101,33 +114,26 @@ public:
             return name_;
         }
 
-        const word& axis() const
+        word axis() const
         {
-            return axis_;
+            return coordFormatNames_[axis_];
         }
 
-        const point& refPoint() const
+        //- Cumulative distance
+        const scalarList& curveDist() const
         {
-            return refPoint_;
+            return curveDist_;
         }
 
         //- Is axis specification a vector
         bool hasVectorAxis() const;
 
         //- Get coordinate of point according to axis specification.
-        //  If axis="distance" can be: -distance to starting point (e.g.
-        //  uniformSet) or -distance to first sampling point
-        //  (e.g. cloudSet)
-        scalar scalarCoord
-        (
-            const label index
-        ) const;
+        //  If axis="distance" is the curveDist[index]
+        scalar scalarCoord(const label index) const;
 
-        //- Get point according to axis="full" specification
-        vector vectorCoord
-        (
-            const label index
-        ) const;
+        //- Get point according to axis="xyz" specification
+        vector vectorCoord(const label index) const;
 
         Ostream& write(Ostream& os) const;
 };

@@ -90,10 +90,12 @@ realizableKE::realizableKE
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& phi,
-    const basicThermo& thermophysicalModel
+    const basicThermo& thermophysicalModel,
+    const word& turbulenceModelName,
+    const word& modelName
 )
 :
-    RASModel(typeName, rho, U, phi, thermophysicalModel),
+    RASModel(modelName, rho, U, phi, thermophysicalModel, turbulenceModelName),
 
     Cmu_
     (

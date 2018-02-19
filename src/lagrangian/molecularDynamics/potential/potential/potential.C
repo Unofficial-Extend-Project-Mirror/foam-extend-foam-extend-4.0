@@ -105,7 +105,7 @@ void Foam::potential::potential::readPotentialDict()
             "idList",
             mesh_.time().constant(),
             mesh_,
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE
         )
     );
@@ -119,7 +119,7 @@ void Foam::potential::potential::readPotentialDict()
             "moleculeProperties",
             mesh_.time().constant(),
             mesh_,
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE,
             false
         )
@@ -151,7 +151,7 @@ void Foam::potential::potential::readPotentialDict()
             "potentialDict",
             mesh_.time().system(),
             mesh_,
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE
         )
     );
@@ -260,7 +260,7 @@ void Foam::potential::potential::readMdInitialiseDict
             "moleculeProperties",
             mesh_.time().constant(),
             mesh_,
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE,
             false
         )

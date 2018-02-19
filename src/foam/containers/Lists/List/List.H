@@ -187,6 +187,9 @@ public:
             //- Clear the list, i.e. set size to zero.
             void clear();
 
+            //- Append an element at the end of the list
+            inline void append(const T&);
+
             //- Append a List at the end of this list
             inline void append(const UList<T>&);
 

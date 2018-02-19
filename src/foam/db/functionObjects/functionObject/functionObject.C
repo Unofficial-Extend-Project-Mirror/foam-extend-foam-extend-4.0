@@ -26,6 +26,7 @@ License
 #include "functionObject.H"
 #include "dictionary.H"
 #include "dlLibraryTable.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -63,12 +64,24 @@ Foam::autoPtr<Foam::functionObject> Foam::functionObject::New
         Info<< "Selecting function " << functionType << endl;
     }
 
-    dlLibraryTable::open
-    (
-        functionDict,
-        "functionObjectLibs",
-        dictionaryConstructorTablePtr_
-    );
+    if (functionDict.found("functionObjectLibs"))
+    {
+        const_cast<Time&>(t).libs().open
+        (
+            functionDict,
+            "functionObjectLibs",
+            dictionaryConstructorTablePtr_
+        );
+    }
+    else
+    {
+        const_cast<Time&>(t).libs().open
+        (
+            functionDict,
+            "libs",
+            dictionaryConstructorTablePtr_
+        );
+    }
 
     if (!dictionaryConstructorTablePtr_)
     {
@@ -118,7 +131,19 @@ const Foam::word& Foam::functionObject::name() const
 
 bool Foam::functionObject::end()
 {
-    return execute();
+    return execute(false);
+}
+
+
+bool Foam::functionObject::timeSet()
+{
+    return false;
+}
+
+
+bool Foam::functionObject::adjustTimeStep()
+{
+    return false;
 }
 
 

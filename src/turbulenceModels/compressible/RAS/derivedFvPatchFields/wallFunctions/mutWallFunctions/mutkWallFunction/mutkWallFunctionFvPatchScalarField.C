@@ -73,15 +73,16 @@ scalar mutkWallFunctionFvPatchScalarField::calcYPlusLam
 
 tmp<scalarField> mutkWallFunctionFvPatchScalarField::calcMut() const
 {
-    const label patchI = patch().index();
-    const RASModel& rasModel = db().lookupObject<RASModel>("RASProperties");
-    const scalarField& y = rasModel.y()[patchI];
-    const scalarField& rhow = rasModel.rho().boundaryField()[patchI];
-    const tmp<volScalarField> tk = rasModel.k();
+    const label patchi = patch().index();
+    const turbulenceModel& turbModel =
+        db().lookupObject<turbulenceModel>("turbulenceModel");
+    const scalarField& y = turbModel.y()[patchi];
+    const scalarField& rhow = turbModel.rho().boundaryField()[patchi];
+    const tmp<volScalarField> tk = turbModel.k();
     const volScalarField& k = tk();
-    const scalarField& muw = rasModel.mu().boundaryField()[patchI];
+    const scalarField& muw = turbModel.mu().boundaryField()[patchi];
 
-    const scalar Cmu25 = pow(Cmu_, 0.25);
+    const scalar Cmu25 = pow025(Cmu_);
 
     tmp<scalarField> tmutw(new scalarField(patch().size(), 0.0));
     scalarField& mutw = tmutw();
@@ -202,18 +203,19 @@ void mutkWallFunctionFvPatchScalarField::updateCoeffs()
 
 tmp<scalarField> mutkWallFunctionFvPatchScalarField::yPlus() const
 {
-    const label patchI = patch().index();
+    const label patchi = patch().index();
 
-    const RASModel& rasModel = db().lookupObject<RASModel>("RASProperties");
-    const scalarField& y = rasModel.y()[patchI];
+    const turbulenceModel& turbModel =
+        db().lookupObject<turbulenceModel>("turbulenceModel");
+    const scalarField& y = turbModel.y()[patchi];
 
-    const tmp<volScalarField> tk = rasModel.k();
+    const tmp<volScalarField> tk = turbModel.k();
     const volScalarField& k = tk();
-    const scalarField kwc = k.boundaryField()[patchI].patchInternalField();
-    const scalarField& muw = rasModel.mu().boundaryField()[patchI];
-    const scalarField& rhow = rasModel.rho().boundaryField()[patchI];
+    const scalarField kwc(k.boundaryField()[patchi].patchInternalField());
+    const scalarField& muw = turbModel.mu().boundaryField()[patchi];
+    const scalarField& rhow = turbModel.rho().boundaryField()[patchi];
 
-    return pow(Cmu_, 0.25)*y*sqrt(kwc)/(muw/rhow);
+    return pow025(Cmu_)*y*sqrt(kwc)/(muw/rhow);
 }
 
 

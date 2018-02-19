@@ -28,14 +28,17 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "objectRegistry.H"
 #include "foamTime.H"
 #include "OSspecific.H"
 #include "IStringStream.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Foam::instantList Foam::Time::findTimes(const fileName& directory)
+Foam::instantList Foam::Time::findTimes
+(
+    const fileName& directory,
+    const word& constantName
+)
 {
     if (debug)
     {
@@ -54,7 +57,7 @@ Foam::instantList Foam::Time::findTimes(const fileName& directory)
     bool haveConstant = false;
     forAll(dirEntries, i)
     {
-        if (dirEntries[i] == "constant")
+        if (dirEntries[i] == constantName)
         {
             Times[nTimes].value() = 0;
             Times[nTimes].name() = dirEntries[i];

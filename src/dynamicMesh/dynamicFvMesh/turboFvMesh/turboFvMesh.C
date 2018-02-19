@@ -167,7 +167,7 @@ Foam::turboFvMesh::turboFvMesh
                 "dynamicMeshDict",
                 time().constant(),
                 *this,
-                IOobject::MUST_READ,
+                IOobject::MUST_READ_IF_MODIFIED,
                 IOobject::NO_WRITE
             )
         ).subDict(typeName + "Coeffs")

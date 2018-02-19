@@ -576,12 +576,13 @@ Foam::label Foam::findSortedIndex
 }
 
 
-template<class ListType>
+template<class ListType, class BinaryOp>
 Foam::label Foam::findLower
 (
     const ListType& l,
     typename ListType::const_reference t,
-    const label start
+    const label start,
+    const BinaryOp& bop
 )
 {
     if (start >= l.size())
@@ -596,7 +597,7 @@ Foam::label Foam::findLower
     {
         label mid = (low + high)/2;
 
-        if (l[mid] < t)
+        if (bop(l[mid], t))
         {
             low = mid;
         }
@@ -606,13 +607,13 @@ Foam::label Foam::findLower
         }
     }
 
-    if (l[high] < t)
+    if (bop(l[high], t))
     {
         return high;
     }
     else
     {
-        if (l[low] < t)
+        if (bop(l[low], t))
         {
             return low;
         }
@@ -621,6 +622,18 @@ Foam::label Foam::findLower
             return -1;
         }
     }
+}
+
+
+template<class ListType>
+Foam::label Foam::findLower
+(
+    const ListType& l,
+    typename ListType::const_reference t,
+    const label start
+)
+{
+    return findLower(l, t, start, lessOp<typename ListType::value_type>());
 }
 
 
@@ -653,6 +666,107 @@ Foam::List<Container> Foam::initListList(const T elems[nRows][nColumns])
         lst[rowI] = cols;
     }
     return lst;
+}
+
+
+template<class T>
+void Foam::ListAppendEqOp<T>::operator()(List<T>& x, const List<T>& y) const
+{
+    if (y.size())
+    {
+        if (x.size())
+        {
+            label sz = x.size();
+            x.setSize(sz + y.size());
+            forAll(y, i)
+            {
+                x[sz++] = y[i];
+            }
+        }
+        else
+        {
+            x = y;
+        }
+    }
+}
+
+
+template<class ListType>
+ListType Foam::reverseList(const ListType& list)
+{
+    const label listSize = list.size();
+    const label lastIndex = listSize - 1;
+
+    ListType tmpList(listSize);
+
+    forAll(tmpList, elemI)
+    {
+        tmpList[elemI] = list[lastIndex - elemI];
+    }
+
+    return tmpList;
+}
+
+
+template<class ListType>
+void Foam::inplaceReverseList(ListType& list)
+{
+    const label listSize = list.size();
+    const label lastIndex = listSize - 1;
+    const label nIterations = listSize >> 1;
+
+    label elemI = 0;
+    while (elemI < nIterations)
+    {
+        Swap(list[elemI], list[lastIndex - elemI]);
+
+        elemI++;
+    }
+}
+
+
+template<class ListType>
+ListType Foam::rotateList(const ListType& list, const label n)
+{
+    const label listSize = list.size();
+
+    ListType tmpList(listSize);
+
+    forAll(tmpList, elemI)
+    {
+        label index = (elemI - n) % listSize;
+
+        if (index < 0)
+        {
+            index += listSize;
+        }
+
+        tmpList[elemI] = list[index];
+    }
+
+    return tmpList;
+}
+
+
+template<template<typename> class ListType, class DataType>
+void Foam::inplaceRotateList(ListType<DataType>& list, label n)
+{
+    const label listSize = list.size();
+
+    n = (listSize - n) % listSize;
+
+    if (n < 0)
+    {
+        n += listSize;
+    }
+
+    SubList<DataType> firstHalf(list, n, 0);
+    SubList<DataType> secondHalf(list, listSize - n, n);
+
+    inplaceReverseList(firstHalf);
+    inplaceReverseList(secondHalf);
+
+    inplaceReverseList(list);
 }
 
 

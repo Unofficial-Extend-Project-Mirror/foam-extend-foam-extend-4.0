@@ -74,9 +74,8 @@ public:
         IOField(const IOobject&, const Xfer<Field<Type> >&);
 
 
-    // Destructor
-
-        virtual ~IOField();
+    //- Destructor
+    virtual ~IOField();
 
 
     // Member functions

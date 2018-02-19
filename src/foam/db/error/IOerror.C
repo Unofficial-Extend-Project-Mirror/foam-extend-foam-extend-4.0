@@ -113,6 +113,43 @@ Foam::OSstream& Foam::IOerror::operator()
 }
 
 
+void Foam::IOerror::SafeFatalIOError
+(
+    const char* functionName,
+    const char* sourceFileName,
+    const int sourceFileLineNumber,
+    const IOstream& ioStream,
+    const string& msg
+)
+{
+    if (JobInfo::constructed)
+    {
+        FatalIOErrorIn
+        (
+            "primitiveEntry::readEntry(const dictionary&, Istream&)",
+            ioStream
+        )   << msg << Foam::exit(FatalIOError);
+    }
+    else
+    {
+        std::cerr
+            << std::endl
+            << "--> FOAM FATAL IO ERROR:" << std::endl
+            << msg
+            << std::endl
+            << "file: " << ioStream.name()
+            << " at line " << ioStream.lineNumber() << '.'
+            << std::endl << std::endl
+            << "    From function " << functionName
+            << std::endl
+            << "    in file " << sourceFileName
+            << " at line " << sourceFileLineNumber << '.'
+            << std::endl;
+        ::exit(1);
+    }
+}
+
+
 Foam::IOerror::operator Foam::dictionary() const
 {
     dictionary errDict(error::operator dictionary());
@@ -138,10 +175,7 @@ void Foam::IOerror::exit(const int)
 
     if (abort_)
     {
-        Perr<< endl << *this << endl
-            << "\nFOAM aborting (FOAM_ABORT set)\n" << endl;
-        printStack(Perr);
-        ::abort();
+        abort();
     }
 
     if (Pstream::parRun())
@@ -220,28 +254,31 @@ void Foam::IOerror::abort()
 
 Foam::Ostream& Foam::operator<<(Ostream& os, const IOerror& ioErr)
 {
-    os  << endl
-        << ioErr.title().c_str() << endl
-        << ioErr.message().c_str() << endl << endl;
-
-    os  << "file: " << ioErr.ioFileName().c_str();
-
-    if (ioErr.ioStartLineNumber() >= 0 && ioErr.ioEndLineNumber() >= 0)
+    if (!os.bad())
     {
-        os  << " from line " << ioErr.ioStartLineNumber()
-            << " to line " << ioErr.ioEndLineNumber() << '.';
-    }
-    else if (ioErr.ioStartLineNumber() >= 0)
-    {
-        os  << " at line " << ioErr.ioStartLineNumber() << '.';
-    }
+        os  << endl
+            << ioErr.title().c_str() << endl
+            << ioErr.message().c_str() << endl << endl;
 
-    if (IOerror::level >= 2 && ioErr.sourceFileLineNumber())
-    {
-        os  << endl << endl
-            << "    From function " << ioErr.functionName().c_str() << endl
-            << "    in file " << ioErr.sourceFileName().c_str()
-            << " at line " << ioErr.sourceFileLineNumber() << '.';
+        os  << "file: " << ioErr.ioFileName().c_str();
+
+        if (ioErr.ioStartLineNumber() >= 0 && ioErr.ioEndLineNumber() >= 0)
+        {
+            os  << " from line " << ioErr.ioStartLineNumber()
+                << " to line " << ioErr.ioEndLineNumber() << '.';
+        }
+        else if (ioErr.ioStartLineNumber() >= 0)
+        {
+            os  << " at line " << ioErr.ioStartLineNumber() << '.';
+        }
+
+        if (IOerror::level >= 2 && ioErr.sourceFileLineNumber())
+        {
+            os  << endl << endl
+                << "    From function " << ioErr.functionName().c_str() << endl
+                << "    in file " << ioErr.sourceFileName().c_str()
+                << " at line " << ioErr.sourceFileLineNumber() << '.';
+        }
     }
 
     return os;

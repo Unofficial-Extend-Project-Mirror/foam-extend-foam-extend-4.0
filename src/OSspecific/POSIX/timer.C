@@ -32,13 +32,17 @@ Description
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::timer, 0);
+namespace Foam
+{
+defineTypeNameAndDebug(timer, 0);
 
-jmp_buf Foam::timer::envAlarm;
+jmp_buf timer::envAlarm;
 
-struct sigaction Foam::timer::oldAction_;
+struct sigaction timer::oldAction_;
 
-unsigned int Foam::timer::oldTimeOut_ = 0;
+unsigned int timer::oldTimeOut_ = 0;
+}
+
 
 // * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
 
@@ -55,8 +59,6 @@ void Foam::timer::signalHandler(int)
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-
-// Construct from components
 Foam::timer::timer(const unsigned int newTimeOut)
 :
     newTimeOut_(newTimeOut)

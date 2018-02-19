@@ -75,7 +75,7 @@ void Foam::equationReader::parse(label index) const
 
         // Bug fix - equations ending in brackets read an extra token of type
         // FATALERROR at the end, caused by string replace ')' with ' ) ' above
-        if (tl[tl.size() - 1].type() == token::FATALERROR)
+        if (tl[tl.size() - 1].type() == token::ERROR)
         {
             tl.setSize(tl.size() - 1);
             forceEnd = true;

@@ -37,6 +37,8 @@ fields
     sigmaxx
 );
 
+surfaceFormat null;
+
 surfaces
 (
 );

@@ -82,7 +82,7 @@ bool Foam::divFlux::start()
 }
 
 
-bool Foam::divFlux::execute()
+bool Foam::divFlux::execute(const bool forceWrite)
 {
     const fvMesh& mesh =
         time_.lookupObject<fvMesh>(regionName_);

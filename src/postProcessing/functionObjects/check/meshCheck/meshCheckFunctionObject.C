@@ -77,7 +77,7 @@ bool Foam::meshCheckFunctionObject::start()
 }
 
 
-bool Foam::meshCheckFunctionObject::execute()
+bool Foam::meshCheckFunctionObject::execute(const bool forceWrite)
 {
     const polyMesh& mesh =
         time_.lookupObject<polyMesh>(regionName_);
@@ -89,6 +89,12 @@ bool Foam::meshCheckFunctionObject::execute()
 
     mesh.checkGeometry(true);
 
+    return true;
+}
+
+
+bool Foam::meshCheckFunctionObject::timeSet()
+{
     return true;
 }
 

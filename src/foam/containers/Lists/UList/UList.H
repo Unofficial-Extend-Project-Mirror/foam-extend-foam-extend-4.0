@@ -45,6 +45,7 @@ SourceFiles
 #include "bool.H"
 #include "label.H"
 #include "uLabel.H"
+#include "nullObject.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,7 +59,9 @@ template<class T> class SubList;
 // Forward declaration of friend functions and operators
 template<class T> class UList;
 template<class T> Ostream& operator<<(Ostream&, const UList<T>&);
+template<class T> Istream& operator>>(Istream&, UList<T>&);
 
+typedef UList<label> labelUList;
 
 /*---------------------------------------------------------------------------*\
                            Class UList Declaration

@@ -86,7 +86,7 @@ void Foam::functionEntries::inputModeEntry::setMode(Istream& is)
     }
     else if (mode == "error")
     {
-        mode_ = FATALERROR;
+        mode_ = ERROR;
     }
     else
     {
@@ -136,7 +136,7 @@ bool Foam::functionEntries::inputModeEntry::protect()
 
 bool Foam::functionEntries::inputModeEntry::error()
 {
-    return mode_ == FATALERROR;
+    return mode_ == ERROR;
 }
 
 

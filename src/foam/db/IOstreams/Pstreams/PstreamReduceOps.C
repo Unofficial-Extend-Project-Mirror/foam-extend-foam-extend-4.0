@@ -31,12 +31,10 @@ License
 #include "allReduce.H"
 
 // Check type of label for use in MPI calls
-#if defined(WM_INT)
+#if WM_LABEL_SIZE == 32
 #   define MPI_LABEL MPI_INT
-#elif defined(WM_LONG)
+#elif WM_LABEL_SIZE == 64
 #   define MPI_LABEL MPI_LONG
-#elif defined(WM_LLONG)
-#   define MPI_LABEL MPI_LONG_LONG
 #endif
 
 // Check type of scalar for use in MPI calls

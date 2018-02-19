@@ -204,6 +204,8 @@ sets
 surfaces
 ();
 
+surfaceFormat null;
+
 fields
 (
     N1

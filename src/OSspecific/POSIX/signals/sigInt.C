@@ -23,8 +23,8 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
 #include "sigInt.H"
+#include "error.H"
 #include "JobInfo.H"
 #include "IOstreams.H"
 
@@ -32,16 +32,17 @@ License
 
 struct sigaction Foam::sigInt::oldAction_;
 
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::sigInt::sigIntHandler(int)
+void Foam::sigInt::sigHandler(int)
 {
     // Reset old handling
     if (sigaction(SIGINT, &oldAction_, NULL) < 0)
     {
         FatalErrorIn
         (
-            "Foam::sigInt::sigIntHandler()"
+            "Foam::sigInt::sigHandler()"
         )   << "Cannot reset SIGINT trapping"
             << abort(FatalError);
     }
@@ -80,7 +81,7 @@ Foam::sigInt::~sigInt()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::sigInt::set(const bool verbose)
+void Foam::sigInt::set(const bool)
 {
     if (oldAction_.sa_handler)
     {
@@ -92,7 +93,7 @@ void Foam::sigInt::set(const bool verbose)
     }
 
     struct sigaction newAction;
-    newAction.sa_handler = sigIntHandler;
+    newAction.sa_handler = sigHandler;
     newAction.sa_flags = SA_NODEFER;
     sigemptyset(&newAction.sa_mask);
     if (sigaction(SIGINT, &newAction, &oldAction_) < 0)

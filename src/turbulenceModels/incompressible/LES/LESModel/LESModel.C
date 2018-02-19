@@ -57,10 +57,11 @@ LESModel::LESModel
     const word& type,
     const volVectorField& U,
     const surfaceScalarField& phi,
-    transportModel& lamTransportModel
+    transportModel& transport,
+    const word& turbulenceModelName
 )
 :
-    turbulenceModel(U, phi, lamTransportModel),
+    turbulenceModel(U, phi, transport, turbulenceModelName),
 
     IOdictionary
     (
@@ -69,7 +70,7 @@ LESModel::LESModel
             "LESProperties",
             U.time().constant(),
             U.db(),
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE
         )
     ),
@@ -94,7 +95,8 @@ autoPtr<LESModel> LESModel::New
 (
     const volVectorField& U,
     const surfaceScalarField& phi,
-    transportModel& transport
+    transportModel& transport,
+    const word& turbulenceModelName
 )
 {
     word modelName;
@@ -110,8 +112,9 @@ autoPtr<LESModel> LESModel::New
                 "LESProperties",
                 U.time().constant(),
                 U.db(),
-                IOobject::MUST_READ,
-                IOobject::NO_WRITE
+                IOobject::MUST_READ_IF_MODIFIED,
+                IOobject::NO_WRITE,
+                false
             )
         );
 
@@ -136,7 +139,10 @@ autoPtr<LESModel> LESModel::New
             << exit(FatalError);
     }
 
-    return autoPtr<LESModel>(cstrIter()(U, phi, transport));
+    return autoPtr<LESModel>
+    (
+        cstrIter()(U, phi, transport, turbulenceModelName)
+    );
 }
 
 
@@ -157,7 +163,22 @@ void LESModel::correct()
 
 bool LESModel::read()
 {
-    if (regIOobject::read())
+    //if (regIOobject::read())
+
+    // Bit of trickery : we are both IOdictionary ('RASProperties') and
+    // an regIOobject from the turbulenceModel level. Problem is to distinguish
+    // between the two - we only want to reread the IOdictionary.
+
+    bool ok = IOdictionary::readData
+    (
+        IOdictionary::readStream
+        (
+            IOdictionary::type()
+        )
+    );
+    IOdictionary::close();
+
+    if (ok)
     {
         if (const dictionary* dictPtr = subDictPtr(type() + "Coeffs"))
         {

@@ -63,7 +63,7 @@ functions
         enabled         true;
         outputControl   outputTime;
         log             true;
-        valueOutput     true;
+        valueOutput     false;
         source          patch;
         sourceName      outlet;
         operation       weightedAverage;

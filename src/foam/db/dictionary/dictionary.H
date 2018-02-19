@@ -112,6 +112,23 @@ public:
         {
             return name_;
         }
+
+        //- Return the local dictionary name (final part of scoped name)
+        const word dictName() const
+        {
+            const word scopedName = name_.name();
+
+            string::size_type i = scopedName.rfind('.');
+
+            if (i == scopedName.npos)
+            {
+                return scopedName;
+            }
+            else
+            {
+                return scopedName.substr(i + 1, scopedName.npos);
+            }
+        }
 };
 
 
@@ -125,6 +142,10 @@ class dictionary
     public IDLList<entry>
 {
     // Private data
+
+        //- If true write optional keywords and values
+        //  if not present in dictionary
+        static bool writeOptionalEntries;
 
         //- HashTable of the entries held on the DL-list for quick lookup
         HashTable<entry*> hashedEntries_;
@@ -191,9 +212,13 @@ public:
             Istream&
         );
 
-        //- Construct top-level dictionary from Istream, reading entries
-        //  until EOF
+        //- Construct top-level dictionary from Istream,
+        //  reading entries until EOF
         dictionary(Istream&);
+
+        //- Construct top-level dictionary from Istream,
+        //  reading entries until EOF, optionally keeping the header
+        dictionary(Istream&, const bool keepHeader);
 
         //- Construct as copy given the parent dictionary
         dictionary(const dictionary& parentDict, const dictionary&);
@@ -205,8 +230,8 @@ public:
         //  A null pointer is treated like an empty dictionary.
         dictionary(const dictionary*);
 
-        //- Construct by transferring parameter contents from
-        //  given parent dictionary
+        //- Construct by transferring parameter contents given parent
+        //  dictionary
         dictionary(const dictionary& parentDict, const Xfer<dictionary>&);
 
         //- Construct top-level dictionary by transferring parameter contents
@@ -219,9 +244,8 @@ public:
         static autoPtr<dictionary> New(Istream&);
 
 
-    // Destructor
-
-        ~dictionary();
+    //- Destructor
+    virtual ~dictionary();
 
 
     // Member functions
@@ -232,6 +256,9 @@ public:
             return parent_;
         }
 
+        //- Return the top of the tree
+        const dictionary& topDict() const;
+
         //- Return line number of first token in dictionary
         label startLineNumber() const;
 
@@ -241,12 +268,21 @@ public:
         //- Return the SHA1 digest of the dictionary contents
         SHA1Digest digest() const;
 
+        //- Return the dictionary as a list of tokens
+        tokenList tokens() const;
+
 
         // Search and lookup
 
             //- Search dictionary for given keyword
             //  If recursive, search parent dictionaries
-            bool found(const word&, bool recursive = false) const;
+            //  If patternMatch, use regular expressions
+            bool found
+            (
+                const word&,
+                bool recursive = false,
+                bool patternMatch = true
+            ) const;
 
             //- Find and return an entry data stream pointer if present
             //  otherwise return NULL.
@@ -270,8 +306,7 @@ public:
                 bool patternMatch
             );
 
-            //- Find and return an entry data stream
-            //  if present otherwise error.
+            //- Find and return an entry data stream if present otherwise error.
             //  If recursive, search parent dictionaries.
             //  If patternMatch, use regular expressions.
             const entry& lookupEntry
@@ -330,6 +365,15 @@ public:
                 bool patternMatch = true
             ) const;
 
+            //- Find and return an entry data stream pointer if present
+            //  otherwise return NULL. Allows scoping using '.'
+            const entry* lookupScopedEntryPtr
+            (
+                const word&,
+                bool recursive,
+                bool patternMatch
+            ) const;
+
             //- Check if entry is a sub-dictionary
             bool isDict(const word&) const;
 
@@ -345,10 +389,17 @@ public:
 
             //- Find and return a sub-dictionary as a copy, or
             //  return an empty dictionary if the sub-dictionary does not exist
-            dictionary subOrEmptyDict(const word&) const;
+            dictionary subOrEmptyDict
+            (
+                const word&,
+                const bool mustRead = false
+            ) const;
 
             //- Return the table of contents
             wordList toc() const;
+
+            //- Return the sorted table of contents
+            wordList sortedToc() const;
 
             //- Return the list of available keys or patterns
             List<keyType> keys(bool patterns = false) const;
@@ -359,6 +410,10 @@ public:
             //- Substitute the given keyword prepended by '$' with the
             //  corresponding sub-dictionary entries
             bool substituteKeyword(const word& keyword);
+
+            //- Substitute the given scoped keyword prepended by '$' with the
+            //  corresponding sub-dictionary entries
+            bool substituteScopedKeyword(const word& keyword);
 
             //- Add a new entry
             //  With the merge option, dictionaries are interwoven and
@@ -444,10 +499,14 @@ public:
             //- Read dictionary from Istream
             bool read(Istream&);
 
+            //- Read dictionary from Istream, optionally keeping the header
+            bool read(Istream&, const bool keepHeader);
+
 
         // Write
 
-            void write(Ostream&, bool subDict = true) const;
+            //- Write dictionary, normally with sub-dictionary formatting
+            void write(Ostream&, const bool subDict = true) const;
 
 
     // Member Operators
@@ -500,7 +559,7 @@ dictionary operator|(const dictionary& dict1, const dictionary& dict2);
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "dictionaryTemplates.C"
+    #include "dictionaryTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

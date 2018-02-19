@@ -25,6 +25,8 @@ Class
     Foam::outputFilterOutputControl
 
 Description
+    An output control for function objects.
+    The default is time-step execution at every interval.
 
 SourceFiles
     outputFilterOutputControl.C
@@ -35,7 +37,7 @@ SourceFiles
 #define outputFilterOutputControl_H
 
 #include "dictionary.H"
-#include "objectRegistry.H"
+#include "foamTime.H"
 #include "NamedEnum.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -51,10 +53,16 @@ class outputFilterOutputControl
 {
 public:
 
+    //- The output control options
     enum outputControls
     {
-        ocTimeStep,
-        ocOutputTime
+        ocTimeStep,       /*!< execution is coupled to the time-step */
+        ocOutputTime,     /*!< execution is coupled to the output-time */
+        ocAdjustableTime, /*!< Adjust time step for dumping */
+        ocRunTime,        /*!< run time for dumping */
+        ocClockTime,      /*!< clock time for dumping */
+        ocCpuTime,        /*!< cpu time for dumping */
+        ocNone            /*!< no output */
     };
 
 
@@ -65,15 +73,24 @@ private:
         //- Time object
         const Time& time_;
 
+        //- Prefix
+        const word prefix_;
+
         //- String representation of outputControls enums
-        static const NamedEnum<outputControls, 2> outputControlNames_;
+        static const NamedEnum<outputControls, 7> outputControlNames_;
 
         //- Type of output
         outputControls outputControl_;
 
-        //- The execution interval (in time steps) when using TIMESTEP mode
+        //- The execution interval (in time steps) when using \c timeStep mode,
         //  a value <= 1 means execute at every time step
         label outputInterval_;
+
+        //- Dumping counter for ocOutputTime or index dump for ocAdjustableTime
+        label outputTimeLastDump_;
+
+        //- Dump each deltaT (adjust Ttime)
+        scalar writeInterval_;
 
 
     // Private Member Functions
@@ -88,10 +105,15 @@ public:
     // Constructors
 
         //- Construct from Time object and dictionary
-        outputFilterOutputControl(const Time&, const dictionary&);
+        outputFilterOutputControl
+        (
+            const Time&,
+            const dictionary&,
+            const word& prefix
+        );
 
 
-    // Destructor
+    //- Destructor
         ~outputFilterOutputControl();
 
 
@@ -107,7 +129,25 @@ public:
         }
 
         //- Flag to indicate whether to output
-        bool output() const;
+        bool output();
+
+        //- Return outputControl
+        outputControls outputControl() const
+        {
+            return outputControl_;
+        }
+
+        //- Return writeInterval
+        scalar writeInterval() const
+        {
+            return writeInterval_;
+        }
+
+        //- Return outputTimeLastDump
+        label outputTimeLastDump() const
+        {
+            return outputTimeLastDump_;
+        }
 };
 
 

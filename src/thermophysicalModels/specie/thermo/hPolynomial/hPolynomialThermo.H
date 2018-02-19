@@ -40,7 +40,7 @@ SourceFiles
 #define hPolynomialThermo_H
 
 #include "scalar.H"
-#include "PolynomialTemplate.H"
+#include "Polynomial.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

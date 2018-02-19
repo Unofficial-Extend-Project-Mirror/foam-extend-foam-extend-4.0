@@ -10,7 +10,6 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    location    "system";
     object      controlDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -37,33 +36,54 @@ writeFormat     ascii;
 
 writePrecision  6;
 
-writeCompression uncompressed;
+writeCompression off;
 
 timeFormat      general;
 
 timePrecision   6;
 
-runTimeModifiable yes;
+runTimeModifiable true;
 
 functions
-(
+{
     faceObj1
     {
         type            faceSource;
         functionObjectLibs ("libfieldFunctionObjects.so");
+
         enabled         true;
         outputControl   outputTime;
+
+        // Output to log&file (true) or to file only
         log             true;
+
+        // Output field values as well
         valueOutput     true;
+
+        // Type of source: patch/faceZone/sampledSurface
         source          patch;
+
+        // if patch or faceZone: name of patch or faceZone
         sourceName      movingWall;
-//        source          faceZone;
-//        sourceName      f0;
+
+        //// if sampledSurface: dictionary with a sampledSurface
+        //// Note: will not sample surface fields.
+        //sampledSurfaceDict
+        //{
+        //    // Sampling on triSurface
+        //    type        sampledTriSurfaceMesh;
+        //    surface     integrationPlane.stl;
+        //    source      cells;  // sample cells or boundaryFaces
+        //    interpolate true;
+        //}
+
+        // Operation: areaAverage/sum/weightedAverage ...
         operation       areaAverage;
+
         fields
         (
             p
-            phi
+            phi         // surface fields not supported for sampledSurface
             U
         );
     }
@@ -79,6 +99,7 @@ functions
         source          faceZone;
         sourceName      f0;
         operation       sum;
+
         fields
         (
             phi
@@ -96,13 +117,14 @@ functions
         source          cellZone;
         sourceName      c0;
         operation       volAverage;
+
         fields
         (
             p
             U
         );
     }
-);
+}
 
 
 // ************************************************************************* //

@@ -26,7 +26,7 @@ Typedef
 
 Description
     FunctionObject wrapper around dsmcFields to allow it to be created via
-    the functions list within controlDict.
+    the functions entry within controlDict.
 
 SourceFiles
     dsmcFieldsFunctionObject.C

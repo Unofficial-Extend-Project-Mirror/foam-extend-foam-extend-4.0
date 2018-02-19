@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     (
         probes::typeName,
         mesh,
-        "probesDict",
+        word("probesDict"),
         IOobject::MUST_READ,
         true
     );

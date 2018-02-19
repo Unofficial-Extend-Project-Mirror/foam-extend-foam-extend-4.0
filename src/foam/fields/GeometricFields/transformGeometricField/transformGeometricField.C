@@ -145,7 +145,7 @@ tmp<GeometricField<Type, PatchField, GeoMesh> > transform
 {
     tmp<GeometricField<Type, PatchField, GeoMesh> > tranf
     (
-        new GeometricField<vector, PatchField, GeoMesh>
+        new GeometricField<Type, PatchField, GeoMesh>
         (
             IOobject
             (

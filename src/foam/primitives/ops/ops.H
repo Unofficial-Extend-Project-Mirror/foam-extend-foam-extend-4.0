@@ -222,6 +222,18 @@ class cmptMultiplyOp
 { public: T operator()(const T& x, const T& y) const { return cmptMultiply(x, y); } };
 
 template<class T, class T1, class T2>
+class cmptPowOp3
+{ public: T operator()(const T1& x, const T2& y) const { return cmptPow(x, y); } };
+
+template<class T1, class T2>
+class cmptPowOp2
+{ public: T1 operator()(const T1& x, const T2& y) const { return cmptPow(x, y); } };
+
+template<class T>
+class cmptPowOp
+{ public: T operator()(const T& x, const T& y) const { return cmptPow(x, y); } };
+
+template<class T, class T1, class T2>
 class cmptDivideOp3
 { public: T operator()(const T1& x, const T2& y) const { return cmptDivide(x, y); } };
 
@@ -317,6 +329,53 @@ template<class T>
 class eqEqOp
 { public: T operator()(const T& x, const T& y) const { return x == y; } };
 
+template<class T, class T1, class T2>
+class lessOp3
+{ public: T operator()(const T1& x, const T2& y) const { return x < y; } };
+
+template<class T1, class T2>
+class lessOp2
+{ public: T1 operator()(const T1& x, const T2& y) const { return x < y; } };
+
+template<class T>
+class lessOp
+{ public: T operator()(const T& x, const T& y) const { return x < y; } };
+
+template<class T, class T1, class T2>
+class lessEqOp3
+{ public: T operator()(const T1& x, const T2& y) const { return x <= y; } };
+
+template<class T1, class T2>
+class lessEqOp2
+{ public: T1 operator()(const T1& x, const T2& y) const { return x <= y; } };
+
+template<class T>
+class lessEqOp
+{ public: T operator()(const T& x, const T& y) const { return x <= y; } };
+
+template<class T, class T1, class T2>
+class greaterOp3
+{ public: T operator()(const T1& x, const T2& y) const { return x > y; } };
+
+template<class T1, class T2>
+class greaterOp2
+{ public: T1 operator()(const T1& x, const T2& y) const { return x > y; } };
+
+template<class T>
+class greaterOp
+{ public: T operator()(const T& x, const T& y) const { return x > y; } };
+
+template<class T, class T1, class T2>
+class greaterEqOp3
+{ public: T operator()(const T1& x, const T2& y) const { return x >= y; } };
+
+template<class T1, class T2>
+class greaterEqOp2
+{ public: T1 operator()(const T1& x, const T2& y) const { return x >= y; } };
+
+template<class T>
+class greaterEqOp
+{ public: T operator()(const T& x, const T& y) const { return x >= y; } };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

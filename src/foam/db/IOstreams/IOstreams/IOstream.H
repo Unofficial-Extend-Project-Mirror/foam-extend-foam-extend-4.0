@@ -51,8 +51,6 @@ SourceFiles
 #include "InfoProxy.H"
 #include "infoSwitch.H"
 
-#include "debug.H"
-
 #include <iostream>
 
 
@@ -215,7 +213,7 @@ public:
         static const versionNumber currentVersion;
 
         //- Default precision
-        static Foam::debug::infoSwitch precision_;
+        static debug::infoSwitch precision_;
 
 private:
 

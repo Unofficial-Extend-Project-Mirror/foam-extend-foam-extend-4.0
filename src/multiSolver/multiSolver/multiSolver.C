@@ -925,7 +925,7 @@ void Foam::multiSolver::readMultiDictDirectory
                             sourcePath.name(),
                             local,
                             multiDictRegistry_,
-                            IOobject::MUST_READ,
+                            IOobject::MUST_READ_IF_MODIFIED,
                             IOobject::NO_WRITE
                         )
                     )
@@ -1136,7 +1136,7 @@ Foam::multiSolver::multiSolver
             multiControlDictName,
             multiDictRegistry_.system(),
             multiDictRegistry_,
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE,
             false
         ),
@@ -1196,7 +1196,7 @@ Foam::multiSolver::multiSolver
             multiControlDictName,
             multiDictRegistry_.system(),
             multiDictRegistry_,
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE,
             false
         )

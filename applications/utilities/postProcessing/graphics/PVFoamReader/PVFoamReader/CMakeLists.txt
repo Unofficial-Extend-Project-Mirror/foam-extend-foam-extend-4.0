@@ -18,11 +18,16 @@ SET(PVFoamReader_LIBS
 
 INCLUDE_DIRECTORIES(
     $ENV{WM_PROJECT_DIR}/src/OpenFOAM/lnInclude
+    $ENV{WM_PROJECT_DIR}/src/OSspecific/$ENV{WM_OSTYPE}/lnInclude
     $ENV{WM_PROJECT_DIR}/src/finiteVolume/lnInclude
     $ENV{ParaView_INST_DIR}/include
     ../vtkFoam/lnInclude
 )
-ADD_DEFINITIONS(-DWM_$ENV{WM_PRECISION_OPTION})
+
+ADD_DEFINITIONS(
+    -DWM_$ENV{WM_PRECISION_OPTION}
+    -DWM_LABEL_SIZE=$ENV{WM_LABEL_SIZE}
+)
 
 #-----------------------------------------------------------------------------
 # Most users should not need to change anything below this line.

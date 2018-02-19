@@ -97,4 +97,16 @@ inline Foam::label& Foam::regIOobject::eventNo()
 }
 
 
+inline Foam::label Foam::regIOobject::watchIndex() const
+{
+    return watchIndex_;
+}
+
+
+inline Foam::label& Foam::regIOobject::watchIndex()
+{
+    return watchIndex_;
+}
+
+
 // ************************************************************************* //

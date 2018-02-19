@@ -49,13 +49,6 @@ adjustTimeStep  no;
 
 functions
 (
-    dsmcFields1
-    {
-        type dsmcFields;
-        enabled   on;
-        functionObjectLibs ( "libutilityFunctionObjects.so" );
-        outputControl     outputTime;
-    }
     fieldAverage1
     {
         type fieldAverage;
@@ -119,6 +112,13 @@ functions
                 base time;
             }
         );
+    }
+    dsmcFields1
+    {
+        type dsmcFields;
+        enabled   on;
+        functionObjectLibs ( "libutilityFunctionObjects.so" );
+        outputControl     outputTime;
     }
 );
 

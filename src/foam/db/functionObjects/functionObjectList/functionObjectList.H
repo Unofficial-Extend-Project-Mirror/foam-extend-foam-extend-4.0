@@ -49,6 +49,8 @@ SourceFiles
 namespace Foam
 {
 
+class mapPolyMesh;
+
 /*---------------------------------------------------------------------------*\
                      Class functionObjectList Declaration
 \*---------------------------------------------------------------------------*/
@@ -108,7 +110,7 @@ public:
 
         //- Construct from Time, a dictionary with "functions" entry
         //  and the execution setting.
-        //  @param[in]  parentDict - the parent dictionary containing
+        //  \param[in]  parentDict - the parent dictionary containing
         //    a "functions" entry, which can either be a list or a dictionary
         //    of functionObject specifications.
         functionObjectList
@@ -119,7 +121,7 @@ public:
         );
 
 
-    // Destructor
+    //- Destructor
 
         virtual ~functionObjectList();
 
@@ -138,6 +140,8 @@ public:
         //- Clear the list of function objects
         virtual void clear();
 
+        //- Find the ID of a given function object by name
+        virtual label findObjectID(const word& name) const;
 
         //- Switch the function objects on
         virtual void on();
@@ -152,15 +156,28 @@ public:
         //- Called at the start of the time-loop
         virtual bool start();
 
-        //- Called at each ++ or += of the time-loop
-        virtual bool execute();
+        //- Called at each ++ or += of the time-loop. forceWrite overrides
+        //  the usual outputControl behaviour and forces writing always
+        //  (used in postprocessing mode)
+        virtual bool execute(const bool forceWrite = false);
 
         //- Called when Time::run() determines that the time-loop exits
         virtual bool end();
 
+        //- Called when time was set at the end of the Time::operator++
+        virtual bool timeSet();
+
+        //- Called at the end of Time::adjustDeltaT() if adjustTime is true
+        virtual bool adjustTimeStep();
+
         //- Read and set the function objects if their data have changed
         virtual bool read();
 
+        //- Update for changes of mesh
+        virtual void updateMesh(const mapPolyMesh& mpm);
+
+        //- Update for changes of mesh
+        virtual void movePoints(const pointField& mesh);
 };
 
 

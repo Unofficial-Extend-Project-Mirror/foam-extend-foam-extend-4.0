@@ -21,9 +21,6 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-InClass
-    Foam::runTimeSelectionTables
-
 Description
     Macros for easy insertion into run-time selection tables
 
@@ -50,7 +47,28 @@ Description
                                                                               \
     /* Add the thisType constructor function to the table, find by lookup */  \
     baseType::add##argNames##ConstructorToTable< thisType >                   \
-        add_##lookup##_##thisType##argNames##ConstructorTo##baseType##Table_(#lookup)
+        add_##lookup##_##thisType##argNames##ConstructorTo##baseType##Table_  \
+        (#lookup)
+
+
+// add to hash-table of functions with typename as the key
+#define addRemovableToRunTimeSelectionTable\
+(baseType,thisType,argNames)                                                  \
+                                                                              \
+    /* Add the thisType constructor function to the table */                  \
+    baseType::addRemovable##argNames##ConstructorToTable< thisType >          \
+        addRemovable##thisType##argNames##ConstructorTo##baseType##Table_
+
+
+// add to hash-table of functions with 'lookup' as the key
+#define addRemovableNamedToRunTimeSelectionTable\
+(baseType,thisType,argNames,lookup)                                           \
+                                                                              \
+    /* Add the thisType constructor function to the table, find by lookup */  \
+    baseType::addRemovable##argNames##ConstructorToTable< thisType >          \
+        addRemovable_##lookup##_##thisType##argNames##ConstructorTo           \
+        ##baseType##Table_(#lookup)
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -72,7 +90,8 @@ Description
                                                                               \
     /* Add the thisType constructor function to the table, find by lookup */  \
     baseType::add##argNames##ConstructorToTable< thisType< Targ > >           \
-        add_##lookup##_##thisType##Targ##argNames##ConstructorTo##baseType##Table_(#lookup)
+        add_##lookup##_##thisType##Targ##argNames##ConstructorTo##baseType    \
+        ##Table_(#lookup)
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -95,7 +114,8 @@ Description
                                                                               \
     /* Add the thisType constructor function to the table, find by lookup */  \
     baseType< Targ >::add##argNames##ConstructorToTable< thisType< Targ > >   \
-        add_##lookup##_##thisType##Targ##argNames##ConstructorTo##baseType##Targ##Table_(#lookup)
+        add_##lookup##_##thisType##Targ##argNames##ConstructorTo##baseType##  \
+        Targ##Table_(#lookup)
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

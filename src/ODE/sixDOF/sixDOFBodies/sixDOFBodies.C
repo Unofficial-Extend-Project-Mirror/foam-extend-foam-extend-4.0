@@ -74,7 +74,7 @@ void Foam::sixDOFBodies::setBodies()
                     names_[bodyI],
                     runTime_.timeName(),
                     runTime_,
-                    IOobject::MUST_READ,
+                    IOobject::MUST_READ_IF_MODIFIED,
                     IOobject::AUTO_WRITE
                 )
             )
@@ -106,7 +106,7 @@ Foam::sixDOFBodies::sixDOFBodies
             "sixDOFsolverDict",
             runTime.system(),
             runTime,
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE
         )
     ),

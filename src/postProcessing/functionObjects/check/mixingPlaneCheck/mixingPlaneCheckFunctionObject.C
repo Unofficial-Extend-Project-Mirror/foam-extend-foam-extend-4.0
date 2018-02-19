@@ -78,7 +78,7 @@ bool Foam::mixingPlaneCheckFunctionObject::start()
 }
 
 
-bool Foam::mixingPlaneCheckFunctionObject::execute()
+bool Foam::mixingPlaneCheckFunctionObject::execute(const bool forceWrite)
 {
     const polyMesh& mesh =
         time_.lookupObject<polyMesh>(regionName_);
@@ -232,6 +232,12 @@ bool Foam::mixingPlaneCheckFunctionObject::execute()
         }
     }
 
+    return true;
+}
+
+
+bool Foam::mixingPlaneCheckFunctionObject::timeSet()
+{
     return true;
 }
 

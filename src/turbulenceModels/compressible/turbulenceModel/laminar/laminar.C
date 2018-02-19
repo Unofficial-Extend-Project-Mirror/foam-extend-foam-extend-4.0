@@ -51,10 +51,11 @@ laminar::laminar
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& phi,
-    const basicThermo& thermophysicalModel
+    const basicThermo& thermophysicalModel,
+    const word& turbulenceModelName
 )
 :
-    turbulenceModel(rho, U, phi, thermophysicalModel)
+    turbulenceModel(rho, U, phi, thermophysicalModel, turbulenceModelName)
 {}
 
 
@@ -65,10 +66,14 @@ autoPtr<laminar> laminar::New
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& phi,
-    const basicThermo& thermophysicalModel
+    const basicThermo& thermophysicalModel,
+    const word& turbulenceModelName
 )
 {
-    return autoPtr<laminar>(new laminar(rho, U, phi, thermophysicalModel));
+    return autoPtr<laminar>
+    (
+        new laminar(rho, U, phi, thermophysicalModel, turbulenceModelName)
+    );
 }
 
 
@@ -90,6 +95,27 @@ tmp<volScalarField> laminar::mut() const
             ),
             mesh_,
             dimensionedScalar("mut", mu().dimensions(), 0.0)
+        )
+    );
+}
+
+
+tmp<volScalarField> laminar::alphat() const
+{
+    return tmp<volScalarField>
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "alphat",
+                runTime_.timeName(),
+                U_.db(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh_,
+            dimensionedScalar("alphat", alpha().dimensions(), 0.0)
         )
     );
 }
@@ -208,7 +234,7 @@ void laminar::correct()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace incompressible
+} // End namespace compressible
 } // End namespace Foam
 
 // ************************************************************************* //

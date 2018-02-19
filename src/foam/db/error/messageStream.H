@@ -34,9 +34,10 @@ Description
     the messageStream class in the standard manner.
 
 Usage
-    @code
-        messageStream << "message1" << "message2" << FoamDataType << endl;
-    @endcode
+    \code
+        messageStream
+            << "message1" << "message2" << FoamDataType << endl;
+    \endcode
 
 SourceFiles
     messageStream.C
@@ -55,6 +56,7 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
 class IOstream;
 class Ostream;
 class OSstream;
@@ -142,6 +144,8 @@ public:
             const int sourceFileLineNumber = 0
         );
 
+        //- Convert to Ostream
+        //  Prints basic message and returns OSstream for further info.
         OSstream& operator()
         (
             const string& functionName,
@@ -200,24 +204,118 @@ extern messageStream Warning;
 extern messageStream Info;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-// Convienient macros to add the file name and line number to the function name
-
-#define SeriousErrorIn(fn) SeriousError(fn, __FILE__, __LINE__)
-#define SeriousIOErrorIn(fn, ios) SeriousError(fn, __FILE__, __LINE__, ios)
-
-#define WarningIn(fn) Warning(fn, __FILE__, __LINE__)
-#define IOWarningIn(fn, ios) Warning(fn, __FILE__, __LINE__, ios)
-
-#define InfoIn(fn) Info(fn, __FILE__, __LINE__)
-#define IOInfoIn(fn, ios) Info(fn, __FILE__, __LINE__, ios)
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "OSstream.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Convenience macros to add the file name and line number to the function name
+
+// Compiler provided function name string:
+//     for gcc-compatible compilers use __PRETTY_FUNCTION__
+//     otherwise use the standard __func__
+#ifdef __GNUC__
+    #define FUNCTION_NAME __PRETTY_FUNCTION__
+#else
+    #define FUNCTION_NAME __func__
+#endif
+
+
+//- Report an error message using Foam::SeriousError
+//  for functionName in file __FILE__ at line __LINE__
+#define SeriousErrorIn(functionName)                                           \
+    ::Foam::SeriousError((functionName), __FILE__, __LINE__)
+
+//- Report an error message using Foam::SeriousError
+//  for FUNCTION_NAME in file __FILE__ at line __LINE__
+#define SeriousErrorInFunction SeriousErrorIn(FUNCTION_NAME)
+
+
+//- Report an IO error message using Foam::SeriousError
+//  for functionName in file __FILE__ at line __LINE__
+//  for a particular IOstream
+#define SeriousIOErrorIn(functionName, ios)                                    \
+    ::Foam::SeriousError((functionName), __FILE__, __LINE__, ios)
+
+//- Report an IO error message using Foam::SeriousError
+//  for FUNCTION_NAME in file __FILE__ at line __LINE__
+//  for a particular IOstream
+#define SeriousIOErrorInFunction(ios) SeriousIOErrorIn(FUNCTION_NAME, ios)
+
+
+//- Report a warning using Foam::Warning
+//  for functionName in file __FILE__ at line __LINE__
+#define WarningIn(functionName)                                                \
+    ::Foam::Warning((functionName), __FILE__, __LINE__)
+
+//- Report a warning using Foam::Warning
+//  for FUNCTION_NAME in file __FILE__ at line __LINE__
+#define WarningInFunction WarningIn(FUNCTION_NAME)
+
+
+//- Report an IO warning using Foam::Warning
+//  for functionName in file __FILE__ at line __LINE__
+//  for a particular IOstream
+#define IOWarningIn(functionName, ios)                                         \
+    ::Foam::Warning((functionName), __FILE__, __LINE__, (ios))
+
+//- Report an IO warning using Foam::Warning
+//  for FUNCTION_NAME in file __FILE__ at line __LINE__
+//  for a particular IOstream
+#define IOWarningInFunction(ios) IOWarningIn(FUNCTION_NAME, ios)
+
+
+//- Report an information message using Foam::Info
+//  for functionName in file __FILE__ at line __LINE__
+#define InfoIn(functionName)                                                   \
+    ::Foam::Info((functionName), __FILE__, __LINE__)
+
+//- Report an information message using Foam::Info
+//  for FUNCTION_NAME in file __FILE__ at line __LINE__
+#define InfoInFunction InfoIn(FUNCTION_NAME)
+
+//- Report write to Foam::Info if the local log switch is true
+#define Log                                                                    \
+    if (log) Info
+
+
+//- Report an IO information message using Foam::Info
+//  for functionName in file __FILE__ at line __LINE__
+//  for a particular IOstream
+#define IOInfoIn(functionName, ios)                                            \
+    ::Foam::Info((functionName), __FILE__, __LINE__, (ios))
+
+//- Report an IO information message using Foam::Info
+//  for FUNCTION_NAME in file __FILE__ at line __LINE__
+//  for a particular IOstream
+#define IOInfoInFunction(ios) IOInfoIn(FUNCTION_NAME, ios)
+
+
+//- Report an information message using Foam::Info
+//  if the local debug switch is true
+#define DebugInfo                                                              \
+    if (debug) Info
+
+//- Report an information message using Foam::Info
+//  for FUNCTION_NAME in file __FILE__ at line __LINE__
+//  if the local debug switch is true
+#define DebugInFunction                                                        \
+    if (debug) InfoInFunction
+
+//- Report a variable name and value
+//  using Foam::Pout in file __FILE__ at line __LINE__
+#define DebugVar(var)                                                          \
+{                                                                              \
+    ::Foam::string oldPrefix(::Foam::Pout.prefix());                           \
+    ::Foam::Pout<< "["<< __FILE__ << ":" << __LINE__ << "] ";                  \
+    ::Foam::Pout.prefix() = oldPrefix + #var " ";                              \
+    ::Foam::Pout<< var << ::Foam::endl;                                        \
+    ::Foam::Pout.prefix() = oldPrefix;                                         \
+}
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

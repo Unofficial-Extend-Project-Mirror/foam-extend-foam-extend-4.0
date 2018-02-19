@@ -27,6 +27,7 @@ License
 
 #include "PatchToolsCheck.C"
 #include "PatchToolsEdgeOwner.C"
+#include "PatchToolsGatherAndMerge.C"
 #include "PatchToolsSearch.C"
 #include "PatchToolsSortEdges.C"
 

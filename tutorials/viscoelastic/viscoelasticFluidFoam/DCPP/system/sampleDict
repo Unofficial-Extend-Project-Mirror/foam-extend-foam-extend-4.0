@@ -48,6 +48,8 @@ sets
     }
 );
 
+surfaceFormat null;
+
 surfaces
 ();
 

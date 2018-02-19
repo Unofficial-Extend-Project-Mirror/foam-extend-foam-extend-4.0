@@ -104,7 +104,7 @@ const Foam::GAMGAgglomeration& Foam::GAMGAgglomeration::New
     {
         word agglomeratorType(dict.lookup("agglomerator"));
 
-        dlLibraryTable::open
+        const_cast<Time&>(mesh.thisDb().time()).libs().open
         (
             dict,
             "geometricGAMGAgglomerationLibs",
@@ -159,7 +159,7 @@ const Foam::GAMGAgglomeration& Foam::GAMGAgglomeration::New
     {
         word agglomeratorType(dict.lookup("agglomerator"));
 
-        dlLibraryTable::open
+        const_cast<Time&>(mesh.thisDb().time()).libs().open
         (
             dict,
             "algebraicGAMGAgglomerationLibs",

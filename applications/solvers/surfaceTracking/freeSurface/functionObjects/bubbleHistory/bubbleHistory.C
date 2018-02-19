@@ -285,7 +285,7 @@ bool Foam::bubbleHistory::start()
 }
 
 
-bool Foam::bubbleHistory::execute()
+bool Foam::bubbleHistory::execute(const bool forceWrite)
 {
     const fvMesh& mesh =
         time_.lookupObject<fvMesh>(regionName_);
@@ -400,6 +400,11 @@ bool Foam::bubbleHistory::execute()
     return false;
 }
 
+
+bool Foam::bubbleHistory::setTime()
+{
+    return true;
+}
 
 bool Foam::bubbleHistory::read(const dictionary& dict)
 {

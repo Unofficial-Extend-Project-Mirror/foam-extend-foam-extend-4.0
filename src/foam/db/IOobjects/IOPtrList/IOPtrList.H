@@ -79,9 +79,8 @@ public:
         IOPtrList(const IOobject&, const Xfer<PtrList<T> >&);
 
 
-    // Destructor
-
-        virtual ~IOPtrList();
+    //- Destructor
+    virtual ~IOPtrList();
 
 
     // Member functions

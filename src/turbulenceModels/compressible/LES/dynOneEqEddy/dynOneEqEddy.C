@@ -90,11 +90,13 @@ dynOneEqEddy::dynOneEqEddy
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& phi,
-    const basicThermo& thermoPhysicalModel
+    const basicThermo& thermophysicalModel,
+    const word& turbulenceModelName,
+    const word& modelName
 )
 :
-    LESModel(typeName, rho, U, phi, thermoPhysicalModel),
-    GenEddyVisc(rho, U, phi, thermoPhysicalModel),
+    LESModel(modelName, rho, U, phi, thermophysicalModel, turbulenceModelName),
+    GenEddyVisc(rho, U, phi, thermophysicalModel),
 
     filterPtr_(LESfilter::New(U.mesh(), coeffDict())),
     filter_(filterPtr_())

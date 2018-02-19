@@ -42,6 +42,7 @@ SourceFiles
 #include "interpolation.H"
 #include "coordSet.H"
 #include "writer.H"
+#include "wordReList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -53,7 +54,7 @@ class dictionary;
 class fvMesh;
 
 /*---------------------------------------------------------------------------*\
-                      Class sampledSets Declaration
+                         Class sampledSets Declaration
 \*---------------------------------------------------------------------------*/
 
 class sampledSets
@@ -66,30 +67,45 @@ class sampledSets
         template<class Type>
         class fieldGroup
         :
-            public wordList
+            public DynamicList<word>
         {
         public:
 
-            //- Set formatter
-            autoPtr<writer<Type> > formatter;
+            //- The set formatter
+            autoPtr< writer<Type> > formatter;
 
             //- Construct null
             fieldGroup()
             :
-                wordList(0),
+                DynamicList<word>(0),
                 formatter(NULL)
             {}
 
+            //- Construct for a particular format
+            fieldGroup(const word& writeFormat)
+            :
+                DynamicList<word>(0),
+                formatter(writer<Type>::New(writeFormat))
+            {}
+
+            //- Reset format and field list
             void clear()
             {
-                wordList::clear();
+                DynamicList<word>::clear();
                 formatter.clear();
             }
+
+            //- Assign a new formatter
+            void operator=(const word& writeFormat)
+            {
+                formatter = writer<Type>::New(writeFormat);
+            }
+
         };
 
 
         //- Class used for sampling volFields
-        template <class Type>
+        template<class Type>
         class volFieldSampler
         :
             public List<Field<Type> >
@@ -131,7 +147,7 @@ class sampledSets
 
     // Static data members
 
-        //- output verbosity
+        //- Output verbosity
         static bool verbose_;
 
 
@@ -160,7 +176,7 @@ class sampledSets
         // Read from dictonary
 
             //- Names of fields to sample
-            wordList fieldNames_;
+            wordReList fieldSelection_;
 
             //- Interpolation scheme to use
             word interpolationScheme_;
@@ -186,16 +202,14 @@ class sampledSets
 
     // Private Member Functions
 
-        //- Classify field types, return true if nFields > 0
-        bool checkFieldTypes();
+        //- Clear old field groups
+        void clearFieldGroups();
 
-        //- Find the fields in the list of the given type, return count
-        template<class Type>
-        label grep
-        (
-            fieldGroup<Type>& fieldList,
-            const wordList& fieldTypes
-        ) const;
+        //- Append fieldName to the appropriate group
+        label appendFieldGroup(const word& fieldName, const word& fieldType);
+
+        //- Classify field types, returns the number of fields
+        label classifyFields();
 
         //- Combine points from all processors. Sort by curveDist and produce
         //  index list. Valid result only on master processor.
@@ -253,9 +267,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~sampledSets();
+    //- Destructor
+    virtual ~sampledSets();
 
 
     // Member Functions
@@ -266,7 +279,7 @@ public:
             return name_;
         }
 
-        //- set verbosity level
+        //- Set verbosity level
         void verbose(const bool verbosity = true);
 
         //- Execute, currently does nothing
@@ -274,6 +287,9 @@ public:
 
         //- Execute at the final time-loop, currently does nothing
         virtual void end();
+
+        //- Called when time was set at the end of the Time::operator++
+        virtual void timeSet();
 
         //- Sample and write
         virtual void write();

@@ -45,15 +45,28 @@ turbulenceModel::turbulenceModel
 (
     const volVectorField& U,
     const surfaceScalarField& phi,
-    transportModel& lamTransportModel
+    transportModel& transport,
+    const word& turbulenceModelName
 )
 :
+    regIOobject
+    (
+        IOobject
+        (
+            turbulenceModelName,
+            U.time().constant(),
+            U.db(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        )
+    ),
     runTime_(U.time()),
     mesh_(U.mesh()),
 
     U_(U),
     phi_(phi),
-    transportModel_(lamTransportModel)
+    transportModel_(transport),
+    y_(mesh_)
 {}
 
 
@@ -63,7 +76,8 @@ autoPtr<turbulenceModel> turbulenceModel::New
 (
     const volVectorField& U,
     const surfaceScalarField& phi,
-    transportModel& transport
+    transportModel& transport,
+    const word& turbulenceModelName
 )
 {
     word modelName;
@@ -79,7 +93,7 @@ autoPtr<turbulenceModel> turbulenceModel::New
                 "turbulenceProperties",
                 U.time().constant(),
                 U.db(),
-                IOobject::MUST_READ,
+                IOobject::MUST_READ_IF_MODIFIED,
                 IOobject::NO_WRITE
             )
         );
@@ -105,7 +119,10 @@ autoPtr<turbulenceModel> turbulenceModel::New
             << exit(FatalError);
     }
 
-    return autoPtr<turbulenceModel>(cstrIter()(U, phi, transport));
+    return autoPtr<turbulenceModel>
+    (
+        cstrIter()(U, phi, transport, turbulenceModelName)
+    );
 }
 
 
@@ -114,6 +131,11 @@ autoPtr<turbulenceModel> turbulenceModel::New
 void turbulenceModel::correct()
 {
     transportModel_.correct();
+
+    if (mesh_.changing())
+    {
+        y_.correct();
+    }
 }
 
 

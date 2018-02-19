@@ -319,26 +319,6 @@ namespace meshOps
     );
 
 } // End namespace meshOps
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-// Add additional operations missing in ops.H
-template<class T>
-class lessOp
-{ public: T operator()(const T& x, const T& y) const { return x < y; } };
-
-template<class T>
-class lessEqOp
-{ public: T operator()(const T& x, const T& y) const { return x <= y; } };
-
-template<class T>
-class greaterOp
-{ public: T operator()(const T& x, const T& y) const { return x > y; } };
-
-template<class T>
-class greaterEqOp
-{ public: T operator()(const T& x, const T& y) const { return x >= y; } };
-
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

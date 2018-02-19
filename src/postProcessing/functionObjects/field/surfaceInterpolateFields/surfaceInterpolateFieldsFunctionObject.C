@@ -29,7 +29,11 @@ License
 
 namespace Foam
 {
-    defineNamedTemplateTypeNameAndDebug(surfaceInterpolateFieldsFunctionObject, 0);
+    defineNamedTemplateTypeNameAndDebug
+    (
+        surfaceInterpolateFieldsFunctionObject,
+        0
+    );
 
     addToRunTimeSelectionTable
     (

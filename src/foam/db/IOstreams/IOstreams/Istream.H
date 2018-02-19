@@ -85,10 +85,9 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~Istream()
-        {}
+    //- Destructor
+    virtual ~Istream()
+    {}
 
 
     // Member functions
@@ -96,12 +95,19 @@ public:
         // Read functions
 
             //- Put back token
+            //  Only a single put back is permitted
             void putBack(const token&);
 
-            //- Get the put back token
+            //- Get the put back token if there is one and return true.
+            //  Return false if no put back token is available.
             bool getBack(token&);
 
-             //- Return next token from stream
+            //- Peek at the put back token without removing it.
+            //  Returns false if no put back token is available and set the
+            //  token to undefined.
+            bool peekBack(token&);
+
+            //- Return next token from stream
             virtual Istream& read(token&) = 0;
 
             //- Read a character

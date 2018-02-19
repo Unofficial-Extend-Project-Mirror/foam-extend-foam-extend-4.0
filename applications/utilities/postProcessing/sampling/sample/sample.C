@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
     (
         sampledSets::typeName,
         mesh,
-        "sampleDict",
+        word("sampleDict"),
         IOobject::MUST_READ,
         true
     );
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
     (
         sampledSurfaces::typeName,
         mesh,
-        "sampleDict",
+        word("sampleDict"),
         IOobject::MUST_READ,
         true
     );

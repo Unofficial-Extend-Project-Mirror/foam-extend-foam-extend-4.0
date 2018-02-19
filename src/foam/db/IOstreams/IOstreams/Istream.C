@@ -24,35 +24,9 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "Istream.H"
-#include "bool.H"
-#include "token.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Set t to the put back token if there is one and return true,
-// otherwise return false
-bool Foam::Istream::getBack(token& t)
-{
-    if (bad())
-    {
-        FatalIOErrorIn("void Istream::getBack(token&)", *this)
-            << "Attempt to get back from bad stream"
-            << exit(FatalIOError);
-
-        return false;
-    }
-    else if (putBack_)
-    {
-        t = putBackToken_;
-        putBack_ = false;
-        return true;
-    }
-
-    return false;
-}
-
-
-// Keep the put back token
 void Foam::Istream::putBack(const token& t)
 {
     if (bad())
@@ -72,6 +46,40 @@ void Foam::Istream::putBack(const token& t)
         putBackToken_ = t;
         putBack_ = true;
     }
+}
+
+
+bool Foam::Istream::getBack(token& t)
+{
+    if (bad())
+    {
+        FatalIOErrorIn("void Istream::getBack(token&)", *this)
+            << "Attempt to get back from bad stream"
+            << exit(FatalIOError);
+    }
+    else if (putBack_)
+    {
+        t = putBackToken_;
+        putBack_ = false;
+        return true;
+    }
+
+    return false;
+}
+
+
+bool Foam::Istream::peekBack(token& t)
+{
+    if (putBack_)
+    {
+        t = putBackToken_;
+    }
+    else
+    {
+        t = token::undefinedToken;
+    }
+
+    return putBack_;
 }
 
 

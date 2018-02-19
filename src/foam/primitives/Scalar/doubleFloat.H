@@ -31,16 +31,6 @@ License
 
 #include <cmath>
 
-#ifndef DUMMY_SCALAR_FUNCTIONS
-#define DUMMY_SCALAR_FUNCTIONS
-inline float j0f(float x) { return float(j0(double(x)));}
-inline float j1f(float x) { return float(j1(double(x)));}
-inline float y0f(float x) { return float(y0(double(x)));}
-inline float y1f(float x) { return float(y1(double(x)));}
-inline float jnf(const int n, const float s) { return float(jn(n, double(s))); }
-inline float ynf(const int n, const float s) { return float(yn(n, double(s))); }
-#endif
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -79,27 +69,31 @@ inline bool equal(const T& s1, const T& s2)
                                                   \
 MAXMIN(retType, type1, type2)                     \
                                                   \
-inline double pow(const type1 s, const type2 e)   \
+inline retType pow(const type1 s, const type2 e)  \
 {                                                 \
-    return ::pow(double(s), double(e));           \
+    return ::pow(s, e);                           \
 }
+
 
 MAXMINPOW(long double, long double, long double)
 MAXMINPOW(long double, long double, double)
 MAXMINPOW(long double, long double, float)
-MAXMINPOW(long double, long double, int)
 MAXMINPOW(long double, double, long double)
 MAXMINPOW(long double, float, long double)
+MAXMINPOW(long double, long double, int)
 MAXMINPOW(long double, int, long double)
+MAXMINPOW(long double, long double, long)
+MAXMINPOW(long double, long, long double)
 
 MAXMINPOW(double, double, double)
 MAXMINPOW(double, double, float)
 MAXMINPOW(double, float, double)
-MAXMINPOW(float, float, float)
 MAXMINPOW(double, double, int)
 MAXMINPOW(double, int, double)
 MAXMINPOW(double, double, long)
 MAXMINPOW(double, long, double)
+
+MAXMINPOW(float, float, float)
 MAXMINPOW(float, float, int)
 MAXMINPOW(float, int, float)
 MAXMINPOW(float, float, long)

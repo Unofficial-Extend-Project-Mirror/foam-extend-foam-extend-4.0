@@ -35,6 +35,7 @@ SourceFiles
 #ifndef profilingStack_H
 #define profilingStack_H
 
+#include "List.H"
 #include "LIFOStack.H"
 #include "clockTime.H"
 

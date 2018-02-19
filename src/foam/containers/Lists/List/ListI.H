@@ -94,14 +94,19 @@ inline Foam::Xfer< Foam::List<T> > Foam::List<T>::xfer()
 
 
 template<class T>
+inline void Foam::List<T>::append(const T& t)
+{
+    setSize(size()+1, t);
+}
+
+
+template<class T>
 inline void Foam::List<T>::append(const UList<T>& lst)
 {
     if (this == &lst)
     {
-        FatalErrorIn
-        (
-            "List<T>::append(const UList<T>&)"
-        )   << "attempted appending to self" << abort(FatalError);
+        FatalErrorInFunction
+            << "attempted appending to self" << abort(FatalError);
     }
 
     label nextFree = this->size();

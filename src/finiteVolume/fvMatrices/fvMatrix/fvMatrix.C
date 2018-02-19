@@ -641,6 +641,16 @@ void Foam::fvMatrix<Type>::setReference
 template<class Type>
 void Foam::fvMatrix<Type>::relax(const scalar alpha)
 {
+    if (debug)
+    {
+        InfoIn
+        (
+            "fvMatrix<Type>(const scalar alpha"
+        )   << "relaxing fvMatrix<Type> for field " << psi_.name()
+            << " with " << alpha
+            << endl;
+    }
+
     if (alpha <= 0)
     {
         return;

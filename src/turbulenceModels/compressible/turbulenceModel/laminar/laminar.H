@@ -66,7 +66,8 @@ public:
             const volScalarField& rho,
             const volVectorField& U,
             const surfaceScalarField& phi,
-            const basicThermo& thermophysicalModel
+            const basicThermo& thermophysicalModel,
+            const word& turbulenceModelName = turbulenceModel::typeName
         );
 
 
@@ -78,7 +79,8 @@ public:
             const volScalarField& rho,
             const volVectorField& U,
             const surfaceScalarField& phi,
-            const basicThermo& thermophysicalModel
+            const basicThermo& thermophysicalModel,
+            const word& turbulenceModelName = turbulenceModel::typeName
         );
 
 
@@ -97,6 +99,9 @@ public:
         {
             return tmp<volScalarField>(new volScalarField("muEff", mu()));
         }
+
+    //- Return the turbulence thermal diffusivity
+        virtual tmp<volScalarField> alphat() const;
 
         //- Return the effective turbulent thermal diffusivity,
         //  i.e. the laminar thermal diffusivity
@@ -131,7 +136,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace incompressible
+} // End namespace compressible
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -21,9 +21,6 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Description
-    DictionaryEntry constructor from Istream and Ostream output operator.
-
 \*---------------------------------------------------------------------------*/
 
 #include "keyType.H"
@@ -78,7 +75,7 @@ void Foam::dictionaryEntry::write(Ostream& os) const
 }
 
 
-// * * * * * * * * * * * * * Ostream operator  * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Ostream operator  * * * * * * * * * * * * * * //
 
 Foam::Ostream& Foam::operator<<(Ostream& os, const dictionaryEntry& de)
 {

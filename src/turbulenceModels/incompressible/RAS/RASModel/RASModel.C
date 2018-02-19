@@ -57,10 +57,11 @@ RASModel::RASModel
     const word& type,
     const volVectorField& U,
     const surfaceScalarField& phi,
-    transportModel& lamTransportModel
+    transportModel& transport,
+    const word& turbulenceModelName
 )
 :
-    turbulenceModel(U, phi, lamTransportModel),
+    turbulenceModel(U, phi, transport, turbulenceModelName),
 
     IOdictionary
     (
@@ -69,7 +70,7 @@ RASModel::RASModel
             "RASProperties",
             U.time().constant(),
             U.db(),
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE
         )
     ),
@@ -83,9 +84,7 @@ RASModel::RASModel
     epsilonSmall_("epsilonSmall", epsilon0_.dimensions(), SMALL),
     omega0_("omega0", dimless/dimTime, SMALL),
     omegaSmall_("omegaSmall", omega0_.dimensions(), SMALL),
-    nuRatio_(lookupOrDefault<scalar>("nuRatio", 1e6)),
-
-    y_(mesh_)
+    nuRatio_(lookupOrDefault<scalar>("nuRatio", 1e6))
 {
     // Force the construction of the mesh deltaCoeffs which may be needed
     // for the construction of the derived models and BCs
@@ -99,7 +98,8 @@ autoPtr<RASModel> RASModel::New
 (
     const volVectorField& U,
     const surfaceScalarField& phi,
-    transportModel& transport
+    transportModel& transport,
+    const word& turbulenceModelName
 )
 {
     word modelName;
@@ -115,7 +115,7 @@ autoPtr<RASModel> RASModel::New
                 "RASProperties",
                 U.time().constant(),
                 U.db(),
-                IOobject::MUST_READ,
+                IOobject::MUST_READ_IF_MODIFIED,
                 IOobject::NO_WRITE
             )
         );
@@ -141,7 +141,10 @@ autoPtr<RASModel> RASModel::New
             << exit(FatalError);
     }
 
-    return autoPtr<RASModel>(cstrIter()(U, phi, transport));
+    return autoPtr<RASModel>
+    (
+        cstrIter()(U, phi, transport, turbulenceModelName)
+    );
 }
 
 
@@ -208,17 +211,27 @@ tmp<scalarField> RASModel::yPlus(const label patchNo, const scalar Cmu) const
 void RASModel::correct()
 {
     turbulenceModel::correct();
-
-    if (turbulence_ && mesh_.changing())
-    {
-        y_.correct();
-    }
 }
 
 
 bool RASModel::read()
 {
-    if (regIOobject::read())
+    //if (regIOobject::read())
+
+    // Bit of trickery : we are both IOdictionary ('RASProperties') and
+    // an regIOobject from the turbulenceModel level. Problem is to distinguish
+    // between the two - we only want to reread the IOdictionary.
+
+    bool ok = IOdictionary::readData
+    (
+        IOdictionary::readStream
+        (
+            IOdictionary::type()
+        )
+    );
+    IOdictionary::close();
+
+    if (ok)
     {
         lookup("turbulence") >> turbulence_;
 

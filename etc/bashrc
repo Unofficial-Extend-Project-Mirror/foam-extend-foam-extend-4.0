@@ -47,7 +47,7 @@ export FOAM_DEV=1
 #
 # Location of FOAM installation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-foamInstall=$HOME/$WM_PROJECT
+foamInstall=$HOME/OpenFOAM
 # foamInstall=~$WM_PROJECT
 # foamInstall=/usr/local/$WM_PROJECT
 # foamInstall=/opt/$WM_PROJECT
@@ -178,6 +178,9 @@ export WM_COMPILER_LIB_ARCH=
 
 # WM_PRECISION_OPTION = LDP | DP | SP
 : ${WM_PRECISION_OPTION:=DP}; export WM_PRECISION_OPTION
+
+#    WM_LABEL_SIZE = 32 | 64
+: ${WM_LABEL_SIZE:=32}; export WM_LABEL_SIZE
 
 # WM_COMPILE_OPTION = Opt | Debug | Prof
 : ${WM_COMPILE_OPTION:=Opt}; export WM_COMPILE_OPTION

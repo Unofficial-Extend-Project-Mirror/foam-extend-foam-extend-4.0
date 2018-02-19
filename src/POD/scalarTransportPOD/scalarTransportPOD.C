@@ -78,7 +78,7 @@ void Foam::scalarTransportPOD::calcOrthoBase() const
 
     forAll (Times, i)
     {
-        if (Times[i].value() < SMALL || Times[i] == runTime.constant())
+        if (Times[i].equal(0) )
         {
             Info << "Skipping time " << Times[i] << endl;
 
@@ -162,7 +162,7 @@ void Foam::scalarTransportPOD::calcDerivativeCoeffs() const
             "transportProperties",
             runTime.constant(),
             this->mesh(),
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE
         )
     );

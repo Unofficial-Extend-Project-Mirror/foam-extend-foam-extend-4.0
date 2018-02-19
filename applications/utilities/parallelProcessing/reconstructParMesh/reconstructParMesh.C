@@ -50,8 +50,8 @@ Description
 
 int main(int argc, char *argv[])
 {
-    // enable -constant ... if someone really wants it
-    // enable -zeroTime to prevent accidentally trashing the initial fields
+    // disable -constant
+    // enable -noZero to prevent accidentally trashing the initial fields
     timeSelector::addOptions(false, true);
     argList::noParallel();
 #   include "addRegionOption.H"
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
     {
         Info<< "Reading database for processor " << procI << endl;
 
-        databases[procI].setTime(runTime.timeName(), runTime.timeIndex());
+        databases[procI].setTime(runTime, runTime.timeIndex());
     }
 
     // Read all meshes and addressing to reconstructed mesh

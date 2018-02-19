@@ -29,8 +29,20 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Foam::Ostream& Foam::OSstream::write(const token&)
+Foam::Ostream& Foam::OSstream::write(const token& t)
 {
+    if (t.type() == token::VERBATIMSTRING)
+    {
+        write(char(token::HASH));
+        write(char(token::BEGIN_BLOCK));
+        writeQuoted(t.stringToken(), false);
+        write(char(token::HASH));
+        write(char(token::END_BLOCK));
+    }
+    else if (t.type() == token::VARIABLE)
+    {
+        writeQuoted( t.stringToken(), false);
+    }
     return *this;
 }
 

@@ -25,8 +25,8 @@ Typedef
     Foam::surfaceInterpolateFieldsFunctionObject
 
 Description
-    FunctionObject wrapper around surfaceInterpolateFields to allow them to be created via
-    the functions entry within controlDict.
+    FunctionObject wrapper around surfaceInterpolateFields to allow
+    them to be created via the functions entry within controlDict.
 
 SourceFiles
     surfaceInterpolateFieldsFunctionObject.C

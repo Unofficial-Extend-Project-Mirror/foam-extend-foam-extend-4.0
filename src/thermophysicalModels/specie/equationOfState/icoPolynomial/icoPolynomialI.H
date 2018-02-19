@@ -88,7 +88,7 @@ Foam::icoPolynomial<PolySize>::New(Istream& is)
 template<int PolySize>
 inline Foam::scalar Foam::icoPolynomial<PolySize>::rho(scalar, scalar T) const
 {
-    return rhoPolynomial_.evaluate(T)/this->W();
+    return rhoPolynomial_.value(T)/this->W();
 }
 
 

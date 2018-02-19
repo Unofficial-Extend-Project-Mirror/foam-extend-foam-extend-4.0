@@ -38,7 +38,9 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#include "OSspecific.H"
+#ifndef sigQuit_H
+#define sigQuit_H
+
 #include <signal.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -60,23 +62,25 @@ class sigQuit
 
     // Private Member Functions
 
-        static void sigQuitHandler(int);
+        //- Handler for caught signals
+        static void sigHandler(int);
 
 
 public:
 
     // Constructors
 
+        //- Construct null
         sigQuit();
 
 
-    // Destructor
-
-        ~sigQuit();
+    //- Destructor
+    ~sigQuit();
 
 
     // Member functions
 
+        //- Activate SIGQUIT signal handler
         void set(const bool verbose);
 };
 
@@ -84,5 +88,9 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

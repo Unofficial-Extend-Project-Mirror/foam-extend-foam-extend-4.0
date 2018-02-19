@@ -37,6 +37,7 @@ SourceFiles
 #define ListOps_H
 
 #include "labelList.H"
+#include "ops.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -81,13 +82,22 @@ void inplaceMapKey(const UList<label>& oldToNew, Container&);
 template<class T>
 void sortedOrder(const UList<T>&, labelList& order);
 
+template<class T, class Cmp>
+void sortedOrder(const UList<T>&, labelList& order, const Cmp& cmp);
+
 //- Generate (sorted) indices corresponding to duplicate list values
 template<class T>
 void duplicateOrder(const UList<T>&, labelList& order);
 
+template<class T, class Cmp>
+void duplicateOrder(const UList<T>&, labelList& order, const Cmp& cmp);
+
 //- Generate (sorted) indices corresponding to unique list values
 template<class T>
 void uniqueOrder(const UList<T>&, labelList& order);
+
+template<class T, class Cmp>
+void uniqueOrder(const UList<T>&, labelList& order, const Cmp& cmp);
 
 //- Extract elements of List when select is a certain value.
 //  eg, to extract all selected elements:
@@ -201,6 +211,18 @@ label findSortedIndex
 
 //- Find last element < given value in sorted list and return index,
 //  return -1 if not found. Binary search.
+template<class ListType, class BinaryOp>
+label findLower
+(
+    const ListType&,
+    typename ListType::const_reference,
+    const label stary,
+    const BinaryOp& bop
+);
+
+
+//- Find last element < given value in sorted list and return index,
+//  return -1 if not found. Binary search.
 template<class ListType>
 label findLower
 (
@@ -220,6 +242,36 @@ List<Container> initList(const T[nRows]);
 //  to initialise e.g. faceList from arrays of labels.
 template<class Container, class T, int nRows, int nColumns>
 List<Container> initListList(const T[nRows][nColumns]);
+
+
+//- Helper class for list to append y onto the end of x
+template<class T>
+class ListAppendEqOp
+{
+public:
+    void operator()(List<T>& x, const List<T>& y) const;
+};
+
+
+//- Reverse a list. First element becomes last element etc.
+template<class ListType>
+ListType reverseList(const ListType& list);
+
+
+//- Inplace reversal of a list using Swap.
+template<class ListType>
+void inplaceReverseList(ListType& list);
+
+
+//- Rotate a list by n places. If n is positive rotate clockwise/right/down.
+//  If n is negative rotate anti-clockwise/left/up.
+template<class ListType>
+ListType rotateList(const ListType& list, const label n);
+
+
+//- Inplace reversal of a list using the Reversal Block Swapping algorithm.
+template<template<typename> class ListType, class DataType>
+void inplaceRotateList(ListType<DataType>& list, label n);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -23,8 +23,9 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "floatScalar.H"
+// Source IOstreams.H first for consistency
 #include "IOstreams.H"
+#include "floatScalar.H"
 
 #include <sstream>
 
@@ -33,11 +34,15 @@ License
 #define Scalar floatScalar
 #define ScalarVGREAT floatScalarVGREAT
 #define ScalarVSMALL floatScalarVSMALL
+#define ScalarROOTVGREAT floatScalarROOTVGREAT
+#define ScalarROOTVSMALL floatScalarROOTVSMALL
 #define readScalar readFloatScalar
 #include "ScalarTemplate.C"
 #undef Scalar
 #undef ScalarVSMALL
 #undef ScalarVSMALL
+#undef ScalarROOTVGREAT
+#undef ScalarROOTVSMALL
 #undef readScalar
 
 // ************************************************************************* //

@@ -45,6 +45,11 @@ const char* const Foam::FOAMbuild = "BUILD_STRING";
 #include "new.C"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Create the nullObject singleton
+
+#include "nullObject.C"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Global IO streams
 
 #include "IOstreams.C"
@@ -52,7 +57,7 @@ const char* const Foam::FOAMbuild = "BUILD_STRING";
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "JobInfo.H"
-bool Foam::JobInfo::constructed = false;
+bool Foam::JobInfo::constructed(false);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Global error definitions (initialised by construction)

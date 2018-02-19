@@ -62,7 +62,7 @@ bool Foam::functionEntry::execute
 
     if (!executedictionaryIstreamMemberFunctionTablePtr_)
     {
-        cerr<<"functionEntry::execute"
+        cerr<< "functionEntry::execute"
             << "(const word&, dictionary&, Istream&)"
             << " not yet initialized, function = "
             << functionName.c_str() << std::endl;
@@ -136,5 +136,6 @@ bool Foam::functionEntry::execute
 
     return mfIter()(parentDict, entry, is);
 }
+
 
 // ************************************************************************* //

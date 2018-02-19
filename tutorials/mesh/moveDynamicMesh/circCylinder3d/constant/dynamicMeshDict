@@ -187,7 +187,7 @@ dynamicTopoFvMesh
     // maxModifications   1000;
 
     //- Load custom libraries for metrics
-    // tetMetricLibs      ("libtetMetrics.so");
+    //tetMetricLibs      ("libtetMetrics.so");
 
     //- Tetrahedral mesh quality metric
     tetMetric          Knupp;

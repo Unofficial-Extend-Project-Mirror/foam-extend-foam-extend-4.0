@@ -153,7 +153,7 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                         (
                             dynamicCast<token::Compound<List<scalar> > >
                             (
-                                fieldToken.transferCompoundToken()
+                                fieldToken.transferCompoundToken(is)
                             )
                         );
 
@@ -190,7 +190,7 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                         (
                             dynamicCast<token::Compound<List<vector> > >
                             (
-                                fieldToken.transferCompoundToken()
+                                fieldToken.transferCompoundToken(is)
                             )
                         );
 
@@ -230,7 +230,7 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                                 token::Compound<List<sphericalTensor> >
                             >
                             (
-                                fieldToken.transferCompoundToken()
+                                fieldToken.transferCompoundToken(is)
                             )
                         );
 
@@ -270,7 +270,7 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                                 token::Compound<List<symmTensor> >
                             >
                             (
-                                fieldToken.transferCompoundToken()
+                                fieldToken.transferCompoundToken(is)
                             )
                         );
 
@@ -307,7 +307,7 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                         (
                             dynamicCast<token::Compound<List<tensor> > >
                             (
-                                fieldToken.transferCompoundToken()
+                                fieldToken.transferCompoundToken(is)
                             )
                         );
 

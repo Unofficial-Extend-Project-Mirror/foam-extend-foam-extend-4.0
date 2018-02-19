@@ -48,7 +48,7 @@ Foam::autoPtr<Foam::rhoChemistryModel> Foam::rhoChemistryModel::New
                 "chemistryProperties",
                 mesh.time().constant(),
                 obj,
-                IOobject::MUST_READ,
+                IOobject::MUST_READ_IF_MODIFIED,
                 IOobject::NO_WRITE
             )
         );

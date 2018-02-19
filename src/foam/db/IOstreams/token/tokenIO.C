@@ -93,7 +93,7 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const token& t)
             os << *t.compoundTokenPtr_;
         break;
 
-        case token::FATALERROR:
+        case token::ERROR:
             os << "FATALERROR";
             WarningIn("Ostream& operator<<(Ostream&, const token&)")
                 << "Error token" << endl;
@@ -191,7 +191,7 @@ ostream& Foam::operator<<(ostream& os, const InfoProxy<token>& ip)
         }
         break;
 
-        case token::FATALERROR:
+        case token::ERROR:
             os  << " an error";
         break;
 
@@ -265,7 +265,7 @@ Ostream& operator<<(Ostream& os, const InfoProxy<token>& ip)
         }
         break;
 
-        case token::FATALERROR:
+        case token::ERROR:
             os  << " an error";
         break;
 

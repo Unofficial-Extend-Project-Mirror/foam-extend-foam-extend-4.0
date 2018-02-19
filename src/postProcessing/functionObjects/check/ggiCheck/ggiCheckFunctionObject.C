@@ -79,7 +79,7 @@ bool Foam::ggiCheckFunctionObject::start()
 }
 
 
-bool Foam::ggiCheckFunctionObject::execute()
+bool Foam::ggiCheckFunctionObject::execute(const bool forceWrite)
 {
     const objectRegistry& mesh =
         time_.lookupObject<objectRegistry>(regionName_);
@@ -252,12 +252,18 @@ bool Foam::ggiCheckFunctionObject::execute()
     }
     else
     {
-        InfoIn("bool ggiCheckFunctionObject::execute()")
+        InfoIn("bool ggiCheckFunctionObject::execute(const bool forceWrite)")
             << "Cannot find flux field phi"
             << endl;
 
         return false;
     }
+}
+
+
+bool Foam::ggiCheckFunctionObject::timeSet()
+{
+    return true;
 }
 
 

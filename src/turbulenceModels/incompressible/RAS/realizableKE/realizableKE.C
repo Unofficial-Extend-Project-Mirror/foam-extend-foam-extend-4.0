@@ -89,10 +89,12 @@ realizableKE::realizableKE
 (
     const volVectorField& U,
     const surfaceScalarField& phi,
-    transportModel& lamTransportModel
+    transportModel& transport,
+    const word& turbulenceModelName,
+    const word& modelName
 )
 :
-    RASModel(typeName, U, phi, lamTransportModel),
+    RASModel(modelName, U, phi, transport, turbulenceModelName),
 
     Cmu_
     (

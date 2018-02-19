@@ -35,100 +35,12 @@ License
 
 namespace Foam
 {
-    defineTypeNameAndDebug(sampledSets, 0);
+defineTypeNameAndDebug(sampledSets, 0);
+bool sampledSets::verbose_ = false;
 }
-
-bool Foam::sampledSets::verbose_ = false;
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-bool Foam::sampledSets::checkFieldTypes()
-{
-    wordList fieldTypes(fieldNames_.size());
-
-    // check files for a particular time
-    if (loadFromFiles_)
-    {
-        forAll(fieldNames_, fieldi)
-        {
-            IOobject io
-            (
-                fieldNames_[fieldi],
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::MUST_READ,
-                IOobject::NO_WRITE,
-                false
-            );
-
-            if (io.headerOk())
-            {
-                fieldTypes[fieldi] = io.headerClassName();
-            }
-            else
-            {
-                fieldTypes[fieldi] = "(notFound)";
-            }
-        }
-    }
-    else
-    {
-        // check objectRegistry
-        forAll(fieldNames_, fieldi)
-        {
-            objectRegistry::const_iterator iter =
-                mesh_.find(fieldNames_[fieldi]);
-
-            if (iter != mesh_.objectRegistry::end())
-            {
-                fieldTypes[fieldi] = iter()->type();
-            }
-            else
-            {
-                fieldTypes[fieldi] = "(notFound)";
-            }
-        }
-    }
-
-
-    label nFields = 0;
-
-    // classify fieldTypes
-    nFields += grep(scalarFields_, fieldTypes);
-    nFields += grep(vectorFields_, fieldTypes);
-    nFields += grep(sphericalTensorFields_, fieldTypes);
-    nFields += grep(symmTensorFields_, fieldTypes);
-    nFields += grep(tensorFields_, fieldTypes);
-
-    if (Pstream::master())
-    {
-        if (debug)
-        {
-            Pout<< "timeName = " << mesh_.time().timeName() << nl
-                << "scalarFields    " << scalarFields_ << nl
-                << "vectorFields    " << vectorFields_ << nl
-                << "sphTensorFields " << sphericalTensorFields_ << nl
-                << "symTensorFields " << symmTensorFields_ <<nl
-                << "tensorFields    " << tensorFields_ <<nl;
-        }
-
-        if (nFields > 0)
-        {
-            if (debug)
-            {
-                Pout<< "Creating directory "
-                    << outputPath_/mesh_.time().timeName()
-                    << nl << endl;
-            }
-
-            mkDir(outputPath_/mesh_.time().timeName());
-        }
-    }
-
-    return nFields > 0;
-}
-
 
 void Foam::sampledSets::combineSampledSets
 (
@@ -146,9 +58,9 @@ void Foam::sampledSets::combineSampledSets
 
     const PtrList<sampledSet>& sampledSets = *this;
 
-    forAll(sampledSets, seti)
+    forAll (sampledSets, setI)
     {
-        const sampledSet& samplePts = sampledSets[seti];
+        const sampledSet& samplePts = sampledSets[setI];
 
         // Collect data from all processors
         List<List<point> > gatheredPts(Pstream::nProcs());
@@ -187,31 +99,27 @@ void Foam::sampledSets::combineSampledSets
             )
         );
 
+
+        if (Pstream::master() && allCurveDist.size() == 0)
+        {
+            WarningIn("sampledSets::combineSampledSets(..)")
+                << "Sample set " << samplePts.name()
+                << " has zero points." << endl;
+        }
+
         // Sort curveDist and use to fill masterSamplePts
         SortableList<scalar> sortedDist(allCurveDist);
-        indexSets[seti] = sortedDist.indices();
-
-        // Get reference point (note: only master has all points)
-        point refPt;
-
-        if (allPts.size())
-        {
-            refPt = samplePts.getRefPoint(allPts);
-        }
-        else
-        {
-            refPt = vector::zero;
-        }
+        indexSets[setI] = sortedDist.indices();
 
         masterSampledSets.set
         (
-            seti,
+            setI,
             new coordSet
             (
                 samplePts.name(),
                 samplePts.axis(),
-                UIndirectList<point>(allPts, indexSets[seti]),
-                refPt
+                List<point>(UIndirectList<point>(allPts, indexSets[setI])),
+                allCurveDist
             )
         );
     }
@@ -233,18 +141,17 @@ Foam::sampledSets::sampledSets
     mesh_(refCast<const fvMesh>(obr)),
     loadFromFiles_(loadFromFiles),
     outputPath_(fileName::null),
-    searchEngine_(mesh_, true),
-    fieldNames_(),
+    searchEngine_(mesh_),
     interpolationScheme_(word::null),
     writeFormat_(word::null)
 {
     if (Pstream::parRun())
     {
-        outputPath_ = mesh_.time().path()/".."/name_;
+        outputPath_ = mesh_.time().path()/".."/"postProcessing"/name_;
     }
     else
     {
-        outputPath_ = mesh_.time().path()/name_;
+        outputPath_ = mesh_.time().path()/"postProcessing"/name_;
     }
     if (mesh_.name() != fvMesh::defaultRegion)
     {
@@ -281,15 +188,51 @@ void Foam::sampledSets::end()
 }
 
 
+void Foam::sampledSets::timeSet()
+{
+    // Do nothing - only valid on write
+}
+
+
 void Foam::sampledSets::write()
 {
-    if (size() && checkFieldTypes())
+    if (size())
     {
-        sampleAndWrite(scalarFields_);
-        sampleAndWrite(vectorFields_);
-        sampleAndWrite(sphericalTensorFields_);
-        sampleAndWrite(symmTensorFields_);
-        sampleAndWrite(tensorFields_);
+        const label nFields = classifyFields();
+
+        if (Pstream::master())
+        {
+            if (debug)
+            {
+                Pout<< "timeName = " << mesh_.time().timeName() << nl
+                    << "scalarFields    " << scalarFields_ << nl
+                    << "vectorFields    " << vectorFields_ << nl
+                    << "sphTensorFields " << sphericalTensorFields_ << nl
+                    << "symTensorFields " << symmTensorFields_ <<nl
+                    << "tensorFields    " << tensorFields_ <<nl;
+            }
+
+            if (nFields)
+            {
+                if (debug)
+                {
+                    Pout<< "Creating directory "
+                        << outputPath_/mesh_.time().timeName()
+                            << nl << endl;
+                }
+
+                mkDir(outputPath_/mesh_.time().timeName());
+            }
+        }
+
+        if (nFields)
+        {
+            sampleAndWrite(scalarFields_);
+            sampleAndWrite(vectorFields_);
+            sampleAndWrite(sphericalTensorFields_);
+            sampleAndWrite(symmTensorFields_);
+            sampleAndWrite(tensorFields_);
+        }
     }
 }
 
@@ -298,37 +241,44 @@ void Foam::sampledSets::read(const dictionary& dict)
 {
     dict_ = dict;
 
-    fieldNames_ = wordList(dict_.lookup("fields"));
+    bool setsFound = dict_.found("sets");
+    if (setsFound)
+    {
+        dict_.lookup("fields") >> fieldSelection_;
+        clearFieldGroups();
 
-    interpolationScheme_ = "cell";
-    dict_.readIfPresent("interpolationScheme", interpolationScheme_);
+        dict.lookup("interpolationScheme") >> interpolationScheme_;
+        dict.lookup("setFormat") >> writeFormat_;
 
-    dict_.lookup("setFormat") >> writeFormat_;
+        PtrList<sampledSet> newList
+        (
+            dict_.lookup("sets"),
+            sampledSet::iNew(mesh_, searchEngine_)
+        );
+        transfer(newList);
+        combineSampledSets(masterSampledSets_, indexSets_);
 
-    scalarFields_.clear();
-    vectorFields_.clear();
-    sphericalTensorFields_.clear();
-    symmTensorFields_.clear();
-    tensorFields_.clear();
-
-    PtrList<sampledSet> newList
-    (
-        dict_.lookup("sets"),
-        sampledSet::iNew(mesh_, searchEngine_)
-    );
-    transfer(newList);
-    combineSampledSets(masterSampledSets_, indexSets_);
+        if (this->size())
+        {
+            Info<< "Reading set description:" << nl;
+            forAll(*this, setI)
+            {
+                Info<< "    " << operator[](setI).name() << nl;
+            }
+            Info<< endl;
+        }
+    }
 
     if (Pstream::master() && debug)
     {
-        Pout<< "sample fields:" << fieldNames_ << nl
+        Pout<< "sample fields:" << fieldSelection_ << nl
             << "sample sets:" << nl << "(" << nl;
 
-        forAll(*this, si)
+        forAll(*this, setI)
         {
-            Pout << "  " << operator[](si) << endl;
+            Pout<< "  " << operator[](setI) << endl;
         }
-        Pout << ")" << endl;
+        Pout<< ")" << endl;
     }
 }
 

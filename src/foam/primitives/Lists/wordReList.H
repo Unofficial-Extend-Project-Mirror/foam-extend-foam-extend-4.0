@@ -22,10 +22,16 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Typedef
+    Foam::wordReUList
+
+Description
+    A UList of wordRe (word or regular expression)
+
+Typedef
     Foam::wordReList
 
 Description
-    List of wordRe (word or regular expression)
+    A List of wordRe (word or regular expression)
 
 \*---------------------------------------------------------------------------*/
 
@@ -39,6 +45,8 @@ Description
 
 namespace Foam
 {
+    typedef UList<wordRe> wordReUList;
+
     typedef List<wordRe> wordReList;
 }
 

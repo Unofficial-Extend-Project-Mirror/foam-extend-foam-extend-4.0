@@ -99,10 +99,10 @@ public:
         instant(const scalar, const word&);
 
         //- Construct from time value
-        instant(const scalar);
+        explicit instant(const scalar);
 
         //- Construct from word
-        instant(const word&);
+        explicit instant(const word&);
 
 
     // Member Functions
@@ -132,6 +132,9 @@ public:
             {
                 return name_;
             }
+
+            //- Comparison used for instants to be equal
+            bool equal(const scalar) const;
 
 
     // Friend Operators

@@ -96,7 +96,7 @@ inline Foam::scalar Foam::polynomialTransport<Thermo, PolySize>::mu
     const scalar T
 ) const
 {
-    return muPolynomial_.evaluate(T)/this->W();
+    return muPolynomial_.value(T)/this->W();
 }
 
 
@@ -106,7 +106,7 @@ inline Foam::scalar Foam::polynomialTransport<Thermo, PolySize>::kappa
     const scalar T
 ) const
 {
-    return kappaPolynomial_.evaluate(T)/this->W();
+    return kappaPolynomial_.value(T)/this->W();
 }
 
 

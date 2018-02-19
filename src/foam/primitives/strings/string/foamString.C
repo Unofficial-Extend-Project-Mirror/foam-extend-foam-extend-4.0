@@ -24,7 +24,8 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "foamString.H"
-#include "OSspecific.H"
+#include "stringOps.H"
+
 
 /* * * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * * */
 
@@ -32,9 +33,9 @@ const char* const Foam::string::typeName = "string";
 int Foam::string::debug(debug::debugSwitchFromDict(string::typeName, 0));
 const Foam::string Foam::string::null;
 
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Count and return the number of a given character in the string
 Foam::string::size_type Foam::string::count(const char c) const
 {
     register size_type cCount = 0;
@@ -51,7 +52,6 @@ Foam::string::size_type Foam::string::count(const char c) const
 }
 
 
-// Replace first occurence of sub-string oldStr with newStr
 Foam::string& Foam::string::replace
 (
     const string& oldStr,
@@ -70,7 +70,6 @@ Foam::string& Foam::string::replace
 }
 
 
-// Replace all occurences of sub-string oldStr with newStr
 Foam::string& Foam::string::replaceAll
 (
     const string& oldStr,
@@ -93,134 +92,13 @@ Foam::string& Foam::string::replaceAll
 }
 
 
-// Expand all occurences of environment variables and initial tilde sequences
-Foam::string& Foam::string::expand()
+Foam::string& Foam::string::expand(const bool allowEmpty)
 {
-    size_type startEnvar = 0;
-
-    // Expand $VARS
-    // Repeat until nothing more is found
-    while
-    (
-        (startEnvar = find('$', startEnvar)) != npos
-     && startEnvar < size()-1
-    )
-    {
-        if (startEnvar == 0 || operator[](startEnvar-1) != '\\')
-        {
-            // Find end of first occurrence
-            size_type endEnvar = startEnvar;
-            size_type nd = 0;
-
-            if (operator[](startEnvar+1) == '{')
-            {
-                endEnvar = find('}', startEnvar);
-                nd = 1;
-            }
-            else
-            {
-                iterator iter = begin() + startEnvar + 1;
-
-                while (iter != end() && (isalnum(*iter) || *iter == '_'))
-                {
-                    ++iter;
-                    ++endEnvar;
-                }
-            }
-
-            if (endEnvar != npos && endEnvar != startEnvar)
-            {
-                string enVar = substr
-                (
-                    startEnvar + 1 + nd,
-                    endEnvar - startEnvar - 2*nd
-                );
-
-                string enVarString = getEnv(enVar);
-
-                if (enVarString.size())
-                {
-                    std::string::replace
-                    (
-                        startEnvar,
-                        endEnvar - startEnvar + 1,
-                        enVarString
-                    );
-                    startEnvar += enVarString.size();
-                }
-                else
-                {
-                    //startEnvar = endEnvar;
-
-                    FatalErrorIn("string::expand()")
-                        << "Unknown variable name " << enVar << '.'
-                        << exit(FatalError);
-                }
-            }
-            else
-            {
-                break;
-            }
-        }
-        else
-        {
-            startEnvar++;
-        }
-    }
-
-    if (size())
-    {
-        if (operator[](0) == '~')
-        {
-            // Expand initial ~
-            //   ~/        => home directory
-            //   ~foam => site/user FOAM configuration directory
-            //   ~user     => home directory for specified user
-
-            word user;
-            fileName file;
-
-            if ((startEnvar = find('/')) != npos)
-            {
-                user = substr(1, startEnvar - 1);
-                file = substr(startEnvar + 1);
-            }
-            else
-            {
-                user = substr(1);
-            }
-
-            // NB: be a bit lazy and expand ~unknownUser as an
-            // empty string rather than leaving it untouched.
-            // otherwise add extra test
-            if (user == "foam")
-            {
-                *this = findEtcFile(file);
-            }
-            else
-            {
-                *this = home(user)/file;
-            }
-        }
-        else if (operator[](0) == '.')
-        {
-            // Expand initial '.' and './' into cwd
-            if (size() == 1)
-            {
-                *this = cwd();
-            }
-            else if (operator[](1) == '/')
-            {
-                std::string::replace(0, 1, cwd());
-            }
-        }
-    }
-
+    stringOps::inplaceExpand(*this, allowEmpty);
     return *this;
 }
 
 
-// Remove repeated characters returning true if string changed
 bool Foam::string::removeRepeated(const char character)
 {
     bool changed = false;
@@ -259,7 +137,6 @@ bool Foam::string::removeRepeated(const char character)
 }
 
 
-// Return string with repeated characters removed
 Foam::string Foam::string::removeRepeated(const char character) const
 {
     string str(*this);
@@ -268,7 +145,6 @@ Foam::string Foam::string::removeRepeated(const char character) const
 }
 
 
-// Remove trailing character returning true if string changed
 bool Foam::string::removeTrailing(const char character)
 {
     bool changed = false;
@@ -284,7 +160,6 @@ bool Foam::string::removeTrailing(const char character)
 }
 
 
-// Return string with trailing character removed
 Foam::string Foam::string::removeTrailing(const char character) const
 {
     string str(*this);

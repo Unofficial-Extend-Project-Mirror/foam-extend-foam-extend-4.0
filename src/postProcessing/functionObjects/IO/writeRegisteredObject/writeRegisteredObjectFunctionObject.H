@@ -26,7 +26,7 @@ Typedef
 
 Description
     FunctionObject wrapper around writeRegisteredObject to allow them to be
-    created via the functions list within controlDict.
+    created via the functions entry within controlDict.
 
 SourceFiles
     writeRegisteredObjectFunctionObject.C
