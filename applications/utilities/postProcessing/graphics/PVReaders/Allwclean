@@ -1,0 +1,10 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+
+wclean libso vtkPVFoam
+
+[ ! -z "$FOAM_LIBBIN" ] && rm -f "$FOAM_LIBBIN/libvtkPVFoam"* 2>/dev/null
+[ ! -z "$PV_PLUGIN_PATH" ] && rm -f "$PV_PLUGIN_PATH/libPVFoamReader_SM"* 2>/dev/null
+rm -rf PVFoamReader/Make
+
+#------------------------------------------------------------------------------

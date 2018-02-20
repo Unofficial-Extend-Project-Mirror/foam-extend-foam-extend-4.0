@@ -1,0 +1,41 @@
+#!/bin/bash
+cd ${0%/*} || exit 1    # Run from this directory
+
+if [ -d "$PARAVIEW_DIR" -a -r "$PARAVIEW_DIR" ]; then
+    case "$PARAVIEW_VERSION" in
+        4* | 5*)
+            [ -n "$PV_PLUGIN_PATH" ] || {
+                echo "$0 : PV_PLUGIN_PATH not valid - it is unset"
+                exit 1
+            }
+
+            # ensure CMake gets the correct C/C++ compilers
+            [ -n "$WM_CC" ] && export CC="$WM_CC"
+            [ -n "$WM_CXX" ] && export CXX="$WM_CXX"
+
+            # store major version for usage in vtkPVFoam/Make/options
+            export PARAVIEW_MAJOR_VERSION="${PARAVIEW_VERSION:0:1}"
+
+            wmake libso vtkPVFoam
+
+            # clear major version
+            unset PARAVIEW_MAJOR_VERSION
+
+            (
+                cd PVFoamReader
+                mkdir -p Make/$WM_OPTIONS > /dev/null 2>&1
+                cd Make/$WM_OPTIONS
+                cmake ../..
+                if [ "$WM_ARCH_BASE" == "darwin" ]
+                then
+                    sed -i bak -e 's/-dynamiclib /& -undefined dynamic_lookup /' CMakeFiles/PVFoamReader.dir/link.txt
+                    sed -i bak -e 's/-dynamiclib /& -undefined dynamic_lookup /' CMakeFiles/PVFoamReader_SM.dir/link.txt
+                fi
+                make
+            )
+
+        ;;
+    esac
+fi
+
+#------------------------------------------------------------------------------
