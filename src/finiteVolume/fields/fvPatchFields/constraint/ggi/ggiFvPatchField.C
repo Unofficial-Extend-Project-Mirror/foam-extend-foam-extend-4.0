@@ -188,9 +188,18 @@ tmp<Field<Type> > ggiFvPatchField<Type>::patchNeighbourField() const
             this->patchInternalField()
         );
 
-        // Note: bridging now takes into account fully uncovered and partially
-        // covered faces. VV, 18/Oct/2017.
-        ggiPatch_.bridge(bridgeField, pnf);
+//        if (pTraits<Type>::rank == 0)
+//        {
+//            // Scale the field for scalars to ensure conservative and consistent
+//            // flux on both sides
+//            ggiPatch_.scaleForPartialCoverage(bridgeField, pnf);
+//        }
+//        else
+        {
+            // Bridge the field for higher order tensors to correctly take into
+            // account mirroring
+            ggiPatch_.bridge(bridgeField, pnf);
+        }
     }
 
     return tpnf;

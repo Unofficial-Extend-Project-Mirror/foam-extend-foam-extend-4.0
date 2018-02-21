@@ -270,20 +270,23 @@ void Foam::ggiPolyPatch::bridge
 template<class Type>
 void Foam::ggiPolyPatch::scaleForPartialCoverage
 (
-    Field<Type>& fieldToScale
+    const Field<Type>& uncoveredFaceField,
+    Field<Type>& ff
 ) const
 {
     // Check and expand the field from patch size to zone size
-    if (fieldToScale.size() != size())
+    if (ff.size() != size())
     {
         FatalErrorIn
         (
             "template<class Type> ggiPolyPatch::scaleForPartialCoverage\n"
             "(\n"
-            "    const Field<Type>& bridgeField,\n"
+            "    const Field<Type>& uncoveredFaceField,\n"
+            "    Field<Type>& ff,\n"
             ") const"
         )   << "Incorrect patch field size for scaling.  Field size: "
-            << fieldToScale.size() << " patch size: " << size()
+            << ff.size() << " uncovered field size: "
+            << uncoveredFaceField.size() << " patch size: " << size()
             << abort(FatalError);
     }
 
@@ -299,11 +302,11 @@ void Foam::ggiPolyPatch::scaleForPartialCoverage
         {
             if (master())
             {
-                patchToPatch().scaleMaster(fieldToScale);
+                patchToPatch().scaleMaster(uncoveredFaceField, ff);
             }
             else
             {
-                patchToPatch().scaleSlave(fieldToScale);
+                patchToPatch().scaleSlave(uncoveredFaceField, ff);
             }
         }
         else
@@ -313,7 +316,8 @@ void Foam::ggiPolyPatch::scaleForPartialCoverage
             {
                 patchToPatch().maskedScaleMaster
                 (
-                    fieldToScale,
+                    uncoveredFaceField,
+                    ff,
                     zoneAddressing()
                 );
             }
@@ -321,7 +325,8 @@ void Foam::ggiPolyPatch::scaleForPartialCoverage
             {
                 patchToPatch().maskedScaleSlave
                 (
-                    fieldToScale,
+                    uncoveredFaceField,
+                    ff,
                     zoneAddressing()
                 );
             }

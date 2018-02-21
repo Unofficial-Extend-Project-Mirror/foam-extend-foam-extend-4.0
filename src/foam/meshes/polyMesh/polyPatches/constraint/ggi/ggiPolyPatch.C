@@ -294,8 +294,6 @@ void Foam::ggiPolyPatch::calcReconFaceCellCentres() const
           - boundaryMesh()[shadowID].faceCentres()
         );
 
-        // The field is now interpolated, but we need to bridge it as well for
-        // possible partially covered faces
         if (bridgeOverlap_)
         {
             // Get necessary mesh data from polyPatch on this (master) side
@@ -305,13 +303,12 @@ void Foam::ggiPolyPatch::calcReconFaceCellCentres() const
             const vectorField ccf = faceCellCentres();
             const vectorField nf = Sf/mag(Sf);
 
-            // Mirrored field since bridging assumes symmetry plane treatment.
-            // Mirror centre-to-face cell centre vectors to other side
-            const vectorField mirrorField =
-                transform(I - 2.0*sqr(nf), ccf - cf);
+            // Deltas for fully uncovered faces
+            const vectorField uncoveredDeltas(2.0*(cf - ccf));
 
-            // Take into account fully uncovered and partially covered faces
-            bridge(mirrorField, tdf());
+            // Scale partially overlapping faces and set uncovered deltas to
+            // fully uncovered faces
+            scaleForPartialCoverage(uncoveredDeltas, tdf());
         }
 
         // Calculate the reconstructed cell centres

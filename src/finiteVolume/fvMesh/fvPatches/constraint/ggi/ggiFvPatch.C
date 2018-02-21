@@ -62,8 +62,9 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
     // HJ, 2/Aug/2007
     if (ggiPolyPatch_.master())
     {
-        // Master side. No need to bridge the overlap since reconFaceCellCentres
-        // already takes it into account. VV, 14/Feb/2018
+        // Master side. No need to scale partially uncovered or set fully
+        // uncovered faces since delta already takes it into account.
+        // VV, 25/Feb/2018.
 
         const vectorField n = nf();
 
@@ -79,8 +80,9 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
     }
     else
     {
-        // Slave side. Interpolate the master side weights and scale them up for
-        // partially covered faces if the bridge overlap is switched on
+        // Slave side. Interpolate the master side weights, scale them for
+        // partially covered faces and set weights for fully uncovered faces if
+        // the bridge overlap is switched on. VV, 15/Feb/2018.
 
         scalarField masterWeights(shadow().size());
         shadow().makeWeights(masterWeights);
@@ -90,13 +92,12 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
 
         if (bridgeOverlap())
         {
-            // Bridge weights for symmetry plane treatment
-            const scalarField bridgeField(w.size(), 0.5);
+            // Weights for fully uncovered faces
+            const scalarField uncoveredWeights(w.size(), 0.5);
 
-            bridge(bridgeField, w);
-
-            // Scale master weights for partially overlapping faces
-//            scaleForPartialCoverage(w);
+            // Scale partially overlapping faces and set uncovered weights
+            // for fully uncovered faces
+            scaleForPartialCoverage(uncoveredWeights, w);
         }
 
         // Finally construct these weights as 1 - master weights
@@ -110,8 +111,9 @@ void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
 {
     if (ggiPolyPatch_.master())
     {
-        // Master side. No need to bridge the overlap since delta already takes
-        // it into account. VV, 18/Oct/2017.
+        // Master side. No need to scale partially uncovered or set fully
+        // uncovered faces since delta already takes it into account.
+        // VV, 25/Feb/2018.
 
         // Stabilised form for bad meshes.  HJ, 24/Aug/2011
         const vectorField d = delta();
@@ -120,8 +122,9 @@ void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
     }
     else
     {
-        // Slave side. Interpolate the master side and scale it up for partially
-        // covered faces if the bridge overlap is switched on
+        // Slave side. Interpolate the master side, scale it for partially
+        // covered faces and set deltaCoeffs for fully uncovered faces if the
+        // bridge overlap is switched on. VV, 15/Feb/2018.
 
         scalarField masterDeltas(shadow().size());
         shadow().makeDeltaCoeffs(masterDeltas);
@@ -129,7 +132,15 @@ void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
 
         if (bridgeOverlap())
         {
-            scaleForPartialCoverage(dc);
+            // Delta coeffs for fully uncovered faces obtained from deltas on
+            // this side
+            const vectorField d = delta();
+            const scalarField uncoveredDeltaCoeffs =
+                1.0/max(nf() & d, 0.05*mag(d));
+
+            // Scale partially overlapping faces and set uncovered deltaCoeffs
+            // for fully uncovered faces.
+            scaleForPartialCoverage(uncoveredDeltaCoeffs, dc);
         }
     }
 }
@@ -158,8 +169,9 @@ Foam::tmp<Foam::vectorField> Foam::ggiFvPatch::delta() const
 {
     if (ggiPolyPatch_.master())
     {
-        // Master side. Note: bridging partially covered faces correctly taken
-        // into account in reconFaceCellCentres function
+        // Master side. Note: scaling partially covered faces and setting deltas
+        // to fully uncovered faces correctly taken into account in
+        // reconFaceCellCentres function. VV, 15/Feb/2018.
 
         tmp<vectorField> tDelta = ggiPolyPatch_.reconFaceCellCentres() - Cn();
 
@@ -167,8 +179,9 @@ Foam::tmp<Foam::vectorField> Foam::ggiFvPatch::delta() const
     }
     else
     {
-        // Slave side. Interpolate the master side and scale it up for partially
-        // covered faces if the bridge overlap is switched on
+        // Slave side. Interpolate the master side, scale it for partially
+        // covered faces and set deltas for fully uncovered faces if the bridge
+        // overlap is switched on. VV, 15/Feb/2018.
 
         tmp<vectorField> tDelta = interpolate
         (
@@ -177,7 +190,12 @@ Foam::tmp<Foam::vectorField> Foam::ggiFvPatch::delta() const
 
         if (bridgeOverlap())
         {
-            scaleForPartialCoverage(tDelta());
+            // Deltas for fully uncovered faces
+            const vectorField uncoveredDeltas(2.0*fvPatch::delta());
+
+            // Scale partially overlapping faces and set uncovered deltas for
+            // fully uncovered faces
+            scaleForPartialCoverage(uncoveredDeltas, tDelta());
         }
 
         return tDelta;
