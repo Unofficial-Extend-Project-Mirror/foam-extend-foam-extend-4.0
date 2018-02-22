@@ -52,7 +52,10 @@ Description
 #include <sys/socket.h>
 #include <netdb.h>
 #include <dlfcn.h>
+
+#ifndef darwin
 #include <link.h>
+#endif
 
 #include <netinet/in.h>
 

@@ -69,6 +69,11 @@ bool read(const char*, int64_t&);
 Istream& operator>>(Istream&, int64_t&);
 Ostream& operator<<(Ostream&, const int64_t);
 
+#if WM_ARCH_OPTION == 64 && darwin && __clang__
+    Istream& operator>>(Istream&, long&);
+    Ostream& operator<<(Ostream&, const long);
+#endif
+
 //- Template specialization for pTraits<int64_t>
 template<>
 class pTraits<int64_t>

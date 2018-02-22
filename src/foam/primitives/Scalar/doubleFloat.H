@@ -31,6 +31,25 @@ License
 
 #include <cmath>
 
+#if defined(darwin) && defined(__clang__)
+#ifndef DUMMY_SCALAR_FUNCTIONS
+#define DUMMY_SCALAR_FUNCTIONS
+inline float j0f(float x) { return float(j0(double(x)));}
+inline float j1f(float x) { return float(j1(double(x)));}
+inline float y0f(float x) { return float(y0(double(x)));}
+inline float y1f(float x) { return float(y1(double(x)));}
+inline float jnf(const int n, const float s) { return float(jn(n, double(s))); }
+inline float ynf(const int n, const float s) { return float(yn(n, double(s))); }
+
+inline long double j0l(float x) { return double(j0(double(x)));}
+inline long double j1l(float x) { return double(j1(double(x)));}
+inline long double y0l(float x) { return double(y0(double(x)));}
+inline long double y1l(float x) { return double(y1(double(x)));}
+inline long double jnl(const int n, const float s) { return double(jn(n, double(s))); }
+inline long double ynl(const int n, const float s) { return double(yn(n, double(s))); }
+#endif
+#endif // darwin
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
