@@ -264,10 +264,10 @@ Foam::fileNameList Foam::findEtcFiles
     fileNameList results;
 
     // Search for user files in
-    // * ~/.OpenFOAM/VERSION
-    // * ~/.OpenFOAM
+    // * ~/.foam/VERSION
+    // * ~/.foam
     //
-    fileName searchDir = home()/".OpenFOAM";
+    fileName searchDir = home()/".foam";
     if (isDir(searchDir))
     {
         fileName fullName = searchDir/FOAMversion/name;
