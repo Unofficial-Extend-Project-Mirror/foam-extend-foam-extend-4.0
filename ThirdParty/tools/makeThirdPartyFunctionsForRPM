@@ -122,7 +122,8 @@ rpm_make()
 
             if [ ! -e "SOURCES/$packageTarBall" ]; then
 		echo "Download $packageTarBall from : $_PACKAGE_URL"
-		( cd SOURCES; wget --no-check-certificate $_PACKAGE_URL )
+		#( cd SOURCES; wget --no-check-certificate $_PACKAGE_URL )
+		( cd SOURCES; curl -L -k -O $_PACKAGE_URL )
             fi
 	fi
 
