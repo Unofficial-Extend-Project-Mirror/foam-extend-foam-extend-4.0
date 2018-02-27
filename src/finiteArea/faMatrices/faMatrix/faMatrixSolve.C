@@ -60,7 +60,7 @@ lduSolverPerformance faMatrix<Type>::solve(const dictionary& solverControls)
             << endl;
     }
 
-    lduSolverPerformance solverPerfVec
+    BlockSolverPerformance<Type> solverPerfVec
     (
         "faMatrix<Type>::solve",
         psi_.name()
@@ -134,14 +134,7 @@ lduSolverPerformance faMatrix<Type>::solve(const dictionary& solverControls)
 
         solverPerf.print();
 
-        if
-        (
-            solverPerf.initialResidual() > solverPerfVec.initialResidual()
-         && !solverPerf.singular()
-        )
-        {
-            solverPerfVec = solverPerf;
-        }
+        solverPerfVec.replace(cmpt, solverPerf);
 
         psi.internalField().replace(cmpt, psiCmpt);
         diag() = saveDiag;
@@ -149,7 +142,9 @@ lduSolverPerformance faMatrix<Type>::solve(const dictionary& solverControls)
 
     psi.correctBoundaryConditions();
 
-    return solverPerfVec;
+    psi_.mesh().solutionDict().setSolverPerformance(psi_.name(), solverPerfVec);
+
+    return solverPerfVec.max();
 }
 
 

@@ -45,6 +45,55 @@ void Foam::solution::cachePrintMessage
 }
 
 
+template<class Type>
+void Foam::solution::setSolverPerformance
+(
+    const word& name,
+    const BlockSolverPerformance<Type>& sp
+) const
+{
+    List<BlockSolverPerformance<Type> > perfs;
+
+    if (prevTimeIndex_ != this->time().timeIndex())
+    {
+        // Reset solver performance between iterations
+        prevTimeIndex_ = this->time().timeIndex();
+        solverPerformance_.clear();
+    }
+    else
+    {
+        solverPerformance_.readIfPresent(name, perfs);
+    }
+
+    // If storeAllResiduals_ is true, we are storing residual of every iteration
+    // inside a single time step. Otherwise, only the first iteration residual
+    // and the current iteration residual are required, so the current
+    // iteration residual replaces the previous one and only the first iteration
+    // residual is always present, VS 2018-02-11
+    if (storeAllResiduals_ || perfs.size() < 2)
+    {
+        // Append to list
+        perfs.setSize(perfs.size() + 1, sp);
+    }
+    else
+    {
+        perfs.last() = sp;
+    }
+
+    solverPerformance_.set(name, perfs);
+}
+
+
+template<class Type>
+void Foam::solution::setSolverPerformance
+(
+    const BlockSolverPerformance<Type>& sp
+) const
+{
+    setSolverPerformance(sp.fieldName(), sp);
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 

@@ -22,26 +22,37 @@ $(faMeshMapper)/faPatchMapper.C
 
 faPatchFields = fields/faPatchFields
 $(faPatchFields)/faPatchField/faPatchFields.C
+$(faPatchFields)/faPatchField/faPatchVectorNFields.C
 
 basicFaPatchFields = $(faPatchFields)/basic
 $(basicFaPatchFields)/basicSymmetry/basicSymmetryFaPatchFields.C
 $(basicFaPatchFields)/basicSymmetry/basicSymmetryFaPatchScalarField.C
 $(basicFaPatchFields)/calculated/calculatedFaPatchFields.C
+$(basicFaPatchFields)/calculated/calculatedFaPatchVectorNFields.C
 $(basicFaPatchFields)/coupled/coupledFaPatchFields.C
+$(basicFaPatchFields)/coupled/coupledFaPatchVectorNFields.C
 $(basicFaPatchFields)/zeroGradient/zeroGradientFaPatchFields.C
+$(basicFaPatchFields)/zeroGradient/zeroGradientFaPatchVectorNFields.C
 $(basicFaPatchFields)/fixedValue/fixedValueFaPatchFields.C
+$(basicFaPatchFields)/fixedValue/fixedValueFaPatchVectorNFields.C
 $(basicFaPatchFields)/fixedGradient/fixedGradientFaPatchFields.C
+$(basicFaPatchFields)/fixedGradient/fixedGradientFaPatchVectorNFields.C
 $(basicFaPatchFields)/mixed/mixedFaPatchFields.C
 $(basicFaPatchFields)/transform/transformFaPatchFields.C
 $(basicFaPatchFields)/transform/transformFaPatchScalarField.C
+$(basicFaPatchFields)/transform/transformFaPatchVectorNFields.C
 
 constraintFaPatchFields = $(faPatchFields)/constraint
 $(constraintFaPatchFields)/empty/emptyFaPatchFields.C
+$(constraintFaPatchFields)/empty/emptyFaPatchVectorNFields.C
 $(constraintFaPatchFields)/processor/processorFaPatchFields.C
 $(constraintFaPatchFields)/processor/processorFaPatchScalarField.C
+$(constraintFaPatchFields)/processor/processorFaPatchVectorNFields.C
 $(constraintFaPatchFields)/wedge/wedgeFaPatchFields.C
 $(constraintFaPatchFields)/wedge/wedgeFaPatchScalarField.C
+$(constraintFaPatchFields)/wedge/wedgeFaPatchVectorNFields.C
 $(constraintFaPatchFields)/cyclic/cyclicFaPatchFields.C
+$(constraintFaPatchFields)/cyclic/cyclicFaPatchVectorNFields.C
 $(constraintFaPatchFields)/symmetry/symmetryFaPatchFields.C
 
 derivedFaPatchFields = $(faPatchFields)/derived
@@ -66,8 +77,18 @@ $(constraintFaePatchFields)/wedge/wedgeFaePatchFields.C
 $(constraintFaePatchFields)/cyclic/cyclicFaePatchFields.C
 $(constraintFaePatchFields)/symmetry/symmetryFaePatchFields.C
 
+faePatchVectorNFields = $(faePatchFields)/faePatchVectorNFields
+$(faePatchVectorNFields)/faePatchVectorNFields.C
+$(faePatchVectorNFields)/calculatedFaePatchVectorNFields.C
+$(faePatchVectorNFields)/emptyFaePatchVectorNFields.C
+$(faePatchVectorNFields)/wedgeFaePatchVectorNFields.C
+$(faePatchVectorNFields)/coupledFaePatchVectorNFields.C
+$(faePatchVectorNFields)/processorFaePatchVectorNFields.C
+
 fields/areaFields/areaFields.C
+fields/areaFields/areaVectorNFields.C
 fields/edgeFields/edgeFields.C
+fields/edgeFields/edgeVectorNFields.C
 
 faMatrices/faMatrices.C
 faMatrices/faScalarMatrix/faScalarMatrix.C
@@ -121,5 +142,13 @@ $(laplacianSchemes)/gaussFaLaplacianScheme/gaussFaLaplacianSchemes.C
 convectionSchemes = finiteArea/convectionSchemes
 $(convectionSchemes)/faConvectionScheme/faConvectionSchemes.C
 $(convectionSchemes)/gaussFaConvectionScheme/gaussFaConvectionSchemes.C
+
+general = cfdTools/general
+
+solutionFaControl = $(general)/solutionFaControl
+$(solutionFaControl)/solutionFaControl/solutionFaControl.C
+$(solutionFaControl)/simpleFaControl/simpleFaControl.C
+$(solutionFaControl)/pimpleFaControl/pimpleFaControl.C
+$(solutionFaControl)/pisoFaControl/pisoFaControl.C
 
 LIB = $(FOAM_LIBBIN)/libfiniteArea

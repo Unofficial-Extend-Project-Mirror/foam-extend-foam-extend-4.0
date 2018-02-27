@@ -24,7 +24,8 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "solutionControl.H"
-#include "lduMatrix.H"
+#include "fieldTypes.H"
+#include "VectorNFieldTypes.H"
 #include "fvc.H"
 #include "inletOutletFvPatchFields.H"
 #include "slipFvPatchFields.H"
@@ -180,6 +181,21 @@ void Foam::solutionControl::storePrevIterFields() const
     storePrevIter<sphericalTensor>();
     storePrevIter<symmTensor>();
     storePrevIter<tensor>();
+
+    storePrevIter<vector2>();
+    storePrevIter<vector4>();
+    storePrevIter<vector6>();
+    storePrevIter<vector8>();
+
+    storePrevIter<sphericalTensor2>();
+    storePrevIter<sphericalTensor4>();
+    storePrevIter<sphericalTensor6>();
+    storePrevIter<sphericalTensor8>();
+
+    storePrevIter<tensor2>();
+    storePrevIter<tensor4>();
+    storePrevIter<tensor6>();
+    storePrevIter<tensor8>();
 }
 
 
@@ -196,7 +212,7 @@ void Foam::solutionControl::maxTypeResidual
 
     if (mesh_.foundObject<fieldType>(fieldName))
     {
-        const List<lduSolverPerformance> sp(data);
+        const List<BlockSolverPerformance<Type> > sp(data);
         firstRes = cmptMax(sp.first().initialResidual());
         lastRes = cmptMax(sp.last().initialResidual());
     }
@@ -217,6 +233,21 @@ Foam::scalar Foam::solutionControl::maxResidual
     maxTypeResidual<sphericalTensor>(fieldName, data, firstRes, lastRes);
     maxTypeResidual<symmTensor>(fieldName, data, firstRes, lastRes);
     maxTypeResidual<tensor>(fieldName, data, firstRes, lastRes);
+
+    maxTypeResidual<vector2>(fieldName, data, firstRes, lastRes);
+    maxTypeResidual<vector4>(fieldName, data, firstRes, lastRes);
+    maxTypeResidual<vector6>(fieldName, data, firstRes, lastRes);
+    maxTypeResidual<vector8>(fieldName, data, firstRes, lastRes);
+
+    maxTypeResidual<sphericalTensor2>(fieldName, data, firstRes, lastRes);
+    maxTypeResidual<sphericalTensor4>(fieldName, data, firstRes, lastRes);
+    maxTypeResidual<sphericalTensor6>(fieldName, data, firstRes, lastRes);
+    maxTypeResidual<sphericalTensor8>(fieldName, data, firstRes, lastRes);
+
+    maxTypeResidual<tensor2>(fieldName, data, firstRes, lastRes);
+    maxTypeResidual<tensor4>(fieldName, data, firstRes, lastRes);
+    maxTypeResidual<tensor6>(fieldName, data, firstRes, lastRes);
+    maxTypeResidual<tensor8>(fieldName, data, firstRes, lastRes);
 
     return firstRes;
 }

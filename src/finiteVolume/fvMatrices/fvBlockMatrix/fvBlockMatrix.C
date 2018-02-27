@@ -1375,6 +1375,8 @@ Foam::BlockSolverPerformance<Type> Foam::fvBlockMatrix<Type>::solve
     // Print performance
     solverPerf.print();
 
+    psi_.mesh().solutionDict().setSolverPerformance(psi_.name(), solverPerf);
+
     return solverPerf;
 }
 

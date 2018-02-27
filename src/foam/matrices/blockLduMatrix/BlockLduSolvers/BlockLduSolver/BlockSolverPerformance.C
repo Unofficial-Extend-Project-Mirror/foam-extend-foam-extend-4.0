@@ -113,6 +113,36 @@ void Foam::BlockSolverPerformance<Type>::print() const
 
 
 template<class Type>
+void Foam::BlockSolverPerformance<Type>::replace
+(
+    const Foam::label cmpt,
+    const Foam::BlockSolverPerformance<typename pTraits<Type>::cmptType>& bsp
+)
+{
+    initialResidual_.replace(cmpt, bsp.initialResidual());
+    finalResidual_.replace(cmpt, bsp.finalResidual());
+    singular_ = singular_ || bsp.singular();
+}
+
+
+template<class Type>
+Foam::BlockSolverPerformance<typename Foam::pTraits<Type>::cmptType>
+Foam::BlockSolverPerformance<Type>::max()
+{
+    return BlockSolverPerformance<typename pTraits<Type>::cmptType>
+    (
+        solverName_,
+        fieldName_,
+        cmptMax(initialResidual_),
+        cmptMax(finalResidual_),
+        nIterations_,
+        converged_,
+        singular_
+    );
+}
+
+
+template<class Type>
 bool Foam::BlockSolverPerformance<Type>::operator!=
 (
     const BlockSolverPerformance<Type>& bsp
@@ -127,6 +157,26 @@ bool Foam::BlockSolverPerformance<Type>::operator!=
      || nIterations()     != bsp.nIterations()
      || converged()       != bsp.converged()
      || singular()        != bsp.singular()
+    );
+}
+
+
+template<class Type>
+typename Foam::BlockSolverPerformance<Type> Foam::max
+(
+    const typename Foam::BlockSolverPerformance<Type>& bsp1,
+    const typename Foam::BlockSolverPerformance<Type>& bsp2
+)
+{
+    return BlockSolverPerformance<Type>
+    (
+        bsp1.solverName(),
+        bsp1.fieldName(),
+        max(bsp1.initialResidual(), bsp2.initialResidual()),
+        max(bsp1.finalResidual(), bsp2.finalResidual()),
+        max(bsp1.nIterations(), bsp2.nIterations()),
+        bsp1.converged() && bsp2.converged(),
+        bsp1.singular() || bsp2.singular()
     );
 }
 

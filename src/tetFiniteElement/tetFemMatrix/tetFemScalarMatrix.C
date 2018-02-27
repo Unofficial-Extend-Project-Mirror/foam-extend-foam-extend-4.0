@@ -131,6 +131,8 @@ lduSolverPerformance tetFemMatrix<scalar>::solve
 
     psi.correctBoundaryConditions();
 
+    psi_.mesh().solutionDict().setSolverPerformance(psi_.name(), solverPerf);
+
     return solverPerf;
 }
 

@@ -69,7 +69,7 @@ Foam::lduSolverPerformance Foam::fvMatrix<Type>::solve
     // Complete matrix assembly.  HJ, 17/Apr/2012
     this->completeAssembly();
 
-    lduSolverPerformance solverPerfVec
+    BlockSolverPerformance<Type> solverPerfVec
     (
         "fvMatrix<Type>::solve",
         psi_.name()
@@ -155,14 +155,7 @@ Foam::lduSolverPerformance Foam::fvMatrix<Type>::solve
 
         solverPerf.print();
 
-        if
-        (
-            solverPerf.initialResidual() > solverPerfVec.initialResidual()
-         && !solverPerf.singular()
-        )
-        {
-            solverPerfVec = solverPerf;
-        }
+        solverPerfVec.replace(cmpt, solverPerf);
 
         psi.internalField().replace(cmpt, psiCmpt);
         diag() = saveDiag;
@@ -172,7 +165,7 @@ Foam::lduSolverPerformance Foam::fvMatrix<Type>::solve
 
     psi_.mesh().solutionDict().setSolverPerformance(psi_.name(), solverPerfVec);
 
-    return solverPerfVec;
+    return solverPerfVec.max();
 }
 
 

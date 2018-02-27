@@ -130,6 +130,8 @@ lduSolverPerformance faMatrix<scalar>::faSolver::solve
 
     psi.correctBoundaryConditions();
 
+    psi.mesh().solutionDict().setSolverPerformance(psi.name(), solverPerf);
+
     return solverPerf;
 }
 
@@ -176,6 +178,8 @@ lduSolverPerformance faMatrix<scalar>::solve
     diag() = saveDiag;
 
     psi.correctBoundaryConditions();
+
+    psi_.mesh().solutionDict().setSolverPerformance(psi_.name(), solverPerf);
 
     return solverPerf;
 }
