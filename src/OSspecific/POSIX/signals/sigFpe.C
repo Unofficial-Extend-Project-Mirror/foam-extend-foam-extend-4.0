@@ -262,7 +262,7 @@ void Foam::sigFpe::set(const bool verbose)
 #       elif defined(__APPLE__)
 
         struct sigaction newAction;
-        newAction.sa_handler = sigFpeHandler;
+        newAction.sa_handler = sigHandler;
         newAction.sa_flags = SA_NODEFER;
         sigemptyset(&newAction.sa_mask);
         if (sigaction(SIGFPE, &newAction, &oldAction_) < 0)

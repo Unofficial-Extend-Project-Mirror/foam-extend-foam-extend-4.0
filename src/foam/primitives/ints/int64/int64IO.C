@@ -101,5 +101,17 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const int64_t i)
     return os;
 }
 
+#if WM_ARCH_OPTION == 64 && darwin && __clang__
+Foam::Istream& Foam::operator>>(Istream& is, long& i)
+{
+    return operator>>(is, reinterpret_cast<int64_t&>(i));
+}
+
+Foam::Ostream& Foam::operator<<(Ostream& os, const long i)
+{
+    os << int64_t(i);
+    return os;
+}
+#endif
 
 // ************************************************************************* //

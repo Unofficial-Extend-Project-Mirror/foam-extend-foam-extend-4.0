@@ -10,4 +10,5 @@ EXE_LIBS = \
     -lmeshTools \
     -lincompressibleRASModels \
     -lincompressibleTransportModels \
+    -lincompressibleTurbulenceModel \
     -llduSolvers

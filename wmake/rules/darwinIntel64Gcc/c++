@@ -1,6 +1,6 @@
 .SUFFIXES: .C .cxx .cc .cpp
 
-c++WARN     = -Wall -Wextra -Wno-unused-parameter -Wold-style-cast -Wno-overloaded-virtual -Wno-unsequenced -Wno-c++11-extensions -Wno-unused-comparison
+c++WARN     = -Wall -Wextra -Wno-unused-parameter -Wold-style-cast -Wno-overloaded-virtual -Wno-unsequenced -Wno-c++11-extensions -Wno-unused-comparison -Wno-undefined-var-template
 
 CC          = $(WM_CXX) $(WM_CXXFLAGS) -ftrapping-math
 
