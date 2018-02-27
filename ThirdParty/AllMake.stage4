@@ -65,6 +65,12 @@ then
 	echo "Building Qt 4.8.6"
 	( rpm_make -p qt-everywhere-opensource-src-4.8.6 -s qt-everywhere-opensource-src-4.8.6.spec -u http://download.qt.io/archive/qt/4.8/4.8.6/qt-everywhere-opensource-src-4.8.6.tar.gz )
     }
+    # Qt 5.8.0
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_QT_580" ] && {
+    echo "Building Qt 5.8.0"
+    ( rpm_make -p qt-everywhere-opensource-src-5.8.0 -s qt-everywhere-opensource-src-5.8.0.spec -u http://download.qt.io/archive/qt/5.8/5.8.0/single/qt-everywhere-opensource-src-5.8.0.tar.gz )
+    }
 else
     echo "Using system installed QT"
     echo ""
@@ -108,6 +114,14 @@ then
             echo "Building ParaView 4.4.0"
             ( rpm_make -p ParaView-4.4.0 -s ParaView-4.4.0.spec -u http://downloads.sourceforge.net/project/foam-extend/ThirdParty/ParaView-v4.4.0-source.tar.gz \
 		-f --define='_qmakePath $QT_BIN_DIR/qmake'
+            )
+        }
+        # ParaView 5.4.1
+        #
+        [ ! -z "$WM_THIRD_PARTY_USE_PARAVIEW_541" ] && {
+            echo "Building ParaView 5.4.1"
+            ( rpm_make -p ParaView-5.4.1 -s ParaView-5.4.1.spec -u http://www.paraview.org/files/v5.4/ParaView-v5.4.1.tar.gz \
+        -f --define='_qmakePath $QT_BIN_DIR/qmake'
             )
         }
     else

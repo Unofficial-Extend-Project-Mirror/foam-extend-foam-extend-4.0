@@ -1,0 +1,12 @@
+vtkPVFoam.C
+vtkPVFoamFields.C
+vtkPVFoamMesh.C
+vtkPVFoamMeshLagrangian.C
+vtkPVFoamMeshPatch.C
+vtkPVFoamMeshSet.C
+vtkPVFoamMeshVolume.C
+vtkPVFoamMeshZone.C
+vtkPVFoamUpdateInfo.C
+vtkPVFoamUtilities.C
+
+LIB = $(FOAM_LIBBIN)/libvtkPVFoam

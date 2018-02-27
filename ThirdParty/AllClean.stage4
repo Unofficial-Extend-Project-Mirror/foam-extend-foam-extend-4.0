@@ -51,13 +51,19 @@ echo ========================================
 echo
 
 # QT
-uninstallPackage qt-everywhere-opensource-src-4.8.6 $1
+uninstallPackage qt-everywhere-opensource-src-4.7.0 $1
 uninstallPackage qt-everywhere-opensource-src-4.7.4 $1
+uninstallPackage qt-everywhere-opensource-src-4.8.5 $1
+uninstallPackage qt-everywhere-opensource-src-4.8.6 $1
+uninstallPackage qt-everywhere-opensource-src-5.8.0 $1
 
 # ParaView
 uninstallPackage ParaView-4.0.1 $1
 uninstallPackage ParaView-4.1.0 $1
+uninstallPackage ParaView-4.2.0 $1
 uninstallPackage ParaView-4.3.1 $1
+uninstallPackage ParaView-4.4.0 $1
+uninstallPackage ParaView-5.4.1 $1
 
 # ParaView-Server
 uninstallPackage llvm-3.6.0
