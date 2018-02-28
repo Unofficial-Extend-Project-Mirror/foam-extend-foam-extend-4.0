@@ -522,7 +522,35 @@ EulerDdtScheme<Type>::fvcDdtConsistentPhiCorr
     const surfaceScalarField& rAUf
 )
 {
-    return (mesh().Sf() & faceU.oldTime())*rAUf/mesh().time().deltaT();
+    tmp<fluxFieldType> toldTimeFlux =
+        (mesh().Sf() & faceU.oldTime())*rAUf/mesh().time().deltaT();
+
+    if (mesh().moving())
+    {
+        // Mesh is moving, need to take into account the ratio between old and
+        // current cell volumes
+        volScalarField V0ByV
+        (
+            IOobject
+            (
+                "V0ByV",
+                mesh().time().timeName(),
+                mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh(),
+            dimensionedScalar("one", dimless, 1.0),
+            zeroGradientFvPatchScalarField::typeName
+        );
+        V0ByV.internalField() = mesh().V0()/mesh().V();
+        V0ByV.correctBoundaryConditions();
+
+        // Correct the flux with interpolated volume ratio
+        toldTimeFlux() *= fvc::interpolate(V0ByV);
+    }
+
+    return toldTimeFlux;
 }
 
 
