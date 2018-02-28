@@ -4,4 +4,3 @@
 
 runApplication blockMesh
 runApplication RichardsFoam
-runApplication spatialMeanValueRichardsonFoam psi
