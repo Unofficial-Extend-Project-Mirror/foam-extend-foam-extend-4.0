@@ -53,8 +53,6 @@ int main(int argc, char *argv[])
 
     instantList timeDirs = timeSelector::select0(runTime, args);
 
-    volPointInterpolation pInterp(mesh);
-
     pointField zeroPoints(mesh.points());
 
     forAll(timeDirs, timeI)
@@ -72,6 +70,9 @@ int main(int argc, char *argv[])
             mesh,
             IOobject::MUST_READ
         );
+
+        // Create volPointInterpolation object after the mesh has been read
+        volPointInterpolation pInterp(mesh);
 
         // Check U exists
         if (Uheader.headerOk())
