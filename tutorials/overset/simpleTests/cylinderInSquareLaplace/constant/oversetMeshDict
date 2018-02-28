@@ -18,7 +18,9 @@ FoamFile
 
 interpolation
 {
-    type injection;
+    interpolationSchemes (injection);
+
+    default injection;
 }
 
 holePatches  ( cylinder );

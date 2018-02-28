@@ -20,8 +20,9 @@ runParallel $application 6
 # Run serial
 runApplication icoOversetFoam
 
+# Commented out for test loop
 # Compare parallel and serial results: serial run will be in time directory 3
 # and the parallel run will be in time directory 2
-\mv 2 3
-runApplication reconstructPar -latestTime
-meld 2 3
+#\mv 2 3
+#runApplication reconstructPar -latestTime
+#meld 2 3

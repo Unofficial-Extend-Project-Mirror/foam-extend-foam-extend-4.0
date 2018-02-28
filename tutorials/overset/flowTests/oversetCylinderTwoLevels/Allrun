@@ -10,7 +10,7 @@ runApplication blockMesh
 \cp -f boundary constant/polyMesh/boundary
 runApplication setSet -batch setBatch.batch
 \rm -f constant/polyMesh/sets/*_old constant/polyMesh/sets/*_old.gz
-runApplication setsToZones -batch
+runApplication setsToZones
 
 runApplication potentialOversetFoam -writep
 runApplication $application

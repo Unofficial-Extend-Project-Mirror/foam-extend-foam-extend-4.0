@@ -8,7 +8,5 @@ application="laplacianFoam"
 \cp -f blockMeshDict constant/polyMesh/blockMeshDict
 runApplication blockMesh
 \cp -f boundary constant/polyMesh/boundary
-# runApplication setsToZones  Not needed: cellZones built by blockMesh
 
-runApplication decomposePar -cellDist
-runParallel $application 2
+runApplication $application

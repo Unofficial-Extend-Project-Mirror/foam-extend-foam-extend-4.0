@@ -1,4 +1,0 @@
-#!/bin/sh
-
-( cd movingCylinderInChannelicoDyMOversetFoam ; ./Allrun )
-( cd movingCylinderInChannelpimpleDyMOversetFoam ; ./Allrun )

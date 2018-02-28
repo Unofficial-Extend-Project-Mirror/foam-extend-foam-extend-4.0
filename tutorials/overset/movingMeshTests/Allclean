@@ -1,4 +1,0 @@
-#!/bin/sh
-
-( cd movingCylinderInChannelicoDyMOversetFoam ; ./Allclean )
-( cd movingCylinderInChannelpimpleDyMOversetFoam ; ./Allclean )
