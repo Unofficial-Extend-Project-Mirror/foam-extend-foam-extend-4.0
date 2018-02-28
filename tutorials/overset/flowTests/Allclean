@@ -1,0 +1,7 @@
+#!/bin/sh
+
+( cd channelSimpleOverlapicoOversetFoam ; ./Allclean )
+( cd cylinderInChannelicoOversetFoam ; ./Allclean )
+
+( cd staticCylinderSheddingTest ; ./Allclean )
+( cd navyCylinderSheddingTest ; ./Allclean )

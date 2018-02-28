@@ -1,0 +1,8 @@
+cellSet backFringe new cellToCell background
+cellSet backFringe subset sphereToCell (0 0 0) 0.27
+cellSet backHole new cellToCell background
+cellSet backHole subset sphereToCell (0 0 0) 0.22
+cellSet backFringe delete cellToCell backHole
+cellSet empty new labelToCell 0 ()
+
+quit

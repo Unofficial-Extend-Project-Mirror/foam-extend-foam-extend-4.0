@@ -1,0 +1,10 @@
+Reference experimental data:
+https://turbmodels.larc.nasa.gov/naca4412sep_val.html
+
+Overset:
+    - Low Reynolds mesh with y+ << 1
+
+Single mesh:
+    - High Reynolds with y+ approximately 16
+
+Work in progress: comparing velocity profiles at certain chord lengths.

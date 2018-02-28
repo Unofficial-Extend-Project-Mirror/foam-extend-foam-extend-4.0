@@ -1,0 +1,32 @@
+#!/bin/bash 
+
+# Run cases
+(cd explicitOverset ; ./Allrun)
+(cd implicitConservativeOverset ; ./Allrun)
+(cd implicitNonConservativeOverset ; ./Allrun)
+(cd noOverset; ./Allrun)
+
+# Plot pressure distribution
+gnuplot -persist  << 'EOF'
+
+set term pngcairo dashed size 1024,768 font "Arial,12"
+set output "Cp.png"
+set yrange [* : *] reverse; 
+plot \
+'./validationData/cp.dat' \
+using ($1/0.901):2 title 'Experimetal results', \
+'./explicitOverset/p_solidWall.raw' \
+using ($1/0.901):($4/368.018) title 'Explicit overset', \
+'./implicitNonConservativeOverset/p_solidWall.raw' \
+using ($1/0.901):($4/368.018) title 'Implicit non-conservative overset', \
+'./implicitConservativeOverset/p_solidWall.raw' \
+using ($1/0.901):($4/368.018) title 'Implicit conservative overset', \
+'./noOverset/p_solidWall.raw' \
+using ($1/0.901):($4/368.018) title 'Single mesh' ;
+
+EOF
+
+# Move the file
+mkdir -v validationResults
+mv -v *.png validationResults/
+gnome-open validationResults/Cp.png

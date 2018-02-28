@@ -1,0 +1,3 @@
+scalarTransportOversetFoam.C
+
+EXE = $(FOAM_APPBIN)/scalarTransportOversetFoam

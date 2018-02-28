@@ -1,0 +1,6 @@
+#!/bin/sh
+
+( cd simpleTests ; ./Allrun )
+( cd flowTests ; ./Allrun )
+( cd movingMeshTests ; ./Allrun )
+( cd freeSurfaceTests ; ./Allrun )

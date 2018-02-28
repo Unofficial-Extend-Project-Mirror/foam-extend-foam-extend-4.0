@@ -1,0 +1,95 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright held by original author
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of OpenFOAM.
+
+    OpenFOAM is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+Class
+    Foam::donorSuitability::patchDistance
+
+Description
+    Patch distance suitability. For master region (acceptors) and all donor
+    regions (donors), a list of patches is specified and the donor suitability
+    function is the least distance from cell centre to nearest patch.
+
+    Attempts to minimise the overlap midway between patches.
+
+SourceFiles
+    patchDistance.C
+
+Author
+    Vuko Vukcevic, FMENA Zagreb.  All rights reserved.
+
+\*---------------------------------------------------------------------------*/
+
+#ifndef patchDistance_H
+#define patchDistance_H
+
+#include "donorSuitability.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+namespace donorSuitability
+{
+
+/*---------------------------------------------------------------------------*\
+                       Class patchDistance Declaration
+\*---------------------------------------------------------------------------*/
+
+class patchDistance
+:
+    public donorSuitability
+{
+
+public:
+
+    //- Runtime type information
+    TypeName("patchDistance");
+
+
+    // Constructors
+
+        //- Construct from components
+        patchDistance
+        (
+            const overlapFringe& overlapFringeAlgorithm,
+            const dictionary& dict
+        );
+
+
+    //- Destructor
+    virtual ~patchDistance()
+    {}
+};
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace patchDistance
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //
