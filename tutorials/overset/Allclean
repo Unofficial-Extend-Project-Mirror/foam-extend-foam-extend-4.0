@@ -1,0 +1,6 @@
+#!/bin/sh
+
+( cd simpleTests ; ./Allclean )
+( cd flowTests ; ./Allclean )
+( cd movingMeshTests ; ./Allclean )
+( cd freeSurfaceTests ; ./Allclean )

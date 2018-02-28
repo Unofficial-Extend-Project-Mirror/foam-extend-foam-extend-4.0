@@ -1,0 +1,71 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  | For copyright notice see file Copyright         |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+    class           dictionary;
+    object          oversetMeshDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+interpolation
+{
+    interpolationSchemes (injection);
+
+    default injection;
+}
+
+// Names or patches that determine hole cells
+holePatches  ( cylinder );
+
+regions
+(
+    background
+    {
+        // Donor regions
+        donorRegions ( front );
+
+//         fringe
+//         {
+//             type manual;
+//             holes       "backHole";
+//             acceptors   "backFringe";
+//         }
+
+        fringe
+        {
+            type overlap;
+
+            suitablePairFraction 0.5;
+            cacheFringe          no;
+
+            donorSuitability
+            {
+                type      noSuitability;
+                threshold 1;
+            }
+        }
+    }
+
+    front
+    {
+        donorRegions ( background );
+
+        fringe
+        {
+            type faceCells;
+            patches ( outerCylinder );
+        }
+    }
+);
+
+
+// ************************************************************************* //

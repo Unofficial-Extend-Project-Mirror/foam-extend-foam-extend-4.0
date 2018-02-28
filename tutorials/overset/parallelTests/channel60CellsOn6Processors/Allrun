@@ -1,0 +1,27 @@
+#!/bin/sh
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+# Get application name
+application="icoOversetFoam"
+
+mkdir constant/polyMesh
+\cp -f blockMeshDict constant/polyMesh/blockMeshDict
+runApplication blockMesh
+\cp -f boundary constant/polyMesh/boundary
+
+# Run parallel
+runApplication decomposePar -cellDist
+runApplication decomposeSets -writeEmptySets
+runParallel $application 6
+
+\mv log.icoOversetFoam log.icoOversetFoam-parallel
+
+# Run serial
+runApplication icoOversetFoam
+
+# Compare parallel and serial results: serial run will be in time directory 3
+# and the parallel run will be in time directory 2
+\mv 2 3
+runApplication reconstructPar -latestTime
+meld 2 3

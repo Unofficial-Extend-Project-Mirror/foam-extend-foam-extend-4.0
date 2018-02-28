@@ -1,0 +1,5 @@
+cellSet leftCells new cellToCell cellRegion0
+cellSet rightCells new cellToCell cellRegion1
+cellSet cellRegion0 delete
+cellSet cellRegion1 delete
+quit

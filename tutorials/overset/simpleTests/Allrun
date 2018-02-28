@@ -1,0 +1,17 @@
+#!/bin/sh
+
+( cd channelLaplaceNoOverset ; ./Allrun )
+( cd channelBodyFittedLaplace ; ./Allrun )
+
+( cd channelSimpleOverlapLaplace ; ./Allrun )
+( cd channelSimpleOverlapLaplaceNonInterfering ; ./Allrun )
+( cd channelSimpleOverlapLaplaceCutAlong ; ./Allrun )
+( cd channelSimpleOverlapLaplaceCutAcross ; ./Allrun )
+( cd channelSimpleOverlapLaplaceCutFringe ; ./Allrun )
+
+( cd cylinderInSquareLaplaceAutoFringe ; ./Allrun )
+
+( cd channelSimpleOverlapPotentialScalarTransport ; ./Allrun )
+
+( cd cylinderInSquareLaplace ; ./Allrun )
+( cd cylinderInChannelPotentialScalarTransport ; ./Allrun )
