@@ -46,25 +46,28 @@ void Foam::reconstructLagrangianPositions
         IDLList<passiveParticle>()
     );
 
-    forAll(meshes, i)
+    forAll (meshes, i)
     {
-        const labelList& cellMap = cellProcAddressing[i];
-
-        Cloud<passiveParticle> lpi(meshes[i], cloudName, false);
-
-        forAllIter(Cloud<passiveParticle>, lpi, iter)
+        if (meshes.set(i))
         {
-            const passiveParticle& ppi = iter();
+            const labelList& cellMap = cellProcAddressing[i];
 
-            lagrangianPositions.append
-            (
-                new passiveParticle
+            Cloud<passiveParticle> lpi(meshes[i], cloudName, false);
+
+            forAllIter (Cloud<passiveParticle>, lpi, iter)
+            {
+                const passiveParticle& ppi = iter();
+
+                lagrangianPositions.append
                 (
-                    lagrangianPositions,
-                    ppi.position(),
-                    cellMap[ppi.cell()]
-                )
-            );
+                    new passiveParticle
+                    (
+                        lagrangianPositions,
+                        ppi.position(),
+                        cellMap[ppi.cell()]
+                    )
+                );
+            }
         }
     }
 

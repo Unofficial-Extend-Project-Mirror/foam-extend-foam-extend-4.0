@@ -28,8 +28,62 @@ License
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
+void Foam::pointFieldReconstructor::reconstructField
+(
+    GeometricField<Type, pointPatchField, pointMesh>& reconField,
+    const PtrList<GeometricField<Type, pointPatchField, pointMesh> >& procFields
+) const
+{
+    // Get references to internal and boundary field
+    Field<Type>& iField = reconField.internalField();
+
+    typename GeometricField<Type, pointPatchField, pointMesh>::
+        GeometricBoundaryField& bouField = reconField.boundaryField();
+
+    forAll (procMeshes_, procI)
+    {
+        if (procFields.set(procI))
+        {
+            const GeometricField<Type, pointPatchField, pointMesh>&
+                procField = procFields[procI];
+
+            // Get processor-to-global addressing for use in rmap
+            const labelList& procToGlobalAddr = pointProcAddressing_[procI];
+
+            // Set the cell values in the reconstructed field
+            iField.rmap
+            (
+                procField.internalField(),
+                procToGlobalAddr
+            );
+
+            // Set the boundary patch values in the reconstructed field
+            forAll (boundaryProcAddressing_[procI], patchI)
+            {
+                // Get patch index of the original patch
+                const label curBPatch = boundaryProcAddressing_[procI][patchI];
+
+                // Check if the boundary patch is not a processor patch
+                if (curBPatch >= 0)
+                {
+                    bouField[curBPatch].rmap
+                    (
+                        procFields[procI].boundaryField()[patchI],
+                        patchPointAddressing_[procI][patchI]
+                    );
+                }
+            }
+        }
+    }
+}
+
+
+template<class Type>
 Foam::tmp<Foam::GeometricField<Type, Foam::pointPatchField, Foam::pointMesh> >
-Foam::pointFieldReconstructor::reconstructField(const IOobject& fieldIoObject)
+Foam::pointFieldReconstructor::reconstructField
+(
+    const IOobject& fieldIoObject
+) const
 {
     // Read the field for all the processors
     PtrList<GeometricField<Type, pointPatchField, pointMesh> > procFields
@@ -37,89 +91,100 @@ Foam::pointFieldReconstructor::reconstructField(const IOobject& fieldIoObject)
         procMeshes_.size()
     );
 
-    forAll (procMeshes_, proci)
+    forAll (procMeshes_, procI)
     {
-        procFields.set
-        (
-            proci,
-            new GeometricField<Type, pointPatchField, pointMesh>
+        if (procMeshes_.set(procI))
+        {
+            procFields.set
             (
-                IOobject
+                procI,
+                new GeometricField<Type, pointPatchField, pointMesh>
                 (
-                    fieldIoObject.name(),
-                    procMeshes_[proci]().time().timeName(),
-                    procMeshes_[proci](),
-                    IOobject::MUST_READ,
-                    IOobject::NO_WRITE
-                ),
-                procMeshes_[proci]
-            )
-        );
+                    IOobject
+                    (
+                        fieldIoObject.name(),
+                        procMeshes_[procI]().time().timeName(),
+                        procMeshes_[procI](),
+                        IOobject::MUST_READ,
+                        IOobject::NO_WRITE
+                    ),
+                    procMeshes_[procI]
+                )
+            );
+        }
     }
-
-
-    // Create the internalField
-    Field<Type> internalField(mesh_.size());
 
     // Create the patch fields
     PtrList<pointPatchField<Type> > patchFields(mesh_.boundary().size());
 
-
-    forAll (procMeshes_, proci)
+    forAll (procMeshes_, procI)
     {
-        const GeometricField<Type, pointPatchField, pointMesh>&
-            procField = procFields[proci];
-
-        // Get processor-to-global addressing for use in rmap
-        const labelList& procToGlobalAddr = pointProcAddressing_[proci];
-
-        // Set the cell values in the reconstructed field
-        internalField.rmap
-        (
-            procField.internalField(),
-            procToGlobalAddr
-        );
-
-        // Set the boundary patch values in the reconstructed field
-        forAll(boundaryProcAddressing_[proci], patchi)
+        if (procMeshes_.set(procI))
         {
-            // Get patch index of the original patch
-            const label curBPatch = boundaryProcAddressing_[proci][patchi];
-
-            // check if the boundary patch is not a processor patch
-            if (curBPatch >= 0)
+            // Set the boundary patch in the reconstructed field
+            forAll (boundaryProcAddressing_[procI], patchI)
             {
-                if (!patchFields(curBPatch))
-                {
-                    patchFields.set
-                    (
-                        curBPatch,
-                        pointPatchField<Type>::New
-                        (
-                            procField.boundaryField()[patchi],
-                            mesh_.boundary()[curBPatch],
-                            DimensionedField<Type, pointMesh>::null(),
-                            pointPatchFieldReconstructor
-                            (
-                                mesh_.boundary()[curBPatch].size(),
-                                procField.boundaryField()[patchi].size()
-                            )
-                        )
-                    );
-                }
+                // Get patch index of the original patch
+                const label curBPatch = boundaryProcAddressing_[procI][patchI];
 
-                patchFields[curBPatch].rmap
-                (
-                    procField.boundaryField()[patchi],
-                    patchPointAddressing_[proci][patchi]
-                );
+                // Check if the boundary patch is not a processor patch
+                if (curBPatch >= 0)
+                {
+                    if (!patchFields(curBPatch))
+                    {
+                        patchFields.set
+                        (
+                            curBPatch,
+                            pointPatchField<Type>::New
+                            (
+                                procFields[procI].boundaryField()[patchI],
+                                mesh_.boundary()[curBPatch],
+                                DimensionedField<Type, pointMesh>::null(),
+                                pointPatchFieldReconstructor
+                                (
+                                    mesh_.boundary()[curBPatch].size(),
+                                    procFields[procI].boundaryField()
+                                        [patchI].size()
+                                )
+                            )
+                        );
+                    }
+                }
             }
         }
     }
 
-    // Construct and write the field
-    // setting the internalField and patchFields
-    return tmp<GeometricField<Type, pointPatchField, pointMesh> >
+    // Add missing patch fields
+    forAll (mesh_.boundary(), patchI)
+    {
+        if (!patchFields(patchI))
+        {
+            patchFields.set
+            (
+                patchI,
+                pointPatchField<Type>::New
+                (
+                    mesh_.boundary()[patchI].type(),
+                    mesh_.boundary()[patchI],
+                    DimensionedField<Type, pointMesh>::null()
+                )
+            );
+        }
+    }
+
+    label firstValidMesh = 0;
+
+    forAll (procMeshes_, procI)
+    {
+        if (procMeshes_.set(procI))
+        {
+            firstValidMesh = procI;
+            break;
+        }
+    }
+
+    // Construct the reconstructed field with patches
+    tmp<GeometricField<Type, pointPatchField, pointMesh> > treconField
     (
         new GeometricField<Type, pointPatchField, pointMesh>
         (
@@ -132,11 +197,20 @@ Foam::pointFieldReconstructor::reconstructField(const IOobject& fieldIoObject)
                 IOobject::NO_WRITE
             ),
             mesh_,
-            procFields[0].dimensions(),
-            internalField,
+            procFields[firstValidMesh].dimensions(),
+            Field<Type>(mesh_.size()),
             patchFields
         )
     );
+
+    // Reconstruct field
+    reconstructField
+    (
+        treconField(),
+        procFields
+    );
+
+    return treconField;
 }
 
 
@@ -145,7 +219,7 @@ template<class Type>
 void Foam::pointFieldReconstructor::reconstructFields
 (
     const IOobjectList& objects
-)
+) const
 {
     word fieldClassName
     (

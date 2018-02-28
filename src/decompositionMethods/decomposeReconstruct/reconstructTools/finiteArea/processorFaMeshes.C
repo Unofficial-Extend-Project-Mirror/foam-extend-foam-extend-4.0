@@ -28,99 +28,102 @@ License
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::processorFaMeshes::read()
+void Foam::processorFaMeshes::readMeshes()
 {
     forAll (fvMeshes_, procI)
     {
-        meshes_.set
-        (
-            procI,
-            new faMesh(fvMeshes_[procI])
-        );
-
-        pointProcAddressing_.set
-        (
-            procI,
-            new labelIOList
+        if (fvMeshes_.set(procI))
+        {
+            meshes_.set
             (
-                IOobject
-                (
-                    "pointProcAddressing",
-                    meshes_[procI].time().findInstance
-                    (
-                        meshes_[procI].meshDir(),
-                        "pointProcAddressing"
-                    ),
-                    meshes_[procI].meshSubDir,
-                    fvMeshes_[procI],
-                    IOobject::MUST_READ,
-                    IOobject::NO_WRITE
-                )
-            )
-        );
+                procI,
+                new faMesh(fvMeshes_[procI])
+            );
 
-        edgeProcAddressing_.set
-        (
-            procI,
-            new labelIOList
-            (
-                IOobject
-                (
-                    "edgeProcAddressing",
-                    meshes_[procI].time().findInstance
-                    (
-                        meshes_[procI].meshDir(),
-                        "edgeProcAddressing"
-                    ),
-                    meshes_[procI].meshSubDir,
-                    fvMeshes_[procI],
-                    IOobject::MUST_READ,
-                    IOobject::NO_WRITE
-                )
-            )
-        );
+            pointProcAddressing_.set
+           (
+               procI,
+               new labelIOList
+               (
+                   IOobject
+                   (
+                       "pointProcAddressing",
+                       meshes_[procI].time().findInstance
+                       (
+                           meshes_[procI].meshDir(),
+                           "pointProcAddressing"
+                       ),
+                       meshes_[procI].meshSubDir,
+                       fvMeshes_[procI],
+                       IOobject::MUST_READ,
+                       IOobject::NO_WRITE
+                   )
+               )
+           );
 
-        faceProcAddressing_.set
-        (
-            procI,
-            new labelIOList
+            edgeProcAddressing_.set
             (
-                IOobject
+                procI,
+                new labelIOList
                 (
-                    "faceProcAddressing",
-                    meshes_[procI].time().findInstance
+                    IOobject
                     (
-                        meshes_[procI].meshDir(),
-                        "faceProcAddressing"
-                    ),
-                    meshes_[procI].meshSubDir,
-                    fvMeshes_[procI],
-                    IOobject::MUST_READ,
-                    IOobject::NO_WRITE
+                        "edgeProcAddressing",
+                        meshes_[procI].time().findInstance
+                        (
+                            meshes_[procI].meshDir(),
+                            "edgeProcAddressing"
+                        ),
+                        meshes_[procI].meshSubDir,
+                        fvMeshes_[procI],
+                        IOobject::MUST_READ,
+                        IOobject::NO_WRITE
+                    )
                 )
-            )
-        );
+            );
 
-        boundaryProcAddressing_.set
-        (
-            procI,
-            new labelIOList
+            faceProcAddressing_.set
             (
-                IOobject
+                procI,
+                new labelIOList
                 (
-                    "boundaryProcAddressing",
-                    meshes_[procI].time().findInstance
+                    IOobject
                     (
-                        meshes_[procI].meshDir(),
-                        "faceProcAddressing"
-                    ),
-                    meshes_[procI].meshSubDir,
-                    fvMeshes_[procI],
-                    IOobject::MUST_READ,
-                    IOobject::NO_WRITE
+                        "faceProcAddressing",
+                        meshes_[procI].time().findInstance
+                        (
+                            meshes_[procI].meshDir(),
+                            "faceProcAddressing"
+                        ),
+                        meshes_[procI].meshSubDir,
+                        fvMeshes_[procI],
+                        IOobject::MUST_READ,
+                        IOobject::NO_WRITE
+                    )
                 )
-            )
-        );
+            );
+
+            boundaryProcAddressing_.set
+            (
+                procI,
+                new labelIOList
+                (
+                    IOobject
+                    (
+                        "boundaryProcAddressing",
+                        meshes_[procI].time().findInstance
+                        (
+                            meshes_[procI].meshDir(),
+                            "faceProcAddressing"
+                        ),
+                        meshes_[procI].meshSubDir,
+                        fvMeshes_[procI],
+                        IOobject::MUST_READ,
+                    IOobject::NO_WRITE
+                    )
+                )
+            );
+        }
     }
 }
 
@@ -129,7 +132,8 @@ void Foam::processorFaMeshes::read()
 
 Foam::processorFaMeshes::processorFaMeshes
 (
-    const PtrList<fvMesh>& processorFvMeshes
+    const PtrList<fvMesh>& processorFvMeshes,
+    const bool read
 )
 :
     fvMeshes_(processorFvMeshes),
@@ -139,120 +143,14 @@ Foam::processorFaMeshes::processorFaMeshes
     faceProcAddressing_(processorFvMeshes.size()),
     boundaryProcAddressing_(processorFvMeshes.size())
 {
-    read();
+    if (read)
+    {
+        readMeshes();
+    }
 }
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-// Foam::fvMesh::readUpdateState Foam::processorFaMeshes::readUpdate()
-// {
-//     fvMesh::readUpdateState stat = fvMesh::UNCHANGED;
-
-//     forAll (databases_, procI)
-//     {
-//         // Check if any new meshes need to be read.
-//         fvMesh::readUpdateState procStat = meshes_[procI].readUpdate();
-
-//         /*
-//         if (procStat != fvMesh::UNCHANGED)
-//         {
-//             Info<< "Processor " << procI
-//                 << " at time " << databases_[procI].timeName()
-//                 << " detected mesh change " << procStat
-//                 << endl;
-//         }
-//         */
-
-//         // Combine into overall mesh change status
-//         if (stat == fvMesh::UNCHANGED)
-//         {
-//             stat = procStat;
-//         }
-//         else
-//         {
-//             if (stat != procStat)
-//             {
-//                 FatalErrorIn("processorFaMeshes::readUpdate()")
-//                     << "Processor " << procI
-//                     << " has a different polyMesh at time "
-//                     << databases_[procI].timeName()
-//                     << " compared to any previous processors." << nl
-//                     << "Please check time " << databases_[procI].timeName()
-//                     << " directories on all processors for consistent"
-//                     << " mesh files."
-//                     << exit(FatalError);
-//             }
-//         }
-//     }
-
-//     if
-//     (
-//         stat == fvMesh::TOPO_CHANGE
-//      || stat == fvMesh::TOPO_PATCH_CHANGE
-//     )
-//     {
-//         // Reread all meshes and addresssing
-//         read();
-//     }
-//     return stat;
-// }
-
-
-// void Foam::processorFaMeshes::reconstructPoints(fvMesh& mesh)
-// {
-//     // Read the field for all the processors
-//     PtrList<pointIOField> procsPoints(meshes_.size());
-
-//     forAll (meshes_, procI)
-//     {
-//         procsPoints.set
-//         (
-//             procI,
-//             new pointIOField
-//             (
-//                 IOobject
-//                 (
-//                     "points",
-//                     meshes_[procI].time().timeName(),
-//                     polyMesh::meshSubDir,
-//                     meshes_[procI],
-//                     IOobject::MUST_READ,
-//                     IOobject::NO_WRITE
-//                 )
-//             )
-//         );
-//     }
-
-//     // Create the new points
-//     vectorField newPoints(mesh.nPoints());
-
-//     forAll (meshes_, procI)
-//     {
-//         const vectorField& procPoints = procsPoints[procI];
-
-//         // Set the cell values in the reconstructed field
-
-//         const labelList& pointProcAddressingI = pointProcAddressing_[procI];
-
-//         if (pointProcAddressingI.size() != procPoints.size())
-//         {
-//             FatalErrorIn("processorFaMeshes")
-//                 << "problem :"
-//                 << " pointProcAddressingI:" << pointProcAddressingI.size()
-//                 << " procPoints:" << procPoints.size()
-//                 << abort(FatalError);
-//         }
-
-//         forAll(pointProcAddressingI, pointI)
-//         {
-//             newPoints[pointProcAddressingI[pointI]] = procPoints[pointI];
-//         }
-//     }
-
-//     mesh.movePoints(newPoints);
-//     mesh.write();
-// }
 
 
 // ************************************************************************* //

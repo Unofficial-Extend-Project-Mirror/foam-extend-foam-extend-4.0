@@ -95,6 +95,9 @@ class processorMeshesReconstructor
         //- Attempt to read mapping.  If not available, return false
         bool readMapping();
 
+        //- Return first valid mesh index
+        label firstValidMesh() const;
+
         //- Return neighbour processor patch
         const processorPolyPatch& neighbourProcPatch
         (
@@ -115,11 +118,12 @@ public:
 
     // Constructors
 
-        //- Construct from components
+        //- Construct reading mesh names
         processorMeshesReconstructor
         (
             PtrList<Time>& databases,
-            const word& meshName
+            const word& meshName,
+            const bool read
         );
 
 
@@ -139,7 +143,13 @@ public:
         void reconstructPoints(fvMesh& mesh) const;
 
         //- Return meshes
-        const PtrList<fvMesh>& meshes()
+        const PtrList<fvMesh>& meshes() const
+        {
+            return meshes_;
+        }
+
+        //- Return access to meshes
+        PtrList<fvMesh>& meshes()
         {
             return meshes_;
         }

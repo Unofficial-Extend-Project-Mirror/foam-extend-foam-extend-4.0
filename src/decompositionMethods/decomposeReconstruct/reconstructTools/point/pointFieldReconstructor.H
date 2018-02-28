@@ -143,16 +143,29 @@ public:
         );
 
 
+    // Destructor - default
+
+
     // Member Functions
 
-        //- Reconstruct field
+        //- Reconstruct point field data into a given field
+        //  If a PtrList slot is empty, it is skipped
+        template<class Type>
+        void reconstructField
+        (
+            GeometricField<Type, pointPatchField, pointMesh>& reconField,
+            const PtrList<GeometricField<Type, pointPatchField, pointMesh> >&
+                procFields
+        ) const;
+
+        //- Reconstruct point field
         template<class Type>
         tmp<GeometricField<Type, pointPatchField, pointMesh> >
-        reconstructField(const IOobject& fieldIoObject);
+        reconstructField(const IOobject& fieldIoObject) const;
 
-        //- Reconstruct and write all fields
+        //- Reconstruct and write all point fields
         template<class Type>
-        void reconstructFields(const IOobjectList& objects);
+        void reconstructFields(const IOobjectList& objects) const;
 };
 
 

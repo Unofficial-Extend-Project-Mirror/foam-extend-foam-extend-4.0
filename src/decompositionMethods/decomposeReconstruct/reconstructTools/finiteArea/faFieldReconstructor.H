@@ -29,6 +29,7 @@ Description
 
 Author
     Zeljko Tukovic, FSB Zagreb.  All rights reserved
+    Hrvoje Jasak, Wikki Ltd.
 
 SourceFiles
     faFieldReconstructor.C
@@ -109,6 +110,11 @@ public:
                 {}
 
 
+            //- Destructor
+            virtual ~faPatchFieldReconstructor()
+            {}
+            
+
             // Member functions
 
                 virtual label size() const
@@ -148,13 +154,33 @@ public:
 
     // Member Functions
 
+        //- Reconstruct area field data into a given field
+        //  If a PtrList slot is empty, it is skipped
+        template<class Type>
+        void reconstructFaAreaField
+        (
+            GeometricField<Type, faPatchField, areaMesh>& reconField,
+            const PtrList<GeometricField<Type, faPatchField, areaMesh> >&
+                procFields
+        ) const;
+
         //- Reconstruct area field
         template<class Type>
         tmp<GeometricField<Type, faPatchField, areaMesh> >
         reconstructFaAreaField
         (
             const IOobject& fieldIoObject
-        );
+        ) const;
+
+        //- Reconstruct edge field data into a given field
+        //  If a PtrList slot is empty, it is skipped
+        template<class Type>
+        void reconstructFaEdgeField
+        (
+            GeometricField<Type, faePatchField, edgeMesh>& reconField,
+            const PtrList<GeometricField<Type, faePatchField, edgeMesh> >&
+                procFields
+        ) const;
 
         //- Reconstruct edge field
         template<class Type>
@@ -162,21 +188,21 @@ public:
         reconstructFaEdgeField
         (
             const IOobject& fieldIoObject
-        );
+        ) const;
 
         //- Reconstruct and write all area fields
         template<class Type>
         void reconstructFaAreaFields
         (
             const IOobjectList& objects
-        );
+        ) const;
 
-        //- Reconstruct and write all area fields
+        //- Reconstruct and write all edge fields
         template<class Type>
         void reconstructFaEdgeFields
         (
             const IOobjectList& objects
-        );
+        ) const;
 };
 
 

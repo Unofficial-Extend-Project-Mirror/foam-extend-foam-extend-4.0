@@ -106,6 +106,11 @@ public:
                 {}
 
 
+            //- Destructor
+            virtual ~fvPatchFieldReconstructor()
+            {}
+            
+
             // Member functions
 
                 virtual label size() const
@@ -143,9 +148,12 @@ public:
         );
 
 
+    // Destructor - default
+
+
     // Member Functions
 
-        //- Reconstruct volume field into a given field
+        //- Reconstruct volume field data into a given field
         //  If a PtrList slot is empty, it is skipped
         template<class Type>
         void reconstructFvVolumeField
@@ -153,7 +161,7 @@ public:
             GeometricField<Type, fvPatchField, volMesh>& reconField,
             const PtrList<GeometricField<Type, fvPatchField, volMesh> >&
                 procFields
-        );
+        ) const;
 
         //- Reconstruct volume field
         template<class Type>
@@ -161,7 +169,17 @@ public:
         reconstructFvVolumeField
         (
             const IOobject& fieldIoObject
-        );
+        ) const;
+
+        //- Reconstruct volume field data into a given field
+        //  If a PtrList slot is empty, it is skipped
+        template<class Type>
+        void reconstructFvSurfaceField
+        (
+            GeometricField<Type, fvsPatchField, surfaceMesh>& reconField,
+            const PtrList<GeometricField<Type, fvsPatchField, surfaceMesh> >&
+                procFields
+        ) const;
 
         //- Reconstruct surface field
         template<class Type>
@@ -169,7 +187,7 @@ public:
         reconstructFvSurfaceField
         (
             const IOobject& fieldIoObject
-        );
+        ) const;
 
         //- Reconstruct and write all/selected volume fields
         template<class Type>
@@ -177,7 +195,7 @@ public:
         (
             const IOobjectList& objects,
             const HashSet<word>& selectedFields
-        );
+        ) const;
 
         //- Reconstruct and write all/selected volume fields
         template<class Type>
@@ -185,7 +203,7 @@ public:
         (
             const IOobjectList& objects,
             const HashSet<word>& selectedFields
-        );
+        ) const;
 };
 
 

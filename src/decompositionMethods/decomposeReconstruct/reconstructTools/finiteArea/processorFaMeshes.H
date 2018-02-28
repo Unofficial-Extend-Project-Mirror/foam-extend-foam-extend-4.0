@@ -80,7 +80,10 @@ class processorFaMeshes
     // Private Member Functions
 
         //- Read all meshes
-        void read();
+        void readMeshes();
+
+        //- Return first valid mesh index
+        label firstValidMesh() const;
 
         //- Disallow default bitwise copy construct
         processorFaMeshes(const processorFaMeshes&);
@@ -94,34 +97,40 @@ public:
     // Constructors
 
         //- Construct from components
-        processorFaMeshes(const PtrList<fvMesh>& processorFvMeshes);
+        processorFaMeshes
+        (
+            const PtrList<fvMesh>& processorFvMeshes,
+            const bool read
+        );
 
 
     // Member Functions
 
-        //- Update the meshes based on the mesh files saved in
-        //  time directories
-//         fvMesh::readUpdateState readUpdate();
-
-        //- Reconstruct point position after motion in parallel
-//         void reconstructPoints(faMesh& mesh);
-
-        PtrList<faMesh>& meshes()
+        //- Return meshes
+        const PtrList<faMesh>& meshes() const
         {
             return meshes_;
         }
+
+        //- Return point addressing
         const PtrList<labelIOList>& pointProcAddressing() const
         {
             return pointProcAddressing_;
         }
+
+        //- Return edge addressing
         PtrList<labelIOList>& edgeProcAddressing()
         {
             return edgeProcAddressing_;
         }
+
+        //- Return face addressing
         const PtrList<labelIOList>& faceProcAddressing() const
         {
             return faceProcAddressing_;
         }
+
+        //- Return boundary addressing
         const PtrList<labelIOList>& boundaryProcAddressing() const
         {
             return boundaryProcAddressing_;

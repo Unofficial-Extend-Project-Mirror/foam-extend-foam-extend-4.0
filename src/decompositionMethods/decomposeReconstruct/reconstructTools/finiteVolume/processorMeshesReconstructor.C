@@ -67,7 +67,8 @@ void Foam::processorMeshesReconstructor::clearMaps()
 Foam::processorMeshesReconstructor::processorMeshesReconstructor
 (
     PtrList<Time>& databases,
-    const word& meshName
+    const word& meshName,
+    const bool read
 )
 :
     databases_(databases),
@@ -78,7 +79,10 @@ Foam::processorMeshesReconstructor::processorMeshesReconstructor
     cellProcAddressing_(),
     boundaryProcAddressing_()
 {
-    readMeshes();
+    if (read)
+    {
+        readMeshes();
+    }
 }
 
 
@@ -91,27 +95,31 @@ Foam::processorMeshesReconstructor::readUpdate()
 
     forAll (databases_, procI)
     {
-        // Check if any new meshes need to be read.
-        polyMesh::readUpdateState procStat = meshes_[procI].readUpdate();
+        // Only do action if database has been set
+        if (databases_.set(procI))
+        {
+            // Check if any new meshes need to be read.
+            polyMesh::readUpdateState procStat = meshes_[procI].readUpdate();
 
-        // Combine into overall mesh change status
-        if (stat == polyMesh::UNCHANGED)
-        {
-            stat = procStat;
-        }
-        else
-        {
-            if (stat != procStat)
+            // Combine into overall mesh change status
+            if (stat == polyMesh::UNCHANGED)
             {
-                FatalErrorIn("processorMeshesReconstructor::readUpdate()")
-                    << "Processor " << procI
-                    << " has a different polyMesh at time "
-                    << databases_[procI].timeName()
-                    << " compared to any previous processors." << nl
-                    << "Please check time " << databases_[procI].timeName()
-                    << " directories on all processors for consistent"
-                    << " mesh files."
-                    << exit(FatalError);
+                stat = procStat;
+            }
+            else
+            {
+                if (stat != procStat)
+                {
+                    FatalErrorIn("processorMeshesReconstructor::readUpdate()")
+                        << "Processor " << procI
+                        << " has a different polyMesh at time "
+                        << databases_[procI].timeName()
+                        << " compared to any previous processors." << nl
+                        << "Please check time " << databases_[procI].timeName()
+                        << " directories on all processors for consistent"
+                        << " mesh files."
+                        << exit(FatalError);
+                }
             }
         }
     }

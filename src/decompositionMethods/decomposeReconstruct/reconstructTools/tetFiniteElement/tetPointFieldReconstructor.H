@@ -54,7 +54,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-              Class tetPointFieldReconstructor Declaration
+                  Class tetPointFieldReconstructor Declaration
 \*---------------------------------------------------------------------------*/
 
 class tetPointFieldReconstructor
@@ -166,37 +166,60 @@ public:
         );
 
 
+    // Destructor - default
+
+
     // Member Functions
 
-        //- Reconstruct point field
+        //- Reconstruct tetPoint field data into a given field
+        //  If a PtrList slot is empty, it is skipped
+        template<class Type>
+        void reconstructTetPointField
+        (
+            GeometricField<Type, tetPolyPatchField, tetPointMesh>& reconField,
+            const PtrList<GeometricField<Type, tetPolyPatchField, tetPointMesh> >&
+                procFields
+        ) const;
+
+        //- Reconstruct tetPoint field
         template<class Type>
         tmp<GeometricField<Type, tetPolyPatchField, tetPointMesh> >
         reconstructTetPointField
         (
             const IOobject& fieldIoObject
-        );
+        ) const;
 
-        //- Reconstruct element field
+        //- Reconstruct tetElement field data into a given field
+        //  If a PtrList slot is empty, it is skipped
+        template<class Type>
+        void reconstructElementField
+        (
+            GeometricField<Type, elementPatchField, elementMesh>& reconField,
+            const PtrList<GeometricField<Type, elementPatchField, elementMesh> >&
+                procFields
+        ) const;
+
+        //- Reconstruct tetElement field
         template<class Type>
         tmp<GeometricField<Type, elementPatchField, elementMesh> >
         reconstructElementField
         (
             const IOobject& fieldIoObject
-        );
+        ) const;
 
-        //- Reconstruct and write all point fields
+        //- Reconstruct and write all tetPoint fields
         template<class Type>
         void reconstructTetPointFields
         (
             const IOobjectList& objects
-        );
+        ) const;
 
-        //- Reconstruct and write all element fields
+        //- Reconstruct and write all tetElement fields
         template<class Type>
         void reconstructElementFields
         (
             const IOobjectList& objects
-        );
+        ) const;
 };
 
 

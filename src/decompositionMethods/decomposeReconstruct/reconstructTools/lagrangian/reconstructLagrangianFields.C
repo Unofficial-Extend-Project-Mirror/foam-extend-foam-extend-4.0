@@ -56,29 +56,32 @@ Foam::tmp<Foam::IOField<Type> > Foam::reconstructLagrangianField
     );
     Field<Type>& field = tfield();
 
-    forAll(meshes, i)
+    forAll (meshes, i)
     {
-        // Check object on local mesh
-        IOobject localIOobject
-        (
-            fieldName,
-            meshes[i].time().timeName(),
-            cloud::prefix/cloudName,
-            meshes[i],
-            IOobject::MUST_READ,
-            IOobject::NO_WRITE
-        );
-
-        if (localIOobject.headerOk())
+        if (meshes.set(i))
         {
-            IOField<Type> fieldi(localIOobject);
+            // Check object on local mesh
+            IOobject localIOobject
+            (
+                fieldName,
+                meshes[i].time().timeName(),
+                cloud::prefix/cloudName,
+                meshes[i],
+                IOobject::MUST_READ,
+                IOobject::NO_WRITE
+            );
 
-            label offset = field.size();
-            field.setSize(offset + fieldi.size());
-
-            forAll(fieldi, j)
+            if (localIOobject.headerOk())
             {
-                field[offset + j] = fieldi[j];
+                IOField<Type> fieldi(localIOobject);
+
+                label offset = field.size();
+                field.setSize(offset + fieldi.size());
+
+                forAll (fieldi, j)
+                {
+                    field[offset + j] = fieldi[j];
+                }
             }
         }
     }
