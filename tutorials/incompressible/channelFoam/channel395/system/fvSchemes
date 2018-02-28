@@ -41,7 +41,7 @@ laplacianSchemes
 {
     default         none;
     laplacian(nuEff,U) Gauss linear corrected;
-    laplacian((1|A(U)),p) Gauss linear corrected;
+    laplacian(rAU,p) Gauss linear corrected;
     laplacian(DkEff,k) Gauss linear corrected;
     laplacian(DBEff,B) Gauss linear corrected;
     laplacian(DnuTildaEff,nuTilda) Gauss linear corrected;
