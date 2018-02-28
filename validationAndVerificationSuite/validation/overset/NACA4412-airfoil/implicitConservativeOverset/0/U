@@ -1,0 +1,82 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  | For copyright notice see file Copyright         |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    location    "0";
+    object      U;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (26.3389 0 6.5036);
+
+boundaryField
+{
+    OversetFaces
+    {
+        type  overset;
+        value uniform (0 0 0);
+        coupledFringe yes;
+        setHoleCellValue  yes;
+        holeCellValue     (0 0 0);
+    }
+
+    Inflow
+    {
+        type    fixedValue;
+        value   uniform (26.3389 0 6.5036);
+    }
+    Outflow
+    {
+        type        inletOutlet;
+        inletValue  uniform (0 0 0);
+        value       uniform (0 0 0);
+    }
+
+    Lower
+    {
+        type    fixedValue;
+        value   uniform (26.3389 0 6.5036);
+    }
+    Upper
+    {
+        type        inletOutlet;
+        inletValue  uniform (0 0 0);
+        value       uniform (0 0 0);
+    }
+
+    airfoil
+    {
+        type        fixedValue;
+        value       uniform (0 0 0);
+    }
+
+    frontAndBack
+    {
+        type        empty;
+    }
+
+    OversetMiddle
+    {
+        type        emptyOverset;
+        value       uniform (0 0 0);
+    }
+
+    OversetFront
+    {
+        type        emptyOverset;
+        value       uniform (0 0 0);
+    }
+}
+
+
+// ************************************************************************* //

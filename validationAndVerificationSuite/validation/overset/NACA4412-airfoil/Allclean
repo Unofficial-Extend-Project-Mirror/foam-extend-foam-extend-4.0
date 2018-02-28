@@ -1,0 +1,8 @@
+#!/bin/bash 
+
+(cd explicitOverset ; ./Allclean)
+(cd implicitConservativeOverset ; ./Allclean)
+(cd implicitNonConservativeOverset ; ./Allclean)
+(cd noOverset; ./Allclean)
+
+\rm -rf validationResults
