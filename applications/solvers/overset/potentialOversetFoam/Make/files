@@ -1,0 +1,3 @@
+potentialOversetFoam.C
+
+EXE = $(FOAM_APPBIN)/potentialOversetFoam

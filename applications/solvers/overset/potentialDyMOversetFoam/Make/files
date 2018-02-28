@@ -1,0 +1,3 @@
+potentialDyMOversetFoam.C
+
+EXE = $(FOAM_APPBIN)/potentialDyMOversetFoam
