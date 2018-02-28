@@ -5,6 +5,6 @@ simulations are performed with four different time steps spanning four orders of
 magnitude: 0.01, 0.001, 0.0001 and 0.00001 s. Tolerances for all equations are
 very small, yielding extremely small (O(1e-11)) differences in converged
 pressure field. If the differences are larger - it means that the converged
-solution is not independent to time step size.
+solution depends on the time step size.
 
 Author: Vuko Vukcevic, vuko.vukcevic@fsb.hr
