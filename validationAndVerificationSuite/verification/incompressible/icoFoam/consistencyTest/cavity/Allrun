@@ -18,4 +18,4 @@ done
 
 # Print out the converged pressure for all time steps for visual check whether
 # the solution does not depend on the time step
-tail -n 1 */probes/0/p
+tail -n 1 */postProcessing/probes/0/p

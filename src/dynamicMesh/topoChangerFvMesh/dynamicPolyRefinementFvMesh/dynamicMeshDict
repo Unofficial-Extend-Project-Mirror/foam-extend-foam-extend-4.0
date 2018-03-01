@@ -1,0 +1,58 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      dynamicMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dynamicFvMesh   dynamicPolyRefinementFvMesh;
+
+dynamicPolyRefinementFvMeshCoeffs
+{
+    // Dynamic mesh procedure controls
+    refineInterval   1;
+
+    // Refinement selection criteria
+    refinementSelection
+    {
+        // Refines all cells with 0.001 < alpha < 0.999, otherwise unrefines
+        // previously refined cells
+        type        fieldBoundsRefinement;
+        fieldName   alpha;
+        lowerBound  0.001;
+        upperBound  0.999;
+
+        // Whether to use cell-point-cell smoothing for selecting refinement
+        // candidates. Off by default
+        cellPointCellSmoothing off;
+    }
+
+    // Polyhedral refinement engine controls
+    active yes;
+
+    // Maximum number of cells to allow (not strictly controlled)
+    maxCells             2000000;
+
+    // Maximum refinement level
+    maxRefinementLevel   3;
+
+    // Number of buffer layers between refinement levels
+    nBufferLayers        1;
+
+    // Whether to use point based consistency check. Needed when one allows more
+    // than 2 refinement levels (automatically switched on in that case)
+    pointBasedRefinement yes;
+}
+
+
+// ************************************************************************* //

@@ -1,0 +1,133 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  | For copyright notice see file Copyright         |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "1";
+    object      oversetTypes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 0 0 0 0];
+
+internalField   nonuniform List<scalar> 
+60
+(
+0
+0
+0
+0
+1
+2
+0
+0
+0
+0
+1
+2
+0
+0
+0
+0
+1
+2
+0
+0
+0
+0
+1
+2
+0
+0
+0
+0
+1
+2
+2
+1
+0
+0
+0
+0
+2
+1
+0
+0
+0
+0
+2
+1
+0
+0
+0
+0
+2
+1
+0
+0
+0
+0
+2
+1
+0
+0
+0
+0
+)
+;
+
+boundaryField
+{
+    oversetFaces
+    {
+        type            overset;
+        coupledFringe   false;
+        setHoleCellValue false;
+        holeCellValue   0;
+        value           nonuniform 0();
+    }
+    left
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    leftEnd
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    rightStart
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    right
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    top
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    bottom
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    frontAndBack
+    {
+        type            empty;
+    }
+}
+
+
+// ************************************************************************* //

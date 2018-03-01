@@ -1,0 +1,48 @@
+#!/bin/sh
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+# Copy background grid
+\cp -r backgroundMesh/constant/polyMesh constant/.
+
+# Merge meshes and clean up
+runApplication mergeMeshes ..\
+    NACA4412-ThreeLayerOverlapFringeAssemby-100Processors . middleMesh
+\rm -rf constant/polyMesh
+\mv 1/polyMesh constant
+rm -rf 1
+\rm -f constant/polyMesh/pointZones constant/polyMesh/pointZones.gz\
+    constant/polyMesh/faceZones constant/polyMesh/faceZones.gz\
+    constant/polyMesh/cellZones constant/polyMesh/cellZones.gz
+\mv log.mergeMeshes log.mergeMeshes-backgroundMiddle
+
+runApplication mergeMeshes ..\
+    NACA4412-ThreeLayerOverlapFringeAssemby-100Processors . frontMesh
+\rm -rf constant/polyMesh
+\mv 1/polyMesh constant
+rm -rf 1
+\rm -f constant/polyMesh/pointZones constant/polyMesh/pointZones.gz\
+    constant/polyMesh/faceZones constant/polyMesh/faceZones.gz\
+    constant/polyMesh/cellZones constant/polyMesh/cellZones.gz
+\mv log.mergeMeshes log.mergeMeshes-backgroundMiddleFront
+
+# Make cell zones for all regions and clean up
+runApplication regionCellSets
+runApplication setSet -batch setBatch.batch
+\rm -f log.setSet
+\rm -f constant/polyMesh/sets/*_old constant/polyMesh/sets/*_old.gz
+\rm -f constant/polyMesh/sets/cellRegion0 constant/polyMesh/sets/cellRegion0.gz\
+    constant/polyMesh/sets/cellRegion1 constant/polyMesh/sets/cellRegion1.gz
+runApplication setsToZones
+
+# Scale x and y directions to have the same setup as the case from
+# foam-extend-4.0 validationSuite
+transformPoints -scale "(0.901 1 0.905512)" > log.transformPoints
+
+# Set up boundary patches
+\cp -f boundary constant/polyMesh/boundary
+
+runApplication decomposePar -cellDist
+runApplication decomposeSets -writeEmptySets
+runParallel calcOverset 100
+runParallel oversetRegionIndex 100

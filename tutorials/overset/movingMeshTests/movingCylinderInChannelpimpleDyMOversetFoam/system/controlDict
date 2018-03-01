@@ -1,0 +1,83 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  | For copyright notice see file Copyright         |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     icoDyMOversetFoam;
+
+// startFrom       startTime;
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         5;
+
+deltaT          0.01;
+
+writeControl    runTime;
+
+writeInterval   0.2;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  10;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  no;
+maxCo           1;
+
+libs
+(
+    "libfoam.so"
+    "libmeshTools.so"
+    "libsurfMesh.so"
+    "libsampling.so"
+    "libdynamicMesh.so"
+    "libdynamicFvMesh.so"
+    "liboversetMesh.so"
+    "liboversetDynamicFvMesh.so"
+);
+
+functions
+(
+    forces
+    {
+         type                forces;
+         functionObjectLibs  ( "libforces.so" );
+         outputControl       timeStep;
+         outputInterval      1;
+         patches             ( cylinder );
+         pName               p;
+         UName               U;
+         rhoName             rhoInf;
+         log                 true;
+         rhoInf              1;
+         CofR                ( 0 0 0 );
+    }
+
+);
+
+
+// ************************************************************************* //

@@ -1,0 +1,12 @@
+#!/bin/bash 
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+application=simpleFoam
+
+runApplication potentialFoam
+runApplication $application
+
+# Perform sampling
+runApplication sample -latestTime
+timeStep=$(grep "^endTime" system/controlDict | awk '{ print $2 }' | sed 's/;//g')
+cp -v surfaces/$timeStep/p_solidWall.raw .

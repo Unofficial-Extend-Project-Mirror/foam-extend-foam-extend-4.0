@@ -212,7 +212,7 @@ void Foam::ggiPolyPatch::bridge
     {
         FatalErrorIn
         (
-            "tmp<Field<Type> > ggiPolyPatch::bridge\n"
+            "template<class Type> void ggiPolyPatch::bridge\n"
             "(\n"
             "    const Field<Type>& ff,\n"
             "    Field<Type>& ff\n"
@@ -258,6 +258,74 @@ void Foam::ggiPolyPatch::bridge
                 patchToPatch().maskedBridgeSlave
                 (
                     bridgeField,
+                    ff,
+                    zoneAddressing()
+                );
+            }
+        }
+    }
+}
+
+
+template<class Type>
+void Foam::ggiPolyPatch::scaleForPartialCoverage
+(
+    const Field<Type>& uncoveredFaceField,
+    Field<Type>& ff
+) const
+{
+    // Check and expand the field from patch size to zone size
+    if (ff.size() != size())
+    {
+        FatalErrorIn
+        (
+            "template<class Type> ggiPolyPatch::scaleForPartialCoverage\n"
+            "(\n"
+            "    const Field<Type>& uncoveredFaceField,\n"
+            "    Field<Type>& ff,\n"
+            ") const"
+        )   << "Incorrect patch field size for scaling.  Field size: "
+            << ff.size() << " uncovered field size: "
+            << uncoveredFaceField.size() << " patch size: " << size()
+            << abort(FatalError);
+    }
+
+    if (bridgeOverlap())
+    {
+        if (empty())
+        {
+            // Patch empty, no bridging
+            return;
+        }
+
+        if (localParallel())
+        {
+            if (master())
+            {
+                patchToPatch().scaleMaster(uncoveredFaceField, ff);
+            }
+            else
+            {
+                patchToPatch().scaleSlave(uncoveredFaceField, ff);
+            }
+        }
+        else
+        {
+            // Note: since bridging is only a local operation
+            if (master())
+            {
+                patchToPatch().maskedScaleMaster
+                (
+                    uncoveredFaceField,
+                    ff,
+                    zoneAddressing()
+                );
+            }
+            else
+            {
+                patchToPatch().maskedScaleSlave
+                (
+                    uncoveredFaceField,
                     ff,
                     zoneAddressing()
                 );

@@ -1,0 +1,65 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  | For copyright notice see file Copyright         |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+//     T
+//     {
+//         solver     smoothSolver;
+//         smoother   GaussSeidel;
+//         nSweeps 5;
+//         minIter 1;
+//         maxIter 10;
+//         tolerance 1e-6;
+//         relTol    0;
+//     }
+
+    T
+    {
+        solver           BiCGStab;
+        preconditioner   DILU;
+        tolerance        1e-8;
+        relTol           0.0;
+        minIter          1;
+    }
+
+//     T
+//     {
+//         solver          amgSolver;
+//         cycle           W-cycle;
+//         policy          AAMG;
+//         nPreSweeps      0;
+//         nPostSweeps     2;
+//         groupSize       2;
+//         minCoarseEqns   20;
+//         nMaxLevels      100;
+//         scale           on;
+//         smoother        ILU;
+
+//         tolerance        1e-8;
+//         relTol           0.01;
+//         minIter          1;
+//     }
+}
+
+SIMPLE
+{
+    nNonOrthogonalCorrectors 0;
+}
+
+
+
+// ************************************************************************* //

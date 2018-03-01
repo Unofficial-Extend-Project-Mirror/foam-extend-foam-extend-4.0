@@ -379,6 +379,20 @@ class greaterEqOp
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+template<class T, int defaultValue>
+class ifEqEqAssignFirstOp
+{
+public:
+
+    void operator()(T& x, const T& y) const
+    {
+            x = (x == y) ? x : defaultValue;
+    }
+};
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

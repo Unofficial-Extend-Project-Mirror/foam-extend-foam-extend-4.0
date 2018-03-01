@@ -1,0 +1,3 @@
+interOversetFoam.C
+
+EXE = $(FOAM_APPBIN)/interOversetFoam

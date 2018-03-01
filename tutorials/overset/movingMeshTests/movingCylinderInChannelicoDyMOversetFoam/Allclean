@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Source tutorial clean functions
+. $WM_PROJECT_DIR/bin/tools/CleanFunctions
+
+cleanCase
+\rm -f *.vtk
+\rm -f constant/cellDecomposition constant/cellDecomposition.gz
+\rm -rf constant/polyMesh/
+mkdir constant/polyMesh
+\rm -rf 0
+cp -r save 0

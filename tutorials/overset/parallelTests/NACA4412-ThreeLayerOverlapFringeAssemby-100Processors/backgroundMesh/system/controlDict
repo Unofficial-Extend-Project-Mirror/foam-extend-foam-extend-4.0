@@ -1,0 +1,77 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     simpleFoam;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         100;
+
+deltaT          1;
+
+writeControl    adjustableRunTime;
+
+writeInterval   1000;
+
+cycleWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  15;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+adjustTimeStep  yes;
+
+maxCo           0.3;
+
+maxDeltaT       1;
+
+
+functions
+(
+forces
+{
+type forceCoeffs;
+functionObjectLibs ("libforces.so");
+patches (airfoil);
+pName p;
+UName U;
+rhoName rhoInf;
+rhoInf 1; // Reference density, fluid
+CofR (0.25 0 0); // Origin for moment calculations
+outputControl timeStep;
+outputInterval 1;
+log	true;
+liftDir (-0.239719744 0 0.970842132 );
+dragDir (0.970842132  0 0.239719744);
+magUInf 24.472;
+lRef	1;
+Aref	1;
+pitchAxis (0 1 0);
+}
+);
+
+// ************************************************************************* //

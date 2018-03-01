@@ -1,0 +1,71 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  | For copyright notice see file Copyright         |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    p
+    {
+//         solver           smoothSolver;
+//         smoother         GaussSeidel;
+//         nSweeps          1;
+
+        solver           CG;
+//         solver           BiCGStab;
+//         preconditioner   DILU;
+        preconditioner   diagonal;
+
+//         solver           CG;
+//         preconditioner   DIC;
+
+        minIter          1;
+        maxIter          1000;
+        tolerance        1e-10;
+        relTol           0;
+    }
+
+    U
+    {
+        solver           smoothSolver;
+        smoother         GaussSeidel;
+        nSweeps          1;
+
+//         solver           BiCGStab;
+//         preconditioner   DILU;
+
+        minIter          1;
+        maxIter          1000;
+        tolerance        1e-7;
+        relTol           0;
+    }
+}
+
+
+SIMPLE
+{
+    pRefCell 0;
+    pRefValue 0;
+}
+
+PISO
+{
+    pRefCell 0;
+    pRefValue 0;
+
+    nCorrectors 4;
+}
+
+
+// ************************************************************************* //

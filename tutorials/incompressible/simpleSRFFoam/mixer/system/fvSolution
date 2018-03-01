@@ -74,7 +74,7 @@ SIMPLE
 
 relaxationFactors
 {
-    p               0.3;
+    p               0.1;
     Urel            0.5;
     k               0.7;
     epsilon         0.7;

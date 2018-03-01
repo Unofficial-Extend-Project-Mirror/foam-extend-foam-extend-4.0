@@ -178,17 +178,28 @@ tmp<Field<Type> > ggiFvPatchField<Type>::patchNeighbourField() const
 
     if (ggiPatch_.bridgeOverlap())
     {
-        // Symmetry treatment used for overlap
-        const vectorField nHat = this->patch().nf();
-
-        // Use mirrored neighbour field for interpolation
-        // HJ, 21/Jan/2009
+        // Use mirrored neighbour field for interpolation. Note: mirroring needs
+        // to take into account the weights, i.e. how "far" we are actually
+        // mirroring. VV, 19/Jan/2018.
         const Field<Type> bridgeField =
-            transform(I - 2.0*sqr(nHat), this->patchInternalField());
+        transform
+        (
+            (I - sqr(this->patch().nf())/(1.0 - ggiPatch_.fvPatch::weights())),
+            this->patchInternalField()
+        );
 
-        // Note: bridging now takes into account fully uncovered and partially
-        // covered faces. VV, 18/Oct/2017.
-        ggiPatch_.bridge(bridgeField, pnf);
+//        if (pTraits<Type>::rank == 0)
+//        {
+//            // Scale the field for scalars to ensure conservative and consistent
+//            // flux on both sides
+//            ggiPatch_.scaleForPartialCoverage(bridgeField, pnf);
+//        }
+//        else
+        {
+            // Bridge the field for higher order tensors to correctly take into
+            // account mirroring
+            ggiPatch_.bridge(bridgeField, pnf);
+        }
     }
 
     return tpnf;
@@ -259,15 +270,19 @@ void ggiFvPatchField<Type>::initInterfaceMatrixUpdate
 
     if (ggiPatch_.bridgeOverlap())
     {
-        // Note: will not work properly for types with rank > 0 (everything
-        // above scalar) if the symmetry plane is not aligned with one of the
-        // coordinate axes. VV, 18/Oct/2017.
+        // Note: this implicit treatment does not really work implicitly for
+        // types with rank > 0 (everything above scalar) if the symmetry plane
+        // is not aligned with one of the coordinate axes. VV, 18/Oct/2017.
+
+        // Use mirrored neighbour field for interpolation. Note: mirroring needs
+        // to take into account the weights, i.e. how "far" we are actually
+        // mirroring. VV, 19/Jan/2018.
         const scalarField bridgeField =
-            transform
-            (
-                I - 2.0*sqr(this->patch().nf()),
-                ggiPatch_.patchInternalField(psiInternal)
-            );
+        transform
+        (
+            (I - sqr(this->patch().nf())/(1.0 - ggiPatch_.fvPatch::weights())),
+            ggiPatch_.patchInternalField(psiInternal)
+        );
 
         ggiPatch_.bridge(bridgeField, pnf);
     }
@@ -335,15 +350,15 @@ void ggiFvPatchField<Type>::initInterfaceMatrixUpdate
 
     if (ggiPatch_.bridgeOverlap())
     {
-        // Note: will not work properly for types with rank > 0 (everything
-        // above scalar) if the symmetry plane is not aligned with one of the
-        // coordinate axes. VV, 18/Oct/2017.
+        // Use mirrored neighbour field for interpolation. Note: mirroring needs
+        // to take into account the weights, i.e. how "far" we are actually
+        // mirroring. VV, 19/Jan/2018.
         const Field<Type> bridgeField =
-            transform
-            (
-                I - 2.0*sqr(this->patch().nf()),
-                ggiPatch_.patchInternalField(psiInternal)
-            );
+        transform
+        (
+            (I - sqr(this->patch().nf())/(1.0 - ggiPatch_.fvPatch::weights())),
+            ggiPatch_.patchInternalField(psiInternal)
+        );
 
         ggiPatch_.bridge(bridgeField, pnf);
     }

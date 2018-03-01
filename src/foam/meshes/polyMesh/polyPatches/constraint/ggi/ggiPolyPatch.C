@@ -39,6 +39,7 @@ Contributor
 #include "SubField.H"
 #include "foamTime.H"
 #include "indirectPrimitivePatch.H"
+#include "symmTransformField.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -286,17 +287,32 @@ void Foam::ggiPolyPatch::calcReconFaceCellCentres() const
     {
         const label shadowID = shadowIndex();
 
-        // Get the transformed and interpolated shadow face cell centers
-        reconFaceCellCentresPtr_ =
-            new vectorField
-            (
-                interpolate
-                (
-                    boundaryMesh()[shadowID].faceCellCentres()
-                  - boundaryMesh()[shadowID].faceCentres()
-                )
-              + faceCentres()
-            );
+        // Get interpolated shadow face centre to face cell centre vectors
+        tmp<vectorField> tdf = interpolate
+        (
+            boundaryMesh()[shadowID].faceCellCentres()
+          - boundaryMesh()[shadowID].faceCentres()
+        );
+
+        if (bridgeOverlap_)
+        {
+            // Get necessary mesh data from polyPatch on this (master) side
+            const vectorField::subField cf = faceCentres();
+            const vectorField::subField Sf = faceAreas();
+
+            const vectorField ccf = faceCellCentres();
+            const vectorField nf = Sf/mag(Sf);
+
+            // Deltas for fully uncovered faces
+            const vectorField uncoveredDeltas(2.0*(cf - ccf));
+
+            // Scale partially overlapping faces and set uncovered deltas to
+            // fully uncovered faces
+            scaleForPartialCoverage(uncoveredDeltas, tdf());
+        }
+
+        // Calculate the reconstructed cell centres
+        reconFaceCellCentresPtr_ = new vectorField(tdf() + faceCentres());
     }
     else
     {

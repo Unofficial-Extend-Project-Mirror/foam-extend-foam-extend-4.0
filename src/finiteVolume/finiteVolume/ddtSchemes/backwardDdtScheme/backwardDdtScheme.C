@@ -732,18 +732,66 @@ backwardDdtScheme<Type>::fvcDdtConsistentPhiCorr
 
     const scalar rDeltaT = 1.0/deltaT;
 
+    // Note: minus sign in gamma coefficient so we can simply add the fluxes
+    // together at the end
     const dimensionedScalar beta("beta", dimless/dimTime, coefft0*rDeltaT);
     const dimensionedScalar gamma("gamma", dimless/dimTime, -coefft00*rDeltaT);
 
-    return
-        rAUf*
+    // Calculate old and old-old flux contributions
+    fluxFieldType oldTimeFlux =
+        beta*rAUf*(mesh().Sf() & faceU.oldTime());
+    fluxFieldType oldOldTimeFlux =
+        gamma*rAUf*(mesh().Sf() & faceU.oldTime().oldTime());
+
+    if (mesh().moving())
+    {
+        // Mesh is moving, need to take into account the ratio between old and
+        // current cell volumes for old flux contribution
+        volScalarField V0ByV
         (
-            mesh().Sf()
-          & (
-                beta*faceU.oldTime()
-              + gamma*faceU.oldTime().oldTime()
-            )
+            IOobject
+            (
+                "V0ByV",
+                mesh().time().timeName(),
+                mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh(),
+            dimensionedScalar("one", dimless, 1.0),
+            zeroGradientFvPatchScalarField::typeName
         );
+        V0ByV.internalField() = mesh().V0()/mesh().V();
+        V0ByV.correctBoundaryConditions();
+
+        // Correct old time flux contribution
+        oldTimeFlux *= fvc::interpolate(V0ByV);
+
+
+        // Also need to take into account the ratio between old-old and current
+        // cell volumes for old-old time flux contribution
+        volScalarField V00ByV
+        (
+            IOobject
+            (
+                "V00ByV",
+                mesh().time().timeName(),
+                mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh(),
+            dimensionedScalar("one", dimless, 1.0),
+            zeroGradientFvPatchScalarField::typeName
+        );
+        V00ByV.internalField() = mesh().V00()/mesh().V();
+        V00ByV.correctBoundaryConditions();
+
+        // Correct old-old time flux contribution
+        oldOldTimeFlux *= fvc::interpolate(V00ByV);
+    }
+
+    return oldTimeFlux + oldOldTimeFlux;
 }
 
 

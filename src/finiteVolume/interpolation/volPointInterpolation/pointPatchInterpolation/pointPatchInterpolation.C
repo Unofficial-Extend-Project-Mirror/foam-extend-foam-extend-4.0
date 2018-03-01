@@ -44,13 +44,28 @@ defineTypeNameAndDebug(pointPatchInterpolation, 0);
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void pointPatchInterpolation::makePatchPatchAddressing()
+void pointPatchInterpolation::makePatchPatchAddressing() const
 {
     if (debug)
     {
         Info<< "pointPatchInterpolation::makePatchPatchAddressing() : "
             << "constructing boundary addressing"
             << endl;
+    }
+
+    if
+    (
+        !patchInterpolators_.empty()
+      || patchPatchPointsPtr_
+      || patchPatchPointConstraintPointsPtr_
+      || patchPatchPointConstraintTensorsPtr_
+    )
+    {
+        FatalErrorIn
+        (
+            "void pointPatchInterpolation::makePatchPatchAddressing() const"
+        )   << "Patch-patch point interpolation data already calculated."
+            << abort(FatalError);
     }
 
     const fvBoundaryMesh& bm = fvMesh_.boundary();
@@ -72,7 +87,9 @@ void pointPatchInterpolation::makePatchPatchAddressing()
     // Go through all patches and mark up the external edge points
     Map<label> patchPatchPointSet(2*nPatchPatchPoints);
 
-    patchPatchPoints_.setSize(nPatchPatchPoints);
+    // Allocate patch patch points
+    patchPatchPointsPtr_ = new labelList(nPatchPatchPoints);
+    labelList& patchPatchPoints = *patchPatchPointsPtr_;
 
     List<pointConstraint> patchPatchPointConstraints(nPatchPatchPoints);
 
@@ -94,7 +111,7 @@ void pointPatchInterpolation::makePatchPatchAddressing()
                 if (iter == patchPatchPointSet.end())
                 {
                     patchPatchPointSet.insert(ppp, pppi);
-                    patchPatchPoints_[pppi] = ppp;
+                    patchPatchPoints[pppi] = ppp;
 
                     pbm[patchi].applyConstraint
                     (
@@ -116,11 +133,18 @@ void pointPatchInterpolation::makePatchPatchAddressing()
     }
 
     nPatchPatchPoints = pppi;
-    patchPatchPoints_.setSize(nPatchPatchPoints);
+    patchPatchPoints.setSize(nPatchPatchPoints);
     patchPatchPointConstraints.setSize(nPatchPatchPoints);
 
-    patchPatchPointConstraintPoints_.setSize(nPatchPatchPoints);
-    patchPatchPointConstraintTensors_.setSize(nPatchPatchPoints);
+    // Allocate patch patch point constraint data
+    patchPatchPointConstraintPointsPtr_ = new labelList(nPatchPatchPoints);
+    labelList& patchPatchPointConstraintPoints =
+        *patchPatchPointConstraintPointsPtr_;
+
+    patchPatchPointConstraintTensorsPtr_ = new tensorField(nPatchPatchPoints);
+    tensorField& patchPatchPointConstraintTensors =
+        *patchPatchPointConstraintTensorsPtr_;
+
 
     label nConstraints = 0;
 
@@ -128,20 +152,20 @@ void pointPatchInterpolation::makePatchPatchAddressing()
     {
         if (patchPatchPointConstraints[i].first() != 0)
         {
-            patchPatchPointConstraintPoints_[nConstraints] =
-                patchPatchPoints_[i];
+            patchPatchPointConstraintPoints[nConstraints] =
+                patchPatchPoints[i];
 
-            patchPatchPointConstraintTensors_[nConstraints] =
+            patchPatchPointConstraintTensors[nConstraints] =
                 patchPatchPointConstraints[i].constraintTransformation();
 
             nConstraints++;
         }
     }
 
-    patchPatchPointConstraintPoints_.setSize(nConstraints);
-    patchPatchPointConstraintTensors_.setSize(nConstraints);
+    patchPatchPointConstraintPoints.setSize(nConstraints);
+    patchPatchPointConstraintTensors.setSize(nConstraints);
 
-    patchInterpolators_.clear();
+    // Set patch interpolators
     patchInterpolators_.setSize(bm.size());
 
     forAll (bm, patchi)
@@ -162,7 +186,7 @@ void pointPatchInterpolation::makePatchPatchAddressing()
 }
 
 
-void pointPatchInterpolation::makePatchPatchWeights()
+void pointPatchInterpolation::makePatchPatchWeights() const
 {
     if (debug)
     {
@@ -171,8 +195,21 @@ void pointPatchInterpolation::makePatchPatchWeights()
             << endl;
     }
 
-    patchPatchPointWeights_.clear();
-    patchPatchPointWeights_.setSize(patchPatchPoints_.size());
+    if (patchPatchPointWeightsPtr_)
+    {
+        FatalErrorIn
+        (
+            "void pointPatchInterpolation::makePatchPatchWeights() const"
+        )   << "Patch-patch point interpolation weights already calculated."
+            << abort(FatalError);
+    }
+
+    // Get patch patch points
+    const labelList& patchPatchPts = patchPatchPoints();
+
+    // Allocate weights
+    patchPatchPointWeightsPtr_ = new scalarListList(patchPatchPts.size());
+    scalarListList& patchPatchPointWeights = *patchPatchPointWeightsPtr_;
 
     // Note: Do not use fvMesh functionality, because of update order
     // The polyMesh is already up-to-date - use this instead
@@ -193,13 +230,13 @@ void pointPatchInterpolation::makePatchPatchWeights()
         dimensionedScalar("zero", dimless, 0)
     );
 
-    forAll (patchPatchPoints_, pointi)
+    forAll (patchPatchPts, pointi)
     {
-        const label curPoint = patchPatchPoints_[pointi];
+        const label curPoint = patchPatchPts[pointi];
         const labelList& curFaces = pf[curPoint];
 
-        patchPatchPointWeights_[pointi].setSize(curFaces.size());
-        scalarList& pw = patchPatchPointWeights_[pointi];
+        patchPatchPointWeights[pointi].setSize(curFaces.size());
+        scalarList& pw = patchPatchPointWeights[pointi];
 
         label nFacesAroundPoint = 0;
 
@@ -257,10 +294,10 @@ void pointPatchInterpolation::makePatchPatchWeights()
     }
 
     // Re-scale the weights for the current point
-    forAll (patchPatchPoints_, pointi)
+    forAll (patchPatchPts, pointi)
     {
-        scalarList& pw = patchPatchPointWeights_[pointi];
-        scalar sumw = sumWeights[patchPatchPoints_[pointi]];
+        scalarList& pw = patchPatchPointWeights[pointi];
+        scalar sumw = sumWeights[patchPatchPts[pointi]];
 
         forAll (pw, facei)
         {
@@ -277,32 +314,110 @@ void pointPatchInterpolation::makePatchPatchWeights()
 }
 
 
+void pointPatchInterpolation::clearOut() const
+{
+    // Delete demand driven data
+    deleteDemandDrivenData(patchPatchPointsPtr_);
+    deleteDemandDrivenData(patchPatchPointConstraintPointsPtr_);
+    deleteDemandDrivenData(patchPatchPointConstraintTensorsPtr_);
+    deleteDemandDrivenData(patchPatchPointWeightsPtr_);
+}
+
+
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
 pointPatchInterpolation::pointPatchInterpolation(const fvMesh& vm)
 :
-    fvMesh_(vm)
-{
-    updateMesh();
-}
+    fvMesh_(vm),
+    patchInterpolators_(),
+    patchPatchPointsPtr_(NULL),
+    patchPatchPointConstraintPointsPtr_(NULL),
+    patchPatchPointConstraintTensorsPtr_(NULL),
+    patchPatchPointWeightsPtr_(NULL)
+{}
 
 
 // * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
 
 pointPatchInterpolation::~pointPatchInterpolation()
-{}
+{
+    clearOut();
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-bool pointPatchInterpolation::movePoints()
+const PtrList<primitivePatchInterpolation>&
+pointPatchInterpolation::patchInterpolators() const
 {
-    forAll (patchInterpolators_, patchi)
+    if (patchInterpolators_.empty())
     {
-        patchInterpolators_[patchi].movePoints();
+        makePatchPatchAddressing();
     }
 
-    makePatchPatchWeights();
+    return patchInterpolators_;
+}
+
+
+const labelList& pointPatchInterpolation::patchPatchPoints() const
+{
+    if (!patchPatchPointsPtr_)
+    {
+        makePatchPatchAddressing();
+    }
+
+    return *patchPatchPointsPtr_;
+}
+
+
+const labelList&
+pointPatchInterpolation::patchPatchPointConstraintPoints() const
+{
+    if (!patchPatchPointConstraintPointsPtr_)
+    {
+        makePatchPatchAddressing();
+    }
+
+    return *patchPatchPointConstraintPointsPtr_;
+}
+
+
+const tensorField&
+pointPatchInterpolation::patchPatchPointConstraintTensors() const
+{
+    if (!patchPatchPointConstraintTensorsPtr_)
+    {
+        makePatchPatchAddressing();
+    }
+
+    return *patchPatchPointConstraintTensorsPtr_;
+}
+
+
+const scalarListList& pointPatchInterpolation::patchPatchPointWeights() const
+{
+    if (!patchPatchPointWeightsPtr_)
+    {
+        makePatchPatchWeights();
+    }
+
+    return *patchPatchPointWeightsPtr_;
+}
+
+
+bool pointPatchInterpolation::movePoints()
+{
+    if (!patchInterpolators_.empty())
+    {
+        // Reset patch interpolators (also lazy evaluated)
+        forAll (patchInterpolators_, patchi)
+        {
+            patchInterpolators_[patchi].movePoints();
+        }
+    }
+
+    // Clear out demand driven data
+    clearOut();
 
     return true;
 }
@@ -310,8 +425,11 @@ bool pointPatchInterpolation::movePoints()
 
 void pointPatchInterpolation::updateMesh()
 {
-    makePatchPatchAddressing();
-    makePatchPatchWeights();
+    // Clear out patch interpolators to force recalculation
+    patchInterpolators_.clear();
+
+    // Clear out demand driven data
+    clearOut();
 }
 
 

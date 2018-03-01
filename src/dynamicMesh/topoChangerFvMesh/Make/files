@@ -11,4 +11,8 @@ mixerFvMesh/mixerFvMesh.C
 multiMixerFvMesh/mixerRotor.C
 multiMixerFvMesh/multiMixerFvMesh.C
 
+dynamicPolyRefinementFvMesh/dynamicPolyRefinementFvMesh.C
+dynamicPolyRefinementFvMesh/refinementSelection/refinementSelection/refinementSelection.C
+dynamicPolyRefinementFvMesh/refinementSelection/fieldBoundsRefinement/fieldBoundsRefinement.C
+
 LIB = $(FOAM_LIBBIN)/libtopoChangerFvMesh

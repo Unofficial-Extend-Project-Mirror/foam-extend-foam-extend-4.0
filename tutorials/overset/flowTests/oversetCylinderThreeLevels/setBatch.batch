@@ -1,0 +1,16 @@
+cellSet backFringe new cellToCell background
+cellSet backFringe subset boxToCell (-14 -14 0) (14 14 5)
+cellSet backHole new cellToCell background
+cellSet backHole subset boxToCell (-13 -13 0) (13 13 5)
+cellSet backFringe delete cellToCell backHole
+
+cellSet refineFringe new cellToCell refine
+cellSet refineFringe subset sphereToCell (0 0 0) 7.8
+cellSet refineHole new cellToCell refine
+cellSet refineHole subset sphereToCell (0 0 0) 7.2
+cellSet refineFringe delete cellToCell refineHole
+
+
+cellSet empty new labelToCell 0 ()
+
+quit

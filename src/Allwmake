@@ -81,6 +81,9 @@ wmake libso immersedBoundary/immersedBoundaryTurbulence
 wmake libso immersedBoundary/immersedBoundaryForce
 wmake libso immersedBoundary/immersedBoundaryDynamicMesh
 
+wmake libso overset/oversetMesh
+wmake libso overset/oversetDynamicFvMesh
+
 ( cd cudaSolvers ; ./Allwmake )
 
 # ----------------------------------------------------------------- end-of-file

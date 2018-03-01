@@ -1,0 +1,74 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     simpleOversetFoam;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         10000;
+
+deltaT          1;
+
+writeControl    runTime;
+
+writeInterval   200;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  10;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+functions
+(
+    forces
+    {
+        type forceCoeffs;
+        functionObjectLibs ("libforces.so");
+        patches (airfoil);
+
+        pName p;
+        UName U;
+        rhoName rhoInf;
+        rhoInf 1;
+
+        outputControl timeStep;
+        outputInterval 1;
+        log	true;
+
+        CofR (0.25 0 0); // Note sure because of scaling
+        liftDir (-0.239719744 0 0.970842132);
+        dragDir (0.970842132  0 0.239719744);
+        magUInf 27.13;
+        lRef	0.901;
+        Aref	0.815866; // Not sure because of scaling
+        pitchAxis (0 1 0);
+    }
+);
+
+// ************************************************************************* //

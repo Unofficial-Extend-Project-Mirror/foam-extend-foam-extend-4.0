@@ -378,6 +378,16 @@ public:
                 Field<Type>& ff
             ) const;
 
+            //- Scale field for partially covered faces and set
+            //  uncoveredFaceField to fully uncovered faces. Needed for correct
+            //  calculation of fvPatchData: delta, deltaCoeffs and weights
+            template<class Type>
+            void scaleForPartialCoverage
+            (
+                const Field<Type>& uncoveredFaceField,
+                Field<Type>& ff
+            ) const;
+
 
         // Geometric data
 

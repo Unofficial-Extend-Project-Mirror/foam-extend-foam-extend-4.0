@@ -10,7 +10,6 @@ dynamicMotionSolverFvMesh/dynamicMotionSolverFvMesh.C
 subsetMotionSolverFvMesh/subsetMotionSolverFvMesh.C
 dynamicInkJetFvMesh/dynamicInkJetFvMesh.C
 dynamicRefineFvMesh/dynamicRefineFvMesh.C
-dynamicRefinePolyFvMesh/dynamicRefinePolyFvMesh.C
 
 mixerGgiFvMesh/mixerGgiFvMesh.C
 turboFvMesh/turboFvMesh.C

@@ -53,10 +53,13 @@ void volPointInterpolation::interpolateInternalField
 
     const labelListList& pointCells = vf.mesh().pointCells();
 
+    // Get point weights
+    const scalarListList& pWeights = this->pointWeights();
+
     // Multiply volField by weighting factor matrix to create pointField
     forAll(pointCells, pointi)
     {
-        const scalarList& pw = pointWeights_[pointi];
+        const scalarList& pw = pWeights[pointi];
         const labelList& ppc = pointCells[pointi];
 
         pf[pointi] = pTraits<Type>::zero;

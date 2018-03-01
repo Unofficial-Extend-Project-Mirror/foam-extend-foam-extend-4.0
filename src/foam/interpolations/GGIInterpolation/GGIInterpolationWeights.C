@@ -90,11 +90,11 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
      || slaveAddrPtr_
      || slaveWeightsPtr_
      || uncoveredMasterAddrPtr_
-     || partiallyCoveredMasterAddrPtr_
-     || masterFaceCoveredFractionsPtr_
+     || partiallyUncoveredMasterAddrPtr_
+     || masterFaceUncoveredFractionsPtr_
      || uncoveredSlaveAddrPtr_
-     || partiallyCoveredSlaveAddrPtr_
-     || slaveFaceCoveredFractionsPtr_
+     || partiallyUncoveredSlaveAddrPtr_
+     || slaveFaceUncoveredFractionsPtr_
     )
     {
         FatalErrorIn
@@ -618,8 +618,8 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
     // Calculate master and slave partially covered addressing
 
     // Note: This function allocates:
-    // 1. partiallyCoveredMasterAddrPtr_
-    // 2. masterFaceCoveredFractionsPtr_
+    // 1. partiallyUncoveredMasterAddrPtr_
+    // 2. masterFaceUncoveredFractionsPtr_
     calcPartiallyCoveredFaces
     (
         maW,
@@ -628,8 +628,8 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
     );
 
     // Note: this function allocates:
-    // 1. partiallyCoveredSlaveAddrPtr_
-    // 2. slaveFaceCoveredFractionsPtr_
+    // 1. partiallyUncoveredSlaveAddrPtr_
+    // 2. slaveFaceUncoveredFractionsPtr_
     calcPartiallyCoveredFaces
     (
         saW,
@@ -695,7 +695,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::rescaleWeightingFactors() const
     scalar curMWC = 0;
 
     // Note: do not rescale weighting factors for partially covered faces
-    if (!partiallyCoveredMasterAddrPtr_ || !partiallyCoveredSlaveAddrPtr_)
+    if (!partiallyUncoveredMasterAddrPtr_ || !partiallyUncoveredSlaveAddrPtr_)
     {
         FatalErrorIn
         (
@@ -705,22 +705,22 @@ void GGIInterpolation<MasterPatch, SlavePatch>::rescaleWeightingFactors() const
             << abort(FatalError);
     }
 
-    const labelList& partiallyCoveredMasterFaces =
-        *partiallyCoveredMasterAddrPtr_;
-    const labelList& partiallyCoveredSlaveFaces =
-        *partiallyCoveredSlaveAddrPtr_;
+    const labelList& partiallyUncoveredMasterFaces =
+        *partiallyUncoveredMasterAddrPtr_;
+    const labelList& partiallyUncoveredSlaveFaces =
+        *partiallyUncoveredSlaveAddrPtr_;
 
     // Create a mask for partially covered master/slave faces
     boolList masterPCMask(maW.size(), false);
     boolList slavePCMask(saW.size(), false);
 
-    forAll (partiallyCoveredMasterFaces, pfmI)
+    forAll (partiallyUncoveredMasterFaces, pfmI)
     {
-        masterPCMask[partiallyCoveredMasterFaces[pfmI]] = true;
+        masterPCMask[partiallyUncoveredMasterFaces[pfmI]] = true;
     }
-    forAll (partiallyCoveredSlaveFaces, pfsI)
+    forAll (partiallyUncoveredSlaveFaces, pfsI)
     {
-        slavePCMask[partiallyCoveredSlaveFaces[pfsI]] = true;
+        slavePCMask[partiallyUncoveredSlaveFaces[pfsI]] = true;
     }
 
     // Rescaling the slave weights
@@ -847,7 +847,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcPartiallyCoveredFaces
     if
     (
         isMaster
-     && (partiallyCoveredMasterAddrPtr_ || masterFaceCoveredFractionsPtr_)
+     && (partiallyUncoveredMasterAddrPtr_ || masterFaceUncoveredFractionsPtr_)
     )
     {
         FatalErrorIn
@@ -861,7 +861,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcPartiallyCoveredFaces
     if
     (
         !isMaster
-     && (partiallyCoveredSlaveAddrPtr_ || slaveFaceCoveredFractionsPtr_)
+     && (partiallyUncoveredSlaveAddrPtr_ || slaveFaceUncoveredFractionsPtr_)
     )
     {
         FatalErrorIn
@@ -899,23 +899,23 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcPartiallyCoveredFaces
     if (isMaster)
     {
         // Allocate master side
-        partiallyCoveredMasterAddrPtr_ =
+        partiallyUncoveredMasterAddrPtr_ =
             new labelList(patchFacePartialOverlap.xfer());
-        masterFaceCoveredFractionsPtr_ =
+        masterFaceUncoveredFractionsPtr_ =
             new scalarField(uncoveredFaceFractions.xfer());
 
         if (debug)
         {
             InfoIn("GGIInterpolation::calcPartiallyCoveredFaces")
-                << "   : Found " << partiallyCoveredMasterAddrPtr_->size()
+                << "   : Found " << partiallyUncoveredMasterAddrPtr_->size()
                 << " partially overlapping faces for master GGI patch" << endl;
             
-            if (partiallyCoveredMasterAddrPtr_->size())
+            if (partiallyUncoveredMasterAddrPtr_->size())
             {
-                Info<< "Max coverage: "
-                    << max(*masterFaceCoveredFractionsPtr_)
-                    << ", min coverage: "
-                    << min(*masterFaceCoveredFractionsPtr_)
+                Info<< "Max uncoverage: "
+                    << max(*masterFaceUncoveredFractionsPtr_)
+                    << ", min uncoverage: "
+                    << min(*masterFaceUncoveredFractionsPtr_)
                     << endl;
             }
         }
@@ -923,23 +923,23 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcPartiallyCoveredFaces
     else
     {
         // Allocate slave side
-        partiallyCoveredSlaveAddrPtr_ =
+        partiallyUncoveredSlaveAddrPtr_ =
             new labelList(patchFacePartialOverlap.xfer());
-        slaveFaceCoveredFractionsPtr_ =
+        slaveFaceUncoveredFractionsPtr_ =
             new scalarField(uncoveredFaceFractions.xfer());
 
         if (debug)
         {
             InfoIn("GGIInterpolation::calcPartiallyCoveredFaces")
-                << "   : Found " << partiallyCoveredSlaveAddrPtr_->size()
+                << "   : Found " << partiallyUncoveredSlaveAddrPtr_->size()
                 << " partially overlapping faces for slave GGI patch" << endl;
 
-            if (partiallyCoveredSlaveAddrPtr_->size())
+            if (partiallyUncoveredSlaveAddrPtr_->size())
             {
-                Info<< "Max coverage: "
-                    << max(*slaveFaceCoveredFractionsPtr_)
-                    << ", min coverage: "
-                    << min(*slaveFaceCoveredFractionsPtr_)
+                Info<< "Max uncoverage: "
+                    << max(*slaveFaceUncoveredFractionsPtr_)
+                    << ", min uncoverage: "
+                    << min(*slaveFaceUncoveredFractionsPtr_)
                     << endl;
             }
         }

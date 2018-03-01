@@ -1,0 +1,8 @@
+cellSet backgroundMesh new cellToCell cellRegion0
+cellSet middleMesh new cellToCell cellRegion1
+cellSet frontMesh new cellToCell cellRegion2
+
+cellSet cellRegion0 delete
+cellSet cellRegion1 delete
+cellSet cellRegion2 delete
+quit

@@ -9,6 +9,6 @@ simulations are performed with five different under-relaxation pairs:
     5. alphaU = 0.4, alphap = 0.6
 Tolerances for all equations are very small, yielding extremely small (O(1e-11))
 differences in converged pressure field. If the differences are larger - it
-means that the converged solution is not independent to relaxation factors.
+means that the converged solution is dependend on relaxation factors.
 
 Author: Vuko Vukcevic, vuko.vukcevic@fsb.hr
