@@ -95,9 +95,11 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
             // Weights for fully uncovered faces
             const scalarField uncoveredWeights(w.size(), 0.5);
 
-            // Scale partially overlapping faces and set uncovered weights
-            // for fully uncovered faces
-            scaleForPartialCoverage(uncoveredWeights, w);
+            // Set weights for uncovered faces
+            setUncoveredFaces(uncoveredWeights, w);
+
+            // Scale partially overlapping faces
+            scalePartialFaces(w);
         }
 
         // Finally construct these weights as 1 - master weights
@@ -138,9 +140,11 @@ void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
             const scalarField uncoveredDeltaCoeffs =
                 1.0/max(nf() & d, 0.05*mag(d));
 
-            // Scale partially overlapping faces and set uncovered deltaCoeffs
-            // for fully uncovered faces.
-            scaleForPartialCoverage(uncoveredDeltaCoeffs, dc);
+            // Set delta coeffs for uncovered faces
+            setUncoveredFaces(uncoveredDeltaCoeffs, dc);
+
+            // Scale partially overlapping faces
+            scalePartialFaces(dc);
         }
     }
 }
@@ -173,9 +177,9 @@ Foam::tmp<Foam::vectorField> Foam::ggiFvPatch::delta() const
         // to fully uncovered faces correctly taken into account in
         // reconFaceCellCentres function. VV, 15/Feb/2018.
 
-        tmp<vectorField> tDelta = ggiPolyPatch_.reconFaceCellCentres() - Cn();
+        tmp<vectorField> tdelta = ggiPolyPatch_.reconFaceCellCentres() - Cn();
 
-        return tDelta;
+        return tdelta;
     }
     else
     {
@@ -183,7 +187,7 @@ Foam::tmp<Foam::vectorField> Foam::ggiFvPatch::delta() const
         // covered faces and set deltas for fully uncovered faces if the bridge
         // overlap is switched on. VV, 15/Feb/2018.
 
-        tmp<vectorField> tDelta = interpolate
+        tmp<vectorField> tdelta = interpolate
         (
             shadow().Cn() - ggiPolyPatch_.shadow().reconFaceCellCentres()
         );
@@ -193,12 +197,14 @@ Foam::tmp<Foam::vectorField> Foam::ggiFvPatch::delta() const
             // Deltas for fully uncovered faces
             const vectorField uncoveredDeltas(2.0*fvPatch::delta());
 
-            // Scale partially overlapping faces and set uncovered deltas for
-            // fully uncovered faces
-            scaleForPartialCoverage(uncoveredDeltas, tDelta());
+            // Set deltas for fully uncovered faces
+            setUncoveredFaces(uncoveredDeltas, tdelta());
+
+            // Scale for partially covered faces
+            scalePartialFaces(tdelta());
         }
 
-        return tDelta;
+        return tdelta;
     }
 }
 

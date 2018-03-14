@@ -76,7 +76,7 @@ void Foam::regionCoupleFvPatch::makeWeights(scalarField& w) const
             {
                 // Set overlap weights to 0.5 and use mirrored neighbour field
                 // for interpolation.  HJ, 21/Jan/2009
-                bridge(scalarField(size(), 0.5), w);
+                setUncoveredFaces(scalarField(size(), 0.5), w);
             }
         }
         else
@@ -93,7 +93,7 @@ void Foam::regionCoupleFvPatch::makeWeights(scalarField& w) const
             {
                 // Set overlap weights to 0.5 and use mirrored neighbour field
                 // for interpolation.  HJ, 21/Jan/2009
-                bridge(scalarField(size(), 0.5), w);
+                setUncoveredFaces(scalarField(size(), 0.5), w);
             }
         }
     }
@@ -120,7 +120,7 @@ void Foam::regionCoupleFvPatch::makeDeltaCoeffs(scalarField& dc) const
             {
                 scalarField bridgeDeltas = nf() & fvPatch::delta();
 
-                bridge(bridgeDeltas, dc);
+                setUncoveredFaces(bridgeDeltas, dc);
             }
         }
         else
@@ -133,7 +133,7 @@ void Foam::regionCoupleFvPatch::makeDeltaCoeffs(scalarField& dc) const
             {
                 scalarField bridgeDeltas = nf() & fvPatch::delta();
 
-                bridge(bridgeDeltas, dc);
+                setUncoveredFaces(bridgeDeltas, dc);
             }
         }
     }
@@ -184,7 +184,7 @@ Foam::tmp<Foam::vectorField> Foam::regionCoupleFvPatch::delta() const
             {
                 vectorField bridgeDeltas = Cf() - Cn();
 
-                bridge(bridgeDeltas, tDelta());
+                setUncoveredFaces(bridgeDeltas, tDelta());
             }
 
             return tDelta;
@@ -200,7 +200,7 @@ Foam::tmp<Foam::vectorField> Foam::regionCoupleFvPatch::delta() const
             {
                 vectorField bridgeDeltas = Cf() - Cn();
 
-                bridge(bridgeDeltas, tDelta());
+                setUncoveredFaces(bridgeDeltas, tDelta());
             }
 
             return tDelta;

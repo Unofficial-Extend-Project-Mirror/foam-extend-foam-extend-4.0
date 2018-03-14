@@ -76,6 +76,15 @@ gaussLaplacianScheme<Type, GType>::fvmLaplacianUncorrected
         fvm.boundaryCoeffs()[patchI] = -patchGamma*psf.gradientBoundaryCoeffs();
     }
 
+    // Manipulate internal and boundary coeffs for diffusion. Needed for very
+    // special treatment and is currently used only for ensuring implicit
+    // conservation across GGI interface that has partially covered faces. Does
+    // nothing for other fvPatchFields. VV, 8/Mar/2018.
+    forAll(fvm.psi().boundaryField(), patchI)
+    {
+        fvm.psi().boundaryField()[patchI].manipulateGradientCoeffs(fvm);
+    }
+
     return tfvm;
 }
 

@@ -249,6 +249,26 @@ void Foam::fvPatchField<Type>::manipulateMatrix(fvMatrix<Type>& matrix)
 
 
 template<class Type>
+void Foam::fvPatchField<Type>::manipulateValueCoeffs
+(
+    fvMatrix<Type>& matrix
+) const
+{
+    // do nothing
+}
+
+
+template<class Type>
+void Foam::fvPatchField<Type>::manipulateGradientCoeffs
+(
+    fvMatrix<Type>& matrix
+) const
+{
+    // do nothing
+}
+
+
+template<class Type>
 void Foam::fvPatchField<Type>::patchInterpolate
 (
     GeometricField<Type, fvsPatchField, surfaceMesh>& fField,

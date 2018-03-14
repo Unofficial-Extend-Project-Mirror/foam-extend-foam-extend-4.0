@@ -305,9 +305,11 @@ void Foam::ggiPolyPatch::calcReconFaceCellCentres() const
             // Deltas for fully uncovered faces
             const vectorField uncoveredDeltas(cf - ccf);
 
-            // Scale partially overlapping faces and set uncovered deltas to
-            // fully uncovered faces
-            scaleForPartialCoverage(uncoveredDeltas, tdf());
+            // Set uncovered deltas to fully uncovered faces
+            setUncoveredFaces(uncoveredDeltas, tdf());
+
+            // Scale partially overlapping faces
+            scalePartialFaces(tdf());
         }
 
         // Calculate the reconstructed cell centres

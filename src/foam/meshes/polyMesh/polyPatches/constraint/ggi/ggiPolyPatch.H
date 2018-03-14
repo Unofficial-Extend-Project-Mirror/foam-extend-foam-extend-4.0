@@ -356,7 +356,8 @@ public:
             const ggiZoneInterpolation& patchToPatch() const;
 
 
-        // Interpolation functions
+        // Interpolation functions and bridging operations for fully uncovered
+        // and partially covered faces
 
             //- Expand face field to full zone size, including reduction
             template<class Type>
@@ -370,21 +371,31 @@ public:
             template<class Type>
             tmp<Field<Type> > interpolate(const tmp<Field<Type> >& tpf) const;
 
-            //- Bridge interpolated face field for uncovered faces
+            //- Set given field for fully uncovered faces
             template<class Type>
-            void bridge
+            void setUncoveredFaces
             (
-                const Field<Type>& bridgeField,
+                const Field<Type>& fieldToSet,
                 Field<Type>& ff
             ) const;
 
-            //- Scale field for partially covered faces and set
-            //  uncoveredFaceField to fully uncovered faces. Needed for correct
-            //  calculation of fvPatchData: delta, deltaCoeffs and weights
+            //- Set given field for partially covered faces
             template<class Type>
-            void scaleForPartialCoverage
+            void setPartialFaces
             (
-                const Field<Type>& uncoveredFaceField,
+                const Field<Type>& fieldToSet,
+                Field<Type>& ff
+            ) const;
+
+            //- Scale field for partially covered faces
+            template<class Type>
+            void scalePartialFaces(Field<Type>& ff) const;
+
+            //- Add given field to partially covered faces
+            template<class Type>
+            void addToPartialFaces
+            (
+                const Field<Type>& fieldToAdd,
                 Field<Type>& ff
             ) const;
 

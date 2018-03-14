@@ -409,11 +409,11 @@ public:
             template<class Type>
             tmp<Field<Type> > interpolate(const tmp<Field<Type> >& tpf) const;
 
-            //- Bridge interpolated face field for uncovered faces
+            //- Set given field for fully uncovered faces
             template<class Type>
-            void bridge
+            void setUncoveredFaces
             (
-                const Field<Type>& bridgeField,
+                const Field<Type>& fieldToSet,
                 Field<Type>& ff
             ) const;
 
