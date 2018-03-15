@@ -290,6 +290,8 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+#include "ggiFvPatchScalarField.H"
+
 #ifdef NoRepository
 #   include "ggiFvPatchField.C"
 #endif

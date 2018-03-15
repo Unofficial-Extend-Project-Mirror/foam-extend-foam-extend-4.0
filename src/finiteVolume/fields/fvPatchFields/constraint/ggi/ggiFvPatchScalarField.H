@@ -25,7 +25,7 @@ Author
     Vuko Vukcevic, Wikki Ltd.  All rights reserved
 
 Description
-    Specilalisation of manipulateMatrix member function for scalars needed to
+    Specilalisation of patchFlux member function for scalars needed to
     ensure conservation across GGI patches that are partially covered if the
     bridge overlap switch is on.
 
@@ -47,10 +47,11 @@ namespace Foam
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<>
-void Foam::ggiFvPatchField<scalar>::manipulateMatrix
+void Foam::ggiFvPatchField<scalar>::patchFlux
 (
-    fvMatrix<scalar>& matrix
-);
+    GeometricField<scalar, fvsPatchField, surfaceMesh>& flux,
+    const fvMatrix<scalar>& matrix
+) const;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

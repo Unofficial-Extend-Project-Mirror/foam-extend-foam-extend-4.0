@@ -38,6 +38,7 @@ Note on parallelisation
 #include "ggiFvPatchField.H"
 #include "symmTransformField.H"
 #include "coeffFields.H"
+#include "fvMatrices.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -520,12 +521,6 @@ void Foam::ggiFvPatchField<Type>::manipulateValueCoeffs
 
         // Scale partially overlapping boundary coeffs to ensure conservation
         ggiPatch_.shadow().scalePartialFaces(slaveBC);
-
-//        Info<< "MANIPULATING VALUE COEFFS" << endl;
-//        Info<< "Slave internal coeffs: " << slaveIC << nl
-//            << "Slave boundary coeffs: " << slaveBC << nl
-//            << "Master internal coeffs: " << masterIC << nl
-//            << "Master boundary coeffs: " << masterBC << endl;
     }
 }
 
@@ -552,12 +547,6 @@ void Foam::ggiFvPatchField<Type>::manipulateGradientCoeffs
         Field<Type>& slaveIC = matrix.internalCoeffs()[sPatchI];
         Field<Type>& slaveBC = matrix.boundaryCoeffs()[sPatchI];
 
-//        Info<< "ORIGINAL COEFFS" << endl;
-//        Info<< "Slave internal coeffs: " << slaveIC << nl
-//            << "Slave boundary coeffs: " << slaveBC << nl
-//            << "Master internal coeffs: " << masterIC << nl
-//            << "Master boundary coeffs: " << masterBC << endl;
-
         // Get surface area magnitudes
         const scalarField& magSfMaster = ggiPatch_.magSf();
         const scalarField& magSfSlave = ggiPatch_.shadow().magSf();
@@ -578,12 +567,6 @@ void Foam::ggiFvPatchField<Type>::manipulateGradientCoeffs
             magSfMaster*ggiPatch_.interpolate(slaveIC/magSfSlave);
         const Field<Type> slaveInterpolatedBC =
             magSfMaster*ggiPatch_.interpolate(slaveBC/magSfSlave);
-
-//        Info<< "INTERPOLATED COEFFS" << endl;
-//        Info<< "Slave internal coeffs: " << slaveInterpolatedIC << nl
-//            << "Slave boundary coeffs: " << slaveInterpolatedBC << nl
-//            << "Master internal coeffs: " << masterInterpolatedIC << nl
-//            << "Master boundary coeffs: " << masterInterpolatedBC << endl;
 
 
         // Set partially covered master coeffs using slave data
@@ -610,12 +593,6 @@ void Foam::ggiFvPatchField<Type>::manipulateGradientCoeffs
         // Add to partially overlapping slave internal coeffs to ensure
         // conservation. Note: boundary coeffs must be negated
         ggiPatch_.shadow().addToPartialFaces((-slaveBC)(), slaveIC);
-
-//        Info<< "MANIPULATING GRADIENT COEFFS" << endl;
-//        Info<< "Slave internal coeffs: " << slaveIC << nl
-//            << "Slave boundary coeffs: " << slaveBC << nl
-//            << "Master internal coeffs: " << masterIC << nl
-//            << "Master boundary coeffs: " << masterBC << endl;
     }
 }
 

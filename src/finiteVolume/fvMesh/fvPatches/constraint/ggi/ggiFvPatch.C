@@ -156,15 +156,24 @@ void Foam::ggiFvPatch::makeCorrVecs(vectorField& cv) const
     // Non-orthogonality correction on a ggi interface
     // MB, 7/April/2009
 
-    // Calculate correction vectors on coupled patches
-    const scalarField& patchDeltaCoeffs = deltaCoeffs();
+    // No non-orthognal correction if the bridge overlap is switched on to
+    // ensure conservative interpolation for partially overlapping faces
+    if (bridgeOverlap())
+    {
+        cv = vector::zero;
+    }
+    else
+    {
+        // Calculate correction vectors on coupled patches
+        const scalarField& patchDeltaCoeffs = deltaCoeffs();
 
-    const vectorField patchDeltas = delta();
-    const vectorField n = nf();
+        const vectorField patchDeltas = delta();
+        const vectorField n = nf();
 
-    // If non-orthogonality is over 90 deg, kill correction vector
-    // HJ, 6/Jan/2011
-    cv = pos(patchDeltas & n)*(n - patchDeltas*patchDeltaCoeffs);
+        // If non-orthogonality is over 90 deg, kill correction vector
+        // HJ, 6/Jan/2011
+        cv = pos(patchDeltas & n)*(n - patchDeltas*patchDeltaCoeffs);
+    }
 }
 
 
