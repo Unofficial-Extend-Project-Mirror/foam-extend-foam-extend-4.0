@@ -116,11 +116,12 @@ class cyclicPolyPatch;
 
 class globalPoints
 {
-    // Private classes
+    // Private typedefs
 
         //- Define procPointList as holding a list of meshPoint/processor labels
         typedef FixedList<label, 2> procPoint;
         typedef List<procPoint> procPointList;
+
 
     // Private data
 
@@ -253,7 +254,6 @@ public:
             {
                 return nGlobalPoints_;
             }
-
 };
 
 
