@@ -1,4 +1,4 @@
-EXE_INC = \
+EXE_INC = -std=c++11 \
     -I$(LIB_SRC)/decompositionMethods/decompositionMethods/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \

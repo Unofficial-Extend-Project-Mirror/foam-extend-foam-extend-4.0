@@ -58,9 +58,6 @@ class processorMeshesReconstructor
 {
     // Private data
 
-        //- Processor databases
-        PtrList<Time>& databases_;
-
         //- Name of mesh region to reconstruct
         const word meshName_;
 
@@ -90,7 +87,7 @@ class processorMeshesReconstructor
 
 
         //- Read all meshes
-        void readMeshes();
+        void readMeshes(PtrList<Time>& databases);
 
         //- Attempt to read mapping.  If not available, return false
         bool readMapping();
@@ -118,12 +115,14 @@ public:
 
     // Constructors
 
-        //- Construct reading mesh names
+        //- Construct given name.  Set meshes later
+        processorMeshesReconstructor(const word& meshName);
+
+        //- Construct reading meshes from databases
         processorMeshesReconstructor
         (
             PtrList<Time>& databases,
-            const word& meshName,
-            const bool read
+            const word& meshName
         );
 
 

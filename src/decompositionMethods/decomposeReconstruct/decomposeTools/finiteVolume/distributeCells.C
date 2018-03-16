@@ -107,8 +107,6 @@ void Foam::domainDecomposition::distributeCells()
 
     // Construct decomposition method and either do decomposition on
     // cell centres or on agglomeration
-
-
     autoPtr<decompositionMethod> decomposePtr = decompositionMethod::New
     (
         decompositionDict_,

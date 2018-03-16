@@ -27,9 +27,9 @@ License
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::processorMeshesReconstructor::readMeshes()
+void Foam::processorMeshesReconstructor::readMeshes(PtrList<Time>& databases)
 {
-    forAll (databases_, procI)
+    forAll (databases, procI)
     {
         Info<< "Reading mesh for processor " << procI << endl;
         meshes_.set
@@ -40,8 +40,8 @@ void Foam::processorMeshesReconstructor::readMeshes()
                 IOobject
                 (
                     meshName_,
-                    databases_[procI].timeName(),
-                    databases_[procI]
+                    databases[procI].timeName(),
+                    databases[procI]
                 )
             )
         );
@@ -66,12 +66,24 @@ void Foam::processorMeshesReconstructor::clearMaps()
 
 Foam::processorMeshesReconstructor::processorMeshesReconstructor
 (
-    PtrList<Time>& databases,
-    const word& meshName,
-    const bool read
+    const word& meshName
 )
 :
-    databases_(databases),
+    meshName_(meshName),
+    meshes_(),
+    pointProcAddressing_(),
+    faceProcAddressing_(),
+    cellProcAddressing_(),
+    boundaryProcAddressing_()
+{}
+
+
+Foam::processorMeshesReconstructor::processorMeshesReconstructor
+(
+    PtrList<Time>& databases,
+    const word& meshName
+)
+:
     meshName_(meshName),
     meshes_(databases.size()),
     pointProcAddressing_(),
@@ -79,10 +91,7 @@ Foam::processorMeshesReconstructor::processorMeshesReconstructor
     cellProcAddressing_(),
     boundaryProcAddressing_()
 {
-    if (read)
-    {
-        readMeshes();
-    }
+    readMeshes(databases);
 }
 
 
@@ -93,10 +102,10 @@ Foam::processorMeshesReconstructor::readUpdate()
 {
     polyMesh::readUpdateState stat = polyMesh::UNCHANGED;
 
-    forAll (databases_, procI)
+    forAll (meshes_, procI)
     {
         // Only do action if database has been set
-        if (databases_.set(procI))
+        if (meshes_.set(procI))
         {
             // Check if any new meshes need to be read.
             polyMesh::readUpdateState procStat = meshes_[procI].readUpdate();
@@ -113,9 +122,10 @@ Foam::processorMeshesReconstructor::readUpdate()
                     FatalErrorIn("processorMeshesReconstructor::readUpdate()")
                         << "Processor " << procI
                         << " has a different polyMesh at time "
-                        << databases_[procI].timeName()
+                        << meshes_[procI].time().timeName()
                         << " compared to any previous processors." << nl
-                        << "Please check time " << databases_[procI].timeName()
+                        << "Please check time "
+                        << meshes_[procI].time().timeName()
                         << " directories on all processors for consistent"
                         << " mesh files."
                         << exit(FatalError);

@@ -25,7 +25,7 @@ License
 
 #include "processorMeshesReconstructor.H"
 #include "processorPolyPatch.H"
-#include "globalMeshData.H"
+#include "sharedPoints.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -494,8 +494,9 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
         << "    nPatches = " << nReconPatches << nl
         << "    nPatchFaces = " << reconPatchSizes << endl;
 
-    // Note: for easier debugging, set owner and neighbour to -1
+    // Note: for easier debugging, set mapping, owner and neighbour to -1
     pointField reconPoints(nReconPoints);
+    labelList globalPointMapping(nReconPoints, -1);
     faceList reconFaces(nReconFaces);
     labelList cellOffset(meshes_.size(), 0);
     labelList reconOwner(nReconFaces, -1);
@@ -604,8 +605,10 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
     reconPatchSizes = 0;
 
-    // Prepare handling for globally shared points
-    labelList globalPointMapping;
+    // Prepare handling for globally shared points.  This is equivalent
+    // to parallel processor points, but working on a PtrList of meshes
+    // on the same processor
+    sharedPoints sharedData(meshes_);
 
     // Dump first valid mesh without checking
     {
@@ -618,10 +621,6 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
         labelList& fpAddr = faceProcAddressing_[fvmId];
         labelList& cpAddr = cellProcAddressing_[fvmId];
         labelList& bpAddr = boundaryProcAddressing_[fvmId];
-
-        // Prepare handling for global mesh data: set to -1
-        globalPointMapping.setSize(curMesh.globalData().nGlobalPoints());
-        globalPointMapping = -1;
 
         // Dump all points into the global point list
         // Reconstruct only live points.  HJ, 7/Mar/2011
@@ -636,8 +635,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
         }
 
         // Collect globally shared point labels
-        // CHANGE HERE!!!
-        const labelList& curSpl = curMesh.globalData().sharedPointLabels();
+        const labelList& curSpl = sharedData.sharedPointLabels()[fvmId];
 
         forAll (curSpl, splI)
         {
@@ -816,7 +814,8 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
                         forAll (reversedFaces, faceI)
                         {
-                            reversedFaces[faceI] = procPatch[faceI].reverseFace();
+                            reversedFaces[faceI] =
+                                procPatch[faceI].reverseFace();
                         }
 
                         primitiveFacePatch reversedPatch
@@ -828,8 +827,9 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                         // Insert addressing from master side into
                         // local point addressing.  Each face of reversed patch
                         // now matches the master face.
-                        // Note: this is done by visiting faces, since meshPoints
-                        // are ordered in increasing order.  HJ, 10/Mar/2011
+                        // Note: this is done by visiting faces, since
+                        // meshPoints are ordered in increasing order.
+                        // HJ, 10/Mar/2011
 
                         forAll (reversedFaces, faceI)
                         {
@@ -879,7 +879,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
             fpAddr.setSize(curFaces.size());
 
             // Collect globally shared point labels
-            const labelList& curSpl = curMesh.globalData().sharedPointLabels();
+            const labelList& curSpl = sharedData.sharedPointLabels()[procI];
 
             forAll (curSpl, splI)
             {
@@ -893,7 +893,11 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                 else
                 {
                     // Compare.  Is this needed - should always be OK.
-                    if (globalPointMapping[curSpl[splI]] != ppAddr[curSpl[splI]])
+                    if
+                    (
+                        globalPointMapping[curSpl[splI]]
+                     != ppAddr[curSpl[splI]]
+                    )
                     {
                         WarningIn
                         (
@@ -963,7 +967,8 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
                         const label masterProcID = procPatch.neighbProcNo();
 
-                        // Get local face-cell addressing: it will become neighbour
+                        // Get local face-cell addressing: it will become
+                        // a neighbour
                         // addressing for the already inserted faces
                         const labelList procFaceCells = procPatch.faceCells();
 
@@ -1039,7 +1044,8 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                 cpAddr[cellI] = cellI + cellOffset[procI];
             }
 
-            // Sort out boundary addressing: i for live patches, -1 for processor
+            // Sort out boundary addressing: i for live patches,
+            // -1 for processor
             bpAddr = -1;
 
             // Note: loop over mapped patches

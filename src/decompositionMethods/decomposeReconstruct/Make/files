@@ -8,6 +8,7 @@ decomposeTools/point/pointFieldDecomposer.C
 decomposeTools/tetFiniteElement/tetPointFieldDecomposer.C
 decomposeTools/lagrangian/lagrangianFieldDecomposer.C
 
+reconstructTools/finiteVolume/sharedPoints.C
 reconstructTools/finiteVolume/processorMeshesReconstructor.C
 reconstructTools/finiteVolume/processorMeshesRebuild.C
 reconstructTools/finiteVolume/fvFieldReconstructor.C

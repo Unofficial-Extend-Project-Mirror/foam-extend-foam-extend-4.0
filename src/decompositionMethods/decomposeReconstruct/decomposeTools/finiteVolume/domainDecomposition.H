@@ -177,11 +177,12 @@ public:
 
         // Decomposed mesh and addressing
 
-            //- Decompose mesh for a given processor
+            //- Create a decomposed mesh for a given processor index
             autoPtr<fvMesh> processorMesh
             (
                 const label procI,
-                const Time& procDb
+                const Time& procDb,
+                const word& regionName
             ) const;
 
             //- Return processor point addressing

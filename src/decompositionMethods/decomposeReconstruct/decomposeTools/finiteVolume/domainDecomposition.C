@@ -83,7 +83,8 @@ Foam::domainDecomposition::~domainDecomposition()
 Foam::autoPtr<Foam::fvMesh> Foam::domainDecomposition::processorMesh
 (
     const label procI,
-    const Time& processorDb
+    const Time& processorDb,
+    const word& regionName
 ) const
 {
     // Create processor points
@@ -210,7 +211,7 @@ Foam::autoPtr<Foam::fvMesh> Foam::domainDecomposition::processorMesh
         (
             IOobject
             (
-                mesh_.polyMesh::name(),  // region name of undecomposed mesh
+                regionName,
                 mesh_.pointsInstance(),
                 processorDb
             ),
@@ -283,8 +284,8 @@ Foam::autoPtr<Foam::fvMesh> Foam::domainDecomposition::processorMesh
         nPatches++;
     }
 
-    // Add boundary patches
-    procMesh.addPatches(procPatches);
+    // Add boundary patches to polyMesh and fvMesh
+    procMesh.addFvPatches(procPatches);
 
     // Create and add zones
 
@@ -531,7 +532,12 @@ bool Foam::domainDecomposition::writeDecomposition()
         // Set the precision of the points data to 10
         IOstream::defaultPrecision(10);
 
-        autoPtr<fvMesh> procMeshPtr = processorMesh(procI, processorDb);
+        autoPtr<fvMesh> procMeshPtr = processorMesh
+        (
+            procI,
+            processorDb,
+            mesh_.polyMesh::name()     // region name of undecomposed mesh
+        );
         fvMesh& procMesh = procMeshPtr();
 
         procMesh.write();
