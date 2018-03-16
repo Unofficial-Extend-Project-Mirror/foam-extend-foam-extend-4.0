@@ -124,7 +124,7 @@ Foam::fvMesh::fvMesh(const IOobject& io)
 :
     polyMesh(io),
     surfaceInterpolation(*this),
-    boundary_(*this, boundaryMesh()),
+    boundary_(*this),
     lduPtr_(NULL),
     curTimeIndex_(time().timeIndex()),
     VPtr_(NULL),
@@ -248,6 +248,34 @@ Foam::fvMesh::fvMesh
 Foam::fvMesh::fvMesh
 (
     const IOobject& io,
+    Istream& is,
+    const bool syncPar
+)
+:
+    polyMesh(io, is, syncPar),
+    surfaceInterpolation(*this),
+    boundary_(*this),
+    lduPtr_(NULL),
+    curTimeIndex_(time().timeIndex()),
+    VPtr_(NULL),
+    V0Ptr_(NULL),
+    V00Ptr_(NULL),
+    SfPtr_(NULL),
+    magSfPtr_(NULL),
+    CPtr_(NULL),
+    CfPtr_(NULL),
+    phiPtr_(NULL)
+{
+    if (debug)
+    {
+        Info<< "Constructing fvMesh from Istream" << endl;
+    }
+}
+
+
+Foam::fvMesh::fvMesh
+(
+    const IOobject& io,
     const Xfer<pointField>& points,
     const Xfer<faceList>& faces,
     const Xfer<cellList>& cells,
@@ -347,9 +375,9 @@ void Foam::fvMesh::addFvPatches
             << abort(FatalError);
     }
 
-    // first add polyPatches
+    // First add polyPatches
     addPatches(p, validBoundary);
-    boundary_.addPatches(boundaryMesh());
+    boundary_.addFvPatches();
 }
 
 
@@ -390,7 +418,7 @@ Foam::polyMesh::readUpdateState Foam::fvMesh::readUpdate()
             Info << "Boundary and topological update" << endl;
         }
 
-        boundary_.readUpdate(boundaryMesh());
+        boundary_.readUpdate();
 
         clearOut();
 

@@ -178,6 +178,14 @@ public:
         //- Construct from IOobject
         explicit fvMesh(const IOobject& io);
 
+        //- Construct from Istream
+        fvMesh
+        (
+            const IOobject& io,
+            Istream& is,
+            const bool syncPar = true
+        );
+
         //- Construct from components without boundary.
         //  Boundary is added using addFvPatches() member function
         fvMesh
@@ -226,6 +234,8 @@ public:
         // Helpers
 
             //- Add boundary patches. Constructor helper
+            //  Note: adding polyPatches to polyMesh patches and
+            //  fvPatches to fvMesh
             void addFvPatches
             (
                 const List<polyPatch*>&,

@@ -34,16 +34,19 @@ namespace Foam
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void fvBoundaryMesh::addPatches(const polyBoundaryMesh& basicBdry)
+void fvBoundaryMesh::addFvPatches()
 {
-    setSize(basicBdry.size());
+    const polyBoundaryMesh& bMesh = mesh_.boundaryMesh();
+    
+    setSize(bMesh.size());
 
-    // Set boundary patches
+    // Set boundary patches, using the patches added to the polyMesh
+    // Bug fix.  HJ, 1/Mar/2018
     fvPatchList& Patches = *this;
 
     forAll(Patches, patchI)
     {
-        Patches.set(patchI, fvPatch::New(basicBdry[patchI], *this));
+        Patches.set(patchI, fvPatch::New(bMesh[patchI], *this));
     }
 }
 
@@ -55,21 +58,10 @@ fvBoundaryMesh::fvBoundaryMesh
     const fvMesh& m
 )
 :
-    fvPatchList(0),
-    mesh_(m)
-{}
-
-
-fvBoundaryMesh::fvBoundaryMesh
-(
-    const fvMesh& m,
-    const polyBoundaryMesh& basicBdry
-)
-:
-    fvPatchList(basicBdry.size()),
+    fvPatchList(m.boundaryMesh().size()),
     mesh_(m)
 {
-    addPatches(basicBdry);
+    addFvPatches();
 }
 
 
@@ -109,10 +101,10 @@ lduInterfacePtrsList fvBoundaryMesh::interfaces() const
 }
 
 
-void fvBoundaryMesh::readUpdate(const polyBoundaryMesh& basicBdry)
+void fvBoundaryMesh::readUpdate()
 {
     clear();
-    addPatches(basicBdry);
+    addFvPatches();
 }
 
 
