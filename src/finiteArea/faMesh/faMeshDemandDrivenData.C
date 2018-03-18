@@ -128,9 +128,7 @@ void faMesh::calcLe() const
             *this,
             dimLength
         );
-
     edgeVectorField& Le = *LePtr_;
-
 
     const pointField& pPoints = points();
     const edgeList& pEdges = edges();
@@ -187,16 +185,16 @@ void faMesh::calcLe() const
             patchLe[edgeI] *=
               - sign
                 (
-                    patchLe[edgeI]&
-                    (
+                    patchLe[edgeI]
+                  & (
                         fCentresInternal[bndEdgeFaces[edgeI]]
                       - patchECentres[edgeI]
                     )
                 );
 
             patchLe[edgeI] *=
-                magLe().boundaryField()[patchI][edgeI]
-                /mag(patchLe[edgeI]);
+                magLe().boundaryField()[patchI][edgeI]/
+                mag(patchLe[edgeI]);
         }
     }
 }

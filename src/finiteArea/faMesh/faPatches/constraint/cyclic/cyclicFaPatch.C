@@ -38,12 +38,6 @@ namespace Foam
 defineTypeNameAndDebug(cyclicFaPatch, 0);
 addToRunTimeSelectionTable(faPatch, cyclicFaPatch, dictionary);
 
-const Foam::debug::tolerancesSwitch cyclicFaPatch::matchTol_
-(
-    "patchFaceMatchTol",
-    1e-3
-);
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void Foam::cyclicFaPatch::calcTransforms()
