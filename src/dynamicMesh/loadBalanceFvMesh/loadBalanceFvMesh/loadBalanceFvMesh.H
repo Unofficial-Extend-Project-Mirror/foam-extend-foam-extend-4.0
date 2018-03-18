@@ -22,24 +22,21 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::solidBodyMotionFvMesh
+    Foam::loadBalanceFvMesh
 
 Description
-    Solid-body motion of the mesh specified by a run-time selectable
-    motion function.
+    Load balancing fvMesh
 
 SourceFiles
-    solidBodyMotionFvMesh.C
+    loadBalanceFvMesh.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef solidBodyMotionFvMesh_H
-#define solidBodyMotionFvMesh_H
+#ifndef loadBalanceFvMesh_H
+#define loadBalanceFvMesh_H
 
 #include "dynamicFvMesh.H"
 #include "dictionary.H"
-#include "pointIOField.H"
-#include "solidBodyMotionFunction.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,10 +44,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                  Class solidBodyMotionFvMesh Declaration
+                     Class loadBalanceFvMesh Declaration
 \*---------------------------------------------------------------------------*/
 
-class solidBodyMotionFvMesh
+class loadBalanceFvMesh
 :
     public dynamicFvMesh
 {
@@ -59,36 +56,36 @@ class solidBodyMotionFvMesh
         //- Dictionary of motion control parameters
         dictionary dynamicMeshCoeffs_;
 
-        //- Motion control function
-        autoPtr<solidBodyMotionFunction> SBMFPtr_;
-
-        //- Reference points which are transformed
-        pointIOField undisplacedPoints_;
+        //- Imbalance trigger 0 < imbalance < 1
+        scalar imbalanceTrigger_;
 
 
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        solidBodyMotionFvMesh(const solidBodyMotionFvMesh&);
+        loadBalanceFvMesh(const loadBalanceFvMesh&);
 
         //- Disallow default bitwise assignment
-        void operator=(const solidBodyMotionFvMesh&);
+        void operator=(const loadBalanceFvMesh&);
+
+        //- Check balance.  Return true if re-balancing is required
+        bool checkLoadBalance(const scalarField& weights) const;
 
 
 public:
 
     //- Runtime type information
-    TypeName("solidBodyMotionFvMesh");
+    TypeName("loadBalanceFvMesh");
 
 
     // Constructors
 
         //- Construct from IOobject
-        explicit solidBodyMotionFvMesh(const IOobject& io);
+        explicit loadBalanceFvMesh(const IOobject& io);
 
 
     //- Destructor
-    virtual ~solidBodyMotionFvMesh();
+    virtual ~loadBalanceFvMesh();
 
 
     // Member Functions

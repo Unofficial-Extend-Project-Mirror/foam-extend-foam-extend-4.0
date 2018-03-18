@@ -120,9 +120,8 @@ public:
         static autoPtr<dynamicFvMesh> New(const IOobject& io);
 
 
-    // Destructor
-
-        virtual ~dynamicFvMesh();
+    //- Destructor
+    virtual ~dynamicFvMesh();
 
 
     // Member Functions
