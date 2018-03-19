@@ -139,8 +139,7 @@ int main(int argc, char *argv[])
     processorMeshesReconstructor procMeshes
     (
         databases,
-        regionName,
-        true         // read meshes
+        regionName
     );
 
     autoPtr<fvMesh> meshPtr = procMeshes.reconstructMesh(runTime);
