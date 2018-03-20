@@ -77,6 +77,7 @@ setenv WM_THIRD_PARTY_DIR $WM_PROJECT_DIR/ThirdParty
 # This can be overriden in prefs.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # For AllMake.stage1
+setenv WM_THIRD_PARTY_USE_BISON_27 1
 #setenv WM_THIRD_PARTY_USE_CMAKE_322 1
 
 #
@@ -137,6 +138,8 @@ if ( ! $?WM_OSTYPE ) setenv WM_OSTYPE POSIX
 if ( ! $?WM_COMPILER ) setenv WM_COMPILER Gcc
 #setenv WM_COMPILER Gcc
 #setenv WM_COMPILER Icc
+#setenv WM_COMPILER Clang
+#setenv WM_COMPILER Arm
 
 setenv WM_COMPILER_ARCH
 setenv WM_COMPILER_LIB_ARCH
@@ -244,6 +247,29 @@ case Linux:
     default:
         echo Unknown processor type `uname -m` for Linux
         breaksw
+
+    aarch64)
+        WM_ARCH=linuxARM8
+        if ( $WM_COMPILER == "Gcc" )
+        then
+            setenv WM_COMPILER_LIB_ARCH 64
+            setenv WM_CC 'gcc'
+            setenv WM_CXX 'g++'
+            setenv WM_CFLAGS '-fPIC -march=native -mtune=native'
+            setenv WM_CXXFLAGS '-fPIC -march=native -mtune=native'
+            setenv WM_LDFLAGS ''
+        else if ( $WM_COMPILER == "Arm" )
+        then
+            setenv WM_LDFLAGS ''
+            setenv WM_COMPILER_LIB_ARCH 64
+            setenv WM_CC 'armclang'
+            setenv WM_CXX 'armclang++'
+            setenv WM_CFLAGS '-fPIC'
+            setenv WM_CXXFLAGS '-fPIC'
+        else
+            echo "Unknown WM_COMPILER" $WM_COMPILER
+        fi
+        ;;
 
     endsw
     breaksw
