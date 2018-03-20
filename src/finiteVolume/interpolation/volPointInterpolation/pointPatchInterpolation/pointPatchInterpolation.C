@@ -407,14 +407,8 @@ const scalarListList& pointPatchInterpolation::patchPatchPointWeights() const
 
 bool pointPatchInterpolation::movePoints()
 {
-    if (!patchInterpolators_.empty())
-    {
-        // Reset patch interpolators (also lazy evaluated)
-        forAll (patchInterpolators_, patchi)
-        {
-            patchInterpolators_[patchi].movePoints();
-        }
-    }
+    // Clear out patch interpolators to force recalculation
+    patchInterpolators_.clear();
 
     // Clear out demand driven data
     clearOut();
