@@ -3555,9 +3555,7 @@ void Foam::polyhedralRefinement::setCellsToRefine
     // Transfer the contents into the data member (ordinary list)
     cellsToRefine_.transfer(cellsToRefineDynamic);
 
-    Info<< "polyhedralRefinement::setCellsToRefine"
-        << "(const labelList& refinementCellCandidates)" << nl
-        << "Selected " << returnReduce(cellsToRefine_.size(), sumOp<label>())
+    Info<< "Selected " << returnReduce(cellsToRefine_.size(), sumOp<label>())
         << " cells to refine." << endl;
 }
 
@@ -3709,9 +3707,9 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
     }
 
     // Extend protected cells across points using a specified number of buffer
-    // layers + 1 in order to stay far away from cells that are going to be
+    // layers + 2 in order to stay far away from cells that are going to be
     // refined
-    for (label i = 0; i < nBufferLayers_ + 1; ++i)
+    for (label i = 0; i < nBufferLayers_ + 2; ++i)
     {
         extendMarkedCellsAcrossPoints(protectedCell);
     }
@@ -3843,9 +3841,7 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
     // Transfer the contents into the data member (ordinary list)
     splitPointsToUnrefine_.transfer(splitPointsToUnrefineDynamic);
 
-    Info<< "polyhedralRefinement::setSplitPointsToUnrefine"
-        << "(const labelList& unrefinementPointCandidates)" << nl
-        << "Selected "
+    Info<< "Selected "
         << returnReduce(splitPointsToUnrefine_.size(), sumOp<label>())
         << " split points to unrefine." << endl;
 }
