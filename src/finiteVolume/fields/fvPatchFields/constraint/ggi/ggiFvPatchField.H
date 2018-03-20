@@ -47,6 +47,11 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration
+template<class Type>
+class fvMatrix;
+
+
 /*---------------------------------------------------------------------------*\
                       Class ggiFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
@@ -228,6 +233,29 @@ public:
             ) const;
 
 
+        // Patch interpolation and patch flux
+
+            //- Calculate patch flux
+            virtual void patchFlux
+            (
+                GeometricField<Type, fvsPatchField, surfaceMesh>& flux,
+                const fvMatrix<Type>& matrix
+            ) const;
+
+
+        // Matrix manipulation
+
+            //- Manipulate value and boundary coefficients for convection. Used
+            //  to ensure conservation across partially overlapping GGI faces if
+            //  the bridging is switched on
+            virtual void manipulateValueCoeffs(fvMatrix<Type>& matrix) const;
+
+            //- Manipulate value and boundary coefficients for diffusion. Used
+            //  to ensure conservation across partially overlapping GGI faces if
+            //  the bridging is switched on
+            virtual void manipulateGradientCoeffs(fvMatrix<Type>& matrix) const;
+
+
         // GGI coupled interface functions
 
             //- Does the patch field perform the transfromation
@@ -261,6 +289,8 @@ public:
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "ggiFvPatchScalarField.H"
 
 #ifdef NoRepository
 #   include "ggiFvPatchField.C"

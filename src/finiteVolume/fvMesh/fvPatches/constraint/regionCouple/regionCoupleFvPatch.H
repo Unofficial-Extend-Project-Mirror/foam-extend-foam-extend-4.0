@@ -152,15 +152,16 @@ public:
                 return rcPolyPatch_.interpolate(tpf);
             }
 
-            //- Bridge interpolated face field for uncovered faces
+            //- Set given field for uncovered faces. Usually used for setting
+            //  mirrored field
             template<class Type>
-            void bridge
+            void setUncoveredFaces
             (
-                const Field<Type>& bridgeField,
+                const Field<Type>& fieldToSet,
                 Field<Type>& ff
             ) const
             {
-                return rcPolyPatch_.bridge(bridgeField, ff);
+                return rcPolyPatch_.setUncoveredFaces(fieldToSet, ff);
             }
 
 

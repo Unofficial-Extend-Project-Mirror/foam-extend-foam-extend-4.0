@@ -200,9 +200,9 @@ Foam::tmp<Foam::Field<Type> > Foam::regionCouplePolyPatch::interpolate
 
 
 template<class Type>
-void Foam::regionCouplePolyPatch::bridge
+void Foam::regionCouplePolyPatch::setUncoveredFaces
 (
-    const Field<Type>& bridgeField,
+    const Field<Type>& fieldToSet,
     Field<Type>& ff
 ) const
 {
@@ -211,12 +211,12 @@ void Foam::regionCouplePolyPatch::bridge
     {
         FatalErrorIn
         (
-            "tmp<Field<Type> > regionCouplePolyPatch::bridge\n"
+            "tmp<Field<Type> > regionCouplePolyPatch::setUncoveredFaces\n"
             "(\n"
-            "    const Field<Type>& ff,\n"
+            "    const Field<Type>& fieldToSet,\n"
             "    Field<Type>& ff\n"
             ") const"
-        )   << "Incorrect patch field size for bridge.  Field size: "
+        )   << "Incorrect patch field size for setting.  Field size: "
             << ff.size() << " patch size: " << size()
             << abort(FatalError);
     }
@@ -233,11 +233,11 @@ void Foam::regionCouplePolyPatch::bridge
         {
             if (master())
             {
-                patchToPatch().bridgeMaster(bridgeField, ff);
+                patchToPatch().setUncoveredFacesMaster(fieldToSet, ff);
             }
             else
             {
-                patchToPatch().bridgeSlave(bridgeField, ff);
+                patchToPatch().setUncoveredFacesSlave(fieldToSet, ff);
             }
         }
         else
@@ -245,18 +245,18 @@ void Foam::regionCouplePolyPatch::bridge
             // Note: since bridging is only a local operation
             if (master())
             {
-                patchToPatch().maskedBridgeMaster
+                patchToPatch().maskedSetUncoveredFacesMaster
                 (
-                    bridgeField,
+                    fieldToSet,
                     ff,
                     zoneAddressing()
                 );
             }
             else
             {
-                patchToPatch().maskedBridgeSlave
+                patchToPatch().maskedSetUncoveredFacesSlave
                 (
-                    bridgeField,
+                    fieldToSet,
                     ff,
                     zoneAddressing()
                 );

@@ -478,56 +478,69 @@ class GGIInterpolation
         );
 
 
-        // Bridging operations, taking into account partially covered faces
+        // Operations for setting face coeffs
 
-            //- Bridge uncovered faces given addressing
+            //- Set face coeffs given addressing
             template<class Type>
-            static void bridge
+            static void setFaces
             (
-                const Field<Type>& bridgeField,
+                const Field<Type>& fieldToSet,
                 Field<Type>& ff,
-                const labelList& addr,
-                const labelList& partiallyUncoveredAddr,
-                const scalarField& uncoveredFractions
+                const labelList& facesToSet
             );
-    
-            //- Bridge uncovered faces given addressing
-            //  for masked faces only
+
+            //- Set face coeffs given masked addressing
             template<class Type>
-            static void maskedBridge
+            static void maskedSetFaces
             (
-                const Field<Type>& bridgeField,
+                const Field<Type>& fieldToSet,
                 Field<Type>& ff,
                 const labelList& mask,
-                const labelList& uncoveredFaces,
-                const labelList& partiallyUncoveredAddr,
-                const scalarField& uncoveredFractions
+                const labelList& facesToSet
             );
 
 
-        // Scaling operations for partially covered faces
-    
-            //- Scale partially covered faces and set fully uncovered faces
-            //  given addressing
+        // Scaling operations for correction of partially covered faces
+
+            //- Scale partially covered faces given addressing
             template<class Type>
-            static void scale
+            static void scalePartial
             (
-                const Field<Type>& uncoveredFaceField,
                 Field<Type>& ff,
-                const labelList& addr,
                 const labelList& partiallyUncoveredAddr,
                 const scalarField& uncoveredFractions
             );
-    
-            //- Scale partially covered faces and set fully uncovered faces
-            //  given addressing for masked faces only
+
+            //- Scale partially covered faces given masked addressing
             template<class Type>
-            static void maskedScale
+            static void maskedScalePartial
             (
-                const Field<Type>& uncoveredFaceField,
                 Field<Type>& ff,
                 const labelList& mask,
-                const labelList& uncoveredFaces,
+                const labelList& partiallyUncoveredAddr,
+                const scalarField& uncoveredFractions
+            );
+
+
+        // Adding operations for partially covered faces
+
+            //- Add field weighted by uncoverage factor given addressing
+            template<class Type>
+            static void addToPartialFaces
+            (
+                const Field<Type>& fieldToAdd,
+                Field<Type>& ff,
+                const labelList& partiallyUncoveredAddr,
+                const scalarField& uncoveredFractions
+            );
+
+            //- Add field weighted by uncoverage factor given masked addressing
+            template<class Type>
+            static void maskedAddToPartialFaces
+            (
+                const Field<Type>& fieldToAdd,
+                Field<Type>& ff,
+                const labelList& mask,
                 const labelList& partiallyUncoveredAddr,
                 const scalarField& uncoveredFractions
             );
@@ -680,81 +693,142 @@ public:
         ) const;
 
 
-        // Bridging operations taking into account partially uncovered faces
+        // Operations for setting fully uncovered faces
 
-            //- Bridge uncovered master patch field
+            //- Set uncovered faces for master
             template<class Type>
-            void bridgeMaster
+            void setUncoveredFacesMaster
             (
-                const Field<Type>& bridgeField,
+                const Field<Type>& fieldToSet,
                 Field<Type>& ff
             ) const;
-        
-    
-            //- Bridge uncovered master patch field, only for marked master
-            //  faces
+
+
+            //- Set uncovered faces for master, only for marked faces
             template<class Type>
-            void maskedBridgeMaster
+            void maskedSetUncoveredFacesMaster
             (
-                const Field<Type>& bridgeField,
-                Field<Type>& ff,
-                const labelList& mask
-            ) const;
-        
-            //- Bridge uncovered slave patch field
-            template<class Type>
-            void bridgeSlave
-            (
-                const Field<Type>& bridgeField,
-                Field<Type>& ff
-            ) const;
-        
-            //- Bridge uncovered slave patch field, only for marked slave faces
-            template<class Type>
-            void maskedBridgeSlave
-            (
-                const Field<Type>& bridgeField,
+                const Field<Type>& fieldToSet,
                 Field<Type>& ff,
                 const labelList& mask
             ) const;
 
-
-        // Scaling operations for correction of partially uncovered faces
-    
-            //- Scale partially uncovered master patch field and set fully
-            //  uncovered face field
+            //- Set uncovered faces for slave
             template<class Type>
-            void scaleMaster
+            void setUncoveredFacesSlave
             (
-                const Field<Type>& uncoveredFaceField,
+                const Field<Type>& fieldToSet,
                 Field<Type>& ff
             ) const;
-    
-            //- Scale partially uncovered master patch field and set fully
-            //  uncovered face field, only for marked master faces
+
+            //- Set uncovered faces for slave, only for marked faces
             template<class Type>
-            void maskedScaleMaster
+            void maskedSetUncoveredFacesSlave
             (
-                const Field<Type>& uncoveredFaceField,
+                const Field<Type>& fieldToSet,
                 Field<Type>& ff,
                 const labelList& mask
             ) const;
-    
-            //- Scale partially uncovered slave patch field and set fully
-            //  uncovered face field
+
+
+        // Operations for setting partially covered faces
+
+            //- Set partially covered faces for master
             template<class Type>
-            void scaleSlave
+            void setPartialFacesMaster
             (
-                const Field<Type>& uncoveredFaceField,
+                const Field<Type>& fieldToSet,
                 Field<Type>& ff
             ) const;
-    
-            //- Scale partially uncovered slave patch field and set fully
-            //  uncovered, only for marked slave faces
+
+
+            //- Set partially covered faces for master, only for marked faces
             template<class Type>
-            void maskedScaleSlave
+            void maskedSetPartialFacesMaster
             (
-                const Field<Type>& uncoveredFaceField,
+                const Field<Type>& fieldToSet,
+                Field<Type>& ff,
+                const labelList& mask
+            ) const;
+
+            //- Set partially covered faces for slave
+            template<class Type>
+            void setPartialFacesSlave
+            (
+                const Field<Type>& fieldToSet,
+                Field<Type>& ff
+            ) const;
+
+            //- Set partially covered faces for slave, only for marked faces
+            template<class Type>
+            void maskedSetPartialFacesSlave
+            (
+                const Field<Type>& fieldToSet,
+                Field<Type>& ff,
+                const labelList& mask
+            ) const;
+
+
+        // Scaling operations for correction of partially covered faces
+
+            //- Scale partially covered master faces
+            template<class Type>
+            void scalePartialMaster(Field<Type>& ff) const;
+
+            //- Scale partially covered master faces, only for marked faces
+            template<class Type>
+            void maskedScalePartialMaster
+            (
+                Field<Type>& ff,
+                const labelList& mask
+            ) const;
+
+            //- Scale partially covered slave faces
+            template<class Type>
+            void scalePartialSlave(Field<Type>& ff) const;
+
+            //- Scale partially covered slave face, only for marked slave faces
+            template<class Type>
+            void maskedScalePartialSlave
+            (
+                Field<Type>& ff,
+                const labelList& mask
+            ) const;
+
+
+        // Operations for adding a field for partially covered faces
+
+            //- Add to partially covered faces for master
+            template<class Type>
+            void addToPartialFacesMaster
+            (
+                const Field<Type>& fieldToAdd,
+                Field<Type>& ff
+            ) const;
+
+
+            //- Add to partially covered faces for master, only for marked faces
+            template<class Type>
+            void maskedAddToPartialFacesMaster
+            (
+                const Field<Type>& fieldToAdd,
+                Field<Type>& ff,
+                const labelList& mask
+            ) const;
+
+            //- Add to partially covered faces for slave
+            template<class Type>
+            void addToPartialFacesSlave
+            (
+                const Field<Type>& fieldToAdd,
+                Field<Type>& ff
+            ) const;
+
+            //- Add to partially covered faces for slave, only for marked faces
+            template<class Type>
+            void maskedAddToPartialFacesSlave
+            (
+                const Field<Type>& fieldToAdd,
                 Field<Type>& ff,
                 const labelList& mask
             ) const;

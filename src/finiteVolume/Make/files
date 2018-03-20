@@ -119,6 +119,7 @@ $(constraintFvPatchFields)/symmetry/symmetryFvPatchFields.C
 $(constraintFvPatchFields)/wedge/wedgeFvPatchFields.C
 $(constraintFvPatchFields)/wedge/wedgeFvPatchScalarField.C
 $(constraintFvPatchFields)/wedge/wedgeFvPatchVectorNFields.C
+$(constraintFvPatchFields)/ggi/ggiFvPatchScalarField.C
 $(constraintFvPatchFields)/ggi/ggiFvPatchFields.C
 $(constraintFvPatchFields)/ggi/ggiFvPatchVectorNFields.C
 $(constraintFvPatchFields)/jumpGgi/jumpGgiFvPatchFields.C

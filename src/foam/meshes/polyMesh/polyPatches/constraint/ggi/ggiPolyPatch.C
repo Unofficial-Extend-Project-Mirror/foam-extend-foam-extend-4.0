@@ -294,25 +294,26 @@ void Foam::ggiPolyPatch::calcReconFaceCellCentres() const
           - boundaryMesh()[shadowID].faceCentres()
         );
 
+        // Get face centres on master side
+        const vectorField::subField cf = faceCentres();
+
         if (bridgeOverlap_)
         {
-            // Get necessary mesh data from polyPatch on this (master) side
-            const vectorField::subField cf = faceCentres();
-            const vectorField::subField Sf = faceAreas();
-
+            // Get face cell centres on master side
             const vectorField ccf = faceCellCentres();
-            const vectorField nf = Sf/mag(Sf);
 
             // Deltas for fully uncovered faces
-            const vectorField uncoveredDeltas(2.0*(cf - ccf));
+            const vectorField uncoveredDeltas(cf - ccf);
 
-            // Scale partially overlapping faces and set uncovered deltas to
-            // fully uncovered faces
-            scaleForPartialCoverage(uncoveredDeltas, tdf());
+            // Set uncovered deltas to fully uncovered faces
+            setUncoveredFaces(uncoveredDeltas, tdf());
+
+            // Scale partially overlapping faces
+            scalePartialFaces(tdf());
         }
 
         // Calculate the reconstructed cell centres
-        reconFaceCellCentresPtr_ = new vectorField(tdf() + faceCentres());
+        reconFaceCellCentresPtr_ = new vectorField(tdf() + cf);
     }
     else
     {
