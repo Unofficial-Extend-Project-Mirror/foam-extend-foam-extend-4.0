@@ -128,7 +128,13 @@ private:
             Switch pointBasedConsistency_;
 
             //- Number of buffer layers for refinement
-            label nBufferLayers_;
+            label nRefinementBufferLayers_;
+
+            //- Number of buffer layers for unrefinement, controlling how far
+            //  the unrefinement region needs to be from current refinement
+            //  region. Therefore, this should always be at least
+            //  nRefinementBufferLayers + 2 to avoid level inconsistencies
+            label nUnrefinementBufferLayers_;
 
 
     // Private Member Functions

@@ -3018,8 +3018,8 @@ Foam::label Foam::polyhedralRefinement::pointConsistentRefinement
             {
                 if (!willBeRefined)
                 {
-                    // Cell has not been marked for refinement, mark the cell for
-                    // refinement and increment the counter
+                    // Cell has not been marked for refinement, mark the cell
+                    // for refinement and increment the counter
                     willBeRefined = true;
                     ++nAddCells;
                 }
@@ -3029,10 +3029,12 @@ Foam::label Foam::polyhedralRefinement::pointConsistentRefinement
                     (
                         "label polyhedralRefinement::pointConsistentRefinement"
                         "(boolList cellsToRefine) const"
-                    )   << "Cell is marked for refinement, but the 4:1 point"
-                        << " consistency cannot be ensured." << nl
-                        << "Something went wrong before this step."
-                        << endl;
+                    )   << "Cell: " << curCellI << " is marked for refinement,"
+                        << "but the 4:1 consistency cannot be ensured." << nl
+                        << "This is probably because the refinement and "
+                        << "unrefinement regions are very close." << nl
+                        << "Try increasing nUnrefinementBufferLayers. "
+                        << abort(FatalError);
                 }
             }
         }
@@ -3090,7 +3092,10 @@ Foam::label Foam::polyhedralRefinement::faceConsistentUnrefinement
                     << "Owner: " << own << ", neighbour: " << nei
                     << nl
                     << "Owner level: " << ownLevel
-                    << ", neighbour level: " << neiLevel
+                    << ", neighbour level: " << neiLevel << nl
+                    << "This is probably because the refinement and "
+                    << "unrefinement regions are very close." << nl
+                    << "Try increasing nUnrefinementBufferLayers. "
                     << abort(FatalError);
             }
 
@@ -3115,7 +3120,10 @@ Foam::label Foam::polyhedralRefinement::faceConsistentUnrefinement
                     << "Owner: " << own << ", neighbour: " << nei
                     << nl
                     << "Owner level: " << ownLevel
-                    << ", neighbour level: " << neiLevel
+                    << ", neighbour level: " << neiLevel << nl
+                    << "This is probably because the refinement and "
+                    << "unrefinement regions are very close." << nl
+                    << "Try increasing nUnrefinementBufferLayers. "
                     << abort(FatalError);
             }
 
@@ -3168,7 +3176,10 @@ Foam::label Foam::polyhedralRefinement::faceConsistentUnrefinement
                     << "Owner: " << own
                     << nl
                     << "Owner level: " << curOwnLevel
-                    << ", neighbour level: " << neiLevel[i]
+                    << ", neighbour level: " << neiLevel[i] << nl
+                    << "This is probably because the refinement and "
+                    << "unrefinement regions are very close." << nl
+                    << "Try increasing nUnrefinementBufferLayers. "
                     << abort(FatalError);
             }
 
@@ -3263,18 +3274,25 @@ Foam::label Foam::polyhedralRefinement::pointConsistentUnrefinement
                     willBeUnrefined = false;
                     ++nRemCells;
                 }
-                else
-                {
-                    FatalErrorIn
-                    (
-                        "label polyhedralRefinement::"
-                        "pointConsistentUnrefinement"
-                        "(boolList cellsToRefine) const"
-                    )   << "Cell is not marked for unrefinement, but the 4:1"
-                        << " point consistency cannot be ensured." << nl
-                        << "Something went wrong before this step."
-                        << endl;
-                }
+                // Note: I am pretty sure that this check is redundant and
+                // causes unnecessary issues when more than 2 maximum refinement
+                // levels are used. In case of problems, take a detailed look
+                // here. VV, 22/Mar/2018.
+//                else
+//                {
+//                    FatalErrorIn
+//                    (
+//                        "label polyhedralRefinement::"
+//                        "pointConsistentUnrefinement"
+//                        "(boolList cellsToRefine) const"
+//                    )   << "Cell: " << curCellI << " is not marked for "
+//                        << "unrefinement, but the 4:1"
+//                        << " point consistency cannot be ensured." << nl
+//                        << "This is probably because the refinement and "
+//                        << "unrefinement regions are very close." << nl
+//                        << "Try increasing nUnrefinementBufferLayers. "
+//                        << abort(FatalError);
+//                }
             }
         }
     }
@@ -3332,7 +3350,14 @@ Foam::polyhedralRefinement::polyhedralRefinement
     (
         dict.lookupOrDefault<Switch>("pointBasedConsistency", true)
     ),
-    nBufferLayers_(readScalar(dict.lookup("nBufferLayers")))
+    nRefinementBufferLayers_
+    (
+        readScalar(dict.lookup("nRefinementBufferLayers"))
+    ),
+    nUnrefinementBufferLayers_
+    (
+        readScalar(dict.lookup("nUnrefinementBufferLayers"))
+    )
 {
     // Calculate level 0 edge length
     calcLevel0EdgeLength();
@@ -3424,8 +3449,8 @@ Foam::polyhedralRefinement::polyhedralRefinement
             << endl;
     }
 
-    // Check number of buffer layers
-    if (nBufferLayers_ < 0)
+    // Check number of refinement buffer layers
+    if (nRefinementBufferLayers_ < 0)
     {
         FatalErrorIn
         (
@@ -3436,10 +3461,52 @@ Foam::polyhedralRefinement::polyhedralRefinement
             "\n    const label index,"
             "\n    const polyTopoChanger& mme"
             "\n)"
-        )   << "Negative nBufferLayers specified."
+        )   << "Negative nRefinementBufferLayers specified."
             << nl
             << "This is not allowed."
             << abort(FatalError);
+    }
+
+    // Check number of unrefinement buffer layers
+    if (nUnrefinementBufferLayers_ < 0)
+    {
+        FatalErrorIn
+        (
+            "polyhedralRefinement::polyhedralRefinement"
+            "\n("
+            "\n    const word& name,"
+            "\n    const dictionary& dict,"
+            "\n    const label index,"
+            "\n    const polyTopoChanger& mme"
+            "\n)"
+        )   << "Negative nUnrefinementBufferLayers specified."
+            << nl
+            << "This is not allowed."
+            << abort(FatalError);
+    }
+
+    // Check whether the number of unrefinement buffer layers is smaller than
+    // number of refinement buffer layers + 2
+    if (nUnrefinementBufferLayers_ < nRefinementBufferLayers_ + 2)
+    {
+        WarningIn
+        (
+            "polyhedralRefinement::polyhedralRefinement"
+            "\n("
+            "\n    const word& name,"
+            "\n    const dictionary& dict,"
+            "\n    const label index,"
+            "\n    const polyTopoChanger& mme"
+            "\n)"
+        )   << "Using " << nUnrefinementBufferLayers_
+            << " unrefinement buffer layers and " << nRefinementBufferLayers_
+            << " refinement buffer layers."
+            << nl
+            << "Make sure that the number of unrefinement buffer layers is "
+            << "at least nRefinementBufferLayers + 2" << nl
+            << "in order to avoid problems with point level inconsistency when "
+            << "refinement and unrefinement are performed in same iteration."
+            << endl;
     }
 }
 
@@ -3495,8 +3562,9 @@ void Foam::polyhedralRefinement::setCellsToRefine
         }
     }
 
-    // Extend cells across faces using a specified number of buffer layers
-    for (label i = 0; i < nBufferLayers_; ++i)
+    // Extend cells across faces using a specified number of refinement buffer
+    // layers
+    for (label i = 0; i < nRefinementBufferLayers_; ++i)
     {
         extendMarkedCellsAcrossFaces(refineCell);
     }
@@ -3706,10 +3774,9 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
         protectedCell[cellsToRefine_[i]] = true;
     }
 
-    // Extend protected cells across points using a specified number of buffer
-    // layers + 2 in order to stay far away from cells that are going to be
-    // refined
-    for (label i = 0; i < nBufferLayers_ + 2; ++i)
+    // Extend protected cells across points using a specified number of
+    // unrefinement buffer layers
+    for (label i = 0; i < nUnrefinementBufferLayers_ + 2; ++i)
     {
         extendMarkedCellsAcrossPoints(protectedCell);
     }
@@ -4060,7 +4127,8 @@ void Foam::polyhedralRefinement::write(Ostream& os) const
         << maxCells_ << nl
         << maxRefinementLevel_ << nl
         << pointBasedConsistency_ << nl
-        << nBufferLayers_ << endl;
+        << nRefinementBufferLayers_ << nl
+        << nUnrefinementBufferLayers_ << endl;
 }
 
 
@@ -4079,7 +4147,9 @@ void Foam::polyhedralRefinement::writeDict(Ostream& os) const
         << token::END_STATEMENT << nl
         << "    pointBasedConsistency " << pointBasedConsistency_
         << token::END_STATEMENT << nl
-        << "    nBufferLayers " << nBufferLayers_
+        << "    nRefinementBufferLayers " << nRefinementBufferLayers_
+        << token::END_STATEMENT << nl
+        << "    nUnrefinementBufferLayers " << nUnrefinementBufferLayers_
         << token::END_STATEMENT << nl
         << "    active " << active()
         << token::END_STATEMENT << nl
