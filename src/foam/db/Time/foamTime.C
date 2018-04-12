@@ -1132,6 +1132,22 @@ Foam::Time& Foam::Time::operator+=(const scalar deltaT)
 
 Foam::Time& Foam::Time::operator++()
 {
+    if (!subCycling_)
+    {
+        if (timeIndex_ == startTimeIndex_)
+        {
+            addProfile2(fo,"functionObjects_.start()");
+
+            functionObjects_.start();
+        }
+        else
+        {
+            addProfile2(fo,"functionObjects_.execute()");
+
+            functionObjects_.execute();
+        }
+    }
+
     deltaT0_ = deltaTSave_;
     deltaTSave_ = deltaT_;
 
