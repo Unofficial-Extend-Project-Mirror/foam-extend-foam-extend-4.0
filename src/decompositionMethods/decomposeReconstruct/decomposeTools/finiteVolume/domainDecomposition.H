@@ -65,11 +65,12 @@ class domainDecomposition
         //- Number of processors in decomposition
         label nProcs_;
 
-        //- Is the decomposition data to be distributed for each processor
-        bool distributed_;
-
         //- Processor label for each cell
         labelList cellToProc_;
+
+        //- Processor label for neighbour cell for each processor boundary
+        //  Data is used when running decomposition in parallel
+        labelListList patchNbrCellToProc_;
 
         //- Labels of points for each processor
         labelListList procPointAddressing_;
@@ -159,16 +160,17 @@ public:
             return nProcs_;
         }
 
-        //- Is the decomposition data to be distributed for each processor
-        bool distributed() const
-        {
-            return distributed_;
-        }
-
         //- Return cell-processor decomposition labels
         const labelList& cellToProc() const
         {
             return cellToProc_;
+        }
+
+        //- Return cell-processor decomposition labels for cells across
+        //  coupled boundaries when running decomposition in parallel
+        const labelListList& patchNbrCellToProc() const
+        {
+            return patchNbrCellToProc_;
         }
 
         //- Decompose mesh. Optionally remove zero-sized patches.
@@ -178,11 +180,16 @@ public:
         // Decomposed mesh and addressing
 
             //- Create a decomposed mesh for a given processor index
+            //  Note: at the point of construction, the boundary is marked
+            //  as invalid.  If the mesh should be used immediately upon
+            //  creation, initialise the boundary patches before use
+            //  HJ, 12/Apr/2018
             autoPtr<fvMesh> processorMesh
             (
                 const label procI,
                 const Time& procDb,
-                const word& regionName
+                const word& regionName,
+                const bool createPassiveProcPatches = false
             ) const;
 
             //- Return processor point addressing

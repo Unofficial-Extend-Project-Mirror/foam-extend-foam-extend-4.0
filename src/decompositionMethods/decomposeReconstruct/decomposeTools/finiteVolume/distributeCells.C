@@ -26,7 +26,7 @@ License
 #include "domainDecomposition.H"
 #include "decompositionMethod.H"
 #include "cpuTime.H"
-#include "cyclicPolyPatch.H"
+#include "processorFvPatch.H"
 #include "cellSet.H"
 #include "regionSplit.H"
 
@@ -37,7 +37,6 @@ void Foam::domainDecomposition::distributeCells()
     Info<< "\nCalculating distribution of cells" << endl;
 
     cpuTime decompositionTime;
-
 
     // See if any faces need to have owner and neighbour on same processor
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -179,6 +178,46 @@ void Foam::domainDecomposition::distributeCells()
         cellToProc_ = decomposePtr().decompose(globalRegion, regionCentres);
     }
 
+    // If running in parallel, sync cellToProc_ across coupled boundaries
+    // Initialise transfer of restrict addressing on the interface
+    if (Pstream::parRun())
+    {
+        const fvBoundaryMesh& patches = mesh_.boundary();
+
+        forAll (patches, patchI)
+        {
+            if (isA<processorFvPatch>(patches[patchI]))
+            // if (patches[patchI].coupled())
+            {
+                const lduInterface& cpPatch =
+                    refCast<const lduInterface>(patches[patchI]);
+
+                cpPatch.initInternalFieldTransfer
+                (
+                    Pstream::blocking,
+                    cellToProc_
+                );
+            }
+        }
+
+        forAll (patches, patchI)
+        {
+            if (isA<processorFvPatch>(patches[patchI]))
+            // if (patches[patchI].coupled())
+            {
+                const lduInterface& cpPatch =
+                    refCast<const lduInterface>(patches[patchI]);
+
+                patchNbrCellToProc_[patchI] =
+                    cpPatch.internalFieldTransfer
+                    (
+                        Pstream::blocking,
+                        cellToProc_
+                    );
+            }
+        }
+    }
+    
     Info<< "\nFinished decomposition in "
         << decompositionTime.elapsedCpuTime()
         << " s" << endl;

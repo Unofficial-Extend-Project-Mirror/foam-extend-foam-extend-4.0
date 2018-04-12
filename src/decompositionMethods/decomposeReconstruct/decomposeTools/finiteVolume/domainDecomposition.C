@@ -28,6 +28,7 @@ License
 #include "dictionary.H"
 #include "labelIOList.H"
 #include "processorPolyPatch.H"
+#include "passiveProcessorPolyPatch.H"
 #include "fvMesh.H"
 #include "OSspecific.H"
 #include "Map.H"
@@ -49,8 +50,8 @@ Foam::domainDecomposition::domainDecomposition
     mesh_(mesh),
     decompositionDict_(dict),
     nProcs_(readInt(decompositionDict_.lookup("numberOfSubdomains"))),
-    distributed_(false),
     cellToProc_(mesh_.nCells()),
+    patchNbrCellToProc_(mesh_.boundaryMesh().size()),
     procPointAddressing_(nProcs_),
     procFaceAddressing_(nProcs_),
     nInternalProcFaces_(nProcs_),
@@ -64,12 +65,7 @@ Foam::domainDecomposition::domainDecomposition
     procProcessorPatchStartIndex_(nProcs_),
     globallySharedPoints_(0),
     cyclicParallel_(false)
-{
-    if (decompositionDict_.found("distributed"))
-    {
-        distributed_ = Switch(decompositionDict_.lookup("distributed"));
-    }
-}
+{}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -84,7 +80,8 @@ Foam::autoPtr<Foam::fvMesh> Foam::domainDecomposition::processorMesh
 (
     const label procI,
     const Time& processorDb,
-    const word& regionName
+    const word& regionName,
+    const bool createPassiveProcPatches
 ) const
 {
     // Create processor points
@@ -265,27 +262,54 @@ Foam::autoPtr<Foam::fvMesh> Foam::domainDecomposition::processorMesh
         nPatches++;
     }
 
-    forAll (curProcessorPatchSizes, procPatchI)
+    if (createPassiveProcPatches)
     {
-        procPatches[nPatches] =
-            new processorPolyPatch
-            (
-                word("procBoundary") + Foam::name(procI)
-              + word("to")
-              + Foam::name(curNeighbourProcessors[procPatchI]),
-                curProcessorPatchSizes[procPatchI],
-                curProcessorPatchStarts[procPatchI],
-                nPatches,
-                procMesh.boundaryMesh(),
-                procI,
-                curNeighbourProcessors[procPatchI]
-        );
+        forAll (curProcessorPatchSizes, procPatchI)
+        {
+            procPatches[nPatches] =
+                new passiveProcessorPolyPatch
+                (
+                    word("procBoundary") + Foam::name(procI)
+                  + word("to")
+                  + Foam::name(curNeighbourProcessors[procPatchI]),
+                    curProcessorPatchSizes[procPatchI],
+                    curProcessorPatchStarts[procPatchI],
+                    nPatches,
+                    procMesh.boundaryMesh(),
+                    procI,
+                    curNeighbourProcessors[procPatchI]
+                );
 
-        nPatches++;
+            nPatches++;
+        }
+    }
+    else
+    {
+        forAll (curProcessorPatchSizes, procPatchI)
+        {
+            procPatches[nPatches] =
+                new processorPolyPatch
+                (
+                    word("procBoundary") + Foam::name(procI)
+                  + word("to")
+                  + Foam::name(curNeighbourProcessors[procPatchI]),
+                    curProcessorPatchSizes[procPatchI],
+                    curProcessorPatchStarts[procPatchI],
+                    nPatches,
+                    procMesh.boundaryMesh(),
+                    procI,
+                    curNeighbourProcessors[procPatchI]
+                );
+
+            nPatches++;
+        }
     }
 
+
     // Add boundary patches to polyMesh and fvMesh
-    procMesh.addFvPatches(procPatches);
+    // Note: Mark boundary as invalid to disable analysis
+    // due to the presence of old/new patches
+    procMesh.addFvPatches(procPatches, false);
 
     // Create and add zones
 
