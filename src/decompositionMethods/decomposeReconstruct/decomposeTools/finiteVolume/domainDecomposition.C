@@ -50,6 +50,7 @@ Foam::domainDecomposition::domainDecomposition
     mesh_(mesh),
     decompositionDict_(dict),
     nProcs_(readInt(decompositionDict_.lookup("numberOfSubdomains"))),
+    distributed_(false),
     cellToProc_(mesh_.nCells()),
     patchNbrCellToProc_(mesh_.boundaryMesh().size()),
     procPointAddressing_(nProcs_),
@@ -65,7 +66,12 @@ Foam::domainDecomposition::domainDecomposition
     procProcessorPatchStartIndex_(nProcs_),
     globallySharedPoints_(0),
     cyclicParallel_(false)
-{}
+{
+    if (decompositionDict_.found("distributed"))
+    {
+        distributed_ = Switch(decompositionDict_.lookup("distributed"));
+    }
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

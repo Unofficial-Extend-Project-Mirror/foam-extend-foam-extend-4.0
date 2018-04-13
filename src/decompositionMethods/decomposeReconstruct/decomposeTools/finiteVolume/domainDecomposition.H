@@ -65,6 +65,9 @@ class domainDecomposition
         //- Number of processors in decomposition
         label nProcs_;
 
+        //- Is the decomposition data to be distributed for each processor
+        bool distributed_;
+
         //- Processor label for each cell
         labelList cellToProc_;
 
@@ -158,6 +161,12 @@ public:
         label nProcs() const
         {
             return nProcs_;
+        }
+
+        //- Is the decomposition data to be distributed for each processor
+        inline bool distributed() const
+        {
+            return distributed_;
         }
 
         //- Return cell-processor decomposition labels

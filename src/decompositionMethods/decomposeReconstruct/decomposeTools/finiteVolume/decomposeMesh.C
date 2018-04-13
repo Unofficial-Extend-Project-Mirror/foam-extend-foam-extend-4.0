@@ -250,12 +250,10 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
 
         forAll (patches, patchI)
         {
-            // Reset size and start index for all processors
+            // Reset size for all processors
             forAll (procPatchSize_, procI)
             {
                 procPatchSize_[procI][patchI] = 0;
-                procPatchStartIndex_[procI][patchI] =
-                    procFaceList[procI].size();
             }
         }
 
@@ -270,6 +268,8 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
         // the neighbour side.  This has been prepared in patchNbrCellToProc_
         // HJ, 11/Apr/2018
 
+        // Dump current processor patch faces into new processor patches
+        // that will be created in decomposition when running in parallel
         forAll (patches, patchI)
         {
             // Check the processor patch for which neighbour data exists
@@ -338,7 +338,10 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                                 // Add the face
                                 interProcBouFound = true;
 
-                                curInterProcBFacesOwnIter().append(patchStart + patchFaceI);
+                                curInterProcBFacesOwnIter().append
+                                (
+                                    patchStart + patchFaceI
+                                );
 
                                 SLList<label>::iterator
                                     curInterProcBdrsNeiIter =
@@ -447,6 +450,13 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
 
         forAll (patches, patchI)
         {
+            // New patch: record start index for all processors
+            forAll (procPatchSize_, procI)
+            {
+                procPatchStartIndex_[procI][patchI] =
+                    procFaceList[procI].size();
+            }
+
             const label patchStart = patches[patchI].patch().start();
 
             // Do normal patches.  Note that processor patches

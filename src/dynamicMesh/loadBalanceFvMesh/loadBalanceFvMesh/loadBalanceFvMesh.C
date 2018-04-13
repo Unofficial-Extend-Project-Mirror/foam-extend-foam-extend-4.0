@@ -136,12 +136,12 @@ bool Foam::loadBalanceFvMesh::update()
 
         return false;
     }
-            
+
     Info<< "Hello from loadBalanceFvMesh::update()" << endl;
 
     // Check imbalance.  Note: add run-time selection for the imbalance
     // weights criterion
-    
+
     // Create a parallel decomposition
     domainDecomposition meshDecomp
     (
@@ -152,7 +152,8 @@ bool Foam::loadBalanceFvMesh::update()
     // Decompose the mesh based on processor data
     meshDecomp.decomposeMesh(false);
 
-    // Analyse mesh decomposition to see how many cells are passed to which processor
+    // Analyse mesh decomposition to see how many cells are passed
+    // to which processor
     labelListList migratedCells(meshDecomp.nProcs());
 
     // Fill local list with number of local cells to be sent to each processor
@@ -171,9 +172,12 @@ bool Foam::loadBalanceFvMesh::update()
     // Now that each processor has filled in its own part, combine the data
     Pstream::gatherList(migratedCells);
     Pstream::scatterList(migratedCells);
-    Pout<< "migratedCells: " << migratedCells << endl;
+
     // Reading through second index now tells how many cells will arrive
     // from which processor
+
+    // Find out which processor faces will become local internal faces
+    // by comparing decomposition index from the other side
 
 
     // Split the mesh and fields over processors and send
@@ -193,7 +197,8 @@ bool Foam::loadBalanceFvMesh::update()
                 (
                     procI,
                     time(),
-                    "processorPart" + Foam::name(procI)
+                    "processorPart" + Foam::name(procI),
+                    true    // Create passive processor patches
                 );
                 fvMesh& procMesh = procMeshPtr();
 
@@ -314,6 +319,76 @@ bool Foam::loadBalanceFvMesh::update()
         << reconMesh.boundary().size()
         << endl;
 
+    // Apply changes to the local mesh:
+    // - refactor the boundary to match new patches.  Note: processor
+    //   patch types may be added or removed
+    // - reset all primitives
+    Pout<< "Resetting mesh for load balancing.  Old boundary names: "
+        << boundaryMesh().names() << nl
+        << "New boundary names: "
+        << reconMesh.boundaryMesh().names() << nl
+        << endl;
+
+    polyBoundaryMesh& bMesh = const_cast<polyBoundaryMesh&>(boundaryMesh());
+
+    const polyBoundaryMesh& reconBMesh = reconMesh.boundaryMesh();
+
+    // Resize the existing boundary to match in the number of patches
+    if (bMesh.size() > reconBMesh.size())
+    {
+        // Decreasing in size: check patches that are due to disappear
+        Pout<< "New boundary is smaller: "
+            << bMesh.size() << " to " << reconBMesh.size() << endl;
+        // Check before resizing: only processor patches may be deleted
+        bool okToDelete = true;
+        
+        for (label patchI = reconBMesh.size(); patchI < bMesh.size(); patchI++)
+        {
+            if (!isA<processorPolyPatch>(bMesh[patchI]))
+            {
+                okToDelete = false;
+                break;
+            }
+        }
+
+        if (!okToDelete)
+        {
+            FatalErrorIn("bool loadBalanceFvMesh::update()")
+                << "Boundary resizing error: deleting non-processor patches "
+                << bMesh.size() << " to " << reconBMesh.size() << nl
+                << "old patch types: " << bMesh.types() << nl
+                << "new patch types: " << reconBMesh.types() << nl
+                << "This is not allowed."
+                << abort(FatalError);
+        }
+
+        // Resize the boundary
+        bMesh.setSize(reconBMesh.size());
+    }
+    else if (bMesh.size() < reconBMesh.size())
+    {
+        // Increasing in size: check patches that are due to disappear
+        Pout<< "New boundary is larger: "
+            << bMesh.size() << " to " << reconBMesh.size() << endl;
+
+        bMesh.setSize(reconBMesh.size());
+    }
+
+    // Delete processor patches from old boundary
+
+    
+    // Check alignment and types of old and new boundary
+    // forAll (bMesh, patchI)
+    // {
+    //     if (!bMesh[patchI].set())
+    //     {
+    //     }
+    // }
+
+    // To Do: reset mesh in polyMesh
+    // To Do: build a reconstructor from addressing data
+
+        
     // Create field reconstructor
     // fvFieldReconstructor fieldReconstructor
     // (
@@ -330,7 +405,7 @@ bool Foam::loadBalanceFvMesh::update()
     // Otherwise, they will be deleted.  HJ, 5/Mar/2018
     autoPtr<fvMesh> curMesh = procMeshes.set(Pstream::myProcNo(), NULL);
     curMesh.ptr();
-    
+
     return true;
 }
 

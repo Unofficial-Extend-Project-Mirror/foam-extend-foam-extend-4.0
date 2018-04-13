@@ -25,6 +25,14 @@ Class
     Foam::processorMeshesReconstructor
 
 Description
+    The processorMeshesReconstructor will take a list of meshes with
+    matching processor boundaries and build a single combined mesh by
+    matching processor patches to each other.
+
+    In order to 
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 SourceFiles
     processorMeshesReconstructor.C

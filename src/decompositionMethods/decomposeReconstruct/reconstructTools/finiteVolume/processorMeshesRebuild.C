@@ -25,6 +25,7 @@ License
 
 #include "processorMeshesReconstructor.H"
 #include "processorPolyPatch.H"
+#include "passiveProcessorPolyPatch.H"
 #include "sharedPoints.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -45,7 +46,7 @@ Foam::label Foam::processorMeshesReconstructor::firstValidMesh() const
 
     return 0;
 }
-    
+
 
 bool Foam::processorMeshesReconstructor::readMapping()
 {
@@ -200,7 +201,7 @@ bool Foam::processorMeshesReconstructor::readMapping()
             }
         }
 
-        Info<< "Addressing from files: " << nl;
+        Info<< "Addressing from files: " << endl;
         forAll (meshes_, procI)
         {
             if (meshes_.set(procI))
@@ -359,6 +360,18 @@ void Foam::processorMeshesReconstructor::reconstructPoints(fvMesh& mesh) const
 Foam::autoPtr<Foam::fvMesh>
 Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 {
+    // Note:
+    // In load balancing, there will exist a double set of processor patches
+    // One, created by moving cells adjacent to "old" processor boundaries
+    // (processorPolyPatch) and another, created by splitting up previously
+    // internal mesh faces into "new" processor patches
+    // In order to reconstruct the mesh correctly, the two sets of processor
+    // boundaries are kept separately
+    // In reconstruction, the order of processor patch faces needs to be
+    // preserved.  This is achieved by
+    // - first adding original processor patch faces
+    // - adding passiveProcessor patch faces in the processor order
+
     // Check for read
 
     if (readMapping())
@@ -407,34 +420,55 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
         }
     }
 
-    // Prepare patch reconstruction from processor 0
-    wordList reconPatchNames;
-    wordList reconPatchTypes;
+    // Prepare patch reconstruction
+    HashTable<label, word> patchNameLookup
+    (
+        meshes_[firstValidMesh()].boundaryMesh().size()
+    );
+    DynamicList<word> patchTypeLookup
+    (
+        meshes_[firstValidMesh()].boundaryMesh().size()
+    );
+
     label nReconPatches = 0;
 
-    // Grab names and types of patches, excluding processor patches
-    // Order must be identical on all processors
+    forAll (meshes_, procI)
     {
-        const polyBoundaryMesh& proc0Boundary =
-            meshes_[firstValidMesh()].boundaryMesh();
-
-        reconPatchNames.setSize(proc0Boundary.size());
-        reconPatchTypes.setSize(proc0Boundary.size());
-        nReconPatches = 0;
-
-        forAll (proc0Boundary, patchI)
+        if (meshes_.set(procI))
         {
-            if (!isA<processorPolyPatch>(proc0Boundary[patchI]))
+            const polyBoundaryMesh& procPatches = meshes_[procI].boundaryMesh();
+
+            forAll (procPatches, patchI)
             {
-                // Add patch name to list of patches
-                reconPatchNames[nReconPatches] = proc0Boundary[patchI].name();
-                reconPatchTypes[nReconPatches] = proc0Boundary[patchI].type();
-                nReconPatches++;
+                if (!isA<processorPolyPatch>(procPatches[patchI]))
+                {
+                    const word& patchName = procPatches[patchI].name();
+
+                    // Regular patch.  Try to find it in a list
+                    if (!patchNameLookup.found(patchName))
+                    {
+                        // Patch not found.  Add it
+                        patchNameLookup.insert(patchName, nReconPatches);
+                        patchTypeLookup.append(procPatches[patchI].type());
+                        nReconPatches++;
+                    }
+                }
             }
         }
+    }
 
-        reconPatchNames.setSize(nReconPatches);
-        reconPatchTypes.setSize(nReconPatches);
+    // Fill in patch names and types
+    wordList reconPatchNames(patchNameLookup.size());
+    wordList reconPatchTypes(patchNameLookup.size());
+
+    wordList patchNameToc = patchNameLookup.toc();
+
+    forAll (patchNameToc, pnI)
+    {
+        const label pnIndex = patchNameLookup.find(patchNameToc[pnI])();
+
+        reconPatchNames[pnIndex] = patchNameToc[pnI];
+        reconPatchTypes[pnIndex] = patchTypeLookup[pnIndex];
     }
 
     // Prepare point, face and patch reconstruction
@@ -442,6 +476,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
     label nReconFaces = 0;
     label nReconCells = 0;
     labelList reconPatchSizes(reconPatchTypes.size(), 0);
+    Pout<< "reconPatchNames: " << reconPatchNames << endl;
 
     forAll (meshes_, procI)
     {
@@ -454,40 +489,44 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
             const polyBoundaryMesh& procPatches = meshes_[procI].boundaryMesh();
 
-            nReconPatches = 0;
-
             forAll (procPatches, patchI)
             {
                 if (!isA<processorPolyPatch>(procPatches[patchI]))
                 {
+                    // Find processor patch index in reconstructed boundary
+                    const label pnIndex = patchNameLookup.find
+                    (
+                        procPatches[patchI].name()
+                    )();
+
                     // Check patch name and type
                     if
                     (
                         procPatches[patchI].name()
-                     != reconPatchNames[nReconPatches]
+                     != reconPatchNames[pnIndex]
                      || procPatches[patchI].type()
-                     != reconPatchTypes[nReconPatches]
+                     != reconPatchTypes[pnIndex]
                     )
                     {
                         FatalErrorIn
                         (
                             "autoPtr<fvMesh> processorMeshesReconstructor::"
                             "reconstructMesh(const Time& db)"
-                        )   << "Patch names, types or ordering does not match "
-                            << "across processors"
+                        )   << "Patch name and type does not match "
+                            << "across processors for patch "
+                            << procPatches[patchI].name() << " type: "
+                            << procPatches[patchI].type()
                             << abort(FatalError);
                     }
 
                     // Record number of faces in patch
-                    reconPatchSizes[nReconPatches] +=
-                        procPatches[patchI].size();
-                    nReconPatches++;
+                    reconPatchSizes[pnIndex] += procPatches[patchI].size();
                 }
             }
         }
     }
 
-    Info<< "Estimated max global mesh size (with duplicates): " << nl
+    Pout<< "Estimated max global mesh size (with duplicates): " << nl
         << "    nPoints = " << nReconPoints << nl
         << "    nFaces = " << nReconFaces << nl
         << "    nCells = " << nReconCells << nl
@@ -612,8 +651,9 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
     // Dump first valid mesh without checking
     {
+        Pout<< "Dump mesh 0" << endl;
         const label fvmId = firstValidMesh();
-        
+
         cellOffset[fvmId] = 0;
 
         const polyMesh& curMesh = meshes_[fvmId];
@@ -678,6 +718,9 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                 const processorPolyPatch& procPatch =
                     refCast<const processorPolyPatch>(procPatches[patchI]);
 
+                // Record boundary-processor addressing: unmapped patch
+                bpAddr[patchI] = -1;
+                
                 for
                 (
                     label faceI = procPatch.start();
@@ -704,11 +747,18 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
             else
             {
                 // Regular patch: dump faces into patch face list
-                faceList& curRpFaces = reconPatchFaces[patchI];
-                labelList& curRpfOwner = reconPatchOwner[patchI];
-                label& nRpf = reconPatchSizes[patchI];
 
                 const polyPatch& curPatch = procPatches[patchI];
+
+                // Find processor patch index in reconstructed boundary
+                const label pnIndex = patchNameLookup.find(curPatch.name())();
+
+                // Record boundary-processor addressing: mapped patch
+                bpAddr[patchI] = pnIndex;
+                
+                faceList& curRpFaces = reconPatchFaces[pnIndex];
+                labelList& curRpfOwner = reconPatchOwner[pnIndex];
+                label& nRpf = reconPatchSizes[pnIndex];
 
                 for
                 (
@@ -730,7 +780,6 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                     // HJ, 16/Feb/2011
                     fpAddr[faceI] = nRpf + 1;
                     nRpf++;
-
                 }
             }
         }
@@ -740,15 +789,6 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
         {
             cpAddr[cellI] = cellI; // + cellOffset[firstValidMesh()];
         }
-
-        // Sort out boundary addressing: i for live patches, -1 for processor
-        bpAddr = -1;
-
-        // Note: loop over mapped patches
-        forAll (reconPatchSizes, patchI)
-        {
-            bpAddr[patchI] = patchI;
-        }
     }
 
 
@@ -756,6 +796,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
     for (label procI = 1; procI < meshes_.size(); procI++)
     {
+        Pout<< "Dump mesh " << procI << endl;
         // Grab cell offset from previous offset and mesh size
         cellOffset[procI] =
             cellOffset[procI - 1] + meshes_[procI - 1].nCells();
@@ -784,7 +825,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
             // Collect point-processor addressing for points on processor patches
 
-            // Go through all patches.  For neighbour patches, access
+            // Go through all processor patches.  For neighbour patches, access
             // owner addressing and dump into ppAddr
             forAll (procPatches, patchI)
             {
@@ -868,7 +909,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                 }
             }
 
-            Info<< "Processor " << procI << " merged " << nMergedPoints
+            Pout<< "Processor " << procI << " merged " << nMergedPoints
                 << " points out of local " << curPoints.size()
                 << " and total " << nReconPoints << endl;
 
@@ -934,6 +975,9 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                     const processorPolyPatch& procPatch =
                         refCast<const processorPolyPatch>(procPatches[patchI]);
 
+                    // Record boundary-processor addressing: unmapped patch
+                    bpAddr[patchI] = -1;
+                
                     // If patch is a master, drop the faces and fill the
                     // owner side addressing
                     if (procPatch.master())
@@ -1008,11 +1052,18 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                 else
                 {
                     // Regular patch: dump faces into patch face list
-                    faceList& curRpFaces = reconPatchFaces[patchI];
-                    labelList& curRpfOwner = reconPatchOwner[patchI];
-                    label& nRpf = reconPatchSizes[patchI];
 
                     const polyPatch& curPatch = procPatches[patchI];
+
+                    // Find processor patch index in reconstructed boundary
+                    const label pnIndex = patchNameLookup.find(curPatch.name())();
+
+                    // Record boundary-processor addressing: mapped patch
+                    bpAddr[patchI] = pnIndex;
+                
+                    faceList& curRpFaces = reconPatchFaces[pnIndex];
+                    labelList& curRpfOwner = reconPatchOwner[pnIndex];
+                    label& nRpf = reconPatchSizes[pnIndex];
 
                     for
                     (
@@ -1042,16 +1093,6 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
             forAll (cpAddr, cellI)
             {
                 cpAddr[cellI] = cellI + cellOffset[procI];
-            }
-
-            // Sort out boundary addressing: i for live patches,
-            // -1 for processor
-            bpAddr = -1;
-
-            // Note: loop over mapped patches
-            forAll (reconPatchSizes, patchI)
-            {
-                bpAddr[patchI] = patchI;
             }
         }
     }
@@ -1147,6 +1188,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
         }
     }
 
+    // Create global mesh with given region name
     autoPtr<fvMesh> globalMeshPtr
     (
         new fvMesh
@@ -1166,31 +1208,97 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
     );
     fvMesh& globalMesh = globalMeshPtr();
 
-    // Create patch list using mesh from processor 0
-    List<polyPatch*> reconPatches(nReconPatches);
+    // Create patch list by cloning meshes.  If all processors hold all live
+    // patches, it is sufficient to rebuilt the patches only from the first
+    // valid processor
+    // Note: 
+    List<polyPatch*> reconPatches(nReconPatches, NULL);
 
+    forAll (meshes_, procI)
     {
-        const polyBoundaryMesh& procPatches =
-            meshes_[firstValidMesh()].boundaryMesh();
-
-        reconPatches.setSize(reconPatchSizes.size());
-
-        forAll (reconPatchSizes, patchI)
+        if (meshes_.set(procI))
         {
-            reconPatches[patchI] =
-                procPatches[patchI].clone
-                (
-                    globalMesh.boundaryMesh(),
-                    patchI,
-                    reconPatchSizes[patchI],
-                    reconPatchStarts[patchI]
-                ).ptr();
+            const polyBoundaryMesh& procPatches = meshes_[procI].boundaryMesh();
+
+            forAll (procPatches, patchI)
+            {
+                // Processor patches have disappeared: skip them
+                if (!isA<processorPolyPatch>(procPatches[patchI]))
+                {
+                    // Find processor patch index in reconstructed boundary
+                    const label pnIndex = patchNameLookup.find
+                    (
+                        procPatches[patchI].name()
+                    )();
+
+                    // Check if the patch has already been set
+                    if (reconPatches[pnIndex] == NULL)
+                    {
+                        // Patch not set: clone it
+                        // Note: watch indices: setting pnIndex from patchI
+
+                        if (isA<passiveProcessorPolyPatch>(procPatches[patchI]))
+                        {
+                            // For a passive processor patch, create new
+                            // processor patch
+                            const passiveProcessorPolyPatch& ppPatch =
+                                refCast<const passiveProcessorPolyPatch>
+                                (
+                                    procPatches[patchI]
+                                );
+
+                            reconPatches[pnIndex] = new processorPolyPatch
+                            (
+                                ppPatch.name(),
+                                reconPatchSizes[pnIndex],
+                                reconPatchStarts[pnIndex],
+                                pnIndex,
+                                globalMesh.boundaryMesh(),
+                                Pstream::myProcNo(),   // Use correct local proc
+                                ppPatch.neighbProcNo()
+                            );
+                        }
+                        else
+                        {
+                            // Regular patch: clone
+                            reconPatches[pnIndex] =
+                                procPatches[patchI].clone
+                                (
+                                    globalMesh.boundaryMesh(),
+                                    patchI,
+                                    reconPatchSizes[pnIndex],
+                                    reconPatchStarts[pnIndex]
+                                ).ptr();
+                        }
+                    }
+                }
+            }
         }
     }
 
-    // Add both poly and fv boundary patches
-    globalMesh.addFvPatches(reconPatches);
-
+    // Check the list and fill in the missing slots
+    forAll (reconPatches, patchI)
+    {
+        if (reconPatches[patchI] == NULL)
+        {
+            // Patch not set.  Check its type
+            FatalErrorIn
+            (
+                "autoPtr<fvMesh> processorMeshesReconstructor::"
+                "reconstructMesh(const Time& db)"
+            )   << "Reconstructed patch " << patchI
+                << " name " << reconPatchNames[patchI]
+                << " type " << reconPatchTypes[patchI]
+                << " not set."
+                << abort(FatalError);
+        }
+    }
+    
+    // Add boundary patches to polyMesh and fvMesh
+    // Note: Mark boundary as invalid to disable analysis
+    // due to the presence of old/new patches
+    globalMesh.addFvPatches(reconPatches, false);
+    Pout<< "global boundary: " << globalMesh.boundaryMesh() << endl;
     // TODO: point, face and cell zones
 
     Info<< "Reconstructed addressing: " << nl;
