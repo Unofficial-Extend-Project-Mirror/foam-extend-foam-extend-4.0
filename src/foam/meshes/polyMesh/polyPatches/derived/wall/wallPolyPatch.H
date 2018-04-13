@@ -43,7 +43,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class wallPolyPatch Declaration
+                          Class wallPolyPatch Declaration
 \*---------------------------------------------------------------------------*/
 
 class wallPolyPatch
