@@ -125,7 +125,7 @@ Foam::polyBoundaryMesh::polyBoundaryMesh
 {
     polyPatchList& patches = *this;
     token firstToken(is);
-    Pout<< "firstToken: " << firstToken << endl;
+
     PtrList<entry> patchEntries(is);
     patches.setSize(patchEntries.size());
 
