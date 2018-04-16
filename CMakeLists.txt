@@ -1,7 +1,7 @@
 # /*-------------------------------------------------------------------------*\
 #   =========                 |
 #   \\      /  F ield         | foam-extend: Open Source CFD
-#    \\    /   O peration     | Version:     4.0
+#    \\    /   O peration     | Version:     4.1
 #     \\  /    A nd           | Web:         http://www.foam-extend.org
 #      \\/     M anipulation  | For copyright notice see file Copyright
 # -----------------------------------------------------------------------------
@@ -23,7 +23,7 @@
 #
 # Description
 #     CMakeLists.txt file for implementing a test harness for the compilation
-#     and test of foam-extend-3.2 using Kitware CTest/CMake/CDash
+#     and test of foam-extend-4.1 using Kitware CTest/CMake/CDash
 #
 #     The results will be submitted to the CDash server identified by the file
 #     CTestConfig.cmake
@@ -36,7 +36,7 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-PROJECT(foam-extend-4.0)
+PROJECT(foam-extend-4.1)
 
 #-----------------------------------------------------------------------------
 # Utility functions
@@ -59,6 +59,11 @@ function(GetHostName var)
             OUTPUT_VARIABLE thisHostname
         )
     endif()
+
+	# Cleanup possible presence of \n or \r characters
+	string(REPLACE "\n" "" thisHostname ${thisHostname})
+	string(REPLACE "\r" "" thisHostname ${thisHostname})
+
     set(${var} ${thisHostname} PARENT_SCOPE)
 endfunction()
 
