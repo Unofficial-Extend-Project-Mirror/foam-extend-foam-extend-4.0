@@ -52,17 +52,15 @@ function(GetHostName var)
         execute_process(
             COMMAND         hostname
             OUTPUT_VARIABLE thisHostname
+            OUTPUT_STRIP_TRAILING_WHITESPACE
         )
     else()
         execute_process(
             COMMAND         hostname -f
             OUTPUT_VARIABLE thisHostname
+            OUTPUT_STRIP_TRAILING_WHITESPACE
         )
     endif()
-
-	# Cleanup possible presence of \n or \r characters
-	string(REPLACE "\n" "" thisHostname ${thisHostname})
-	string(REPLACE "\r" "" thisHostname ${thisHostname})
 
     set(${var} ${thisHostname} PARENT_SCOPE)
 endfunction()
