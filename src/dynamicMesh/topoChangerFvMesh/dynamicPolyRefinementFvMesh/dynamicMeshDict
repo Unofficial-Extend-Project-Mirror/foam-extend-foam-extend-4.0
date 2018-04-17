@@ -27,6 +27,12 @@ dynamicPolyRefinementFvMeshCoeffs
     // Unrefine every unrefineInterval step
     unrefineInterval 1;
 
+    // Separate refinement/unrefinement steps. In case this is switched on,
+    // if both refinement and unrefinement should have been performed in a
+    // single step, unrefinement is skipped. Switched off by default, meaning
+    // that it should be safe to perform both at the same time
+    separateUpdates false;
+
     // Refinement selection criteria
     refinementSelection
     {
@@ -59,9 +65,9 @@ dynamicPolyRefinementFvMeshCoeffs
     // level inconsistencies
     nUnrefinementBufferLayers      4;
 
-    // Whether to use point based consistency check. Needed when one allows more
-    // than 2 refinement levels (automatically switched on in that case)
-    pointBasedRefinement yes;
+    // Whether to use edge based consistency check. Needed when one allows more
+    // than 2 refinement levels (automatically switched on)
+    edgeBasedConsistency           yes;
 }
 
 

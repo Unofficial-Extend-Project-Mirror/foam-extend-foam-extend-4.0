@@ -59,7 +59,7 @@ void Foam::dynamicPolyRefinementFvMesh::readDict()
             << " trigerring within a certain time step and should be > 0"
             << exit(FatalError);
     }
-    
+
     unrefineInterval_ = readLabel(refinementDict_.lookup("unrefineInterval"));
     if (refineInterval_ < 1)
     {
@@ -69,6 +69,10 @@ void Foam::dynamicPolyRefinementFvMesh::readDict()
             << " trigerring within a certain time step and should be > 0"
             << exit(FatalError);
     }
+
+    // Read separate updates switch
+    separateUpdates_ =
+        refinementDict_.lookupOrDefault<Switch>("separateUpdates", false);
 }
 
 
@@ -97,6 +101,10 @@ Foam::dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh
     ),
     refineInterval_(readLabel(refinementDict_.lookup("refineInterval"))),
     unrefineInterval_(readLabel(refinementDict_.lookup("unrefineInterval"))),
+    separateUpdates_
+    (
+        refinementDict_.lookupOrDefault<Switch>("separateUpdates", false)
+    ),
     curTimeIndex_(-1),
 
     refinementSelectionPtr_(refinementSelection::New(*this, refinementDict_))
@@ -148,7 +156,14 @@ bool Foam::dynamicPolyRefinementFvMesh::update()
 
     // Check whether to perform refinement and/or unrefinement
     const bool performRefinement = timeID % refineInterval_ == 0;
-    const bool performUnrefinement = timeID % unrefineInterval_ == 0;
+
+    // Skip performing refinement/unrefinement in the same step if
+    // separateUpdates flag is switched on
+    bool performUnrefinement = timeID % unrefineInterval_ == 0;
+    if (performRefinement && separateUpdates_)
+    {
+        performUnrefinement = false;
+    }
 
     if
     (
