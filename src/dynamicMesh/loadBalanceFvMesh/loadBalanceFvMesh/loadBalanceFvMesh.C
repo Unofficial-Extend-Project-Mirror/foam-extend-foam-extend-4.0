@@ -26,7 +26,6 @@ License
 #include "loadBalanceFvMesh.H"
 #include "domainDecomposition.H"
 #include "fvFieldDecomposer.H"
-
 #include "processorMeshesReconstructor.H"
 #include "fvFieldReconstructor.H"
 #include "mapPolyMesh.H"
@@ -137,8 +136,6 @@ bool Foam::loadBalanceFvMesh::update()
         return false;
     }
 
-    Info<< "Hello from loadBalanceFvMesh::update()" << endl;
-
     // Check imbalance.  Note: add run-time selection for the imbalance
     // weights criterion
 
@@ -163,6 +160,30 @@ bool Foam::loadBalanceFvMesh::update()
     curMigratedCells.setSize(Pstream::nProcs(), 0);
 
     const labelList& cellToProc = meshDecomp.cellToProc();
+
+    // Write as volScalarField for post-processing
+    volScalarField cellDist
+    (
+        IOobject
+        (
+            "cellDist",
+            time().timeName(),
+            *this,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        *this,
+        dimensionedScalar("cellDist", dimless, 0),
+        zeroGradientFvPatchScalarField::typeName
+    );
+
+    forAll(cellToProc, celli)
+    {
+       cellDist[celli] = cellToProc[celli];
+    }
+
+    cellDist.write();
+
 
     forAll (cellToProc, cellI)
     {
@@ -290,19 +311,24 @@ bool Foam::loadBalanceFvMesh::update()
                         false             // Do not sync
                     )
                 );
-                Pout<< "Received " << procI << " mesh stats: "
-                    << " polyPatches: "
-                    << procMeshes[procI].boundaryMesh().size()
-                    << " patches: "
-                    << procMeshes[procI].boundary().size()
-                    << endl;
+
                 // Receive the fields
             }
         }
         else
         {
             // Insert own mesh
-            procMeshes.set(procI, this);
+            procMeshes.set
+            (
+                procI,
+                meshDecomp.processorMesh
+                (
+                    procI,
+                    time(),
+                    "processorPart" + Foam::name(procI),
+                    true    // Create passive processor patches
+                )                
+            );
         }
     }
 
@@ -323,12 +349,8 @@ bool Foam::loadBalanceFvMesh::update()
     // - refactor the boundary to match new patches.  Note: processor
     //   patch types may be added or removed
     // - reset all primitives
-    Pout<< "Resetting mesh for load balancing.  Old boundary names: "
-        << boundaryMesh().names() << nl
-        << "New boundary names: "
-        << reconMesh.boundaryMesh().names() << nl
-        << endl;
 
+    // Use non-const access to boundaryMesh
     polyBoundaryMesh& bMesh = const_cast<polyBoundaryMesh&>(boundaryMesh());
 
     const polyBoundaryMesh& reconBMesh = reconMesh.boundaryMesh();
@@ -337,11 +359,10 @@ bool Foam::loadBalanceFvMesh::update()
     if (bMesh.size() > reconBMesh.size())
     {
         // Decreasing in size: check patches that are due to disappear
-        Pout<< "New boundary is smaller: "
-            << bMesh.size() << " to " << reconBMesh.size() << endl;
+
         // Check before resizing: only processor patches may be deleted
         bool okToDelete = true;
-        
+
         for (label patchI = reconBMesh.size(); patchI < bMesh.size(); patchI++)
         {
             if (!isA<processorPolyPatch>(bMesh[patchI]))
@@ -362,33 +383,189 @@ bool Foam::loadBalanceFvMesh::update()
                 << abort(FatalError);
         }
 
-        // Resize the boundary
+        // Resize the boundary.  Patches hanging off the end of the list
+        // will be deleted by PtrList
         bMesh.setSize(reconBMesh.size());
     }
     else if (bMesh.size() < reconBMesh.size())
     {
         // Increasing in size: check patches that are due to disappear
-        Pout<< "New boundary is larger: "
-            << bMesh.size() << " to " << reconBMesh.size() << endl;
-
         bMesh.setSize(reconBMesh.size());
     }
 
     // Delete processor patches from old boundary
+    boolList patchesToReplace(bMesh.size(), false);
 
-    
+    forAll (bMesh, patchI)
+    {
+        // If the patch is not set, the slot is available for re-use
+        if (!bMesh.set(patchI))
+        {
+            patchesToReplace[patchI] = true;
+        }
+        else if (isA<processorPolyPatch>(bMesh[patchI]))
+        {
+            // If the patch is set and contains an "old" processor patch
+            // the old patch will be deleted and replaced with a new one
+            patchesToReplace[patchI] = true;
+        }
+    }
+
     // Check alignment and types of old and new boundary
-    // forAll (bMesh, patchI)
-    // {
-    //     if (!bMesh[patchI].set())
-    //     {
-    //     }
-    // }
+    // Insert new patches processor patches
+    // Collect patch sizes and starts
 
-    // To Do: reset mesh in polyMesh
+    labelList reconPatchSizes(reconBMesh.size(), 0);
+
+    forAll (bMesh, patchI)
+    {
+        // If the patch is preserved, types need to match
+        if (!patchesToReplace[patchI])
+        {
+            const polyPatch& bPatch = bMesh[patchI];
+            const polyPatch& reconBPatch = reconBMesh[patchI];
+
+            // Check if the patch is matching
+            if
+            (
+                bPatch.type() != reconBPatch.type()
+             || bPatch.name() != reconBPatch.name()
+            )
+            {
+                FatalErrorIn("bool loadBalanceFvMesh::update()")
+                    << "Patch names or types not matching for index "
+                    << patchI << nl
+                    << "bMesh name: " << bPatch.name()
+                    << " type: " << bPatch.type() << nl
+                    << "reconBMesh name: " << reconBPatch.name()
+                    << "  type: " << reconBPatch.type() << nl
+                    << abort(FatalError);
+            }
+
+            // Record patch size
+            reconPatchSizes[patchI] = reconBMesh[patchI].size();
+        }
+    }
+
+    // Insert new processor patches
+    // Note:
+    // The code is set up so that any intermediate empty boundary patch
+    // slots are re-used.  It is expected that the new patches will be
+    // added at the end, so this is safety.
+    // As a result, patch sizes and starts need to be re-assembled
+    // rather than used directly from reconBMesh
+    // HJ, 16/Apr/2018
+    forAll (reconBMesh, reconPatchI)
+    {
+        if (isA<processorPolyPatch>(reconBMesh[reconPatchI]))
+        {
+            // Find a slot to insert into
+            label nextPatchSlot = 0;
+
+            for
+            (
+                nextPatchSlot = 0;
+                nextPatchSlot < patchesToReplace.size();
+                nextPatchSlot++
+            )
+            {
+                if (patchesToReplace[nextPatchSlot])
+                {
+                    // Found a patch slot
+                    break;
+                }
+            }
+
+            if (nextPatchSlot >= patchesToReplace.size())
+            {
+                FatalErrorIn("bool loadBalanceFvMesh::update()")
+                    << "Cannot find available patch slot: " << nextPatchSlot
+                    << abort(FatalError);
+            }
+
+            // Insert a patch
+            const processorPolyPatch& ppPatch =
+                refCast<const processorPolyPatch>
+                (
+                    reconBMesh[reconPatchI]
+                );
+
+            // Note:
+            // The new mesh has not been reset.  Therefore, sizes and starts
+            // cannot be set properly until the mesh is reset
+            // This is done in the resetPrimitives function
+            // HJ, 16/Apr/2018
+            bMesh.set
+            (
+                nextPatchSlot,
+                new processorPolyPatch
+                (
+                    ppPatch.name(),
+                    0,                  // dummy size
+                    nInternalFaces(),   // dummy start
+                    // ppPatch.size(),
+                    // ppPatch.start(),
+                    nextPatchSlot,
+                    bMesh,
+                    ppPatch.myProcNo(),
+                    ppPatch.neighbProcNo()
+                )
+            );
+
+            // Mark patch slot as used
+            patchesToReplace[nextPatchSlot] = false;
+
+            // Collect size
+            reconPatchSizes[nextPatchSlot] = reconBMesh[reconPatchI].size();
+        }
+    }
+
+    // Debug
+    {
+        labelList RPSIZES(reconBMesh.size());
+
+        forAll (reconBMesh, patchI)
+        {
+            RPSIZES[patchI] = reconBMesh[patchI].size();
+        }
+
+        Pout<< "RPSIZES: " << RPSIZES << end;
+    }
+
+    // Patch sizes are assembled.  Collect patch starts for the new mesh
+    labelList reconPatchStarts(reconBMesh.size(), 0);
+
+    if (!reconPatchStarts.empty())
+    {
+        reconPatchStarts[0] = reconMesh.nInternalFaces();
+
+        for (label i = 1; i < reconPatchStarts.size(); i++)
+        {
+            reconPatchStarts[i] =
+                reconPatchStarts[i - 1]
+              + reconPatchSizes[i - 1];
+        }
+    }
+
+    // Reset fvMesh and patches
+    resetFvPrimitives
+    (
+        xferCopy(reconMesh.allPoints()),
+        xferCopy(reconMesh.allFaces()),
+        xferCopy(reconMesh.faceOwner()),
+        xferCopy(reconMesh.faceNeighbour()),
+        reconPatchSizes,
+        reconPatchStarts,
+        true                       // Valid boundary
+    );
+
+    Pout<< "faceOwner: " << faceOwner() << nl
+        << "faceNeighbour: " << faceNeighbour() << nl
+        << "boundary: " << boundaryMesh() << endl;
+
     // To Do: build a reconstructor from addressing data
 
-        
+
     // Create field reconstructor
     // fvFieldReconstructor fieldReconstructor
     // (
@@ -398,13 +575,6 @@ bool Foam::loadBalanceFvMesh::update()
     //     meshRecon.cellProcAddressing(),
     //     meshRecon.boundaryProcAddressing()
     // );
-
-
-    // Note: Local mesh and fields need to be removed from the PtrList
-    // before the destruction and from autoPtr.
-    // Otherwise, they will be deleted.  HJ, 5/Mar/2018
-    autoPtr<fvMesh> curMesh = procMeshes.set(Pstream::myProcNo(), NULL);
-    curMesh.ptr();
 
     return true;
 }

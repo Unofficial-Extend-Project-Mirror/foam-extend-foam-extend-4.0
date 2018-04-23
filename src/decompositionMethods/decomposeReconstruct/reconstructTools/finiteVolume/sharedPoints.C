@@ -26,12 +26,6 @@ License
 #include "sharedPoints.H"
 #include "processorPolyPatch.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
-
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 Foam::labelListList Foam::sharedPoints::procPatchPairs() const
@@ -393,14 +387,7 @@ void Foam::sharedPoints::calcSharedPoints()
             }
         }
     }
-
-    Info<< "nGlobalPoints_: " << nGlobalPoints_ << nl
-        << "sharedPointLabels_: " << sharedPointLabels_ << nl
-        << "sharedPointAddr_: " << sharedPointAddr_ << endl;
 }
-
-
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -420,20 +407,6 @@ Foam::sharedPoints::sharedPoints(const PtrList<fvMesh>& meshes)
 
 // Foam::sharedPoints::~sharedPoints()
 // {}
-
-
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-// void Foam::sharedPoints::operator=(const sharedPoints& rhs)
-// {
-//     // Check for assignment to self
-//     if (this == &rhs)
-//     {
-//         FatalErrorIn("Foam::sharedPoints::operator=(const Foam::sharedPoints&)")
-//             << "Attempted assignment to self"
-//             << abort(FatalError);
-//     }
-// }
 
 
 // ************************************************************************* //

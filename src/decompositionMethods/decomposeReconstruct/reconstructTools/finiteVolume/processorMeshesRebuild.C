@@ -476,7 +476,6 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
     label nReconFaces = 0;
     label nReconCells = 0;
     labelList reconPatchSizes(reconPatchTypes.size(), 0);
-    Pout<< "reconPatchNames: " << reconPatchNames << endl;
 
     forAll (meshes_, procI)
     {
@@ -909,10 +908,6 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                 }
             }
 
-            Pout<< "Processor " << procI << " merged " << nMergedPoints
-                << " points out of local " << curPoints.size()
-                << " and total " << nReconPoints << endl;
-
             // Dump all internal faces into the list
             const faceList& curFaces = curMesh.allFaces();
             const labelList& curOwner = curMesh.faceOwner();
@@ -1298,7 +1293,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
     // Note: Mark boundary as invalid to disable analysis
     // due to the presence of old/new patches
     globalMesh.addFvPatches(reconPatches, false);
-    Pout<< "global boundary: " << globalMesh.boundaryMesh() << endl;
+
     // TODO: point, face and cell zones
 
     Info<< "Reconstructed addressing: " << nl;
