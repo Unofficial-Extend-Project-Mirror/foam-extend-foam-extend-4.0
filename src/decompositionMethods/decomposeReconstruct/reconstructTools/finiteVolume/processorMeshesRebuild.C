@@ -650,8 +650,8 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
     // Dump first valid mesh without checking
     {
-        Pout<< "Dump mesh 0" << endl;
         const label fvmId = firstValidMesh();
+        Pout<< "Dump mesh " << fvmId << endl;
 
         cellOffset[fvmId] = 0;
 
@@ -719,7 +719,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
                 // Record boundary-processor addressing: unmapped patch
                 bpAddr[patchI] = -1;
-                
+
                 for
                 (
                     label faceI = procPatch.start();
@@ -754,7 +754,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
                 // Record boundary-processor addressing: mapped patch
                 bpAddr[patchI] = pnIndex;
-                
+
                 faceList& curRpFaces = reconPatchFaces[pnIndex];
                 labelList& curRpfOwner = reconPatchOwner[pnIndex];
                 label& nRpf = reconPatchSizes[pnIndex];
@@ -795,13 +795,14 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
     for (label procI = 1; procI < meshes_.size(); procI++)
     {
-        Pout<< "Dump mesh " << procI << endl;
         // Grab cell offset from previous offset and mesh size
         cellOffset[procI] =
             cellOffset[procI - 1] + meshes_[procI - 1].nCells();
 
         if (meshes_.set(procI))
         {
+            Pout<< "Dump mesh " << procI << endl;
+
             const polyMesh& curMesh = meshes_[procI];
             const polyBoundaryMesh& procPatches = curMesh.boundaryMesh();
 
@@ -972,7 +973,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
                     // Record boundary-processor addressing: unmapped patch
                     bpAddr[patchI] = -1;
-                
+
                     // If patch is a master, drop the faces and fill the
                     // owner side addressing
                     if (procPatch.master())
@@ -1055,7 +1056,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
                     // Record boundary-processor addressing: mapped patch
                     bpAddr[patchI] = pnIndex;
-                
+
                     faceList& curRpFaces = reconPatchFaces[pnIndex];
                     labelList& curRpfOwner = reconPatchOwner[pnIndex];
                     label& nRpf = reconPatchSizes[pnIndex];
@@ -1206,7 +1207,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
     // Create patch list by cloning meshes.  If all processors hold all live
     // patches, it is sufficient to rebuilt the patches only from the first
     // valid processor
-    // Note: 
+    // Note:
     List<polyPatch*> reconPatches(nReconPatches, NULL);
 
     forAll (meshes_, procI)
@@ -1288,7 +1289,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                 << abort(FatalError);
         }
     }
-    
+
     // Add boundary patches to polyMesh and fvMesh
     // Note: Mark boundary as invalid to disable analysis
     // due to the presence of old/new patches

@@ -39,6 +39,7 @@ License
 
 defineTypeNameAndDebug(Foam::domainDecomposition, 0);
 
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::domainDecomposition::domainDecomposition
@@ -117,19 +118,19 @@ Foam::autoPtr<Foam::fvMesh> Foam::domainDecomposition::processorMesh
 
     faceList procFaces(curFaceLabels.size());
 
-    forAll (curFaceLabels, facei)
+    forAll (curFaceLabels, faceI)
     {
         // Mark the original face as used
         // Remember to decrement the index by one (turning index)
         // HJ, 5/Dec/2001
-        label curF = mag(curFaceLabels[facei]) - 1;
+        label curF = mag(curFaceLabels[faceI]) - 1;
 
-        faceLookup[curF] = facei;
+        faceLookup[curF] = faceI;
 
         // get the original face
         labelList origFaceLabels;
 
-        if (curFaceLabels[facei] >= 0)
+        if (curFaceLabels[faceI] >= 0)
         {
             // face not turned
             origFaceLabels = meshFaces[curF];
@@ -140,7 +141,7 @@ Foam::autoPtr<Foam::fvMesh> Foam::domainDecomposition::processorMesh
         }
 
         // translate face labels into local point list
-        face& procFaceLabels = procFaces[facei];
+        face& procFaceLabels = procFaces[faceI];
 
         procFaceLabels.setSize(origFaceLabels.size());
 
@@ -275,7 +276,7 @@ Foam::autoPtr<Foam::fvMesh> Foam::domainDecomposition::processorMesh
             procPatches[nPatches] =
                 new passiveProcessorPolyPatch
                 (
-                    word("procBoundary") + Foam::name(procI)
+                    word("passiveProcBoundary") + Foam::name(procI)
                   + word("to")
                   + Foam::name(curNeighbourProcessors[procPatchI]),
                     curProcessorPatchSizes[procPatchI],
