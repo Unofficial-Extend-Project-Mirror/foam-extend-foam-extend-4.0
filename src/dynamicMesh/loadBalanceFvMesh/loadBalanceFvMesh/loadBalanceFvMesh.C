@@ -279,9 +279,6 @@ bool Foam::loadBalanceFvMesh::update()
     // Insert own mesh if there is a piece to insert
     if (curMigratedCells[Pstream::myProcNo()] > 0)
     {
-        Pout<< "Inserting local mesh piece, proc " << Pstream::myProcNo()
-            << endl;
-
         procMeshes.set
         (
             Pstream::myProcNo(),
@@ -293,9 +290,7 @@ bool Foam::loadBalanceFvMesh::update()
                 true    // Create passive processor patches
             )
         );
-        Pout<< "Local proc mesh: " << Pstream::myProcNo() << nl
-            << procMeshes[Pstream::myProcNo()].boundaryMesh()
-            << endl;
+
         // Set local fields
     }
 
@@ -334,9 +329,7 @@ bool Foam::loadBalanceFvMesh::update()
                         false             // Do not sync
                     )
                 );
-                Pout<< "Received boundary: " << nl
-                    << procMeshes[procI].boundaryMesh()
-                    << endl;
+
                 // Receive the fields
             }
         }
@@ -564,10 +557,13 @@ bool Foam::loadBalanceFvMesh::update()
         resetFvPatchFlag,
         true                       // Valid boundary
     );
-    Pout<< "BMESH: " << boundaryMesh() << endl;
 
     // To Do: build a reconstructor from addressing data
+    Pout<< nl << nl
+        << "FINISHED CYCLE" << nl << nl << nl
+        << endl;
 
+    write();
 
     // Create field reconstructor
     // fvFieldReconstructor fieldReconstructor

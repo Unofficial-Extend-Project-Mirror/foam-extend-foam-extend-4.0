@@ -139,6 +139,7 @@ SourceFiles
 #ifndef mapPolyMesh_H
 #define mapPolyMesh_H
 
+#include "boolList.H"
 #include "labelList.H"
 #include "objectMap.H"
 #include "pointField.H"
@@ -259,6 +260,10 @@ class mapPolyMesh
         //  For added cells, the index is set to -1
         const labelListList cellZoneMap_;
 
+        //- Reset patch flag
+        //  True for the rebuilt patch (no mapping)
+        boolList resetPatchFlag_;
+
         //- Pre-motion point positions.
         //  This specifies the correct way of blowing up zero-volume objects
         const pointField preMotionPoints_;
@@ -296,26 +301,36 @@ public:
             const label nOldPoints,
             const label nOldFaces,
             const label nOldCells,
+
             const labelList& pointMap,
             const List<objectMap>& pointsFromPoints,
+
             const labelList& faceMap,
             const List<objectMap>& facesFromPoints,
             const List<objectMap>& facesFromEdges,
             const List<objectMap>& facesFromFaces,
+
             const labelList& cellMap,
             const List<objectMap>& cellsFromPoints,
             const List<objectMap>& cellsFromEdges,
             const List<objectMap>& cellsFromFaces,
             const List<objectMap>& cellsFromCells,
+
             const labelList& reversePointMap,
             const labelList& reverseFaceMap,
             const labelList& reverseCellMap,
+
             const labelHashSet& flipFaceFlux,
+
             const labelListList& patchPointMap,
+
             const labelListList& pointZoneMap,
             const labelListList& faceZonePointMap,
             const labelListList& faceZoneFaceMap,
             const labelListList& cellZoneMap,
+
+            const boolList& resetPatchFlag,
+
             const pointField& preMotionPoints,
             const labelList& oldPatchStarts,
             const labelList& oldPatchNMeshPoints
@@ -328,26 +343,36 @@ public:
             const label nOldPoints,
             const label nOldFaces,
             const label nOldCells,
+
             labelList& pointMap,
             List<objectMap>& pointsFromPoints,
+
             labelList& faceMap,
             List<objectMap>& facesFromPoints,
             List<objectMap>& facesFromEdges,
             List<objectMap>& facesFromFaces,
+
             labelList& cellMap,
             List<objectMap>& cellsFromPoints,
             List<objectMap>& cellsFromEdges,
             List<objectMap>& cellsFromFaces,
             List<objectMap>& cellsFromCells,
+
             labelList& reversePointMap,
             labelList& reverseFaceMap,
             labelList& reverseCellMap,
+
             labelHashSet& flipFaceFlux,
+
             labelListList& patchPointMap,
+
             labelListList& pointZoneMap,
             labelListList& faceZonePointMap,
             labelListList& faceZoneFaceMap,
             labelListList& cellZoneMap,
+
+            boolList& resetPatchFlag,
+
             pointField& preMotionPoints,
             labelList& oldPatchStarts,
             labelList& oldPatchNMeshPoints,
@@ -615,6 +640,14 @@ public:
                 {
                     return cellZoneMap_;
                 }
+
+                //- Reset patch flag
+                //  True for the rebuilt patch (no mapping)
+                const boolList& resetPatchFlag() const
+                {
+                    return resetPatchFlag_;
+                }
+
 
             //- Pre-motion point positions.
             //  This specifies the correct way of blowing up

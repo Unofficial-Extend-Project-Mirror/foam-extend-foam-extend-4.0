@@ -272,24 +272,9 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                                 );
                             }
                         }
-                        else
-                        {
-                            // Owner and neighbour processor index are the same
-                            // across the processor boundary.  This face will be
-                            // re-merged into internal faces in load balancing
-                            // and therefore remains in the processor patch
-                            Pout<< "Preserved proc[" << patchFaceI << "]: "
-                                << ownerProc << " " << neighbourProc << endl;
-
-                            // Add the face
-                            procFaceList[ownerProc].append
-                            (
-                                patchStart + patchFaceI
-                            );
-
-                            // Increment the number of faces for this patch
-                            procPatchSize_[ownerProc][patchI]++;
-                        }
+                        // Note: cannot insert regular faces here, because
+                        // they are out of sequence.
+                        // HJ, 24/Apr/2018
                     }
                 }
             }
@@ -516,24 +501,9 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                                 );
                             }
                         }
-                        else
-                        {
-                            // Owner and neighbour processor index are the same
-                            // across the processor boundary.  This face will be
-                            // re-merged into internal faces in load balancing
-                            // and therefore remains in the processor patch
-                            Pout<< "Preserved proc[" << patchFaceI << "]: "
-                                << ownerProc << " " << neighbourProc << endl;
-
-                            // Add the face
-                            procFaceList[ownerProc].append
-                            (
-                                patchStart + patchFaceI
-                            );
-
-                            // Increment the number of faces for this patch
-                            procPatchSize_[ownerProc][patchI]++;
-                        }
+                        // Note: cannot insert regular faces here, because
+                        // they are out of sequence.
+                        // HJ, 24/Apr/2018
                     }
                 }
             }
@@ -555,35 +525,53 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
             const label patchStart = patches[patchI].patch().start();
 
             // Do normal patches.  Note that processor patches
-            // have already been done and need to be skipped
-            // For all other patches patchNbrCellToProc_ will be empty
-            if (!patchNbrCellToProc_[patchI].empty())
+            // have already been partially done and need special treatment
+            if
+            (
+                isA<processorFvPatch>(patches[patchI])
+             && !patchNbrCellToProc_[patchI].empty()
+            )
             {
+                // Only collect faces where the owner and neighbour processor
+                // index are the same.
+                // If owner and neighbour processor index are different,
+                // the face was already collected into a separate patch
+                // HJ, 23/Apr/2018
+
+                const unallocLabelList& fc = patches[patchI].faceCells();
+
+                // Get neighbour cellToProc addressing across the interface
+                const labelList& curNbrPtc = patchNbrCellToProc_[patchI];
+
+                forAll (fc, patchFaceI)
+                {
+                    // Local owner proc is looked up using faceCells
+                    const label ownerProc = cellToProc_[fc[patchFaceI]];
+
+                    // Neighbour proc is looked up directly
+                    const label neighbourProc = curNbrPtc[patchFaceI];
+
+                    // If the owner and neighbour processor index is the same,
+                    // the face remains in the processor patch
+                    // In load balancing, it will be re-merged on reconstruction
+                    // HJ, 23/Apr/2018
+                    if (ownerProc == neighbourProc)
+                    {
+                        // Add the face
+                        procFaceList[ownerProc].append(patchStart + patchFaceI);
+                        Pout<< "Add proc face to proc patch.  Face "
+                            << patchStart + patchFaceI
+                            << endl;
+                        // Increment the number of faces for this patch
+                        procPatchSize_[ownerProc][patchI]++;
+                    }
+                }
+                
                 // Processor patch.  Skip it
                 continue;
             }
 
-            if (!isA<cyclicFvPatch>(patches[patchI]))
-            {
-                // Normal patch. Add faces to processor where the cell
-                // next to the face lives
-
-                const unallocLabelList& patchFaceCells =
-                    patches[patchI].faceCells();
-
-                forAll (patchFaceCells, patchFaceI)
-                {
-                    const label curProc =
-                        cellToProc_[patchFaceCells[patchFaceI]];
-
-                    // add the face
-                    procFaceList[curProc].append(patchStart + patchFaceI);
-
-                    // increment the number of faces for this patch
-                    procPatchSize_[curProc][patchI]++;
-                }
-            }
-            else
+            else if (isA<cyclicFvPatch>(patches[patchI]))
             {
                 // Cyclic patch special treatment
 
@@ -783,6 +771,24 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                         // Increment the number of faces for this patch
                         procPatchSize_[ownerProc][patchI]++;
                     }
+                }
+            }
+            else
+            {
+                // Normal patch. Add faces to processor where the cell
+                // next to the face lives
+
+                const unallocLabelList& fc = patches[patchI].faceCells();
+
+                forAll (fc, patchFaceI)
+                {
+                    const label curProc = cellToProc_[fc[patchFaceI]];
+
+                    // add the face
+                    procFaceList[curProc].append(patchStart + patchFaceI);
+
+                    // increment the number of faces for this patch
+                    procPatchSize_[curProc][patchI]++;
                 }
             }
         }

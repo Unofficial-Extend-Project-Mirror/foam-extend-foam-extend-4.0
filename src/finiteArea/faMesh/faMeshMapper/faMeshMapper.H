@@ -103,6 +103,10 @@ class faMeshMapper
             //- Boundary mapper
             faBoundaryMeshMapper boundaryMap_;
 
+            //- Reset patch flag.  Set true for the rebuilt patch (no mapping)
+            //- Disabled.  HJ, 24/Apr/2018
+            boolList resetPatchFlag_;
+
 
     // Private Member Functions
 
@@ -200,6 +204,13 @@ public:
             const faBoundaryMeshMapper& boundaryMap() const
             {
                 return boundaryMap_;
+            }
+
+            //- Return reset patch flag
+            //- Disabled.  HJ, 24/Apr/2018
+            const boolList& resetPatchFlag() const
+            {
+                return resetPatchFlag_;
             }
 };
 

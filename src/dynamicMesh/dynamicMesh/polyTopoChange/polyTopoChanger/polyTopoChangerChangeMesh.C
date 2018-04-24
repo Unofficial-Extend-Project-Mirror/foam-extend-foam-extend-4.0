@@ -2416,6 +2416,10 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
     List<objectMap> facesFromFaces;
     List<objectMap> cellsFromCells;
 
+    // Patch reset map is currently dummy: does not support change in number
+    // of boundary patches
+    // HJ, 23/Apr/2018
+    boolList resetPatchFlag(boundary.size(), false);
 
     autoPtr<mapPolyMesh> topoChangeMap
     (
@@ -2452,6 +2456,8 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
             fzPointRenumber,
             fzFaceRenumber,
             czRenumber,
+
+            resetPatchFlag,
 
             newPointsMotion,
             oldPatchStarts,

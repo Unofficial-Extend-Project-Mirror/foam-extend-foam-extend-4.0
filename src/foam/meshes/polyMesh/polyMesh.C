@@ -751,7 +751,6 @@ void Foam::polyMesh::resetPrimitives
 
 
     // Reset patch sizes and starts
-    Pout<< "Resetting patches: starts: " << patchStarts << endl;
     forAll (boundary_, patchI)
     {
         boundary_[patchI].resetPatch
@@ -1294,65 +1293,9 @@ const Foam::globalMeshData& Foam::polyMesh::globalData() const
                 << "Constructing parallelData from processor topology"
                 << endl;
         }
+
         // Construct globalMeshData using processorPatch information only.
         globalMeshDataPtr_ = new globalMeshData(*this);
-
-        // Old method.  HJ, 6/Dec/2006
-
-//         // Check for parallel boundaries
-//         bool parBoundaries = false;
-
-//         forAll (boundaryMesh(), patchI)
-//         {
-//             if
-//             (
-//                 typeid(boundaryMesh()[patchI])
-//              == typeid(processorPolyPatch)
-//             )
-//             {
-//                 parBoundaries = true;
-//                 break;
-//             }
-//         }
-
-//         if (parBoundaries)
-//         {
-//             // All is well - read the parallel data
-
-//             globalDataPtr_ =
-//                 new globalMeshData
-//                 (
-//                     IOobject
-//                     (
-//                         "globalData",
-//                         time().findInstance(meshDir(), "globalData"),
-//                         meshSubDir,
-//                         *this,
-//                         IOobject::MUST_READ,
-//                         IOobject::NO_WRITE
-//                     ),
-//                     *this
-//                 );
-//         }
-//         else
-//         {
-//             // The mesh has no parallel boundaries.  Create and hook a
-//             // "non-parallel" parallel info
-//             globalDataPtr_ =
-//                 new globalMeshData
-//                 (
-//                     *this,
-//                     false,
-//                     false,  // cyclicParallel.  Remove when fixed
-//                     nPoints(),
-//                     nFaces(),
-//                     nCells(),
-//                     0,
-//                     labelList(0),
-//                     labelList(0),
-//                     labelList(0)
-//                 );
-//         }
     }
 
     return *globalMeshDataPtr_;

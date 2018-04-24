@@ -75,7 +75,6 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
     )
     {
         // Zones found.  Check topo changer
-
         if (topoChanger_.empty())
         {
             FatalErrorIn
@@ -136,7 +135,6 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
         cz[nCz] = cellZones()[zoneI].clone(cellZones()).ptr();
         nCz++;
     }
-
 
 
     // Do face zones for slider
@@ -242,7 +240,7 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
     fz.setSize(nFz);
     // Cell zones remain unchanged
 
-    Info << "Adding point and face zones" << endl;
+    Info<< "Adding point and face zones" << endl;
     removeZones();
     addZones(pz, fz, cz);
 

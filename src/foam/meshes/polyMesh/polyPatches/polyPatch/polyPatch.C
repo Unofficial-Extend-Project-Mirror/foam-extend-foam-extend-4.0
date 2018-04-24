@@ -604,8 +604,6 @@ void Foam::polyPatch::resetPatch
             boundaryMesh_.mesh().allPoints()
         )
     );
-
-    Pout<< "Patch reset: faceCells: " << faceCells() << endl;
 }
 
 

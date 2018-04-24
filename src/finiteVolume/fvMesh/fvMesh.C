@@ -422,16 +422,11 @@ void Foam::fvMesh::resetFvPrimitives
         validBoundary
     );
 
+    // Reset fvPatches  HJ, 16/Apr/2018
     boundary_.resetFvPatches(resetFvPatchFlag);
-    surfaceInterpolation::clearOut();
-    clearGeomNotOldVol();
 
-    // Reset fvPatches?  HJ, 16/Apr/2018
-
-    // Clear LDU
-    clearAddressing();
-
-    // Clear cell volumes?
+    // Clear all mesh data
+    clearOut();
 }        
 
 

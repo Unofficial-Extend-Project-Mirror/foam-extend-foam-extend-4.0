@@ -651,6 +651,7 @@ int main(int argc, char *argv[])
                 processorDb
             )
         );
+        procMesh.syncUpdateMesh();
 
         labelIOList cellProcAddressing
         (
