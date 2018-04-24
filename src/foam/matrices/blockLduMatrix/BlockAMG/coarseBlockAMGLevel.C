@@ -244,8 +244,7 @@ void Foam::coarseBlockAMGLevel<Type>::solve
         // Note: top-level preconditioner is incorrect: FIX.  HJ, 3/Oct/2017
         topLevelDict.add("preconditioner", "Cholesky");
 
-        coarseSolverPerf =
-         BlockCGSolver<Type>
+        coarseSolverPerf = BlockCGSolver<Type>
         (
             "topLevelCorr",
             matrixPtr_,
@@ -348,7 +347,7 @@ void Foam::coarseBlockAMGLevel<Type>::initLevel
 )
 {
     // Update matrix by repeating coarsening
-    
+
     // Update smoother for new matrix
     smootherPtr_->initMatrix();
 
