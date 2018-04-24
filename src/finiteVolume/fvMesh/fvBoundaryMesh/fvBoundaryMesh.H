@@ -73,6 +73,11 @@ private:
         //- Add fvPatches corresponding to the polyBoundaryMesh
         void addFvPatches();
 
+        //- Reset fvPatches corresponding to the polyBoundaryMesh
+        //  When the mesh is resized, the existing patches may be preserved
+        //  or reset depending on the resetFlag
+        void resetFvPatches(const boolList& resetFvPatchFlag);
+
 
 protected:
 

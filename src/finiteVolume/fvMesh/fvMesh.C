@@ -392,11 +392,47 @@ void Foam::fvMesh::removeFvBoundary()
 
     // Remove fvBoundaryMesh data first.
     boundary_.clear();
-    boundary_.setSize(0);
     polyMesh::removeBoundary();
 
     clearOut();
 }
+
+
+void Foam::fvMesh::resetFvPrimitives
+(
+    const Xfer<pointField>& points,
+    const Xfer<faceList>& faces,
+    const Xfer<labelList>& owner,
+    const Xfer<labelList>& neighbour,
+    const labelList& patchSizes,
+    const labelList& patchStarts,
+    const boolList& resetFvPatchFlag,
+    const bool validBoundary
+)
+{
+    // Reset polyMesh primitives
+    polyMesh::resetPrimitives
+    (
+        points,
+        faces,
+        owner,
+        neighbour,
+        patchSizes,
+        patchStarts,
+        validBoundary
+    );
+
+    boundary_.resetFvPatches(resetFvPatchFlag);
+    surfaceInterpolation::clearOut();
+    clearGeomNotOldVol();
+
+    // Reset fvPatches?  HJ, 16/Apr/2018
+
+    // Clear LDU
+    clearAddressing();
+
+    // Clear cell volumes?
+}        
 
 
 Foam::polyMesh::readUpdateState Foam::fvMesh::readUpdate()

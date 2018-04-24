@@ -155,7 +155,8 @@ void fvMesh::makeC() const
         *this,
         dimLength,
         cellCentres(),
-        faceCentres()
+        faceCentres(),
+        false             // Do not preserve couples in geometry fields
     );
 
     // This piece of code is necessary for cyclic and cyclicGgi interfaces
@@ -231,7 +232,8 @@ void fvMesh::makeCf() const
         ),
         *this,
         dimLength,
-        faceCentres()
+        faceCentres(),
+        false             // Do not preserve couples in geometry fields
     );
 
     // Boundary update.  Used in complex geometries, eg. immersed boundary

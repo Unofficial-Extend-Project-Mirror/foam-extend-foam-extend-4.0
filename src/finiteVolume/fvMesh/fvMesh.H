@@ -360,6 +360,25 @@ public:
             //  these fvPatches.
             void removeFvBoundary();
 
+            //- Reset mesh primitive data. Assumes all patch info correct
+            //  (so does e.g. parallel communication). If not, use
+            //  validBoundary = false
+            //  (still assumes patchStarts[0] = nInternalFaces and last
+            //  patch ends at nActiveFaces) and change patches with addPatches.
+            //  resetFvPatchFlag indicates which fvPatches will be rebuilt
+            //  if the flag is set to false, original patch is preserved
+            void resetFvPrimitives
+            (
+                const Xfer<pointField>& points,
+                const Xfer<faceList>& faces,
+                const Xfer<labelList>& owner,
+                const Xfer<labelList>& neighbour,
+                const labelList& patchSizes,
+                const labelList& patchStarts,
+                const boolList& resetFvPatchFlag,
+                const bool validBoundary = true
+            );
+
             //- Return cell face motion fluxes
             surfaceScalarField& setPhi();
 
