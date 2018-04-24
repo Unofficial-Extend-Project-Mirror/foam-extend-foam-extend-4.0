@@ -276,6 +276,29 @@ bool Foam::loadBalanceFvMesh::update()
         meshDecomp.nProcs()
     );
 
+    // Insert own mesh if there is a piece to insert
+    if (curMigratedCells[Pstream::myProcNo()] > 0)
+    {
+        Pout<< "Inserting local mesh piece, proc " << Pstream::myProcNo()
+            << endl;
+
+        procMeshes.set
+        (
+            Pstream::myProcNo(),
+            meshDecomp.processorMesh
+            (
+                Pstream::myProcNo(),
+                time(),
+                "processorPart" + Foam::name(Pstream::myProcNo()),
+                true    // Create passive processor patches
+            )
+        );
+        Pout<< "Local proc mesh: " << Pstream::myProcNo() << nl
+            << procMeshes[Pstream::myProcNo()].boundaryMesh()
+            << endl;
+        // Set local fields
+    }
+
     for (label procI = 0; procI < meshDecomp.nProcs(); procI++)
     {
         if (procI != Pstream::myProcNo())
@@ -283,7 +306,7 @@ bool Foam::loadBalanceFvMesh::update()
             // Check if there is a mesh to send
             if (migratedCells[procI][Pstream::myProcNo()] > 0)
             {
-                Info<< "Processor " << procI << ": receive mesh and fields"
+                Pout<< "Receive mesh and fields from " << procI
                     << endl;
 
                 // Note: communication can be optimised.  HJ, 27/Feb/2018
@@ -311,27 +334,15 @@ bool Foam::loadBalanceFvMesh::update()
                         false             // Do not sync
                     )
                 );
-
+                Pout<< "Received boundary: " << nl
+                    << procMeshes[procI].boundaryMesh()
+                    << endl;
                 // Receive the fields
             }
         }
-        else
-        {
-            // Insert own mesh
-            procMeshes.set
-            (
-                procI,
-                meshDecomp.processorMesh
-                (
-                    procI,
-                    time(),
-                    "processorPart" + Foam::name(procI),
-                    true    // Create passive processor patches
-                )                
-            );
-        }
     }
 
+    
     // Create the reconstructed mesh
     autoPtr<fvMesh> reconstructedMeshPtr =
         meshRecon.reconstructMesh(time());
@@ -411,6 +422,10 @@ bool Foam::loadBalanceFvMesh::update()
         }
     }
 
+    // Store the resetFvPatchFlag to indicate patches that will be rebuilt
+    // patchesToReplace will be used in further signalling
+    boolList resetFvPatchFlag = patchesToReplace;
+    
     // Check alignment and types of old and new boundary
     // Insert new patches processor patches
     // Collect patch sizes and starts
@@ -500,7 +515,9 @@ bool Foam::loadBalanceFvMesh::update()
                 nextPatchSlot,
                 new processorPolyPatch
                 (
-                    ppPatch.name(),
+                    // ppPatch.name(),
+                    "procBoundary" + Foam::name(ppPatch.myProcNo()) + "to"
+                    + Foam::name(ppPatch.neighbProcNo()),
                     0,                  // dummy size
                     nInternalFaces(),   // dummy start
                     // ppPatch.size(),
@@ -518,18 +535,6 @@ bool Foam::loadBalanceFvMesh::update()
             // Collect size
             reconPatchSizes[nextPatchSlot] = reconBMesh[reconPatchI].size();
         }
-    }
-
-    // Debug
-    {
-        labelList RPSIZES(reconBMesh.size());
-
-        forAll (reconBMesh, patchI)
-        {
-            RPSIZES[patchI] = reconBMesh[patchI].size();
-        }
-
-        Pout<< "RPSIZES: " << RPSIZES << end;
     }
 
     // Patch sizes are assembled.  Collect patch starts for the new mesh
@@ -556,12 +561,10 @@ bool Foam::loadBalanceFvMesh::update()
         xferCopy(reconMesh.faceNeighbour()),
         reconPatchSizes,
         reconPatchStarts,
+        resetFvPatchFlag,
         true                       // Valid boundary
     );
-
-    Pout<< "faceOwner: " << faceOwner() << nl
-        << "faceNeighbour: " << faceNeighbour() << nl
-        << "boundary: " << boundaryMesh() << endl;
+    Pout<< "BMESH: " << boundaryMesh() << endl;
 
     // To Do: build a reconstructor from addressing data
 
