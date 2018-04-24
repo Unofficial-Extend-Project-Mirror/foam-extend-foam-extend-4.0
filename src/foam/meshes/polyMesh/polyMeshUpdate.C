@@ -36,6 +36,9 @@ Description
 
 void Foam::polyMesh::updateMesh(const mapPolyMesh& mpm)
 {
+    // Mesh is changing
+    changing(true);
+
     // Update zones.  Since boundary depends on zones, they need to be
     // updated first.  HJ, 20/May/2014
     pointZones_.updateMesh();
