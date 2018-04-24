@@ -539,8 +539,8 @@ public:
             void removeZones();
 
             //- Reset mesh primitive data. Assumes all patch info correct
-            //  (so does e.g. parallel communication). If not use
-            //  validBoundary=false
+            //  (so does e.g. parallel communication). If not, use
+            //  validBoundary = false
             //  (still assumes patchStarts[0] = nInternalFaces and last
             //  patch ends at nActiveFaces) and change patches with addPatches.
             void resetPrimitives

@@ -579,6 +579,36 @@ void Foam::polyPatch::syncOrder() const
 {}
 
 
+void Foam::polyPatch::resetPatch
+(
+    const label newSize,
+    const label newStart
+)
+{
+    // Clear all data
+    clearAddressing();
+    
+    // Reset start and primitive patch
+    start_ = newStart;
+    
+    primitivePatch::operator=
+    (
+        primitivePatch
+        (
+            faceSubList
+            (
+                boundaryMesh_.mesh().allFaces(),
+                newSize,
+                newStart
+            ),
+            boundaryMesh_.mesh().allPoints()
+        )
+    );
+
+    Pout<< "Patch reset: faceCells: " << faceCells() << endl;
+}
+
+
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 void Foam::polyPatch::operator=(const polyPatch& p)

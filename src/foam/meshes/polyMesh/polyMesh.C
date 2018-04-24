@@ -719,6 +719,9 @@ void Foam::polyMesh::resetPrimitives
     // Clear addressing. Keep geometric props for mapping.
     clearAddressing();
 
+    // Clear everything
+    clearOut();
+
     // Take over new primitive data.
     // Optimized to avoid overwriting data at all
     if (!pts().empty())
@@ -748,18 +751,15 @@ void Foam::polyMesh::resetPrimitives
 
 
     // Reset patch sizes and starts
+    Pout<< "Resetting patches: starts: " << patchStarts << endl;
     forAll (boundary_, patchI)
     {
-        boundary_[patchI] = polyPatch
+        boundary_[patchI].resetPatch
         (
-            boundary_[patchI].name(),
             patchSizes[patchI],
-            patchStarts[patchI],
-            patchI,
-            boundary_
+            patchStarts[patchI]
         );
     }
-
 
     // Flags the mesh files as being changed
     setInstance(time().timeName());
@@ -804,11 +804,9 @@ void Foam::polyMesh::resetPrimitives
         }
     }
 
-
     // Set the primitive mesh from the owner_, neighbour_.
     // Works out from patch end where the active faces stop.
     initMesh();
-
 
     if (validBoundary)
     {

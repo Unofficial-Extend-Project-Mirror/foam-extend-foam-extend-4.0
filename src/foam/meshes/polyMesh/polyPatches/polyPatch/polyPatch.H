@@ -464,6 +464,13 @@ public:
         //  but is happening on other processors
         virtual void syncOrder() const;
 
+        //- Reset patch
+        virtual void resetPatch
+        (
+            const label newSize,
+            const label newStart
+        );
+
 
     // Member operators
 
