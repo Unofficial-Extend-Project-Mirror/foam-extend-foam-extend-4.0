@@ -1,0 +1,4 @@
+The conservative overlapping GGI needs certain top level changes for solvers
+other than potentialFoam. Basically, all parts that make up the flux on the RHS
+of pressure equation need to be interpolated together. This is not the case with
+the latest version of time and under-relaxation consistent solvers.
