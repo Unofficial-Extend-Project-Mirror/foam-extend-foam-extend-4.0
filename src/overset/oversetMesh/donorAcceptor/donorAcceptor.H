@@ -122,6 +122,15 @@ public:
 
         //- Construct null
         inline donorAcceptor()
+        :
+            acceptorCell_(-1),
+            acceptorProcNo_(-1),
+            acceptorPoint_(vector::zero),
+            donorCell_(-1),
+            donorProcNo_(-1),
+            donorPoint_(vector::zero),
+            extendedDonorCells_(),
+            extendedDonorPoints_()
         {}
 
         //- Construct from acceptor data
