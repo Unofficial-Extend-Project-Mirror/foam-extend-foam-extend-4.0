@@ -1,6 +1,7 @@
 extrudeModel/extrudeModel.C
 extrudeModel/newExtrudeModel.C
 linearNormal/linearNormal.C
+gradedNormal/gradedNormal.C
 linearRadial/linearRadial.C
 sigmaRadial/sigmaRadial.C
 wedge/wedge.C
