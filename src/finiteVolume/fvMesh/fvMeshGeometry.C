@@ -360,7 +360,7 @@ void fvMesh::updatePhi(const scalarField& sweptVols) const
     // HJ, 22/Dec/2017
     V0();
     V();
-    
+
     // Boundary update.  Used in complex geometries, eg. immersed boundary
     // HJ, 29/Nov/2017
     forAll (phi.boundaryField(), patchI)
