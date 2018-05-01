@@ -31,6 +31,8 @@ License
 #include "mapPolyMesh.H"
 #include "addToRunTimeSelectionTable.H"
 
+#include "GeoMesh.H"
+
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
@@ -113,7 +115,6 @@ Foam::loadBalanceFvMesh::loadBalanceFvMesh(const IOobject& io)
 
         imbalanceTrigger_ = 0.8;
     }
-
 }
 
 
@@ -202,52 +203,93 @@ bool Foam::loadBalanceFvMesh::update()
 
 
     // Split the mesh and fields over processors and send
+
+    // Prepare receiving side
+
+    // Create the reconstructor
+    processorMeshesReconstructor meshRecon("reconstructed");
+
+    PtrList<fvMesh>& procMeshes = meshRecon.meshes();
+    procMeshes.setSize(meshDecomp.nProcs());
+
+    // Collect local fields for decomposition
+    clearOut();
+    
+    // Collect fields for load balancing
+    HashTable<const volScalarField*> volScalarFields =
+        thisDb().lookupClass<volScalarField>();
+    Pout<< "volScalarFields: " << volScalarFields.sortedToc() << endl;
+    HashTable<const volVectorField*>volVectorFields =
+        thisDb().lookupClass<volVectorField>();
+    Pout<< "volVectorFields: " << volVectorFields.sortedToc() << endl;
+    HashTable<const surfaceScalarField*> surfaceScalarFields =
+        thisDb().lookupClass<surfaceScalarField>();
+    Pout<< "surfaceScalarFields: " << surfaceScalarFields.sortedToc() << endl;
+    //HJ, HERE: remove the fields that should not be load balanced
+
+    // Prepare fields for reconstruction
+    // First index: field index from volScalarFields
+    // Second index: processor entry for the field
+    List<PtrList<volScalarField> > receivedVolScalarFields
+    (
+        volScalarFields.size()
+    );
+
+    List<PtrList<volVectorField> > receivedVolVectorFields
+    (
+       volVectorFields.size()
+    );
+
+    List<PtrList<surfaceScalarField> > receivedSurfaceScalarFields
+    (
+        surfaceScalarFields.size()
+    );
+
+    forAll (receivedVolScalarFields, fieldI)
+    {
+        receivedVolScalarFields[fieldI].setSize(Pstream::nProcs());
+    }
+
+    forAll (receivedVolVectorFields, fieldI)
+    {
+        receivedVolVectorFields[fieldI].setSize(Pstream::nProcs());
+    }
+
+    forAll (receivedSurfaceScalarFields, fieldI)
+    {
+        receivedSurfaceScalarFields[fieldI].setSize(Pstream::nProcs());
+    }
+
     for (label procI = 0; procI < meshDecomp.nProcs(); procI++)
     {
-        if (procI != Pstream::myProcNo())
+        // Check if there is a mesh to send
+        if (curMigratedCells[procI] > 0)
         {
-            Pout<< "Send mesh and fields to processor " << procI << endl;
+            // Send mesh and field to processor procI
 
-            // Check if there is a mesh to send
-            if (curMigratedCells[procI] > 0)
+            // Get mesh from decomposition
+            autoPtr<fvMesh> procMeshPtr = meshDecomp.processorMesh
+            (
+                procI,
+                time(),
+                "processorPart" + Foam::name(procI),
+                true    // Create passive processor patches
+            );
+            fvMesh& procMesh = procMeshPtr();
+
+            // Create a field decomposer
+            fvFieldDecomposer fieldDecomposer
+            (
+                *this,
+                procMesh,
+                meshDecomp.procFaceAddressing()[procI],
+                meshDecomp.procCellAddressing()[procI],
+                meshDecomp.procBoundaryAddressing()[procI]
+            );
+
+            if (procI != Pstream::myProcNo())
             {
-                // Send mesh and field to processor procI
-
-                // Get mesh from decomposition
-                autoPtr<fvMesh> procMeshPtr = meshDecomp.processorMesh
-                (
-                    procI,
-                    time(),
-                    "processorPart" + Foam::name(procI),
-                    true    // Create passive processor patches
-                );
-                fvMesh& procMesh = procMeshPtr();
-
-                // Create a field decomposer
-                fvFieldDecomposer fieldDecomposer
-                (
-                    *this,
-                    procMesh,
-                    meshDecomp.procFaceAddressing()[procI],
-                    meshDecomp.procCellAddressing()[procI],
-                    meshDecomp.procBoundaryAddressing()[procI]
-                );
-/*
-                // Simple test only: rebalance volScalarFields
-                HashTable<const volScalarField*> volScalarFields =
-                    thisDb().lookupClass<volScalarField>();
-
-                for
-                (
-                    HashTable<const volScalarField*>::const_iterator iter =
-                        volScalarFields.begin();
-                    iter != volScalarFields.end();
-                    ++iter
-                )
-                {
-                    fieldDecomposer.decomposeField(*(iter()));
-                }
-*/
+                Pout<< "Send mesh and fields to processor " << procI << endl;
 
                 OPstream toProc
                 (
@@ -256,44 +298,54 @@ bool Foam::loadBalanceFvMesh::update()
                 );
 
                 // Send the mesh and fields to target processor
-                toProc << procMesh;
+                toProc << procMesh << nl;
+
+                // Send fields
+                sendFields(volScalarFields, fieldDecomposer, toProc);
+                sendFields(volVectorFields, fieldDecomposer, toProc);
+                sendFields(surfaceScalarFields, fieldDecomposer, toProc);
+            }
+            else
+            {
+                // My processor.  Grab mesh and fields
+                // Note: procI == Pstream::myProcNo()
+                // HJ, 26/Apr/2018
+
+                // Set local mesh piece
+                procMeshes.set
+                (
+                    procI,
+                    procMeshPtr
+                );
+
+                // Set local fields
+                // Note: first index is field index and second index is procI
+                insertFields
+                (
+                    volScalarFields,
+                    fieldDecomposer,
+                    receivedVolScalarFields
+                );
+
+                insertFields
+                (
+                    volVectorFields,
+                    fieldDecomposer,
+                    receivedVolVectorFields
+                );
+
+                insertFields
+                (
+                    surfaceScalarFields,
+                    fieldDecomposer,
+                    receivedSurfaceScalarFields
+                );
             }
         }
     }
 
 
     // Collect pieces of mesh and fields from other processors
-
-    // Create a list of processor meshes
-    // Create the reconstructor
-    processorMeshesReconstructor meshRecon("reconstructed");
-
-    PtrList<fvMesh>& procMeshes = meshRecon.meshes();
-    procMeshes.setSize(meshDecomp.nProcs());
-
-    List<PtrList<volScalarField*> > receiveVolScalarFields
-    (
-        meshDecomp.nProcs()
-    );
-
-    // Insert own mesh if there is a piece to insert
-    if (curMigratedCells[Pstream::myProcNo()] > 0)
-    {
-        procMeshes.set
-        (
-            Pstream::myProcNo(),
-            meshDecomp.processorMesh
-            (
-                Pstream::myProcNo(),
-                time(),
-                "processorPart" + Foam::name(Pstream::myProcNo()),
-                true    // Create passive processor patches
-            )
-        );
-
-        // Set local fields
-    }
-
     for (label procI = 0; procI < meshDecomp.nProcs(); procI++)
     {
         if (procI != Pstream::myProcNo())
@@ -330,12 +382,36 @@ bool Foam::loadBalanceFvMesh::update()
                     )
                 );
 
-                // Receive the fields
+                // Receive fields
+                // Note: first index is field index and second index is procI
+                receiveFields
+                (
+                    procI,
+                    receivedVolScalarFields,
+                    procMeshes[procI],
+                    fromProc
+                );
+
+                receiveFields
+                (
+                    procI,
+                    receivedVolVectorFields,
+                    procMeshes[procI],
+                    fromProc
+                );
+
+                receiveFields
+                (
+                    procI,
+                    receivedSurfaceScalarFields,
+                    procMeshes[procI],
+                    fromProc
+                );
             }
         }
     }
 
-    
+
     // Create the reconstructed mesh
     autoPtr<fvMesh> reconstructedMeshPtr =
         meshRecon.reconstructMesh(time());
@@ -398,27 +474,27 @@ bool Foam::loadBalanceFvMesh::update()
     }
 
     // Delete processor patches from old boundary
-    boolList patchesToReplace(bMesh.size(), false);
+    boolList patchFlag(bMesh.size(), false);
 
     forAll (bMesh, patchI)
     {
         // If the patch is not set, the slot is available for re-use
         if (!bMesh.set(patchI))
         {
-            patchesToReplace[patchI] = true;
+            patchFlag[patchI] = true;
         }
         else if (isA<processorPolyPatch>(bMesh[patchI]))
         {
             // If the patch is set and contains an "old" processor patch
             // the old patch will be deleted and replaced with a new one
-            patchesToReplace[patchI] = true;
+            patchFlag[patchI] = true;
         }
     }
 
     // Store the resetFvPatchFlag to indicate patches that will be rebuilt
-    // patchesToReplace will be used in further signalling
-    boolList resetFvPatchFlag = patchesToReplace;
-    
+    // patchFlag will be used in further signalling
+    boolList resetFvPatchFlag = patchFlag;
+
     // Check alignment and types of old and new boundary
     // Insert new patches processor patches
     // Collect patch sizes and starts
@@ -428,7 +504,7 @@ bool Foam::loadBalanceFvMesh::update()
     forAll (bMesh, patchI)
     {
         // If the patch is preserved, types need to match
-        if (!patchesToReplace[patchI])
+        if (!patchFlag[patchI])
         {
             const polyPatch& bPatch = bMesh[patchI];
             const polyPatch& reconBPatch = reconBMesh[patchI];
@@ -473,18 +549,18 @@ bool Foam::loadBalanceFvMesh::update()
             for
             (
                 nextPatchSlot = 0;
-                nextPatchSlot < patchesToReplace.size();
+                nextPatchSlot < patchFlag.size();
                 nextPatchSlot++
             )
             {
-                if (patchesToReplace[nextPatchSlot])
+                if (patchFlag[nextPatchSlot])
                 {
                     // Found a patch slot
                     break;
                 }
             }
 
-            if (nextPatchSlot >= patchesToReplace.size())
+            if (nextPatchSlot >= patchFlag.size())
             {
                 FatalErrorIn("bool loadBalanceFvMesh::update()")
                     << "Cannot find available patch slot: " << nextPatchSlot
@@ -523,7 +599,7 @@ bool Foam::loadBalanceFvMesh::update()
             );
 
             // Mark patch slot as used
-            patchesToReplace[nextPatchSlot] = false;
+            patchFlag[nextPatchSlot] = false;
 
             // Collect size
             reconPatchSizes[nextPatchSlot] = reconBMesh[reconPatchI].size();
@@ -558,22 +634,71 @@ bool Foam::loadBalanceFvMesh::update()
         true                       // Valid boundary
     );
 
+    Pout<< "New mesh: points " << nPoints()
+        << " faces: " << nFaces()
+        << " internal: " << nInternalFaces()
+        << " cells: " << nCells()
+        << " patches: " << reconPatchSizes.size() << endl;
+
+    forAll (procMeshes, procI)
+    {
+        Pout<< "procMesh " << procI
+            << " points " << procMeshes[procI].nPoints()
+            << " faces: " << procMeshes[procI].nFaces()
+            << " internal: " << procMeshes[procI].nInternalFaces()
+            << " cells: " << procMeshes[procI].nCells()
+            << " patches: " << procMeshes[procI].boundary().size()
+            << endl;
+    }
+
+    // Pout<< "RECON face: " << meshRecon.faceProcAddressing() << nl
+    //     << " cell: " << meshRecon.cellProcAddressing() << nl
+    //     << " boundary: " << meshRecon.boundaryProcAddressing() << nl
+    //     << endl;
+
+
     // To Do: build a reconstructor from addressing data
     Pout<< nl << nl
         << "FINISHED CYCLE" << nl << nl << nl
         << endl;
 
-    write();
+    // Create a dummy mapping object to re-size all fields
 
     // Create field reconstructor
-    // fvFieldReconstructor fieldReconstructor
-    // (
-    //     *this,
-    //     procMeshes,
-    //     meshRecon.faceProcAddressing(),
-    //     meshRecon.cellProcAddressing(),
-    //     meshRecon.boundaryProcAddressing()
-    // );
+    fvFieldReconstructor fieldReconstructor
+    (
+        *this,
+        procMeshes,
+        meshRecon.faceProcAddressing(),
+        meshRecon.cellProcAddressing(),
+        meshRecon.boundaryProcAddressing()
+    );
+
+    // Rebuild fields
+
+    rebuildFields
+    (
+        volScalarFields,
+        fieldReconstructor,
+        receivedVolScalarFields,
+        resetFvPatchFlag
+    );
+
+    rebuildFields
+    (
+        volVectorFields,
+        fieldReconstructor,
+        receivedVolVectorFields,
+        resetFvPatchFlag
+    );
+
+    rebuildFields
+    (
+        surfaceScalarFields,
+        fieldReconstructor,
+        receivedSurfaceScalarFields,
+        resetFvPatchFlag
+    );
 
     return true;
 }

@@ -44,7 +44,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                     Class loadBalanceFvMesh Declaration
+                      Class loadBalanceFvMesh Declaration
 \*---------------------------------------------------------------------------*/
 
 class loadBalanceFvMesh
@@ -71,6 +71,44 @@ class loadBalanceFvMesh
         //- Check balance.  Return true if re-balancing is required
         bool checkLoadBalance(const scalarField& weights) const;
 
+        //- Send fields to other processor
+        template<class GeoField, class Decomposer>
+        void sendFields
+        (
+            const HashTable<const GeoField*>& geoFields,
+            const Decomposer& decomposer,
+            Ostream& toProc
+        ) const;
+
+        //- Insert local fields
+        template<class GeoField, class Decomposer>
+        void insertFields
+        (
+            const HashTable<const GeoField*>& geoFields,
+            const Decomposer& decomposer,
+            List<PtrList<GeoField> >& localFields
+        ) const;
+
+        //- Receive fields from other processor
+        template<class GeoMesh, class GeoField>
+        void receiveFields
+        (
+            const label procIndex,
+            List<PtrList<GeoField> >& receivedFields,
+            const GeoMesh& procMesh,
+            Istream& fromProc
+        ) const;
+
+        //- Resize and rebuild fields
+        template<class GeoField, class Reconstructor>
+        void rebuildFields
+        (
+            const HashTable<const GeoField*>& geoFields,
+            const Reconstructor& reconstructor,
+            const List<PtrList<GeoField> >& receivedFields,
+            const boolList& patchesToReplace
+        ) const;
+
 
 public:
 
@@ -94,6 +132,12 @@ public:
         virtual bool update();
 };
 
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "loadBalanceFvMeshTemplates.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
