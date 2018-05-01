@@ -37,7 +37,7 @@ License
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-void Foam::fvFieldReconstructor::reconstructFvVolumeField
+void Foam::fvFieldReconstructor::reconstructField
 (
     GeometricField<Type, fvPatchField, volMesh>& reconField,
     const PtrList<GeometricField<Type, fvPatchField, volMesh> >& procFields
@@ -126,6 +126,124 @@ void Foam::fvFieldReconstructor::reconstructFvVolumeField
 
                             bouField[curBPatch][curPatchFace] =
                                 curProcPatch[faceI];
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+template<class Type>
+void Foam::fvFieldReconstructor::reconstructField
+(
+    GeometricField<Type, fvsPatchField, surfaceMesh>& reconField,
+    const PtrList<GeometricField<Type, fvsPatchField, surfaceMesh> >& procFields
+) const
+{
+    // Create the internalField
+    Field<Type>& iField = reconField.internalField();
+
+    typename GeometricField<Type, fvsPatchField, surfaceMesh>::
+        GeometricBoundaryField& bouField = reconField.boundaryField();
+
+    forAll (procFields, procI)
+    {
+        if (procFields.set(procI))
+        {
+            const GeometricField<Type, fvsPatchField, surfaceMesh>& procField =
+                procFields[procI];
+
+            // Set the face values in the reconstructed field
+
+            // It is necessary to create a copy of the addressing array to
+            // take care of the face direction offset trick.
+            //
+            {
+                labelList curAddr(faceProcAddressing_[procI]);
+
+                forAll (curAddr, addrI)
+                {
+                    curAddr[addrI] -= 1;
+                }
+
+                iField.rmap
+                (
+                    procField.internalField(),
+                    curAddr
+                );
+            }
+
+            // Set the boundary patch values in the reconstructed field
+            forAll (boundaryProcAddressing_[procI], patchI)
+            {
+                // Get patch index of the original patch
+                const label curBPatch = boundaryProcAddressing_[procI][patchI];
+
+                // Get addressing slice for this patch
+                const labelList::subList cp =
+                    procMeshes_[procI].boundary()[patchI].patchSlice
+                    (
+                        faceProcAddressing_[procI]
+                    );
+
+                // Check if the boundary patch is not a processor patch
+                if (curBPatch >= 0)
+                {
+                    // Regular patch. Fast looping
+                    const label curPatchStart =
+                        mesh_.boundaryMesh()[curBPatch].start();
+
+                    labelList reverseAddressing(cp.size());
+
+                    forAll (cp, faceI)
+                    {
+                        // Subtract one to take into account offsets for
+                        // face direction.
+                        reverseAddressing[faceI] =
+                            cp[faceI] - 1 - curPatchStart;
+                    }
+
+                    bouField[curBPatch].rmap
+                    (
+                        procField.boundaryField()[patchI],
+                        reverseAddressing
+                    );
+                }
+                else
+                {
+                    const Field<Type>& curProcPatch =
+                        procField.boundaryField()[patchI];
+
+                    // In processor patches, there's a mix of internal faces
+                    // (some of them turned) and possible cyclics. Slow loop
+                    forAll (cp, faceI)
+                    {
+                        label curF = cp[faceI] - 1;
+
+                        // Is the face turned the right side round
+                        if (curF >= 0)
+                        {
+                            // Is the face on the boundary?
+                            if (curF >= mesh_.nInternalFaces())
+                            {
+                                label curBPatch =
+                                    mesh_.boundaryMesh().whichPatch(curF);
+
+                                // Add the face
+                                label curPatchFace =
+                                    mesh_.boundaryMesh()
+                                    [curBPatch].whichFace(curF);
+
+                                bouField[curBPatch][curPatchFace] =
+                                    curProcPatch[faceI];
+                            }
+                            else
+                            {
+                                // Internal face
+                                iField[curF] = curProcPatch[faceI];
+                            }
                         }
                     }
                 }
@@ -262,131 +380,13 @@ Foam::fvFieldReconstructor::reconstructFvVolumeField
     );
 
     // Reconstruct field
-    reconstructFvVolumeField
+    this->reconstructField
     (
         treconField(),
         procFields
     );
 
     return treconField;
-}
-
-
-template<class Type>
-void Foam::fvFieldReconstructor::reconstructFvSurfaceField
-(
-    GeometricField<Type, fvsPatchField, surfaceMesh>& reconField,
-    const PtrList<GeometricField<Type, fvsPatchField, surfaceMesh> >& procFields
-) const
-{
-    // Create the internalField
-    Field<Type>& iField = reconField.internalField();
-
-    typename GeometricField<Type, fvsPatchField, surfaceMesh>::
-        GeometricBoundaryField& bouField = reconField.boundaryField();
-
-    forAll (procFields, procI)
-    {
-        if (procFields.set(procI))
-        {
-            const GeometricField<Type, fvsPatchField, surfaceMesh>& procField =
-                procFields[procI];
-
-            // Set the face values in the reconstructed field
-
-            // It is necessary to create a copy of the addressing array to
-            // take care of the face direction offset trick.
-            //
-            {
-                labelList curAddr(faceProcAddressing_[procI]);
-
-                forAll (curAddr, addrI)
-                {
-                    curAddr[addrI] -= 1;
-                }
-
-                iField.rmap
-                (
-                    procField.internalField(),
-                    curAddr
-                );
-            }
-
-            // Set the boundary patch values in the reconstructed field
-            forAll (boundaryProcAddressing_[procI], patchI)
-            {
-                // Get patch index of the original patch
-                const label curBPatch = boundaryProcAddressing_[procI][patchI];
-
-                // Get addressing slice for this patch
-                const labelList::subList cp =
-                    procMeshes_[procI].boundary()[patchI].patchSlice
-                    (
-                        faceProcAddressing_[procI]
-                    );
-
-                // Check if the boundary patch is not a processor patch
-                if (curBPatch >= 0)
-                {
-                    // Regular patch. Fast looping
-                    const label curPatchStart =
-                        mesh_.boundaryMesh()[curBPatch].start();
-
-                    labelList reverseAddressing(cp.size());
-
-                    forAll (cp, faceI)
-                    {
-                        // Subtract one to take into account offsets for
-                        // face direction.
-                        reverseAddressing[faceI] =
-                            cp[faceI] - 1 - curPatchStart;
-                    }
-
-                    bouField[curBPatch].rmap
-                    (
-                        procField.boundaryField()[patchI],
-                        reverseAddressing
-                    );
-                }
-                else
-                {
-                    const Field<Type>& curProcPatch =
-                        procField.boundaryField()[patchI];
-
-                    // In processor patches, there's a mix of internal faces
-                    // (some of them turned) and possible cyclics. Slow loop
-                    forAll (cp, faceI)
-                    {
-                        label curF = cp[faceI] - 1;
-
-                        // Is the face turned the right side round
-                        if (curF >= 0)
-                        {
-                            // Is the face on the boundary?
-                            if (curF >= mesh_.nInternalFaces())
-                            {
-                                label curBPatch =
-                                    mesh_.boundaryMesh().whichPatch(curF);
-
-                                // Add the face
-                                label curPatchFace =
-                                    mesh_.boundaryMesh()
-                                    [curBPatch].whichFace(curF);
-
-                                bouField[curBPatch][curPatchFace] =
-                                    curProcPatch[faceI];
-                            }
-                            else
-                            {
-                                // Internal face
-                                iField[curF] = curProcPatch[faceI];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
 
 
@@ -517,7 +517,7 @@ Foam::fvFieldReconstructor::reconstructFvSurfaceField
     );
 
     // Reconstruct field
-    reconstructFvSurfaceField
+    reconstructField
     (
         treconField(),
         procFields

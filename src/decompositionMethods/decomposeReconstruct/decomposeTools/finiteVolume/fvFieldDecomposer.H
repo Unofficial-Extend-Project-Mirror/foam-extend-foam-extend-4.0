@@ -253,9 +253,8 @@ public:
         );
 
 
-    // Destructor
-
-        ~fvFieldDecomposer();
+    //- Destructor
+    ~fvFieldDecomposer();
 
 
     // Member Functions

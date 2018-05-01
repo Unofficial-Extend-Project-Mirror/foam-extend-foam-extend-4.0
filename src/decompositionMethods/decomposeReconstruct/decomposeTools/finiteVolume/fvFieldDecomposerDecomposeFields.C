@@ -47,38 +47,45 @@ fvFieldDecomposer::decomposeField
     // Create and map the patch field values
     PtrList<fvPatchField<Type> > patchFields(boundaryAddressing_.size());
 
-    forAll (boundaryAddressing_, patchi)
+    forAll (boundaryAddressing_, patchI)
     {
-        if (boundaryAddressing_[patchi] >= 0)
+        if (boundaryAddressing_[patchI] >= 0)
         {
             patchFields.set
             (
-                patchi,
+                patchI,
                 fvPatchField<Type>::New
                 (
-                    field.boundaryField()[boundaryAddressing_[patchi]],
-                    procMesh_.boundary()[patchi],
+                    field.boundaryField()[boundaryAddressing_[patchI]],
+                    procMesh_.boundary()[patchI],
                     DimensionedField<Type, volMesh>::null(),
-                    *patchFieldDecomposerPtrs_[patchi]
+                    *patchFieldDecomposerPtrs_[patchI]
                 )
             );
         }
         else
         {
+            // This will be a processor or passiveProcessor field,
+            // depending on the patch type.  Construct it first and set the
+            // data by hand
             patchFields.set
             (
-                patchi,
-                new processorFvPatchField<Type>
+                patchI,
+                fvPatchField<Type>::New
+                // new processorFvPatchField<Type>
                 (
-                    procMesh_.boundary()[patchi],
-                    DimensionedField<Type, volMesh>::null(),
-                    Field<Type>
-                    (
-                        field.internalField(),
-                        *processorVolPatchFieldDecomposerPtrs_[patchi]
-                    )
+                    procMesh_.boundary()[patchI].type(),
+                    procMesh_.boundary()[patchI],
+                    DimensionedField<Type, volMesh>::null()
                 )
             );
+
+            patchFields[patchI] ==
+                Field<Type>
+                (
+                    field.internalField(),
+                    *processorVolPatchFieldDecomposerPtrs_[patchI]
+                );
         }
     }
 
@@ -135,7 +142,9 @@ fvFieldDecomposer::decomposeField
     // faces and faces from cyclic boundaries. This is a bit of a hack, but
     // I cannot find a better solution without making the internal storage
     // mechanism for surfaceFields correspond to the one of faces in polyMesh
-    // (i.e. using slices)
+    // (i.e. using slices). HJ, date unknown, before 2004
+
+    // Copy all face data into a single array across all patches
     Field<Type> allFaceField(field.mesh().nFaces());
 
     forAll (field.internalField(), i)
@@ -143,11 +152,11 @@ fvFieldDecomposer::decomposeField
         allFaceField[i] = field.internalField()[i];
     }
 
-    forAll (field.boundaryField(), patchi)
+    forAll (field.boundaryField(), patchI)
     {
-        const Field<Type> & p = field.boundaryField()[patchi];
+        const Field<Type> & p = field.boundaryField()[patchI];
 
-        const label patchStart = field.mesh().boundaryMesh()[patchi].start();
+        const label patchStart = field.mesh().boundaryMesh()[patchI].start();
 
         forAll (p, i)
         {
@@ -158,38 +167,45 @@ fvFieldDecomposer::decomposeField
     // Create and map the patch field values
     PtrList<fvsPatchField<Type> > patchFields(boundaryAddressing_.size());
 
-    forAll (boundaryAddressing_, patchi)
+    forAll (boundaryAddressing_, patchI)
     {
-        if (boundaryAddressing_[patchi] >= 0)
+        if (boundaryAddressing_[patchI] >= 0)
         {
             patchFields.set
             (
-                patchi,
+                patchI,
                 fvsPatchField<Type>::New
                 (
-                    field.boundaryField()[boundaryAddressing_[patchi]],
-                    procMesh_.boundary()[patchi],
+                    field.boundaryField()[boundaryAddressing_[patchI]],
+                    procMesh_.boundary()[patchI],
                     DimensionedField<Type, surfaceMesh>::null(),
-                    *patchFieldDecomposerPtrs_[patchi]
+                    *patchFieldDecomposerPtrs_[patchI]
                 )
             );
         }
         else
         {
+            // This will be a processor or passiveProcessor field,
+            // depending on the patch type.  Construct it first and set the
+            // data by hand
             patchFields.set
             (
-                patchi,
-                new processorFvsPatchField<Type>
+                patchI,
+                fvsPatchField<Type>::New
+                // new processorFvsPatchField<Type>
                 (
-                    procMesh_.boundary()[patchi],
-                    DimensionedField<Type, surfaceMesh>::null(),
-                    Field<Type>
-                    (
-                        allFaceField,
-                        *processorSurfacePatchFieldDecomposerPtrs_[patchi]
-                    )
+                    procMesh_.boundary()[patchI].type(),
+                    procMesh_.boundary()[patchI],
+                    DimensionedField<Type, surfaceMesh>::null()
                 )
             );
+
+            patchFields[patchI] ==
+                Field<Type>
+                (
+                    allFaceField,
+                    *processorSurfacePatchFieldDecomposerPtrs_[patchI]
+                );
         }
     }
 

@@ -153,57 +153,65 @@ public:
 
     // Member Functions
 
-        //- Reconstruct volume field data into a given field
-        //  If a PtrList slot is empty, it is skipped
-        template<class Type>
-        void reconstructFvVolumeField
-        (
-            GeometricField<Type, fvPatchField, volMesh>& reconField,
-            const PtrList<GeometricField<Type, fvPatchField, volMesh> >&
-                procFields
-        ) const;
+        // Single field reconstruction
+    
+            //- Reconstruct volume field data into a given field
+            //  If a PtrList slot is empty, it is skipped
+            template<class Type>
+            void reconstructField
+            (
+                GeometricField<Type, fvPatchField, volMesh>& reconField,
+                const PtrList<GeometricField<Type, fvPatchField, volMesh> >&
+                    procFields
+            ) const;
 
-        //- Reconstruct volume field
-        template<class Type>
-        tmp<GeometricField<Type, fvPatchField, volMesh> >
-        reconstructFvVolumeField
-        (
-            const IOobject& fieldIoObject
-        ) const;
+            //- Reconstruct volume field data into a given field
+            //  If a PtrList slot is empty, it is skipped
+            template<class Type>
+            void reconstructField
+            (
+                GeometricField<Type, fvsPatchField, surfaceMesh>& reconField,
+                const PtrList<GeometricField<Type, fvsPatchField, surfaceMesh> >&
+                    procFields
+            ) const;
 
-        //- Reconstruct volume field data into a given field
-        //  If a PtrList slot is empty, it is skipped
-        template<class Type>
-        void reconstructFvSurfaceField
-        (
-            GeometricField<Type, fvsPatchField, surfaceMesh>& reconField,
-            const PtrList<GeometricField<Type, fvsPatchField, surfaceMesh> >&
-                procFields
-        ) const;
 
-        //- Reconstruct surface field
-        template<class Type>
-        tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
-        reconstructFvSurfaceField
-        (
-            const IOobject& fieldIoObject
-        ) const;
+        // Reconstruct and return a single field
+    
+            //- Reconstruct volume field
+            template<class Type>
+            tmp<GeometricField<Type, fvPatchField, volMesh> >
+            reconstructFvVolumeField
+            (
+                const IOobject& fieldIoObject
+            ) const;
 
-        //- Reconstruct and write all/selected volume fields
-        template<class Type>
-        void reconstructFvVolumeFields
-        (
-            const IOobjectList& objects,
-            const HashSet<word>& selectedFields
-        ) const;
+            //- Reconstruct surface field
+            template<class Type>
+            tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
+            reconstructFvSurfaceField
+            (
+                const IOobject& fieldIoObject
+            ) const;
 
-        //- Reconstruct and write all/selected volume fields
-        template<class Type>
-        void reconstructFvSurfaceFields
-        (
-            const IOobjectList& objects,
-            const HashSet<word>& selectedFields
-        ) const;
+
+        // Reconstruct and write all/selected fields
+    
+            //- Reconstruct and write all/selected volume fields
+            template<class Type>
+            void reconstructFvVolumeFields
+            (
+                const IOobjectList& objects,
+                const HashSet<word>& selectedFields
+            ) const;
+
+            //- Reconstruct and write all/selected volume fields
+            template<class Type>
+            void reconstructFvSurfaceFields
+            (
+                const IOobjectList& objects,
+                const HashSet<word>& selectedFields
+            ) const;
 };
 
 

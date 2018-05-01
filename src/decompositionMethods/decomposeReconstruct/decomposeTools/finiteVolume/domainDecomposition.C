@@ -207,14 +207,6 @@ Foam::autoPtr<Foam::fvMesh> Foam::domainDecomposition::processorMesh
     }
 
     // Create processor mesh without a boundary
-    Pout<< "RAW MESH: points: " << procPoints.size()
-        << " faces: " << procFaces.size()
-        << " owner: " << procOwner.size()
-        << " procNeighbour: " << procNeighbour.size() << nl
-        << "curPatchSizes: " << procPatchSize_[procI] << nl
-        << " curPatchStarts: " << procPatchStartIndex_[procI] << nl
-        << endl;
-    // Create the mesh
     autoPtr<fvMesh> procMeshPtr
     (
         new fvMesh
