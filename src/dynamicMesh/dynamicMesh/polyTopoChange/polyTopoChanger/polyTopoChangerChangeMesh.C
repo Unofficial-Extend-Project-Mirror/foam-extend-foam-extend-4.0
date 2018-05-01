@@ -2497,6 +2497,9 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh()
         // Increment the morph index
         morphIndex_++;
 
+        // Mark the mesh as changing
+        mesh_.changing(true);
+        
         return topoChangeMap;
     }
     else
@@ -2510,6 +2513,9 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh()
 
             // Sync mesh update
             mesh_.syncUpdateMesh();
+
+            // Mark the mesh as changing
+            mesh_.changing(true);
         }
 
         return autoPtr<mapPolyMesh>(new mapPolyMesh(mesh_));
