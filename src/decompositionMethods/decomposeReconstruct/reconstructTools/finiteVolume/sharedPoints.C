@@ -127,7 +127,7 @@ Foam::labelListList Foam::sharedPoints::procPatchPairs() const
             }
         }
     }
-    Info<< "patch pairs: " << patchPairs << endl;
+
     return patchPairs;
 }
 
