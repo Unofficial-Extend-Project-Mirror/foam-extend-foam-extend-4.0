@@ -566,9 +566,6 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                         procPatchSize_[ownerProc][patchI]++;
                     }
                 }
-                
-                // Processor patch.  Skip it
-                continue;
             }
 
             else if (isA<cyclicFvPatch>(patches[patchI]))
@@ -793,6 +790,8 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
             }
         }
 
+        Pout<< "procPatchSize_: " << procPatchSize_ << endl;
+        
         // Face zone treatment.  HJ, 27/Mar/2009
         // Face zones identified as global will be present on all CPUs
         List<SLList<label> > procZoneFaceList(nProcs_);
@@ -1047,7 +1046,17 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
 
         forAll (oldPatchSizes, patchI)
         {
-            if (!filterEmptyPatches || oldPatchSizes[patchI] > 0)
+            // If filterEmptyPatches is set to true, or a patch is a
+            // processor patch, remove it
+            if
+            (
+                (filterEmptyPatches || isA<processorFvPatch>(patches[patchI]))
+             && oldPatchSizes[patchI] == 0
+            )
+            {
+                // Patch filtered: do nothing
+            }
+            else
             {
                 curBoundaryAddressing[nPatches] = patchI;
 
