@@ -65,6 +65,9 @@ class passiveProcessorPolyPatch
         //- Neighbour processor number
         int neighbProcNo_;
 
+        //- Global processor face index
+        labelList globalFaceIndex_;
+
 
 public:
 
@@ -83,7 +86,8 @@ public:
             const label index,
             const polyBoundaryMesh& bm,
             const int myProcNo,
-            const int neighbProcNo
+            const int neighbProcNo,
+            const labelList& globalFaceIndex
         );
 
         //- Construct from dictionary
@@ -159,6 +163,12 @@ public:
         int neighbProcNo() const
         {
             return neighbProcNo_;
+        }
+
+        //- Return global processor face index
+        const labelList& globalFaceIndex() const
+        {
+            return globalFaceIndex_;
         }
 
         //- Write the polyPatch data as a dictionary

@@ -32,7 +32,6 @@ License
 #include "fvMesh.H"
 #include "OSspecific.H"
 #include "Map.H"
-#include "globalMeshData.H"
 #include "DynamicList.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -52,6 +51,7 @@ Foam::domainDecomposition::domainDecomposition
     decompositionDict_(dict),
     nProcs_(readInt(decompositionDict_.lookup("numberOfSubdomains"))),
     distributed_(false),
+    gfIndex_(mesh_),
     cellToProc_(mesh_.nCells()),
     patchNbrCellToProc_(mesh_.boundaryMesh().size()),
     procPointAddressing_(nProcs_),
@@ -269,8 +269,25 @@ Foam::autoPtr<Foam::fvMesh> Foam::domainDecomposition::processorMesh
 
     if (createPassiveProcPatches)
     {
+        // Creation of passiveProcessor patches requires a global face index
+
+        // Get global index
+        const labelList& globalIndex = gfIndex_.globalLabel();
+
         forAll (curProcessorPatchSizes, procPatchI)
         {
+            // Assemble the global face index for all passive processor patch
+            // faces
+            labelList patchGlobalIndex(curProcessorPatchSizes[procPatchI]);
+
+            const label curPatchStart = curProcessorPatchStarts[procPatchI];
+
+            forAll (patchGlobalIndex, fI)
+            {
+                patchGlobalIndex[fI] =
+                    globalIndex[mag(curFaceLabels[curPatchStart + fI]) - 1];
+            }
+
             procPatches[nPatches] =
                 new passiveProcessorPolyPatch
                 (
@@ -282,7 +299,8 @@ Foam::autoPtr<Foam::fvMesh> Foam::domainDecomposition::processorMesh
                     nPatches,
                     procMesh.boundaryMesh(),
                     procI,
-                    curNeighbourProcessors[procPatchI]
+                    curNeighbourProcessors[procPatchI],
+                    patchGlobalIndex
                 );
 
             nPatches++;

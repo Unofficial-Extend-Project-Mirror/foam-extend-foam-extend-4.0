@@ -60,13 +60,25 @@ Foam::passiveProcessorPolyPatch::passiveProcessorPolyPatch
     const label index,
     const polyBoundaryMesh& bm,
     const int myProcNo,
-    const int neighbProcNo
+    const int neighbProcNo,
+    const labelList& globalFaceIndex
 )
 :
     polyPatch(name, size, start, index, bm),
     myProcNo_(myProcNo),
-    neighbProcNo_(neighbProcNo)
-{}
+    neighbProcNo_(neighbProcNo),
+    globalFaceIndex_(globalFaceIndex)
+{
+    if (globalFaceIndex.size() != size)
+    {
+        FatalErrorIn
+        (
+            "passiveProcessorPolyPatch::passiveProcessorPolyPatch(...)"
+        )   << "Bad global index list.  Patch size: " << this->size()
+            << " global index size: " << globalFaceIndex.size()
+            << abort(FatalError);
+    }
+}
 
 
 Foam::passiveProcessorPolyPatch::passiveProcessorPolyPatch
@@ -79,7 +91,8 @@ Foam::passiveProcessorPolyPatch::passiveProcessorPolyPatch
 :
     polyPatch(name, dict, index, bm),
     myProcNo_(readLabel(dict.lookup("myProcNo"))),
-    neighbProcNo_(readLabel(dict.lookup("neighbProcNo")))
+    neighbProcNo_(readLabel(dict.lookup("neighbProcNo"))),
+    globalFaceIndex_(dict.lookup("globalFaceIndex"))
 {}
 
 
@@ -91,7 +104,8 @@ Foam::passiveProcessorPolyPatch::passiveProcessorPolyPatch
 :
     polyPatch(pp, bm),
     myProcNo_(pp.myProcNo_),
-    neighbProcNo_(pp.neighbProcNo_)
+    neighbProcNo_(pp.neighbProcNo_),
+    globalFaceIndex_(pp.size(), -1)
 {}
 
 
@@ -106,7 +120,8 @@ Foam::passiveProcessorPolyPatch::passiveProcessorPolyPatch
 :
     polyPatch(pp, bm, index, newSize, newStart),
     myProcNo_(pp.myProcNo_),
-    neighbProcNo_(pp.neighbProcNo_)
+    neighbProcNo_(pp.neighbProcNo_),
+    globalFaceIndex_(newSize, -1)  // Cannot set global index.  HJ, 4/May/2018
 {}
 
 
@@ -125,6 +140,8 @@ void Foam::passiveProcessorPolyPatch::write(Ostream& os) const
         << token::END_STATEMENT << nl;
     os.writeKeyword("neighbProcNo") << neighbProcNo_
         << token::END_STATEMENT << nl;
+
+    globalFaceIndex_.writeEntry("globalFaceIndex", os);
 }
 
 

@@ -42,6 +42,7 @@ SourceFiles
 #include "SLList.H"
 #include "PtrList.H"
 #include "point.H"
+#include "globalProcFaceIndex.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -68,6 +69,9 @@ class domainDecomposition
         //- Is the decomposition data to be distributed for each processor
         bool distributed_;
 
+        //- Global face index
+        globalProcFaceIndex gfIndex_;
+    
         //- Processor label for each cell
         labelList cellToProc_;
 
