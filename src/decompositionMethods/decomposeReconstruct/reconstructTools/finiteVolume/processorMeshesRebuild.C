@@ -26,6 +26,7 @@ License
 #include "processorMeshesReconstructor.H"
 #include "processorPolyPatch.H"
 #include "passiveProcessorPolyPatch.H"
+#include "SortableList.H"
 #include "sharedPoints.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -648,6 +649,127 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
     // on the same processor
     sharedPoints sharedData(meshes_);
 
+    // Before assembling the meshes, create unique ordering for all passive
+    // processor patches that will be merged.  HJ, 6/May/2018
+
+    // This list gives insert order for every passive processor patch in the
+    // boundary mesh of every processor mesh.
+    // The index gives the location in the reconstructed patch where the
+    // face should be inserted
+    // For other patch types, the list is empty
+    labelListListList passivePatchInsertOrder(meshes_.size());
+
+
+    // Memory management
+    {
+        // This list provides inser offset for the patch to unpack the list
+        labelListList passivePatchInsertOffset(meshes_.size());
+
+        // This list records all global indices from passive faces
+        // (from multiple proc meshes and patches) that will end up together
+        // It refers to the new patches
+        labelListList globalIndexPerNewProcPatch(reconPatchTypes.size());
+
+        forAll (meshes_, procI)
+        {
+            if (meshes_.set(procI))
+            {
+                const polyBoundaryMesh& procPatches =
+                    meshes_[procI].boundaryMesh();
+
+                passivePatchInsertOrder[procI].setSize(procPatches.size());
+                passivePatchInsertOffset[procI].setSize(procPatches.size());
+
+                forAll (procPatches, patchI)
+                {
+                    if (isA<passiveProcessorPolyPatch>(procPatches[patchI]))
+                    {
+                        const passiveProcessorPolyPatch& curPatch =
+                            refCast<const passiveProcessorPolyPatch>
+                            (
+                                procPatches[patchI]
+                            );
+
+                        // Find new patch index in reconstructed boundary
+                        const label pnIndex = patchNameLookup.find
+                            (curPatch.name())();
+
+                        // Record offset
+                        passivePatchInsertOffset[procI][patchI] =
+                            globalIndexPerNewProcPatch[pnIndex].size();
+
+                        // Set or append the global index
+                        globalIndexPerNewProcPatch[pnIndex].append
+                        (
+                            curPatch.globalFaceIndex()
+                        );
+                    }
+                }
+            }
+        }
+
+        // Now all indices and offsets are collected.
+        // Sort each individual list and get sorted index order
+        // Note: this refers to the new patch
+        forAll (globalIndexPerNewProcPatch, newPatchI)
+        {
+            if (!globalIndexPerNewProcPatch[newPatchI].empty())
+            {
+                SortableList<label> sLabels
+                (
+                    globalIndexPerNewProcPatch[newPatchI]
+                );
+
+                // Note: on sort, indices are done the wrong way around:
+                // old index for new location: Re-pack them
+                const labelList& indices = sLabels.indices();
+
+                // Re-use the storage for the insertion index
+                labelList& invIndices = globalIndexPerNewProcPatch[newPatchI];
+
+                forAll (invIndices, i)
+                {
+                    invIndices[indices[i]] = i;
+                }
+            }
+        }
+
+        // Unpack the list for insertion
+        forAll (meshes_, procI)
+        {
+            if (meshes_.set(procI))
+            {
+                const polyBoundaryMesh& procPatches =
+                    meshes_[procI].boundaryMesh();
+
+                forAll (procPatches, patchI)
+                {
+                    if (isA<passiveProcessorPolyPatch>(procPatches[patchI]))
+                    {
+                        const passiveProcessorPolyPatch& curPatch =
+                            refCast<const passiveProcessorPolyPatch>
+                            (
+                                procPatches[patchI]
+                            );
+
+                        // Find new patch index in reconstructed boundary
+                        const label pnIndex = patchNameLookup.find
+                            (curPatch.name())();
+
+                        // Collect offset
+                        passivePatchInsertOrder[procI][patchI] =
+                            labelList::subList
+                            (
+                                globalIndexPerNewProcPatch[pnIndex],
+                                curPatch.size(),
+                                passivePatchInsertOffset[procI][patchI]
+                            );
+                    }
+                }
+            }
+        }
+    }
+
     // Dump first valid mesh without checking
     {
         const label fvmId = firstValidMesh();
@@ -706,7 +828,8 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
         }
 
         // Go through all patches.  For regular patches
-        // dump the faces into patch lists
+        // dump the faces into patch lists and for processor make internal faces
+
         const polyBoundaryMesh& procPatches = curMesh.boundaryMesh();
 
         forAll (procPatches, patchI)
@@ -714,16 +837,18 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
             if (isA<processorPolyPatch>(procPatches[patchI]))
             {
                 // Processor patch: faces become internal faces
-                const processorPolyPatch& procPatch =
+                const processorPolyPatch& curPatch =
                     refCast<const processorPolyPatch>(procPatches[patchI]);
 
                 // Record boundary-processor addressing: unmapped patch
                 bpAddr[patchI] = -1;
 
+                const label patchStart = curPatch.start();
+
                 for
                 (
-                    label faceI = procPatch.start();
-                    faceI < procPatch.start() + procPatch.size();
+                    label faceI = patchStart;
+                    faceI < patchStart + curPatch.size();
                     faceI++
                 )
                 {
@@ -743,6 +868,56 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                     nReconFaces++;
                 }
             }
+            else if (isA<passiveProcessorPolyPatch>(procPatches[patchI]))
+            {
+                // For passive processor patch, faces need to be inserted in
+                // the increasing global face index
+                const passiveProcessorPolyPatch& curPatch =
+                    refCast<const passiveProcessorPolyPatch>
+                    (
+                        procPatches[patchI]
+                    );
+
+                // Find processor patch index in reconstructed boundary
+                const label pnIndex = patchNameLookup.find(curPatch.name())();
+
+                // Record boundary-processor addressing: mapped patch
+                bpAddr[patchI] = pnIndex;
+
+                faceList& curRpFaces = reconPatchFaces[pnIndex];
+                labelList& curRpfOwner = reconPatchOwner[pnIndex];
+                label& nRpf = reconPatchSizes[pnIndex];
+
+                const labelList& indices =
+                    passivePatchInsertOrder[fvmId][patchI];
+
+                const label patchStart = curPatch.start();
+
+                forAll (indices, i)
+                {
+                    // Location in reconstructed patch where the face
+                    // is inserted
+                    const label insertSlot = indices[i];
+
+                    // Calculate face index depending on the ordering
+                    const label faceI = patchStart + i;
+
+                    face newFace = curFaces[faceI];
+
+                    inplaceRenumber(ppAddr, newFace);
+
+                    // Insert into correct slot
+                    curRpFaces[insertSlot] = newFace;
+                    curRpfOwner[insertSlot] = curOwner[faceI];//+cellOffset[firstValidMesh()];
+
+                    // Temporarily record position of face in the patch.
+                    // Offset for nInternalFaces will be added in the end
+                    // when the complete list of faces is assembled
+                    // HJ, 16/Feb/2011
+                    fpAddr[faceI] = insertSlot + 1;
+                    nRpf++;
+                }
+            }
             else
             {
                 // Regular patch: dump faces into patch face list
@@ -759,10 +934,12 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                 labelList& curRpfOwner = reconPatchOwner[pnIndex];
                 label& nRpf = reconPatchSizes[pnIndex];
 
+                const label patchStart = curPatch.start();
+
                 for
                 (
-                    label faceI = curPatch.start();
-                    faceI < curPatch.start() + curPatch.size();
+                    label faceI = patchStart;
+                    faceI < patchStart + curPatch.size();
                     faceI++
                 )
                 {
@@ -788,20 +965,22 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
         {
             cpAddr[cellI] = cellI; // + cellOffset[firstValidMesh()];
         }
+
+        // Set cell offset for the next mesh
+        if (cellOffset.size() > firstValidMesh() + 1)
+        {
+            cellOffset[firstValidMesh() + 1] = meshes_[firstValidMesh()].nCells();
+        }
     }
 
 
     // Dump all other meshes, merging the processor boundaries
 
-    for (label procI = 1; procI < meshes_.size(); procI++)
+    for (label procI = firstValidMesh() + 1; procI < meshes_.size(); procI++)
     {
-        // Grab cell offset from previous offset and mesh size
-        cellOffset[procI] =
-            cellOffset[procI - 1] + meshes_[procI - 1].nCells();
-
         if (meshes_.set(procI))
         {
-            Pout<< "Dump mesh " << procI << endl;
+            Pout<< "Dump mesh " << procI << " cell offset: " << cellOffset[procI] << endl;
 
             const polyMesh& curMesh = meshes_[procI];
             const polyBoundaryMesh& procPatches = curMesh.boundaryMesh();
@@ -968,20 +1147,22 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                 if (isA<processorPolyPatch>(procPatches[patchI]))
                 {
                     // Processor patch: faces become internal faces
-                    const processorPolyPatch& procPatch =
+                    const processorPolyPatch& curPatch =
                         refCast<const processorPolyPatch>(procPatches[patchI]);
 
                     // Record boundary-processor addressing: unmapped patch
                     bpAddr[patchI] = -1;
 
+                    const label patchStart = curPatch.start();
+
                     // If patch is a master, drop the faces and fill the
                     // owner side addressing
-                    if (procPatch.master())
+                    if (curPatch.master())
                     {
                         for
                         (
-                            label faceI = procPatch.start();
-                            faceI < procPatch.start() + procPatch.size();
+                            label faceI = patchStart;
+                            faceI < patchStart + curPatch.size();
                             faceI++
                         )
                         {
@@ -1005,16 +1186,16 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                     {
                         // Fill the addressing for the neighbour side
 
-                        const label masterProcID = procPatch.neighbProcNo();
+                        const label masterProcID = curPatch.neighbProcNo();
 
                         // Get local face-cell addressing: it will become
                         // a neighbour
                         // addressing for the already inserted faces
-                        const labelList procFaceCells = procPatch.faceCells();
+                        const labelList procFaceCells = curPatch.faceCells();
 
                         // Get the neighbour side patch
                         const processorPolyPatch& masterProcPatch =
-                            neighbourProcPatch(procPatch);
+                            neighbourProcPatch(curPatch);
 
                         // Find the addressing of the master side
                         // and insert the neighbour with offset
@@ -1024,12 +1205,12 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
                         for
                         (
-                            label faceI = procPatch.start();
-                            faceI < procPatch.start() + procPatch.size();
+                            label faceI = patchStart;
+                            faceI < patchStart + curPatch.size();
                             faceI++
                         )
                         {
-                            label faceInPatch = faceI - procPatch.start();
+                            label faceInPatch = faceI - patchStart;
 
                             // Calculate master index
                             label masterIndex = masterProcPatch.start()
@@ -1045,14 +1226,19 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                         }
                     }
                 }
-                else
+                else if (isA<passiveProcessorPolyPatch>(procPatches[patchI]))
                 {
-                    // Regular patch: dump faces into patch face list
-
-                    const polyPatch& curPatch = procPatches[patchI];
+                    // For passive processor patch, faces need to be inserted in
+                    // the increasing global face index
+                    const passiveProcessorPolyPatch& curPatch =
+                        refCast<const passiveProcessorPolyPatch>
+                        (
+                            procPatches[patchI]
+                        );
 
                     // Find processor patch index in reconstructed boundary
-                    const label pnIndex = patchNameLookup.find(curPatch.name())();
+                    const label pnIndex =
+                        patchNameLookup.find(curPatch.name())();
 
                     // Record boundary-processor addressing: mapped patch
                     bpAddr[patchI] = pnIndex;
@@ -1061,10 +1247,60 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                     labelList& curRpfOwner = reconPatchOwner[pnIndex];
                     label& nRpf = reconPatchSizes[pnIndex];
 
+                    const labelList& indices =
+                        passivePatchInsertOrder[procI][patchI];
+
+                    const label patchStart = curPatch.start();
+
+                    forAll (indices, i)
+                    {
+                        // Location in reconstructed patch where the face
+                        // is inserted
+                        const label insertSlot = indices[i];
+
+                        // Calculate face index depending on the ordering
+                        const label faceI = patchStart + i;
+
+                        face newFace = curFaces[faceI];
+
+                        inplaceRenumber(ppAddr, newFace);
+
+                        // Insert into correct slot
+                        curRpFaces[insertSlot] = newFace;
+                        curRpfOwner[insertSlot] =
+                            curOwner[faceI] + cellOffset[procI];
+
+                        // Temporarily record position of face in the patch.
+                        // Offset for nInternalFaces will be added in the end
+                        // when the complete list of faces is assembled
+                        // HJ, 16/Feb/2011
+                        fpAddr[faceI] = insertSlot + 1;
+                        nRpf++;
+                    }
+                }
+                else
+                {
+                    // Regular patch: dump faces into patch face list
+
+                    const polyPatch& curPatch = procPatches[patchI];
+
+                    // Find processor patch index in reconstructed boundary
+                    const label pnIndex =
+                        patchNameLookup.find(curPatch.name())();
+
+                    // Record boundary-processor addressing: mapped patch
+                    bpAddr[patchI] = pnIndex;
+
+                    faceList& curRpFaces = reconPatchFaces[pnIndex];
+                    labelList& curRpfOwner = reconPatchOwner[pnIndex];
+                    label& nRpf = reconPatchSizes[pnIndex];
+
+                    const label patchStart = curPatch.start();
+
                     for
                     (
-                        label faceI = curPatch.start();
-                        faceI < curPatch.start() + curPatch.size();
+                        label faceI = patchStart;
+                        faceI < patchStart + curPatch.size();
                         faceI++
                     )
                     {
@@ -1089,6 +1325,20 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
             forAll (cpAddr, cellI)
             {
                 cpAddr[cellI] = cellI + cellOffset[procI];
+            }
+
+            // Set cell offset for the next mesh
+            if (cellOffset.size() > procI + 1)
+            {
+                cellOffset[procI + 1] = cellOffset[procI] + meshes_[procI].nCells();
+            }
+        }
+        else
+        {
+            // No valid mesh.  Propagate cell offset
+            if (cellOffset.size() > procI + 1)
+            {
+                cellOffset[procI + 1] = cellOffset[procI];
             }
         }
     }
@@ -1168,10 +1418,12 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
                         const polyPatch& curPatch = procPatches[patchI];
 
+                        const label patchStart = curPatch.start();
+
                         for
                         (
-                            label faceI = curPatch.start();
-                            faceI < curPatch.start() + curPatch.size();
+                            label faceI = patchStart;
+                            faceI < patchStart + curPatch.size();
                             faceI++
                         )
                         {
