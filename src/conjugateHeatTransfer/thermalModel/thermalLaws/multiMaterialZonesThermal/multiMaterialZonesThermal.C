@@ -54,13 +54,13 @@ Foam::multiMaterialZonesThermal::multiMaterialZonesThermal
     PtrList<thermalLaw>& laws = *this;
     forAll (laws, lawI)
     {
-        wordList zones (lawEntries[lawI].dict().lookup("zones"));
+        const wordList zones(lawEntries[lawI].dict().lookup("zones"));
 
         forAll(zones, zoneI)
         {
             const label zoneID = mesh().cellZones().findZoneID(zones[zoneI]);
 
-            if ( zoneID < 0 )
+            if (zoneID < 0)
             {
                 FatalErrorIn
                 (

@@ -66,12 +66,14 @@ class multiMaterialThermal
         //- Calculate indicator field given index
         tmp<volScalarField> indicator(const label index) const;
 
+
 protected:
 
     // Protected data
 
         //- Material indicator field
         volScalarField materials_;
+
 
     // Protected member functions
 
@@ -113,6 +115,7 @@ public:
             const scalar defaultMaterial
         );
 
+
     // Destructor
 
         virtual ~multiMaterialThermal();
@@ -128,6 +131,12 @@ public:
 
         //- Return thermal conductivity
         virtual tmp<volScalarField> k() const;
+
+        //- Return thermal expansion coefficient
+        virtual tmp<volScalarField> alpha() const;
+
+        //- Return reference temperature
+        virtual tmp<volScalarField> T0() const;
 
         //- Correct the rheological model
         virtual void correct();
