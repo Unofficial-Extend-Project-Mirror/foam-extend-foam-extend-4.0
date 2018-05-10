@@ -2930,15 +2930,19 @@ Foam::label Foam::polyhedralRefinement::faceConsistentRefinement
         const label curOwnLevel =
             cellsToRefine[own] ? cellLevel_[own] + 1 : cellLevel_[own];
 
-        if (neiLevel[i] > (curOwnLevel + 1))
+        // Note: we are using more stringent 1:1 consistency across coupled
+        // boundaries in order to simplify handling of edge based consistency
+        // checks for parallel runs
+        if (neiLevel[i] > curOwnLevel)
         {
-            // Neighbour level is higher than owner level + 1, owner must be
+            // Neighbour level is higher than owner level, owner must be
             // marked for refinement
             cellsToRefine[own] = true;
             ++nAddCells;
         }
+
         // Note: other possibility (that owner level is higher than neighbour
-        // level + 1) is taken into account on the other side automatically
+        // level) is taken into account on the other side automatically
     }
 
     // Return number of added cells
@@ -2946,7 +2950,7 @@ Foam::label Foam::polyhedralRefinement::faceConsistentRefinement
 }
 
 
-Foam::label Foam::polyhedralRefinement::pointConsistentRefinement
+Foam::label Foam::polyhedralRefinement::edgeConsistentRefinement
 (
     boolList& cellsToRefine
 ) const
@@ -2954,90 +2958,75 @@ Foam::label Foam::polyhedralRefinement::pointConsistentRefinement
     // Count number of cells that will be added
     label nAddCells = 0;
 
-    // Maximum surrounding cell refinement level for each point
-    labelList maxRefLevel(mesh_.nPoints(), 0);
+    // Algorithm: loop over all edges and visit all unique cell pairs sharing
+    // this particular edge. Then, ensure 2:1 edge consistency by marking
+    // cell with lower level for refinement
 
-    // Get point cells
-    const labelListList& meshPointCells = mesh_.pointCells();
+    // Get edge cells
+    const labelListList& meshEdgeCells = mesh_.edgeCells();
 
-    // Loop through all points and collect maximum point level for each point
-    forAll (maxRefLevel, pointI)
+    // Loop through all mesh edges
+    forAll (meshEdgeCells, edgeI)
     {
-        // Get the cells for this point
-        const labelList& curCells = meshPointCells[pointI];
+        // Get current edge cells
+        const labelList& curEdgeCells = meshEdgeCells[edgeI];
 
-        // Get reference to maximum pooint level for this point
-        label& curMaxPointLevel = maxRefLevel[pointI];
-
-        // Find maximum refinement level for this point
-        forAll (curCells, i)
+        // Loop through all edge cells
+        forAll (curEdgeCells, i)
         {
-            // Get cell index and "future" cell level
-            const label& curCellI = curCells[i];
-            const label curCellLevel =
-                cellsToRefine[curCellI]
-              ? cellLevel_[curCellI] + 1
-              : cellLevel_[curCellI];
+            // Get first cell index
+            const label& cellI = curEdgeCells[i];
 
-            // Update maximum point level if the curCellLevel is higher
-            curMaxPointLevel = max(curMaxPointLevel, curCellLevel);
-        }
-    }
-
-    // Sync maximum refinement level across coupled boundaries
-    syncTools::syncPointList
-    (
-        mesh_,
-        maxRefLevel,
-        maxEqOp<label>(),
-        0,   // Null value
-        true // Apply separation for parallel cyclics
-    );
-
-    // Now that the levels are synced, go through all points and add cells to
-    // refine
-    forAll (maxRefLevel, pointI)
-    {
-        // Get the cells for this point
-        const labelList& curCells = meshPointCells[pointI];
-
-        // Loop through these point cells and set cells for refinement which
-        // would end up having refinement level smaller than maximum level - 1
-        forAll (curCells, i)
-        {
-            // Get cell index, reference to refinement flag and "future" cell
-            // level
-            const label& curCellI = curCells[i];
-            bool& willBeRefined = cellsToRefine[curCellI];
-            const label curCellLevel =
-                willBeRefined
-              ? cellLevel_[curCellI] + 1
-              : cellLevel_[curCellI];
-
-            if (curCellLevel < maxRefLevel[pointI] - 1)
+            // Loop through remaining edge cells
+            for (label j = i + 1; j < curEdgeCells.size(); ++j)
             {
-                if (!willBeRefined)
+                // Get second cell index
+                const label& cellJ = curEdgeCells[j];
+
+                // Get levels of the two cells. If the cell is marked for
+                // refinement, the level is current level + 1, otherwise it is
+                // equal to the current level
+
+                // Note: cellsToRefine flag for both cellI and cellJ might
+                // change, this is why we need to recalculate cellI level here
+                const label cellILevel =
+                    cellsToRefine[cellI]
+                  ? cellLevel_[cellI] + 1
+                  : cellLevel_[cellI];
+
+                const label cellJLevel =
+                    cellsToRefine[cellJ]
+                  ? cellLevel_[cellJ] + 1
+                  : cellLevel_[cellJ];
+
+                if (cellILevel > cellJLevel + 1)
                 {
-                    // Cell has not been marked for refinement, mark the cell for
-                    // refinement and increment the counter
-                    willBeRefined = true;
+                    // Level of cellI is higher than level of cellJ + 1, cellJ
+                    // must be marked for refinement
+                    cellsToRefine[cellJ] = true;
                     ++nAddCells;
                 }
-                else
+                else if (cellJLevel > cellILevel + 1)
                 {
-                    FatalErrorIn
-                    (
-                        "label polyhedralRefinement::pointConsistentRefinement"
-                        "(boolList cellsToRefine) const"
-                    )   << "Cell is marked for refinement, but the 4:1 point"
-                        << " consistency cannot be ensured." << nl
-                        << "Something went wrong before this step."
-                        << endl;
+                    // Level of cellJ is higher than level of cellI + 1, cellI
+                    // must be marked for refinement
+                    cellsToRefine[cellI] = true;
+                    ++nAddCells;
                 }
             }
         }
     }
 
+    // Note: in order to avoid very difficult and time-consuming parallelisation
+    // of edge cell connectivity and edge cell values, we enforce a more
+    // stringent face-based consistency across processor boundaries. Basically,
+    // if a face-based consistency of 1:1 (not 2:1 as for ordinary faces) is
+    // ensured, the edge-based consistency becomes a local operation (I'm not
+    // 100% sure to be honest since there are countless variants when dealing
+    // with arbitrary polyhedral cells).
+    // See faceConsistentRefinement for details. VV, 17/Apr/2018.
+
+    // Return number of added cells
     return nAddCells;
 }
 
@@ -3072,7 +3061,7 @@ Foam::label Foam::polyhedralRefinement::faceConsistentUnrefinement
         const label neiLevel =
             cellsToUnrefine[nei] ? cellLevel_[nei] - 1 : cellLevel_[nei];
 
-        if (ownLevel < (neiLevel -1))
+        if (ownLevel < (neiLevel - 1))
         {
             // Owner level is smaller than neighbour level - 1, we must not
             // unrefine owner
@@ -3090,7 +3079,10 @@ Foam::label Foam::polyhedralRefinement::faceConsistentUnrefinement
                     << "Owner: " << own << ", neighbour: " << nei
                     << nl
                     << "Owner level: " << ownLevel
-                    << ", neighbour level: " << neiLevel
+                    << ", neighbour level: " << neiLevel << nl
+                    << "This is probably because the refinement and "
+                    << "unrefinement regions are very close." << nl
+                    << "Try increasing nUnrefinementBufferLayers. "
                     << abort(FatalError);
             }
 
@@ -3115,7 +3107,10 @@ Foam::label Foam::polyhedralRefinement::faceConsistentUnrefinement
                     << "Owner: " << own << ", neighbour: " << nei
                     << nl
                     << "Owner level: " << ownLevel
-                    << ", neighbour level: " << neiLevel
+                    << ", neighbour level: " << neiLevel << nl
+                    << "This is probably because the refinement and "
+                    << "unrefinement regions are very close." << nl
+                    << "Try increasing nUnrefinementBufferLayers. "
                     << abort(FatalError);
             }
 
@@ -3150,9 +3145,12 @@ Foam::label Foam::polyhedralRefinement::faceConsistentUnrefinement
         const label curOwnLevel =
             cellsToUnrefine[own] ? cellLevel_[own] - 1 : cellLevel_[own];
 
-        if (curOwnLevel < (neiLevel[i] - 1))
+        // Note: we are using more stringent 1:1 consistency across coupled
+        // boundaries in order to simplify handling of edge based consistency
+        // checkes for parallel runs
+        if (curOwnLevel < neiLevel[i])
         {
-            // Owner level is smaller than neighbour level - 1, we must not
+            // Owner level is smaller than neighbour level, we must not
             // unrefine owner
 
             // Check whether the cell has not been marked for unrefinement
@@ -3168,7 +3166,10 @@ Foam::label Foam::polyhedralRefinement::faceConsistentUnrefinement
                     << "Owner: " << own
                     << nl
                     << "Owner level: " << curOwnLevel
-                    << ", neighbour level: " << neiLevel[i]
+                    << ", neighbour level: " << neiLevel[i] << nl
+                    << "This is probably because the refinement and "
+                    << "unrefinement regions are very close." << nl
+                    << "Try increasing nUnrefinementBufferLayers. "
                     << abort(FatalError);
             }
 
@@ -3177,7 +3178,7 @@ Foam::label Foam::polyhedralRefinement::faceConsistentUnrefinement
         }
 
         // Note: other possibility (that neighbour level is smaller than owner
-        // level - 1) is taken into account on the other side automatically
+        // level) is taken into account on the other side automatically
     }
 
     // Return number of local cells removed from unrefinement
@@ -3185,100 +3186,129 @@ Foam::label Foam::polyhedralRefinement::faceConsistentUnrefinement
 }
 
 
-Foam::label Foam::polyhedralRefinement::pointConsistentUnrefinement
+Foam::label Foam::polyhedralRefinement::edgeConsistentUnrefinement
 (
     boolList& cellsToUnrefine
 ) const
 {
-    // Count number of cells removed from unrefinement
+    // Count number of cells that will be removed
     label nRemCells = 0;
 
-    // Minimum cell refinement level for each point. Note: initialise with
-    // labelMax
-    labelList minRefLevel(mesh_.nPoints(), labelMax);
+    // Algorithm: loop over all edges and visit all unique cell pairs sharing
+    // this particular edge. Then, ensure 2:1 edge consistency by protecting the
+    // cell with lower level from unrefinement
 
-    // Get point cells
-    const labelListList& meshPointCells = mesh_.pointCells();
+    // Get edge cells
+    const labelListList& meshEdgeCells = mesh_.edgeCells();
 
-    // Loop through all points and collect minimum point level for each point
-    forAll (minRefLevel, pointI)
+    // Loop through all mesh edges
+    forAll (meshEdgeCells, edgeI)
     {
-        // Get the cell for this point
-        const labelList& curCells = meshPointCells[pointI];
+        // Get current edge cells
+        const labelList& curEdgeCells = meshEdgeCells[edgeI];
 
-        // Get reference to minimum point level for this point
-        label& curMinPointLevel = minRefLevel[pointI];
-
-        // Find minimum refinement level for this point
-        forAll (curCells, i)
+        // Loop through all edge cells
+        forAll (curEdgeCells, i)
         {
-            // Get cell index and "future" cell level
-            const label& curCellI = curCells[i];
-            const label curCellLevel =
-                cellsToUnrefine[curCellI]
-              ? cellLevel_[curCellI] - 1
-              : cellLevel_[curCellI];
+            // Get first cell index
+            const label& cellI = curEdgeCells[i];
 
-            // Update minimum point level if the curCellLevel is smaller
-            curMinPointLevel = min(curMinPointLevel, curCellLevel);
-        }
-    }
-
-    // Sync minimum refinement level across coupled boundaries
-    syncTools::syncPointList
-    (
-        mesh_,
-        minRefLevel,
-        minEqOp<label>(),
-        0,   // Null value
-        true // Apply separation for parallel cyclics
-    );
-
-    // Now that the levels are synced, go through all points and protect some
-    // cells from unrefinement
-    forAll (minRefLevel, pointI)
-    {
-        // Get the cells for this point
-        const labelList& curCells = meshPointCells[pointI];
-
-        // Loop through these point cells and protected cells from unrefinement
-        // which would end up having refinement level greater than level + 1
-        forAll (curCells, i)
-        {
-            // Get cell index, reference to unrefinement flag and "future" cell
-            // level
-            const label& curCellI = curCells[i];
-            bool& willBeUnrefined = cellsToUnrefine[curCellI];
-            const label curCellLevel =
-                willBeUnrefined
-              ? cellLevel_[curCellI] - 1
-              : cellLevel_[curCellI];
-
-            if (curCellLevel > minRefLevel[pointI] + 1)
+            // Loop through remaining edge cells
+            for (label j = i + 1; j < curEdgeCells.size(); ++j)
             {
-                if (willBeUnrefined)
+                // Get second cell index
+                const label& cellJ = curEdgeCells[j];
+
+                // Get levels of the two cells. If the cell is marked for
+                // unrefinement, the level is current level - 1, otherwise it is
+                // equal to the current level
+
+                // Note: cellsToUnrefine flag for both cellI and cellJ might
+                // change, this is why we need to recalculate cellI level here
+                const label cellILevel =
+                    cellsToUnrefine[cellI]
+                  ? cellLevel_[cellI] - 1
+                  : cellLevel_[cellI];
+
+                const label cellJLevel =
+                    cellsToUnrefine[cellJ]
+                  ? cellLevel_[cellJ] - 1
+                  : cellLevel_[cellJ];
+
+                if (cellILevel < cellJLevel - 1)
                 {
-                    // Cell has been marked for unrefinement, protect the cell
-                    // from unrefinement and increment the counter
-                    willBeUnrefined = false;
+                    // Level of cellI is smaller than level of cellJ - 1, cellI
+                    // must be protected from unrefinement
+
+                    // Check whether the cell has not been marked for
+                    // unrefinement
+                    if (!cellsToUnrefine[cellI])
+                    {
+                        FatalErrorIn
+                        (
+                            "label polyhedralRefinement::"
+                            "edgeConsistentUnrefinement"
+                            "(boolList& cellsToUnrefine)"
+                        )   << "Cell not marked for unrefinement, indicating a"
+                            << " previous unnoticed problem with unrefinement."
+                            << nl
+                            << "cellI: " << cellI << ", cellJ: " << cellJ
+                            << nl
+                            << "Level of cellI: " << cellILevel
+                            << ", level of cellJ: " << cellJLevel << nl
+                            << "This is probably because the refinement and "
+                            << "unrefinement regions are very close." << nl
+                            << "Try increasing nUnrefinementBufferLayers. "
+                            << abort(FatalError);
+                    }
+
+                    cellsToUnrefine[cellI] = false;
                     ++nRemCells;
                 }
-                else
+                else if (cellJLevel < cellILevel - 1)
                 {
-                    FatalErrorIn
-                    (
-                        "label polyhedralRefinement::"
-                        "pointConsistentUnrefinement"
-                        "(boolList cellsToRefine) const"
-                    )   << "Cell is not marked for unrefinement, but the 4:1"
-                        << " point consistency cannot be ensured." << nl
-                        << "Something went wrong before this step."
-                        << endl;
+                    // Level of cellJ is smaller than level of cellI - 1, cellJ
+                    // must be protected from unrefinement
+
+                    // Check whether the cell has not been marked for
+                    // unrefinement
+                    if (!cellsToUnrefine[cellJ])
+                    {
+                        FatalErrorIn
+                        (
+                            "label polyhedralRefinement::"
+                            "edgeConsistentUnrefinement"
+                            "(boolList& cellsToUnrefine)"
+                        )   << "Cell not marked for unrefinement, indicating a"
+                            << " previous unnoticed problem with unrefinement."
+                            << nl
+                            << "cellI: " << cellI << ", cellJ: " << cellJ
+                            << nl
+                            << "Level of cellI: " << cellILevel
+                            << ", level of cellJ: " << cellJLevel << nl
+                            << "This is probably because the refinement and "
+                            << "unrefinement regions are very close." << nl
+                            << "Try increasing nUnrefinementBufferLayers. "
+                            << abort(FatalError);
+                    }
+
+                    cellsToUnrefine[cellJ] = false;
+                    ++nRemCells;
                 }
             }
         }
     }
 
+    // Note: in order to avoid very difficult and time-consuming parallelisation
+    // of edge cell connectivity and edge cell values, we enforce a more
+    // stringent face-based consistency across processor boundaries. Basically,
+    // if a face-based consistency of 1:1 (not 2:1 as for ordinary faces) is
+    // ensured, the edge-based consistency becomes a local operation (I'm not
+    // 100% sure to be honest whether this is true all the time since there are
+    // countless variants when dealing with arbitrary polyhedral cells).
+    // See faceConsistentRefinement for details. VV, 3/Apr/2018.
+
+    // Return number of removed cells
     return nRemCells;
 }
 
@@ -3328,11 +3358,18 @@ Foam::polyhedralRefinement::polyhedralRefinement
     faceRemover_(mesh_, GREAT), // Merge boundary faces wherever possible
     maxCells_(readLabel(dict.lookup("maxCells"))),
     maxRefinementLevel_(readLabel(dict.lookup("maxRefinementLevel"))),
-    pointBasedConsistency_
+    edgeBasedConsistency_
     (
-        dict.lookupOrDefault<Switch>("pointBasedConsistency", true)
+        dict.lookupOrDefault<Switch>("edgeBasedConsistency", true)
     ),
-    nBufferLayers_(readScalar(dict.lookup("nBufferLayers")))
+    nRefinementBufferLayers_
+    (
+        readScalar(dict.lookup("nRefinementBufferLayers"))
+    ),
+    nUnrefinementBufferLayers_
+    (
+        readScalar(dict.lookup("nUnrefinementBufferLayers"))
+    )
 {
     // Calculate level 0 edge length
     calcLevel0EdgeLength();
@@ -3401,7 +3438,7 @@ Foam::polyhedralRefinement::polyhedralRefinement
 
     // If the maximum refinementLevel is greater than 2 and the user insists on
     // not using point based refinement strategy, issue a warning
-    if (!pointBasedConsistency_ && maxRefinementLevel_ > 2)
+    if (!edgeBasedConsistency_ && maxRefinementLevel_ > 2)
     {
         WarningIn
         (
@@ -3420,12 +3457,12 @@ Foam::polyhedralRefinement::polyhedralRefinement
             << " 8:1 point conflicts."
             << nl
             << "In order to supress this message and use point based"
-            << " consistency checks, set pointBasedConsistency to true."
+            << " consistency checks, set edgeBasedConsistency to true."
             << endl;
     }
 
-    // Check number of buffer layers
-    if (nBufferLayers_ < 0)
+    // Check number of refinement buffer layers
+    if (nRefinementBufferLayers_ < 0)
     {
         FatalErrorIn
         (
@@ -3436,10 +3473,52 @@ Foam::polyhedralRefinement::polyhedralRefinement
             "\n    const label index,"
             "\n    const polyTopoChanger& mme"
             "\n)"
-        )   << "Negative nBufferLayers specified."
+        )   << "Negative nRefinementBufferLayers specified."
             << nl
             << "This is not allowed."
             << abort(FatalError);
+    }
+
+    // Check number of unrefinement buffer layers
+    if (nUnrefinementBufferLayers_ < 0)
+    {
+        FatalErrorIn
+        (
+            "polyhedralRefinement::polyhedralRefinement"
+            "\n("
+            "\n    const word& name,"
+            "\n    const dictionary& dict,"
+            "\n    const label index,"
+            "\n    const polyTopoChanger& mme"
+            "\n)"
+        )   << "Negative nUnrefinementBufferLayers specified."
+            << nl
+            << "This is not allowed."
+            << abort(FatalError);
+    }
+
+    // Check whether the number of unrefinement buffer layers is smaller than
+    // number of refinement buffer layers + 2
+    if (nUnrefinementBufferLayers_ < nRefinementBufferLayers_ + 2)
+    {
+        WarningIn
+        (
+            "polyhedralRefinement::polyhedralRefinement"
+            "\n("
+            "\n    const word& name,"
+            "\n    const dictionary& dict,"
+            "\n    const label index,"
+            "\n    const polyTopoChanger& mme"
+            "\n)"
+        )   << "Using " << nUnrefinementBufferLayers_
+            << " unrefinement buffer layers and " << nRefinementBufferLayers_
+            << " refinement buffer layers."
+            << nl
+            << "Make sure that the number of unrefinement buffer layers is "
+            << "at least nRefinementBufferLayers + 2" << nl
+            << "in order to avoid problems with point level inconsistency when "
+            << "refinement and unrefinement are performed in same iteration."
+            << endl;
     }
 }
 
@@ -3495,8 +3574,9 @@ void Foam::polyhedralRefinement::setCellsToRefine
         }
     }
 
-    // Extend cells across faces using a specified number of buffer layers
-    for (label i = 0; i < nBufferLayers_; ++i)
+    // Extend cells across faces using a specified number of refinement buffer
+    // layers
+    for (label i = 0; i < nRefinementBufferLayers_; ++i)
     {
         extendMarkedCellsAcrossFaces(refineCell);
     }
@@ -3515,11 +3595,11 @@ void Foam::polyhedralRefinement::setCellsToRefine
         // Reset counter at the beginning of each iteration
         nAddCells = 0;
 
-        if (pointBasedConsistency_)
+        if (edgeBasedConsistency_)
         {
-            // Check for 4:1 point based consistent refinement. Updates
+            // Check for 4:1 edge based consistent refinement. Updates
             // cellsToRefine and returns number of cells added in this iteration
-            nAddCells += pointConsistentRefinement(refineCell);
+            nAddCells += edgeConsistentRefinement(refineCell);
         }
 
         // Check for 2:1 face based consistent refinement. Updates cellsToRefine
@@ -3555,9 +3635,7 @@ void Foam::polyhedralRefinement::setCellsToRefine
     // Transfer the contents into the data member (ordinary list)
     cellsToRefine_.transfer(cellsToRefineDynamic);
 
-    Info<< "polyhedralRefinement::setCellsToRefine"
-        << "(const labelList& refinementCellCandidates)" << nl
-        << "Selected " << returnReduce(cellsToRefine_.size(), sumOp<label>())
+    Info<< "Selected " << returnReduce(cellsToRefine_.size(), sumOp<label>())
         << " cells to refine." << endl;
 }
 
@@ -3708,10 +3786,9 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
         protectedCell[cellsToRefine_[i]] = true;
     }
 
-    // Extend protected cells across points using a specified number of buffer
-    // layers + 1 in order to stay far away from cells that are going to be
-    // refined
-    for (label i = 0; i < nBufferLayers_ + 1; ++i)
+    // Extend protected cells across points using a specified number of
+    // unrefinement buffer layers
+    for (label i = 0; i < nUnrefinementBufferLayers_ + 2; ++i)
     {
         extendMarkedCellsAcrossPoints(protectedCell);
     }
@@ -3771,12 +3848,12 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
         // Reset number of removed cells from unrefinement for this iteration
         nRemCells = 0;
 
-        if (pointBasedConsistency_)
+        if (edgeBasedConsistency_)
         {
-            // Check for 4:1 point based consistent unrefinement. Updates
+            // Check for 4:1 edge based consistent unrefinement. Updates
             // cellsToUnrefine and returns number of removed cells from
             // unrefinement in this iteration
-            nRemCells += pointConsistentUnrefinement(cellsToUnrefine);
+            nRemCells += edgeConsistentUnrefinement(cellsToUnrefine);
         }
 
         // Check for 2:1 face based consistent unrefinement. Updates
@@ -3843,9 +3920,7 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
     // Transfer the contents into the data member (ordinary list)
     splitPointsToUnrefine_.transfer(splitPointsToUnrefineDynamic);
 
-    Info<< "polyhedralRefinement::setSplitPointsToUnrefine"
-        << "(const labelList& unrefinementPointCandidates)" << nl
-        << "Selected "
+    Info<< "Selected "
         << returnReduce(splitPointsToUnrefine_.size(), sumOp<label>())
         << " split points to unrefine." << endl;
 }
@@ -4063,8 +4138,9 @@ void Foam::polyhedralRefinement::write(Ostream& os) const
         << name() << nl
         << maxCells_ << nl
         << maxRefinementLevel_ << nl
-        << pointBasedConsistency_ << nl
-        << nBufferLayers_ << endl;
+        << edgeBasedConsistency_ << nl
+        << nRefinementBufferLayers_ << nl
+        << nUnrefinementBufferLayers_ << endl;
 }
 
 
@@ -4081,9 +4157,11 @@ void Foam::polyhedralRefinement::writeDict(Ostream& os) const
         << token::END_STATEMENT << nl
         << "    maxRefinementLevel " << maxRefinementLevel_
         << token::END_STATEMENT << nl
-        << "    pointBasedConsistency " << pointBasedConsistency_
+        << "    edgeBasedConsistency " << edgeBasedConsistency_
         << token::END_STATEMENT << nl
-        << "    nBufferLayers " << nBufferLayers_
+        << "    nRefinementBufferLayers " << nRefinementBufferLayers_
+        << token::END_STATEMENT << nl
+        << "    nUnrefinementBufferLayers " << nUnrefinementBufferLayers_
         << token::END_STATEMENT << nl
         << "    active " << active()
         << token::END_STATEMENT << nl

@@ -124,11 +124,17 @@ private:
             //- Maximum number of refinement levels for a given cell
             label maxRefinementLevel_;
 
-            //- Switch whether to use point based consistency on refinement
-            Switch pointBasedConsistency_;
+            //- Switch whether to use edge based consistency on refinement
+            Switch edgeBasedConsistency_;
 
             //- Number of buffer layers for refinement
-            label nBufferLayers_;
+            label nRefinementBufferLayers_;
+
+            //- Number of buffer layers for unrefinement, controlling how far
+            //  the unrefinement region needs to be from current refinement
+            //  region. Therefore, this should always be at least
+            //  nRefinementBufferLayers + 2 to avoid level inconsistencies
+            label nUnrefinementBufferLayers_;
 
 
     // Private Member Functions
@@ -357,17 +363,17 @@ private:
             //  is obtained. Returns local number of cells changed
             label faceConsistentRefinement(boolList& cellsToRefine) const;
 
-            //- Updates cellsToRefine such that a point consistent 4:1 refinement
+            //- Updates cellsToRefine such that an edge consistent 4:1 refinement
             //  is obtained. Returns local number of cells changed
-            label pointConsistentRefinement(boolList& cellsToRefine) const;
+            label edgeConsistentRefinement(boolList& cellsToRefine) const;
 
             //- Updates cellsToUnrefine such that a face consistent 2:1
             //  unrefinement is obtained. Returns local number of cells changed
             label faceConsistentUnrefinement(boolList& cellsToUnrefine) const;
 
-            //- Updates cellsToUnrefine such that a point consistent 4:1
+            //- Updates cellsToUnrefine such that an edge consistent 4:1
             //  unrefinement is obtained. Returns local number of cells changed
-            label pointConsistentUnrefinement(boolList& cellsToUnrefine) const;
+            label edgeConsistentUnrefinement(boolList& cellsToUnrefine) const;
 
 
         // Copy control
