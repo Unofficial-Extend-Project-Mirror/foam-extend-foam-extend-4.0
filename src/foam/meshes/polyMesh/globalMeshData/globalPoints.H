@@ -83,7 +83,6 @@ Description
         - mark indices for which information has changed
      endloop until nothing changes.
 
-
 SourceFiles
     globalPoints.C
 
