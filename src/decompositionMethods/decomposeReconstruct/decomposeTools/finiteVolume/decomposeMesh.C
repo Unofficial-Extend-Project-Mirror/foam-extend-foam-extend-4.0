@@ -208,14 +208,6 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                         //  the existing processor face and added afterwards
                         if (ownerProc != neighbourProc)
                         {
-                            Pout<< "Slave: New proc from old proc ["
-                                << patchFaceI
-                                << "]: " << ownerProc << " " << neighbourProc
-                                << " face: " << patchStart + patchFaceI
-                                << " C: "
-                                << mesh_.faceCentres()[patchStart + patchFaceI]
-                                << endl;
-
                             // Search algorithm repeated in processor patches.
                             // HJ, 11/Apr/2018
                             SLList<label>::iterator curInterProcBdrsOwnIter =
@@ -440,14 +432,6 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                         //  the existing processor face and added afterwards
                         if (ownerProc != neighbourProc)
                         {
-                            Pout<< "Master: New proc from old proc ["
-                                << patchFaceI << "]: "
-                                << ownerProc << " " << neighbourProc
-                                << " face: " << patchStart + patchFaceI
-                                << " C: "
-                                << mesh_.faceCentres()[patchStart + patchFaceI]
-                                << endl;
-
                             // Search algorithm repeated in processor patches.
                             // HJ, 11/Apr/2018
                             SLList<label>::iterator curInterProcBdrsOwnIter =
@@ -564,9 +548,7 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                     {
                         // Add the face
                         procFaceList[ownerProc].append(patchStart + patchFaceI);
-                        Pout<< "Add proc face to proc patch.  Face "
-                            << patchStart + patchFaceI
-                            << endl;
+
                         // Increment the number of faces for this patch
                         procPatchSize_[ownerProc][patchI]++;
                     }
@@ -793,8 +775,6 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
             }
         }
 
-        Pout<< "procPatchSize_: " << procPatchSize_ << endl;
-
         // Face zone treatment.  HJ, 27/Mar/2009
         // Face zones identified as global will be present on all CPUs
         List<SLList<label> > procZoneFaceList(nProcs_);
@@ -965,7 +945,7 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                 curSize = 0;
 
                 // Add faces for this processor boundary
-                Pout<< "Proc: " << procI << " Patch: " << nProcPatches << endl;
+
                 for
                 (
                     SLList<label>::iterator curFacesIter =
@@ -975,7 +955,7 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                 )
                 {
                     // Add the face
-                    Pout<< "Adding " << curFacesIter() << endl;
+
                     // Remember to increment the index by one such that the
                     // turning index works properly.  HJ, 5/Dec/2001
                     if (cellToProc_[owner[curFacesIter()]] == procI)
@@ -1059,7 +1039,6 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
             )
             {
                 // Patch filtered: do nothing
-                Pout<< "Filtered patch " << patchI << endl;
             }
             else
             {

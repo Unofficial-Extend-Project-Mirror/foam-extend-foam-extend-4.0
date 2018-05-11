@@ -526,13 +526,6 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
         }
     }
 
-    Pout<< "Estimated max global mesh size (with duplicates): " << nl
-        << "    nPoints = " << nReconPoints << nl
-        << "    nFaces = " << nReconFaces << nl
-        << "    nCells = " << nReconCells << nl
-        << "    nPatches = " << nReconPatches << nl
-        << "    nPatchFaces = " << reconPatchSizes << endl;
-
     // Note: for easier debugging, set mapping, owner and neighbour to -1
     pointField reconPoints(nReconPoints);
     labelList globalPointMapping(nReconPoints, -1);
