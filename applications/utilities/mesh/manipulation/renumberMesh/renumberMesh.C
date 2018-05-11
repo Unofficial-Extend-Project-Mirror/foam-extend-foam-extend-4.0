@@ -338,7 +338,7 @@ autoPtr<mapPolyMesh> reorderMesh
     (
         new mapPolyMesh
         (
-            mesh,                       //const polyMesh& mesh,
+            mesh,                       // const polyMesh& mesh,
             mesh.nPoints(),             // nOldPoints,
             mesh.nFaces(),              // nOldFaces,
             mesh.nCells(),              // nOldCells,
