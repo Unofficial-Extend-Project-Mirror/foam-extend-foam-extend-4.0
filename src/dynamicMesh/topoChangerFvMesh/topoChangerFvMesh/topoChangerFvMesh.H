@@ -30,6 +30,8 @@ Description
 SourceFiles
     topoChangerFvMesh.C
     newTopoFvMesh.C
+    topoChangerFvMeshLoadBalance.C
+    topoChangerFvMeshLoadBalanceTemplates.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -61,10 +63,52 @@ class topoChangerFvMesh
         void operator=(const topoChangerFvMesh&);
 
 
+        // Load balancing functions
+
+            //- Send fields to other processor
+            template<class GeoField, class Decomposer>
+            void sendFields
+            (
+                const HashTable<const GeoField*>& geoFields,
+                const Decomposer& decomposer,
+                Ostream& toProc
+            ) const;
+
+            //- Insert local fields
+            template<class GeoField, class Decomposer>
+            void insertFields
+            (
+                const HashTable<const GeoField*>& geoFields,
+                const Decomposer& decomposer,
+                List<PtrList<GeoField> >& localFields
+            ) const;
+
+            //- Receive fields from other processor
+            template<class GeoMesh, class GeoField>
+            void receiveFields
+            (
+                const label procIndex,
+                List<PtrList<GeoField> >& receivedFields,
+                const GeoMesh& procMesh,
+                Istream& fromProc
+            ) const;
+
+            //- Resize and rebuild fields
+            template<class GeoField, class Reconstructor>
+            void rebuildFields
+            (
+                const HashTable<const GeoField*>& geoFields,
+                const Reconstructor& reconstructor,
+                const List<PtrList<GeoField> >& receivedFields,
+                const boolList& patchesToReplace
+            ) const;
+
+
 protected:
 
     // Protected Data
 
+        //- Topo changer
         polyTopoChanger topoChanger_;
 
 
@@ -106,17 +150,25 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~topoChangerFvMesh();
+    //- Destructor
+    virtual ~topoChangerFvMesh();
 
 
     // Member Functions
 
+        //- Load balance the mesh in parallel execution
+        bool loadBalance(const dictionary& dict);
+    
         //- Update the mesh for both mesh motion and topology change
         virtual bool update() = 0;
 };
 
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "topoChangerFvMeshLoadBalanceTemplates.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

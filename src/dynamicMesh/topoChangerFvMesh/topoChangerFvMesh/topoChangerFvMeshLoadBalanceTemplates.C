@@ -23,12 +23,12 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "loadBalanceFvMesh.H"
+#include "topoChangerFvMesh.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class GeoField, class Decomposer>
-void Foam::loadBalanceFvMesh::sendFields
+void Foam::topoChangerFvMesh::sendFields
 (
     const HashTable<const GeoField*>& geoFields,
     const Decomposer& decomposer,
@@ -47,7 +47,6 @@ void Foam::loadBalanceFvMesh::sendFields
         iter
     )
     {
-        Pout<< "Sending field " << iter()->name() << " in slot " << fI << endl;
         // Encapsulate a field within a dictionary in order
         // to read it correctly on the receiving side
         toProc << iter()->name() << nl
@@ -62,7 +61,7 @@ void Foam::loadBalanceFvMesh::sendFields
 
 
 template<class GeoField, class Decomposer>
-void Foam::loadBalanceFvMesh::insertFields
+void Foam::topoChangerFvMesh::insertFields
 (
     const HashTable<const GeoField*>& geoFields,
     const Decomposer& decomposer,
@@ -96,15 +95,13 @@ void Foam::loadBalanceFvMesh::insertFields
             decomposer.decomposeField(*(iter()))
         );
 
-        Pout<< "Setting field " << localFields[fI][Pstream::myProcNo()].name()
-            << " in slot " << fI << endl;
         fI++;
     }
 }
 
 
 template<class GeoMesh, class GeoField>
-void Foam::loadBalanceFvMesh::receiveFields
+void Foam::topoChangerFvMesh::receiveFields
 (
     const label procIndex,
     List<PtrList<GeoField> >& receivedFields,
@@ -130,7 +127,6 @@ void Foam::loadBalanceFvMesh::receiveFields
     forAll (receivedFields, fI)
     {
         word fieldName(fromProc);
-        Pout<< "Receiving field " << fieldName << " in slot " << fI << endl;
 
         dictionary dict(fromProc);
 
@@ -156,7 +152,7 @@ void Foam::loadBalanceFvMesh::receiveFields
 
 
 template<class GeoField, class Reconstructor>
-void Foam::loadBalanceFvMesh::rebuildFields
+void Foam::topoChangerFvMesh::rebuildFields
 (
     const HashTable<const GeoField*>& geoFields,
     const Reconstructor& reconstructor,
@@ -220,7 +216,7 @@ void Foam::loadBalanceFvMesh::rebuildFields
         {
             FatalErrorIn
             (
-                "loadBalanceFvMesh::rebuildFields\n"
+                "topoChangerFvMesh::rebuildFields\n"
                 "(\n"
                 "    const HashTable<const GeoField*>& geoFields,\n"
                 "    const Reconstructor& reconstructor,\n"
@@ -234,7 +230,7 @@ void Foam::loadBalanceFvMesh::rebuildFields
         {
             FatalErrorIn
             (
-                "loadBalanceFvMesh::rebuildFields\n"
+                "topoChangerFvMesh::rebuildFields\n"
                 "(\n"
                 "    const HashTable<const GeoField*>& geoFields,\n"
                 "    const Reconstructor& reconstructor,\n"
@@ -323,7 +319,7 @@ void Foam::loadBalanceFvMesh::rebuildFields
                     << masterField.mesh().boundary()[patchI].size()
                     << endl;
 
-                patchFields[patchI].setSize
+                patchFields[patchI].resetSize
                 (
                     masterField.mesh().boundary()[patchI].size()
                 );

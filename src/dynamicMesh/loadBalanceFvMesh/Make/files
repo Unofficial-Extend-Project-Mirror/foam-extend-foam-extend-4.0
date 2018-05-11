@@ -1,4 +1,3 @@
-dynamicMeshLoadBalance/dynamicMeshLoadBalance.C
 loadBalanceFvMesh/loadBalanceFvMesh.C
 
 LIB = $(FOAM_LIBBIN)/libloadBalanceFvMesh
