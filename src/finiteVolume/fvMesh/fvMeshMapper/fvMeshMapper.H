@@ -97,7 +97,8 @@ public:
             faceMap_(mpm),
             cellMap_(mpm),
             surfaceMap_(mesh, faceMap_),
-            boundaryMap_(mesh, faceMap_)
+            boundaryMap_(mesh, faceMap_),
+            resetPatchFlag_(mpm.resetPatchFlag())
         {}
 
 
