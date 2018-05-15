@@ -83,6 +83,7 @@ protected:
             return T_.mesh();
         }
 
+
 public:
 
     //- Runtime type information
@@ -155,6 +156,12 @@ public:
 
         //- Return thermal conductivity
         virtual tmp<volScalarField> k() const = 0;
+
+        //- Return thermal expansion coefficient
+        virtual tmp<volScalarField> alpha() const = 0;
+
+        //- Return reference temperature
+        virtual tmp<volScalarField> T0() const = 0;
 
         //- Correct the thermal model
         virtual void correct() = 0;

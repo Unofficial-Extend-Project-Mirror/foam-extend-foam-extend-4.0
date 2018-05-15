@@ -118,9 +118,10 @@ void thermalModel::modifyResistance
     }
 }
 
+
 tmp<fvScalarMatrix> thermalModel::laplacian(volScalarField& T)
 {
-    word kScheme ("laplacian(k,T)");
+    const word kScheme("laplacian(k,T)");
 
     surfaceScalarField kf = fvc::interpolate(lawPtr_->k());
 
@@ -128,9 +129,10 @@ tmp<fvScalarMatrix> thermalModel::laplacian(volScalarField& T)
 
     return tmp<fvScalarMatrix>
     (
-        new fvScalarMatrix( fvm::laplacian(kf, T, kScheme) )
+        new fvScalarMatrix(fvm::laplacian(kf, T, kScheme))
     );
 }
+
 
 tmp<volScalarField> thermalModel::S() const
 {
@@ -155,14 +157,16 @@ tmp<volScalarField> thermalModel::S() const
             )
         )
     );
+    volScalarField& source = tsource();
 
     forAll(sourcePtr_, sourceI)
     {
-        sourcePtr_[sourceI].addSource(tsource());
+        sourcePtr_[sourceI].addSource(source);
     }
 
     return tsource;
 }
+
 
 bool thermalModel::read()
 {

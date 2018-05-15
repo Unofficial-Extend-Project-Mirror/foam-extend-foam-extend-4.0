@@ -65,6 +65,13 @@ class dynamicPolyRefinementFvMesh
         //- Refinement interval
         label refineInterval_;
 
+        //- Unrefinement interval
+        label unrefineInterval_;
+
+        //- Separate refinement/unrefinement: off by default, meaning that
+        //  refinement and unrefinement can be performed in the same step
+        Switch separateUpdates_;
+
         //- Current time index (helper variable to skip multiple topo changes in
         //  a single time step)
         label curTimeIndex_;

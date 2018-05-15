@@ -44,7 +44,7 @@ autoPtr<thermalLaw> thermalLaw::New
     const dictionary& dict
 )
 {
-    word rheoTypeName = dict.lookup("type");
+    const word rheoTypeName = dict.lookup("type");
 
     Info<< "Selecting thermal model " << rheoTypeName << endl;
 
@@ -64,7 +64,7 @@ autoPtr<thermalLaw> thermalLaw::New
         )   << "Unknown thermalLaw type "
             << rheoTypeName << endl << endl
             << "Valid  thermalLaws are : " << endl
-            << dictionaryConstructorTablePtr_->toc()
+            << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 

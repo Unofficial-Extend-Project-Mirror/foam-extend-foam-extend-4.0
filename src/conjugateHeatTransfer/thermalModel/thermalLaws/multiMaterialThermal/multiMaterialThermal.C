@@ -109,6 +109,7 @@ void Foam::multiMaterialThermal::readLaws
     }
 }
 
+
 void Foam::multiMaterialThermal::checkLaws() const
 {
     const PtrList<thermalLaw>& laws = *this;
@@ -172,6 +173,7 @@ Foam::multiMaterialThermal::multiMaterialThermal
     readLaws(T, dict);
     checkLaws();
 }
+
 
 // Construct from dictionary and create default material field
 Foam::multiMaterialThermal::multiMaterialThermal
@@ -244,6 +246,7 @@ Foam::tmp<Foam::volScalarField> Foam::multiMaterialThermal::rho() const
     return tresult;
 }
 
+
 Foam::tmp<Foam::volScalarField> Foam::multiMaterialThermal::C() const
 {
     tmp<volScalarField> tresult
@@ -305,6 +308,78 @@ Foam::tmp<Foam::volScalarField> Foam::multiMaterialThermal::k() const
     {
         result += indicator(lawI)*laws[lawI].k();
     }
+
+    return tresult;
+}
+
+
+Foam::tmp<Foam::volScalarField> Foam::multiMaterialThermal::alpha() const
+{
+    tmp<volScalarField> tresult
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "alpha",
+                mesh().time().timeName(),
+                mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh(),
+            dimensionedScalar("zeroE", dimless/dimTemperature, 0),
+            zeroGradientFvPatchScalarField::typeName
+        )
+    );
+    volScalarField& result = tresult();
+
+    // Accumulate data for all fields
+    const PtrList<thermalLaw>& laws = *this;
+
+    forAll (laws, lawI)
+    {
+        result.internalField() +=
+            indicator(lawI)*laws[lawI].alpha()().internalField();
+    }
+
+    result.correctBoundaryConditions();
+
+    return tresult;
+}
+
+
+Foam::tmp<Foam::volScalarField> Foam::multiMaterialThermal::T0() const
+{
+    tmp<volScalarField> tresult
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "T0",
+                mesh().time().timeName(),
+                mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh(),
+            dimensionedScalar("zeroT0", dimTemperature, 0),
+            zeroGradientFvPatchScalarField::typeName
+        )
+    );
+    volScalarField& result = tresult();
+
+    // Accumulate data for all fields
+    const PtrList<thermalLaw>& laws = *this;
+
+    forAll (laws, lawI)
+    {
+        result.internalField() +=
+            indicator(lawI)*laws[lawI].T0()().internalField();
+    }
+
+    result.correctBoundaryConditions();
 
     return tresult;
 }

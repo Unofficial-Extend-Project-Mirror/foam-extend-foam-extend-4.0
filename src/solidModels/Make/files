@@ -79,12 +79,5 @@ $(rheologyLaws)/multiMaterial/multiMaterial.C
 $(rheologyLaws)/orthotropicLinearElastic/orthotropicLinearElastic.C
 $(rheologyLaws)/PronyViscoelastic/PronyViscoelastic.C
 
-thermalModel/thermalModel.C
-thermalLaws = thermalModel/thermalLaws
-$(thermalLaws)/thermalLaw/thermalLaw.C
-$(thermalLaws)/thermalLaw/newThermalLaw.C
-$(thermalLaws)/constantThermal/constantThermal.C
-$(thermalLaws)/multiMaterialThermal/multiMaterialThermal.C
-
 
 LIB = $(FOAM_LIBBIN)/libsolidModels
