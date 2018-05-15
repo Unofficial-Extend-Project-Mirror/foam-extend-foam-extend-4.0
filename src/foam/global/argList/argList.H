@@ -53,7 +53,7 @@ Description
 
     The environment variable \b FOAM_CASE is set to the path of the
     global case (same for serial and parallel jobs).
-    The environment variable @b FOAM_CASENAME is set to the name of the
+    The environment variable \b FOAM_CASENAME is set to the name of the
     global case.
 
 Note
@@ -69,6 +69,7 @@ Note
 
 SourceFiles
     argList.C
+    argListI.H
 
 \*---------------------------------------------------------------------------*/
 
@@ -83,6 +84,7 @@ SourceFiles
 #include "fileName.H"
 #include "parRun.H"
 #include "IStringStream.H"
+#include "OSspecific.H"
 
 #include "sigFpe.H"
 #include "sigInt.H"
@@ -258,7 +260,7 @@ public:
             //  \deprecated use operator[] directly (deprecated Feb 2010)
             stringList::subList additionalArgs() const
             {
-                return args_;
+                return stringList::subList(args_, args_.size()-1, 1);
             }
 
 
@@ -398,7 +400,6 @@ public:
 
             //- Check root path and case path
             bool checkRootCase() const;
-
 };
 
 
