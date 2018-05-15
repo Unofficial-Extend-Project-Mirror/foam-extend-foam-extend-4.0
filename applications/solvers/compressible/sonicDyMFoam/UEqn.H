@@ -7,7 +7,10 @@
 
     UEqn.relax
     (
-        mesh.solutionDict().equationRelaxationFactor(U.select(pimple.finalIter()))
+        mesh.solutionDict().equationRelaxationFactor
+        (
+            U.select(pimple.finalIter())
+        )
     );
 
     solve(UEqn == -fvc::grad(p));
