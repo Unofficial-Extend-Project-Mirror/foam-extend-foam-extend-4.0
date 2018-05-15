@@ -494,22 +494,24 @@ Foam::autoPtr<Foam::decompositionMethod> Foam::decompositionMethod::New
 void Foam::decompositionMethod::loadExternalLibraries()
 {
     wordList libNames(3);
-    libNames[0]=word("scotchDecomp");
-    libNames[1]=word("metisDecomp");
-    libNames[2]=word("parMetisDecomp");
+    
+    libNames[0] = word("scotchDecomp");
+    libNames[1] = word("metisDecomp");
+    libNames[2] = word("parMetisDecomp");
 
-    forAll(libNames,i) {
+    forAll (libNames,i)
+    {
         const word libName("lib"+libNames[i]+".so");
 
-        //        Info << "Loading " << libName << endl;
+        bool ok = dlLibraryTable::open(libName);
 
-        bool ok=dlLibraryTable::open(libName);
-        if(!ok) {
+        if (!ok)
+        {
             WarningIn("decompositionMethod::loadExternalLibraries()")
                 << "Loading of decomposition library " << libName
-                    << " unsuccesful. Some decomposition methods may not be "
-                    << " available"
-                    << endl;
+                << " unsuccesful. Some decomposition methods may not be "
+                << "available"
+                << endl;
         }
     }
 }
