@@ -79,17 +79,14 @@ void Foam::cyclicGgiFvPatch::makeWeights(fvsPatchScalarField& w) const
                 n & (cyclicGgiPolyPatch_.reconFaceCellCentres() - Cf())
             );
 
-        w = nfc/(mag(n & (Cf() - Cn())) + nfc);
-
-        if (bridgeOverlap())
-        {
-            // Set overlap weights to 0.5 and use mirrored neighbour field
-            // for interpolation.  HJ, 21/Jan/2009
-            bridge(scalarField(size(), 0.5), w);
-        }
+        w = nfc/(mag(n & (Cf() - Cn())) + nfc + SMALL);
     }
     else
     {
+        // Slave side. Interpolate the master side weights, scale them for
+        // partially covered faces and set weights for fully uncovered faces if
+        // the bridge overlap is switched on. VV, 15/Feb/2018.
+
         // Pick up weights from the master side
         fvsPatchScalarField masterWeights
         (
@@ -99,14 +96,23 @@ void Foam::cyclicGgiFvPatch::makeWeights(fvsPatchScalarField& w) const
 
         shadow().makeWeights(masterWeights);
 
-        w = interpolate(1 - masterWeights);
+        // Interpolate master weights to this side
+        w = interpolate(masterWeights);
 
         if (bridgeOverlap())
         {
-            // Set overlap weights to 0.5 and use mirrored neighbour field
-            // for interpolation.  HJ, 21/Jan/2009
-            bridge(scalarField(size(), 0.5), w);
+            // Weights for fully uncovered faces
+            const scalarField uncoveredWeights(w.size(), 0.5);
+
+            // Set weights for uncovered faces
+            setUncoveredFaces(uncoveredWeights, w);
+
+            // Scale partially overlapping faces
+            scalePartialFaces(w);
         }
+
+        // Finally construct these weights as 1 - master weights
+        w = 1 - w;
     }
 }
 
@@ -116,20 +122,21 @@ void Foam::cyclicGgiFvPatch::makeDeltaCoeffs(fvsPatchScalarField& dc) const
 {
     if (cyclicGgiPolyPatch_.master())
     {
+        // Master side. No need to scale partially uncovered or set fully
+        // uncovered faces since delta already takes it into account.
+        // VV, 25/Feb/2018.
+
         // Stabilised form for bad meshes.  HJ, 24/Aug/2011
-        vectorField d = delta();
+        const vectorField d = delta();
 
         dc = 1.0/max(nf() & d, 0.05*mag(d));
-
-        if (bridgeOverlap())
-        {
-            scalarField bridgeDeltas = nf() & fvPatch::delta();
-
-            bridge(bridgeDeltas, dc);
-        }
     }
     else
     {
+        // Slave side. Interpolate the master side, scale it for partially
+        // covered faces and set deltaCoeffs for fully uncovered faces if the
+        // bridge overlap is switched on. VV, 15/Feb/2018.
+
         fvsPatchScalarField masterDeltas
         (
             shadow(),
@@ -142,9 +149,17 @@ void Foam::cyclicGgiFvPatch::makeDeltaCoeffs(fvsPatchScalarField& dc) const
 
         if (bridgeOverlap())
         {
-            scalarField bridgeDeltas = nf() & fvPatch::delta();
+            // Delta coeffs for fully uncovered faces obtained from deltas on
+            // this side
+            const vectorField d = delta();
+            const scalarField uncoveredDeltaCoeffs =
+                1.0/max(nf() & d, 0.05*mag(d));
 
-            bridge(bridgeDeltas, dc);
+            // Set delta coeffs for uncovered faces
+            setUncoveredFaces(uncoveredDeltaCoeffs, dc);
+
+            // Scale partially overlapping faces
+            scalePartialFaces(dc);
         }
     }
 }
@@ -162,33 +177,39 @@ Foam::tmp<Foam::vectorField> Foam::cyclicGgiFvPatch::delta() const
 {
     if (cyclicGgiPolyPatch_.master())
     {
-        tmp<vectorField> tDelta =
+        // Master side. Note: scaling partially covered faces and setting deltas
+        // to fully uncovered faces correctly taken into account in
+        // reconFaceCellCentres function. VV, 15/Feb/2018.
+
+        tmp<vectorField> tdelta =
             cyclicGgiPolyPatch_.reconFaceCellCentres() - Cn();
 
-        if (bridgeOverlap())
-        {
-            vectorField bridgeDeltas = Cf() - Cn();
-
-            bridge(bridgeDeltas, tDelta());
-        }
-
-        return tDelta;
+        return tdelta;
     }
     else
     {
-        tmp<vectorField> tDelta = interpolate
+        // Slave side. Interpolate the master side, scale it for partially
+        // covered faces and set deltas for fully uncovered faces if the bridge
+        // overlap is switched on. VV, 15/Feb/2018.
+
+        tmp<vectorField> tdelta = interpolate
         (
             shadow().Cn() - cyclicGgiPolyPatch_.shadow().reconFaceCellCentres()
         );
 
         if (bridgeOverlap())
         {
-            vectorField bridgeDeltas = Cf() - Cn();
+            // Deltas for fully uncovered faces
+            const vectorField uncoveredDeltas(2.0*fvPatch::delta());
 
-            bridge(bridgeDeltas, tDelta());
+            // Set deltas for fully uncovered faces
+            setUncoveredFaces(uncoveredDeltas, tdelta());
+
+            // Scale for partially covered faces
+            scalePartialFaces(tdelta());
         }
 
-        return tDelta;
+        return tdelta;
     }
 }
 
