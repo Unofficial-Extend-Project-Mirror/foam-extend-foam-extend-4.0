@@ -113,6 +113,10 @@ private:
         //- Disallow default bitwise assignment
         void operator=(const decompositionMethod&);
 
+        //- Load missing libraries to avoid compile-time linking to external dependencies
+        //  Temporary hack: to be resolved by Henrik Rusche.  HJ, 15/May/2018
+        static void loadExternalLibraries(Time& time);
+
 
 public:
 
