@@ -143,6 +143,7 @@ class engineValve
         //- Adjust crank angle to drop within the limits of the lift profile
         scalar adjustCrankAngle(const scalar theta) const;
 
+
 public:
 
     // Static data members
