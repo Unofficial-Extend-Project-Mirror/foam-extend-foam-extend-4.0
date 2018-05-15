@@ -25,6 +25,7 @@ Class
     Foam::vtkSurfaceWriter
 
 Description
+    A surfaceWriter for VTK legacy format.
 
 SourceFiles
     vtkSurfaceWriter.C
@@ -42,20 +43,34 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                     Class vtkSurfaceWriter Declaration
+                      Class vtkSurfaceWriter Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class Type>
 class vtkSurfaceWriter
 :
-    public surfaceWriter<Type>
+    public surfaceWriter
 {
     // Private Member Functions
 
         static void writeGeometry(Ostream&, const pointField&, const faceList&);
 
-        static void writeData(Ostream&, const Field<Type>& values);
+        template<class Type>
+        static void writeData(Ostream&, const Field<Type>&);
 
+
+        //- Templated write operation
+        template<class Type>
+        void writeTemplate
+        (
+            const fileName& outputDir,
+            const fileName& surfaceName,
+            const pointField& points,
+            const faceList& faces,
+            const word& fieldName,
+            const Field<Type>& values,
+            const bool isNodeValues,
+            const bool verbose
+        ) const;
 
 public:
 
@@ -69,48 +84,127 @@ public:
         vtkSurfaceWriter();
 
 
-    // Destructor
+    //- Destructor
     virtual ~vtkSurfaceWriter();
 
 
     // Member Functions
 
-        // Write
+        //- Write single surface geometry to file.
+        virtual void write
+        (
+            const fileName& outputDir,
+            const fileName& surfaceName,
+            const pointField& points,
+            const faceList& faces,
+            const bool verbose = false
+        ) const;
 
-            //- Write geometry to file.
-            virtual void write
-            (
-                const fileName& outputDir,
-                const fileName& surfaceName,
-                const pointField& points,
-                const faceList& faces,
-                const bool verbose = false
-            ) const;
 
-            //- Writes single surface to file.
-            virtual void write
-            (
-                const fileName& outputDir,
-                const fileName& surfaceName,
-                const pointField& points,
-                const faceList& faces,
-                const fileName& fieldName,
-                const Field<Type>& values,
-                const surfaceWriterBase::surfaceData sdType,
-                const bool verbose = false
-            ) const;
+        //- Write scalarField for a single surface to file.
+        //  One value per face or vertex (isNodeValues = true)
+        virtual void write
+        (
+            const fileName& outputDir,      // <case>/surface/TIME
+            const fileName& surfaceName,    // name of surface
+            const pointField& points,
+            const faceList& faces,
+            const word& fieldName,          // name of field
+            const Field<scalar>& values,
+            const bool isNodeValues,
+            const bool verbose = false
+        ) const;
+
+        //- Write vectorField for a single surface to file.
+        //  One value per face or vertex (isNodeValues = true)
+        virtual void write
+        (
+            const fileName& outputDir,      // <case>/surface/TIME
+            const fileName& surfaceName,    // name of surface
+            const pointField& points,
+            const faceList& faces,
+            const word& fieldName,          // name of field
+            const Field<vector>& values,
+            const bool isNodeValues,
+            const bool verbose = false
+        ) const;
+
+        //- Write sphericalTensorField for a single surface to file.
+        //  One value per face or vertex (isNodeValues = true)
+        virtual void write
+        (
+            const fileName& outputDir,      // <case>/surface/TIME
+            const fileName& surfaceName,    // name of surface
+            const pointField& points,
+            const faceList& faces,
+            const word& fieldName,          // name of field
+            const Field<sphericalTensor>& values,
+            const bool isNodeValues,
+            const bool verbose = false
+        ) const;
+
+        //- Write symmTensorField for a single surface to file.
+        //  One value per face or vertex (isNodeValues = true)
+        virtual void write
+        (
+            const fileName& outputDir,      // <case>/surface/TIME
+            const fileName& surfaceName,    // name of surface
+            const pointField& points,
+            const faceList& faces,
+            const word& fieldName,          // name of field
+            const Field<symmTensor>& values,
+            const bool isNodeValues,
+            const bool verbose = false
+        ) const;
+
+        //- Write symmTensorField4thOrder for a single surface to file.
+        //  One value per face or vertex (isNodeValues = true)
+        virtual void write
+        (
+            const fileName& outputDir,      // <case>/surface/TIME
+            const fileName& surfaceName,    // name of surface
+            const pointField& points,
+            const faceList& faces,
+            const word& fieldName,          // name of field
+            const Field<symmTensor4thOrder>& values,
+            const bool isNodeValues,
+            const bool verbose = false
+        ) const;
+
+        //- Write diagTensorField for a single surface to file.
+        //  One value per face or vertex (isNodeValues = true)
+        virtual void write
+        (
+            const fileName& outputDir,      // <case>/surface/TIME
+            const fileName& surfaceName,    // name of surface
+            const pointField& points,
+            const faceList& faces,
+            const word& fieldName,          // name of field
+            const Field<diagTensor>& values,
+            const bool isNodeValues,
+            const bool verbose = false
+        ) const;
+
+        //- Write tensorField for a single surface to file.
+        //  One value per face or vertex (isNodeValues = true)
+        virtual void write
+        (
+            const fileName& outputDir,      // <case>/surface/TIME
+            const fileName& surfaceName,    // name of surface
+            const pointField& points,
+            const faceList& faces,
+            const word& fieldName,          // name of field
+            const Field<tensor>& values,
+            const bool isNodeValues,
+            const bool verbose = false
+        ) const;
+
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#ifdef NoRepository
-#   include "vtkSurfaceWriter.C"
-#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
