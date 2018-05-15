@@ -97,6 +97,7 @@ class dynamicPolyRefinementFvMesh
             //- Disallow default bitwise assignment
             void operator=(const dynamicPolyRefinementFvMesh&);
 
+
 public:
 
     //- Runtime type information
