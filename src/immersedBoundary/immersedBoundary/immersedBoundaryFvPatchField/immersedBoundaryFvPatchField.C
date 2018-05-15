@@ -201,8 +201,7 @@ void immersedBoundaryFvPatchField<Type>::write(Ostream& os) const
         // and write the whola patch together
 
         // Write immersed boundary data as a vtk file
-        autoPtr<surfaceWriter<Type> > writerPtr =
-            surfaceWriter<Type>::New("vtk");
+        autoPtr<surfaceWriter> writerPtr = surfaceWriter::New("vtk");
 
         // Get the intersected patch
         const standAlonePatch& ts = ibPatch_.ibPolyPatch().ibPatch();
@@ -215,7 +214,8 @@ void immersedBoundaryFvPatchField<Type>::write(Ostream& os) const
             ts,
             this->dimensionedInternalField().name(),
             *this,
-            surfaceWriterBase::FACE_DATA
+            false, // FACE_DATA
+            false  // verbose
         );
     }
 }

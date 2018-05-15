@@ -214,8 +214,7 @@ void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::write
         // and write the whola patch together
 
         // Write immersed boundary data as a vtk file
-        autoPtr<surfaceWriter<vector> > writerPtr =
-            surfaceWriter<vector>::New("vtk");
+        autoPtr<surfaceWriter> writerPtr = surfaceWriter::New("vtk");
 
         // Get the intersected patch
         const standAlonePatch& ts = ibPatch_.ibPolyPatch().ibPatch();
@@ -228,7 +227,8 @@ void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::write
             ts,
             this->dimensionedInternalField().name(),
             *this,
-            surfaceWriterBase::FACE_DATA
+            false,  // FACE_DATA
+            false   // verbose
         );
     }
 }
