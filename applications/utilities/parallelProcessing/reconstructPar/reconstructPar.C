@@ -485,7 +485,8 @@ int main(int argc, char *argv[])
 
             faMesh aMesh(mesh);
 
-            processorFaMeshes procFaMeshes(procMeshes.meshes());
+            // Create mesh addressing by reading from files
+            processorFaMeshes procFaMeshes(procMeshes.meshes(), true);
 
             faFieldReconstructor faReconstructor
             (

@@ -40,6 +40,7 @@ SourceFiles
 #include "polyMeshModifier.H"
 #include "primitiveFacePatch.H"
 #include "ZoneIDs.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -128,13 +129,14 @@ class layerAdditionRemoval
 
     // Static data members
 
-        //- Thickness insertion fraction for the pre-motion
-        static const scalar addDelta_;
+        //- Motion detection fraction: if the motion is smaller than
+        // motionDelta*minLayerThickness_, it is assumed that the mesh is
+        // not layering
+        static const debug::tolerancesSwitch motionDelta_;
 
-        //- Thickness removal fraction for the cell collapse
-        //  Note: the cell will be collapsed to this relative
-        //  thickness before the layer is removed.
-        static const scalar removeDelta_;
+        //- Thickness insertion fraction for the pre-motion
+        static const debug::tolerancesSwitch addDelta_;
+
 
 public:
 

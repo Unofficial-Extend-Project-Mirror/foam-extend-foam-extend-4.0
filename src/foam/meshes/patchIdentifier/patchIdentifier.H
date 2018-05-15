@@ -52,7 +52,7 @@ Ostream& operator<<(Ostream&, const patchIdentifier&);
 
 
 /*---------------------------------------------------------------------------*\
-                           Class patchIdentifier Declaration
+                     Class patchIdentifier Declaration
 \*---------------------------------------------------------------------------*/
 
 class patchIdentifier
@@ -97,9 +97,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~patchIdentifier();
+    //- Destructor
+    virtual ~patchIdentifier();
 
 
     // Member Functions

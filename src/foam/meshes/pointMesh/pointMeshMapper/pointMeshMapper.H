@@ -36,6 +36,7 @@ SourceFiles
 #ifndef pointMeshMapper_H
 #define pointMeshMapper_H
 
+#include "mapPolyMesh.H"
 #include "pointMapper.H"
 #include "pointBoundaryMeshMapper.H"
 
@@ -65,6 +66,9 @@ class pointMeshMapper
         //- Boundary mapper
         pointBoundaryMeshMapper boundaryMap_;
 
+        //- Reset patch flag.  Set true for the rebuilt patch (no mapping)
+        boolList resetPatchFlag_;
+
 
     // Private Member Functions
 
@@ -84,7 +88,8 @@ public:
         :
             mesh_(mesh),
             pointMap_(mpm),
-            boundaryMap_(mesh, pointMap_, mpm)
+            boundaryMap_(mesh, pointMap_, mpm),
+            resetPatchFlag_(mpm.resetPatchFlag())
         {}
 
 
@@ -114,6 +119,12 @@ public:
         const pointBoundaryMeshMapper& boundaryMap() const
         {
             return boundaryMap_;
+        }
+
+        //- Return reset patch flag
+        const boolList& resetPatchFlag() const
+        {
+            return resetPatchFlag_;
         }
 };
 

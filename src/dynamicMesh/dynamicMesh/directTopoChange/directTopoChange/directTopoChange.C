@@ -3162,6 +3162,10 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::directTopoChange::changeMesh
     calcFaceZonePointMap(mesh, oldFaceZoneMeshPointMaps, faceZonePointMap);
 
 
+    // Patch reset map is currently dummy
+    // HJ, 23/Apr/2018
+    boolList resetPatchFlag(mesh.boundaryMesh().size(), false);
+
     return autoPtr<mapPolyMesh>
     (
         new mapPolyMesh
@@ -3198,6 +3202,8 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::directTopoChange::changeMesh
             faceZonePointMap,
             faceZoneFaceMap,
             cellZoneMap,
+
+            resetPatchFlag,
 
             newPoints,          // if empty signals no inflation.
             oldPatchStarts,
@@ -3470,6 +3476,10 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::directTopoChange::makeMesh
         writeMeshStats(mesh, Pout);
     }
 
+    // Patch reset map is currently dummy
+    // HJ, 23/Apr/2018
+    boolList resetPatchFlag(mesh.boundaryMesh().size(), false);
+
     return autoPtr<mapPolyMesh>
     (
         new mapPolyMesh
@@ -3506,6 +3516,8 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::directTopoChange::makeMesh
             faceZonePointMap,
             faceZoneFaceMap,
             cellZoneMap,
+
+            resetPatchFlag,
 
             newPoints,          // if empty signals no inflation.
             oldPatchStarts,

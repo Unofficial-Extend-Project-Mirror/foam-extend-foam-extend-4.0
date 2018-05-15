@@ -79,14 +79,15 @@ int main(int argc, char *argv[])
 
         Info<< "Crank angle = " << runTime.theta() << " CA-deg" << endl;
 
-        // Make flux absolute
-        phi += meshFlux;
+        // Make the fluxes absolute (using the ddt(rho, U) scheme)
+        phi += fvc::interpolate(rho)*fvc::meshPhi(rho, U);
 
         bool meshChanged = mesh.update();
 
 #       include "volContinuity.H"
 
-        mesh.setBoundaryVelocity(U);
+        // Make the fluxes relative (using the ddt(rho, U) scheme)
+        phi -= fvc::interpolate(rho)*fvc::meshPhi(rho, U);
 
         if (meshChanged)
         {
@@ -95,14 +96,7 @@ int main(int argc, char *argv[])
             rho.correctBoundaryConditions();
         }
 
-        meshFlux = fvc::interpolate(rho)*fvc::meshPhi(rho, U);
-
-        phi = fvc::interpolate(rho)
-            *((fvc::interpolate(U) & mesh.Sf()) - fvc::meshPhi(rho, U));
-
-        DpDt = dpdt + fvc::div(phi/fvc::interpolate(rho), p)
-            - fvc::div(phi/fvc::interpolate(rho) + fvc::meshPhi(U))*p;
-
+        if (meshChanged)
         {
 #           include "compressibleCourantNo.H"
         }
@@ -111,21 +105,19 @@ int main(int argc, char *argv[])
         while (pimple.loop())
         {
 #           include "rhoEqn.H"
+#           include "hEqn.H"
 #           include "UEqn.H"
 
             // --- PISO loop
             while (pimple.correct())
             {
 #               include "pEqn.H"
-#               include "hEqn.H"
             }
+
+            turbulence->correct();
         }
 
-        turbulence->correct();
-
 #       include "logSummary.H"
-
-        rho = thermo.rho();
 
         runTime.write();
 

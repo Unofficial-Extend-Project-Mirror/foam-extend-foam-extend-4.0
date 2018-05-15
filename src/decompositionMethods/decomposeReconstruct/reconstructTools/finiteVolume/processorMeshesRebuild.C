@@ -1,0 +1,1564 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.0
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+License
+    This file is part of foam-extend.
+
+    foam-extend is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+
+\*---------------------------------------------------------------------------*/
+
+#include "processorMeshesReconstructor.H"
+#include "processorPolyPatch.H"
+#include "passiveProcessorPolyPatch.H"
+#include "SortableList.H"
+#include "sharedPoints.H"
+
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+Foam::label Foam::processorMeshesReconstructor::firstValidMesh() const
+{
+    forAll (meshes_, procI)
+    {
+        if (meshes_.set(procI))
+        {
+            return procI;
+        }
+    }
+
+    FatalErrorIn("label processorMeshesReconstructor::firstValidMesh() const")
+        << "Cannot find a valid mesh in reconstruction set"
+        << abort(FatalError);
+
+    return 0;
+}
+
+
+bool Foam::processorMeshesReconstructor::readMapping()
+{
+    // Check for mapping
+    Info<< "Check for mesh mapping data for instance.  ";
+
+    bool readOk = true;
+
+    forAll (meshes_, procI)
+    {
+        if (meshes_.set(procI))
+        {
+            const fvMesh& procMesh = meshes_[procI];
+
+            IOobject pointProcAddressingHeader
+            (
+                "pointProcAddressing",
+                procMesh.facesInstance(),
+                procMesh.meshSubDir,
+                procMesh,
+                IOobject::MUST_READ
+            );
+
+            IOobject faceProcAddressingHeader
+            (
+                "faceProcAddressing",
+                procMesh.facesInstance(),
+                procMesh.meshSubDir,
+                procMesh,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            );
+
+            IOobject cellProcAddressingHeader
+            (
+                "cellProcAddressing",
+                procMesh.facesInstance(),
+                procMesh.meshSubDir,
+                procMesh,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            );
+
+            IOobject boundaryProcAddressingHeader
+            (
+                "boundaryProcAddressing",
+                procMesh.facesInstance(),
+                procMesh.meshSubDir,
+                procMesh,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            );
+
+            if
+            (
+                !pointProcAddressingHeader.headerOk()
+             || !faceProcAddressingHeader.headerOk()
+             || !cellProcAddressingHeader.headerOk()
+             || !boundaryProcAddressingHeader.headerOk()
+            )
+            {
+                readOk = false;
+                break;
+            }
+        }
+    }
+
+    // All processors are fine: read mapping data
+    if (readOk)
+    {
+        Info<< "Mapping data present.  Reading." << endl;
+
+        // Size the mapping arrays
+        pointProcAddressing_.setSize(meshes_.size());
+        faceProcAddressing_.setSize(meshes_.size());
+        cellProcAddressing_.setSize(meshes_.size());
+        boundaryProcAddressing_.setSize(meshes_.size());
+
+        forAll (meshes_, procI)
+        {
+            if (meshes_.set(procI))
+            {
+                const fvMesh& procMesh = meshes_[procI];
+
+                pointProcAddressing_.set
+                (
+                    procI,
+                    new labelIOList
+                    (
+                        IOobject
+                        (
+                            "pointProcAddressing",
+                            procMesh.facesInstance(),
+                            procMesh.meshSubDir,
+                            procMesh,
+                            IOobject::MUST_READ,
+                            IOobject::NO_WRITE
+                        )
+                    )
+                );
+
+                faceProcAddressing_.set
+                (
+                    procI,
+                    new labelIOList
+                    (
+                        IOobject
+                        (
+                            "faceProcAddressing",
+                            procMesh.facesInstance(),
+                            procMesh.meshSubDir,
+                            procMesh,
+                            IOobject::MUST_READ,
+                            IOobject::NO_WRITE
+                        )
+                    )
+                );
+
+                cellProcAddressing_.set
+                (
+                    procI,
+                    new labelIOList
+                    (
+                        IOobject
+                        (
+                            "cellProcAddressing",
+                            procMesh.facesInstance(),
+                            procMesh.meshSubDir,
+                            procMesh,
+                            IOobject::MUST_READ,
+                            IOobject::NO_WRITE
+                        )
+                    )
+                );
+
+                boundaryProcAddressing_.set
+                (
+                    procI,
+                    new labelIOList
+                    (
+                        IOobject
+                        (
+                            "boundaryProcAddressing",
+                            procMesh.facesInstance(),
+                            procMesh.meshSubDir,
+                            procMesh,
+                            IOobject::MUST_READ,
+                            IOobject::NO_WRITE
+                        )
+                    )
+                );
+            }
+        }
+
+        Info<< "Addressing from files: " << endl;
+        forAll (meshes_, procI)
+        {
+            if (meshes_.set(procI))
+            {
+                Info<< "Proc " << procI
+                    << " point addr: " << pointProcAddressing_[procI].size()
+                    << " face addr: " << faceProcAddressing_[procI].size()
+                    << " cell addr: " << cellProcAddressing_[procI].size()
+                    << " boundary addr: "
+                    << boundaryProcAddressing_[procI].size()
+                    << endl;
+            }
+        }
+    }
+    else
+    {
+        Info<< "No mapping data available." << endl;
+    }
+
+    return readOk;
+}
+
+
+void Foam::processorMeshesReconstructor::writeAddressing()
+{
+    forAll (pointProcAddressing_, procI)
+    {
+        if (meshes_.set(procI))
+        {
+            pointProcAddressing_[procI].write();
+            faceProcAddressing_[procI].write();
+            cellProcAddressing_[procI].write();
+            boundaryProcAddressing_[procI].write();
+        }
+    }
+}
+
+
+const Foam::processorPolyPatch&
+Foam::processorMeshesReconstructor::neighbourProcPatch
+(
+    const processorPolyPatch& procPatch
+) const
+{
+    const label masterProcID = procPatch.neighbProcNo();
+
+    if (!meshes_.set(masterProcID))
+    {
+        FatalErrorIn
+        (
+            "const processorPolyPatch&\n"
+            "processorMeshesReconstructor::neighbourProcPatch\n"
+            "(\n"
+            "    const processorPolyPatch& procPatch\n"
+            ") const"
+        )   << "Cannot find processor patch pair ("
+            << procPatch.myProcNo() << " "
+            << procPatch.neighbProcNo() << ") for merging"
+            << abort(FatalError);
+    }
+
+    const polyMesh& masterMesh = meshes_[masterProcID];
+
+    bool found = false;
+
+    // Find the processor patch that corresponds to current patch
+    const polyBoundaryMesh& masterPatches = masterMesh.boundaryMesh();
+
+    forAll (masterPatches, masterPatchI)
+    {
+        if
+        (
+            isA<processorPolyPatch>
+            (
+                masterPatches[masterPatchI]
+            )
+        )
+        {
+            const processorPolyPatch& masterProcPatch =
+                refCast<const processorPolyPatch>
+                (
+                    masterPatches[masterPatchI]
+                );
+
+            // Check neighbour processor index
+            if (masterProcPatch.neighbProcNo() == procPatch.myProcNo())
+            {
+                // Found matching patch
+                return masterProcPatch;
+            }
+        }
+    }
+
+    if (!found)
+    {
+        FatalErrorIn
+        (
+            "const processorPolyPatch&\n"
+            "processorMeshesReconstructor::neighbourProcPatch\n"
+            "(\n"
+            "    const processorPolyPatch& procPatch\n"
+            ") const"
+        )   << "Cannot find processor patch pair ("
+            << procPatch.myProcNo() << " "
+            << procPatch.neighbProcNo() << ") for merging"
+            << abort(FatalError);
+    }
+
+    // Dummy return
+    return procPatch;
+}
+
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+void Foam::processorMeshesReconstructor::reconstructPoints(fvMesh& mesh) const
+{
+    // Create the new points
+    vectorField newPoints(mesh.nPoints());
+
+    forAll (meshes_, procI)
+    {
+        if (meshes_.set(procI))
+        {
+            // Reconstruct only live points.  HJ, 7/Mar/2011
+            const vectorField& procPoints = meshes_[procI].points();
+
+            // Set the cell values in the reconstructed field
+
+            const labelList& pointProcAddressingI =
+                pointProcAddressing()[procI];
+
+            if (pointProcAddressingI.size() != procPoints.size())
+            {
+                FatalErrorIn("processorMeshes")
+                    << "problem :"
+                    << " pointProcAddressingI: " << pointProcAddressingI.size()
+                    << " procPoints:" << procPoints.size()
+                    << abort(FatalError);
+            }
+
+            // Only live points carry reconstruction data.  Reconsider
+            // HJ, 6/Sep/2009
+            for (label pointI = 0; pointI < meshes_[procI].nPoints(); pointI++)
+            {
+                newPoints[pointProcAddressingI[pointI]] = procPoints[pointI];
+            }
+        }
+    }
+
+    mesh.movePoints(newPoints);
+    mesh.write();
+}
+
+
+Foam::autoPtr<Foam::fvMesh>
+Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
+{
+    // Note:
+    // In load balancing, there will exist a double set of processor patches
+    // One, created by moving cells adjacent to "old" processor boundaries
+    // (processorPolyPatch) and another, created by splitting up previously
+    // internal mesh faces into "new" processor patches
+    // In order to reconstruct the mesh correctly, the two sets of processor
+    // boundaries are kept separately
+    // In reconstruction, the order of processor patch faces needs to be
+    // preserved.  This is achieved by
+    // - first adding original processor patch faces
+    // - adding passiveProcessor patch faces in the processor order
+
+    // Check for read
+
+    if (readMapping())
+    {
+        // Mapping data present and read.  Reconstructed mesh may be
+        // present as well
+        bool readMesh = false;
+
+        {
+            IOobject points
+            (
+                "points",
+                db.timeName(),
+                meshes_[firstValidMesh()].meshSubDir,
+                db,
+                IOobject::MUST_READ
+            );
+
+            if (points.headerOk())
+            {
+                readMesh = true;
+            }
+        }
+
+        if (readMesh)
+        {
+            Info<< "Global mesh present for time " << db.timeName()
+                << ".  Reading mesh." << endl;
+
+            autoPtr<fvMesh> globalMeshPtr
+            (
+                new fvMesh
+                (
+                    IOobject
+                    (
+                        meshName_,
+                        db.timeName(),
+                        db,
+                        IOobject::MUST_READ,
+                        IOobject::NO_WRITE
+                    )
+                )
+            );
+
+            return globalMeshPtr;
+        }
+    }
+
+    // Prepare patch reconstruction
+    HashTable<label, word> patchNameLookup
+    (
+        meshes_[firstValidMesh()].boundaryMesh().size()
+    );
+    DynamicList<word> patchTypeLookup
+    (
+        meshes_[firstValidMesh()].boundaryMesh().size()
+    );
+
+    label nReconPatches = 0;
+
+    forAll (meshes_, procI)
+    {
+        if (meshes_.set(procI))
+        {
+            const polyBoundaryMesh& procPatches = meshes_[procI].boundaryMesh();
+
+            forAll (procPatches, patchI)
+            {
+                if (!isA<processorPolyPatch>(procPatches[patchI]))
+                {
+                    const word& patchName = procPatches[patchI].name();
+
+                    // Regular patch.  Try to find it in a list
+                    if (!patchNameLookup.found(patchName))
+                    {
+                        // Patch not found.  Add it
+                        patchNameLookup.insert(patchName, nReconPatches);
+                        patchTypeLookup.append(procPatches[patchI].type());
+                        nReconPatches++;
+                    }
+                }
+            }
+        }
+    }
+
+    // Fill in patch names and types
+    wordList reconPatchNames(patchNameLookup.size());
+    wordList reconPatchTypes(patchNameLookup.size());
+
+    wordList patchNameToc = patchNameLookup.toc();
+
+    forAll (patchNameToc, pnI)
+    {
+        const label pnIndex = patchNameLookup.find(patchNameToc[pnI])();
+
+        reconPatchNames[pnIndex] = patchNameToc[pnI];
+        reconPatchTypes[pnIndex] = patchTypeLookup[pnIndex];
+    }
+
+    // Prepare point, face and patch reconstruction
+    label nReconPoints = 0;
+    label nReconFaces = 0;
+    label nReconCells = 0;
+    labelList reconPatchSizes(reconPatchTypes.size(), 0);
+
+    forAll (meshes_, procI)
+    {
+        if (meshes_.set(procI))
+        {
+            // Count total number of points and faces
+            nReconPoints += meshes_[procI].nPoints();
+            nReconFaces += meshes_[procI].allFaces().size();
+            nReconCells += meshes_[procI].nCells();
+
+            const polyBoundaryMesh& procPatches = meshes_[procI].boundaryMesh();
+
+            forAll (procPatches, patchI)
+            {
+                if (!isA<processorPolyPatch>(procPatches[patchI]))
+                {
+                    // Find processor patch index in reconstructed boundary
+                    const label pnIndex = patchNameLookup.find
+                    (
+                        procPatches[patchI].name()
+                    )();
+
+                    // Check patch name and type
+                    if
+                    (
+                        procPatches[patchI].name()
+                     != reconPatchNames[pnIndex]
+                     || procPatches[patchI].type()
+                     != reconPatchTypes[pnIndex]
+                    )
+                    {
+                        FatalErrorIn
+                        (
+                            "autoPtr<fvMesh> processorMeshesReconstructor::"
+                            "reconstructMesh(const Time& db)"
+                        )   << "Patch name and type does not match "
+                            << "across processors for patch "
+                            << procPatches[patchI].name() << " type: "
+                            << procPatches[patchI].type()
+                            << abort(FatalError);
+                    }
+
+                    // Record number of faces in patch
+                    reconPatchSizes[pnIndex] += procPatches[patchI].size();
+                }
+            }
+        }
+    }
+
+    // Note: for easier debugging, set mapping, owner and neighbour to -1
+    pointField reconPoints(nReconPoints);
+    labelList globalPointMapping(nReconPoints, -1);
+    faceList reconFaces(nReconFaces);
+    labelList cellOffset(meshes_.size(), 0);
+    labelList reconOwner(nReconFaces, -1);
+    labelList reconNeighbour(nReconFaces, -1);
+    faceListList reconPatchFaces(reconPatchTypes.size());
+    labelListList reconPatchOwner(reconPatchTypes.size());
+
+    forAll (reconPatchFaces, patchI)
+    {
+        reconPatchFaces[patchI].setSize(reconPatchSizes[patchI]);
+
+        reconPatchOwner[patchI].setSize(reconPatchSizes[patchI]);
+        reconPatchOwner[patchI] = -1;
+    }
+
+    // Size the mapping arrays
+    pointProcAddressing_.setSize(meshes_.size());
+    faceProcAddressing_.setSize(meshes_.size());
+    cellProcAddressing_.setSize(meshes_.size());
+    boundaryProcAddressing_.setSize(meshes_.size());
+
+    // Allocate addressing arrays on all meshes
+    forAll (meshes_, procI)
+    {
+        if (meshes_.set(procI))
+        {
+            const fvMesh& procMesh = meshes_[procI];
+
+            pointProcAddressing_.set
+            (
+                procI,
+                new labelIOList
+                (
+                    IOobject
+                    (
+                        "pointProcAddressing",
+                        procMesh.facesInstance(),
+                        procMesh.meshSubDir,
+                        procMesh,
+                        IOobject::NO_READ,
+                        IOobject::NO_WRITE
+                    ),
+                    labelList(procMesh.nPoints(), -1)
+                )
+            );
+
+            faceProcAddressing_.set
+            (
+                procI,
+                new labelIOList
+                (
+                    IOobject
+                    (
+                        "faceProcAddressing",
+                        procMesh.facesInstance(),
+                        procMesh.meshSubDir,
+                        procMesh,
+                        IOobject::NO_READ,
+                        IOobject::NO_WRITE
+                    ),
+                    labelList(procMesh.allFaces().size(), -1)
+                )
+            );
+
+            cellProcAddressing_.set
+            (
+                procI,
+                new labelIOList
+                (
+                    IOobject
+                    (
+                        "cellProcAddressing",
+                        procMesh.facesInstance(),
+                        procMesh.meshSubDir,
+                        procMesh,
+                        IOobject::NO_READ,
+                        IOobject::NO_WRITE
+                    ),
+                    labelList(procMesh.nCells(), -1)
+                )
+            );
+
+            boundaryProcAddressing_.set
+            (
+                procI,
+                new labelIOList
+                (
+                    IOobject
+                    (
+                        "boundaryProcAddressing",
+                        procMesh.facesInstance(),
+                        procMesh.meshSubDir,
+                        procMesh,
+                        IOobject::NO_READ,
+                        IOobject::NO_WRITE
+                    ),
+                    labelList(procMesh.boundaryMesh().size(), -1)
+                )
+            );
+        }
+    }
+
+    // Reset the counters
+    nReconPoints = 0;
+    nReconFaces = 0;
+
+    reconPatchSizes = 0;
+
+    // Prepare handling for globally shared points.  This is equivalent
+    // to parallel processor points, but working on a PtrList of meshes
+    // on the same processor
+    sharedPoints sharedData(meshes_);
+
+    // Before assembling the meshes, create unique ordering for all passive
+    // processor patches that will be merged.  HJ, 6/May/2018
+
+    // This list gives insert order for every passive processor patch in the
+    // boundary mesh of every processor mesh.
+    // The index gives the location in the reconstructed patch where the
+    // face should be inserted
+    // For other patch types, the list is empty
+    labelListListList passivePatchInsertOrder(meshes_.size());
+
+
+    // Memory management
+    {
+        // This list provides inser offset for the patch to unpack the list
+        labelListList passivePatchInsertOffset(meshes_.size());
+
+        // This list records all global indices from passive faces
+        // (from multiple proc meshes and patches) that will end up together
+        // It refers to the new patches
+        labelListList globalIndexPerNewProcPatch(reconPatchTypes.size());
+
+        forAll (meshes_, procI)
+        {
+            if (meshes_.set(procI))
+            {
+                const polyBoundaryMesh& procPatches =
+                    meshes_[procI].boundaryMesh();
+
+                passivePatchInsertOrder[procI].setSize(procPatches.size());
+                passivePatchInsertOffset[procI].setSize(procPatches.size());
+
+                forAll (procPatches, patchI)
+                {
+                    if (isA<passiveProcessorPolyPatch>(procPatches[patchI]))
+                    {
+                        const passiveProcessorPolyPatch& curPatch =
+                            refCast<const passiveProcessorPolyPatch>
+                            (
+                                procPatches[patchI]
+                            );
+
+                        // Find new patch index in reconstructed boundary
+                        const label pnIndex = patchNameLookup.find
+                            (curPatch.name())();
+
+                        // Record offset
+                        passivePatchInsertOffset[procI][patchI] =
+                            globalIndexPerNewProcPatch[pnIndex].size();
+
+                        // Set or append the global index
+                        globalIndexPerNewProcPatch[pnIndex].append
+                        (
+                            curPatch.globalFaceIndex()
+                        );
+                    }
+                }
+            }
+        }
+
+        // Now all indices and offsets are collected.
+        // Sort each individual list and get sorted index order
+        // Note: this refers to the new patch
+        forAll (globalIndexPerNewProcPatch, newPatchI)
+        {
+            if (!globalIndexPerNewProcPatch[newPatchI].empty())
+            {
+                SortableList<label> sLabels
+                (
+                    globalIndexPerNewProcPatch[newPatchI]
+                );
+
+                // Note: on sort, indices are done the wrong way around:
+                // old index for new location: Re-pack them
+                const labelList& indices = sLabels.indices();
+
+                // Re-use the storage for the insertion index
+                labelList& invIndices = globalIndexPerNewProcPatch[newPatchI];
+
+                forAll (invIndices, i)
+                {
+                    invIndices[indices[i]] = i;
+                }
+            }
+        }
+
+        // Unpack the list for insertion
+        forAll (meshes_, procI)
+        {
+            if (meshes_.set(procI))
+            {
+                const polyBoundaryMesh& procPatches =
+                    meshes_[procI].boundaryMesh();
+
+                forAll (procPatches, patchI)
+                {
+                    if (isA<passiveProcessorPolyPatch>(procPatches[patchI]))
+                    {
+                        const passiveProcessorPolyPatch& curPatch =
+                            refCast<const passiveProcessorPolyPatch>
+                            (
+                                procPatches[patchI]
+                            );
+
+                        // Find new patch index in reconstructed boundary
+                        const label pnIndex = patchNameLookup.find
+                            (curPatch.name())();
+
+                        // Collect offset
+                        passivePatchInsertOrder[procI][patchI] =
+                            labelList::subList
+                            (
+                                globalIndexPerNewProcPatch[pnIndex],
+                                curPatch.size(),
+                                passivePatchInsertOffset[procI][patchI]
+                            );
+                    }
+                }
+            }
+        }
+    }
+
+    // Dump first valid mesh without checking
+    {
+        const label fvmId = firstValidMesh();
+        Pout<< "Dump mesh " << fvmId << endl;
+
+        cellOffset[fvmId] = 0;
+
+        const polyMesh& curMesh = meshes_[fvmId];
+        labelList& ppAddr = pointProcAddressing_[fvmId];
+        labelList& fpAddr = faceProcAddressing_[fvmId];
+        labelList& cpAddr = cellProcAddressing_[fvmId];
+        labelList& bpAddr = boundaryProcAddressing_[fvmId];
+
+        // Dump all points into the global point list
+        // Reconstruct only live points.  HJ, 7/Mar/2011
+        const pointField& curPoints = curMesh.points();
+        ppAddr.setSize(curPoints.size());
+
+        forAll (curPoints, pointI)
+        {
+            reconPoints[nReconPoints] = curPoints[pointI];
+            ppAddr[pointI] = nReconPoints;
+            nReconPoints++;
+        }
+
+        // Collect globally shared point labels
+        const labelList& curSpl = sharedData.sharedPointLabels()[fvmId];
+
+        forAll (curSpl, splI)
+        {
+            // From processor 0, mark points without checking
+            globalPointMapping[curSpl[splI]] = ppAddr[curSpl[splI]];
+        }
+
+        // Dump all internal faces into the list
+        const faceList& curFaces = curMesh.allFaces();
+        const labelList& curOwner = curMesh.faceOwner();
+        const labelList& curNeighbour = curMesh.faceNeighbour();
+        fpAddr.setSize(curFaces.size());
+
+        for (label faceI = 0; faceI < curMesh.nInternalFaces(); faceI++)
+        {
+            // Renumber face in new vertices
+            face newFace = curFaces[faceI];
+            inplaceRenumber(ppAddr, newFace);
+
+            reconFaces[nReconFaces] = newFace;
+            reconOwner[nReconFaces] = curOwner[faceI];//+cellOffset[firstValidMesh()];
+            reconNeighbour[nReconFaces] = curNeighbour[faceI];//+cellOffset[firstValidMesh()];
+
+            // Face-processor addressing uses offset of 1 and a turning index
+            // If the label is negative, it means the global face points
+            // in direction opposite to decomposed face.  HJ, 16/Feb/2011
+            fpAddr[faceI] = nReconFaces + 1;
+            nReconFaces++;
+        }
+
+        // Go through all patches.  For regular patches
+        // dump the faces into patch lists and for processor make internal faces
+
+        const polyBoundaryMesh& procPatches = curMesh.boundaryMesh();
+
+        forAll (procPatches, patchI)
+        {
+            if (isA<processorPolyPatch>(procPatches[patchI]))
+            {
+                // Processor patch: faces become internal faces
+                const processorPolyPatch& curPatch =
+                    refCast<const processorPolyPatch>(procPatches[patchI]);
+
+                // Record boundary-processor addressing: unmapped patch
+                bpAddr[patchI] = -1;
+
+                const label patchStart = curPatch.start();
+
+                for
+                (
+                    label faceI = patchStart;
+                    faceI < patchStart + curPatch.size();
+                    faceI++
+                )
+                {
+                    // Renumber face in new vertices
+                    face newFace = curFaces[faceI];
+                    inplaceRenumber(ppAddr, newFace);
+
+                    reconFaces[nReconFaces] = newFace;
+
+                    fpAddr[faceI] = nReconFaces + 1;
+                    reconOwner[nReconFaces] = curOwner[faceI];//+cellOffset[firstValidMesh()];
+
+                    // For partially completed neighbour, set nbr to -2
+                    // for easier debugging
+                    reconNeighbour[nReconFaces] = -2;
+
+                    nReconFaces++;
+                }
+            }
+            else if (isA<passiveProcessorPolyPatch>(procPatches[patchI]))
+            {
+                // For passive processor patch, faces need to be inserted in
+                // the increasing global face index
+                const passiveProcessorPolyPatch& curPatch =
+                    refCast<const passiveProcessorPolyPatch>
+                    (
+                        procPatches[patchI]
+                    );
+
+                // Find processor patch index in reconstructed boundary
+                const label pnIndex = patchNameLookup.find(curPatch.name())();
+
+                // Record boundary-processor addressing: mapped patch
+                bpAddr[patchI] = pnIndex;
+
+                faceList& curRpFaces = reconPatchFaces[pnIndex];
+                labelList& curRpfOwner = reconPatchOwner[pnIndex];
+                label& nRpf = reconPatchSizes[pnIndex];
+
+                const labelList& indices =
+                    passivePatchInsertOrder[fvmId][patchI];
+
+                const label patchStart = curPatch.start();
+
+                forAll (indices, i)
+                {
+                    // Location in reconstructed patch where the face
+                    // is inserted
+                    const label insertSlot = indices[i];
+
+                    // Calculate face index depending on the ordering
+                    const label faceI = patchStart + i;
+
+                    face newFace = curFaces[faceI];
+
+                    inplaceRenumber(ppAddr, newFace);
+
+                    // Insert into correct slot
+                    curRpFaces[insertSlot] = newFace;
+                    curRpfOwner[insertSlot] = curOwner[faceI];//+cellOffset[firstValidMesh()];
+
+                    // Temporarily record position of face in the patch.
+                    // Offset for nInternalFaces will be added in the end
+                    // when the complete list of faces is assembled
+                    // HJ, 16/Feb/2011
+                    fpAddr[faceI] = insertSlot + 1;
+                    nRpf++;
+                }
+            }
+            else
+            {
+                // Regular patch: dump faces into patch face list
+
+                const polyPatch& curPatch = procPatches[patchI];
+
+                // Find processor patch index in reconstructed boundary
+                const label pnIndex = patchNameLookup.find(curPatch.name())();
+
+                // Record boundary-processor addressing: mapped patch
+                bpAddr[patchI] = pnIndex;
+
+                faceList& curRpFaces = reconPatchFaces[pnIndex];
+                labelList& curRpfOwner = reconPatchOwner[pnIndex];
+                label& nRpf = reconPatchSizes[pnIndex];
+
+                const label patchStart = curPatch.start();
+
+                for
+                (
+                    label faceI = patchStart;
+                    faceI < patchStart + curPatch.size();
+                    faceI++
+                )
+                {
+                    // Renumber face in new vertices
+                    face newFace = curFaces[faceI];
+                    inplaceRenumber(ppAddr, newFace);
+
+                    curRpFaces[nRpf] = newFace;
+                    curRpfOwner[nRpf] = curOwner[faceI];//+cellOffset[firstValidMesh()];
+
+                    // Temporarily record position of face in the patch.
+                    // Offset for nInternalFaces will be added in the end
+                    // when the complete list of faces is assembled
+                    // HJ, 16/Feb/2011
+                    fpAddr[faceI] = nRpf + 1;
+                    nRpf++;
+                }
+            }
+        }
+
+        // Cell-processor addressing
+        forAll (cpAddr, cellI)
+        {
+            cpAddr[cellI] = cellI; // + cellOffset[firstValidMesh()];
+        }
+
+        // Set cell offset for the next mesh
+        if (cellOffset.size() > firstValidMesh() + 1)
+        {
+            cellOffset[firstValidMesh() + 1] = meshes_[firstValidMesh()].nCells();
+        }
+    }
+
+
+    // Dump all other meshes, merging the processor boundaries
+
+    for (label procI = firstValidMesh() + 1; procI < meshes_.size(); procI++)
+    {
+        if (meshes_.set(procI))
+        {
+            Pout<< "Dump mesh " << procI << " cell offset: " << cellOffset[procI] << endl;
+
+            const polyMesh& curMesh = meshes_[procI];
+            const polyBoundaryMesh& procPatches = curMesh.boundaryMesh();
+
+            labelList& ppAddr = pointProcAddressing_[procI];
+            labelList& fpAddr = faceProcAddressing_[procI];
+            labelList& cpAddr = cellProcAddressing_[procI];
+            labelList& bpAddr = boundaryProcAddressing_[procI];
+
+            // Point mapping
+
+            // Reconstruct only live points.  HJ, 7/Mar/2011
+            const pointField& curPoints = curMesh.points();
+
+            // Set ppAddr to -1, to use as point usage indicators
+            ppAddr.setSize(curPoints.size());
+            ppAddr = -1;
+
+            // Find points already added via processor patches and mark them
+            // in ppAddr
+
+            // Collect point-processor addressing for points on processor patches
+
+            // Go through all processor patches.  For neighbour patches, access
+            // owner addressing and dump into ppAddr
+            forAll (procPatches, patchI)
+            {
+                if (isA<processorPolyPatch>(procPatches[patchI]))
+                {
+                    // Processor patch: faces become internal faces
+                    const processorPolyPatch& procPatch =
+                        refCast<const processorPolyPatch>(procPatches[patchI]);
+
+                    // If patch is a neighbour, its master has already inserted
+                    // the points
+                    if (procPatch.slave())
+                    {
+                        const label masterProcID = procPatch.neighbProcNo();
+
+                        // Get the neighbour side patch
+                        const processorPolyPatch& masterProcPatch =
+                            neighbourProcPatch(procPatch);
+
+                        // Find the addressing of the master side
+                        const labelList& masterPpAddr =
+                            pointProcAddressing_[masterProcID];
+
+                        // Assemble neighbour mesh point addressing in matching
+                        // order by reversing processor patch faces
+                        faceList reversedFaces(procPatch.size());
+
+                        forAll (reversedFaces, faceI)
+                        {
+                            reversedFaces[faceI] =
+                                procPatch[faceI].reverseFace();
+                        }
+
+                        primitiveFacePatch reversedPatch
+                        (
+                            reversedFaces,
+                            procPatch.points()
+                        );
+
+                        // Insert addressing from master side into
+                        // local point addressing.  Each face of reversed patch
+                        // now matches the master face.
+                        // Note: this is done by visiting faces, since
+                        // meshPoints are ordered in increasing order.
+                        // HJ, 10/Mar/2011
+
+                        forAll (reversedFaces, faceI)
+                        {
+                            // Current reverse face
+                            const face& curRF = reversedFaces[faceI];
+
+                            // Current master face
+                            const face& curMF = masterProcPatch[faceI];
+
+                            forAll (curRF, pointI)
+                            {
+                                // Mapping is established
+                                ppAddr[curRF[pointI]] =
+                                    masterPpAddr[curMF[pointI]];
+                            }
+                        }
+                    } // End of "is neighbour"
+                } // End of "is processor"
+            }
+
+            // Dump unmarked points into the global point list
+            label nMergedPoints = 0;
+
+            forAll (curPoints, pointI)
+            {
+                if (ppAddr[pointI] == -1)
+                {
+                    // Unmerged point
+                    reconPoints[nReconPoints] = curPoints[pointI];
+                    ppAddr[pointI] = nReconPoints;
+                    nReconPoints++;
+                }
+                else
+                {
+                    nMergedPoints++;
+                }
+            }
+
+            // Dump all internal faces into the list
+            const faceList& curFaces = curMesh.allFaces();
+            const labelList& curOwner = curMesh.faceOwner();
+            const labelList& curNeighbour = curMesh.faceNeighbour();
+            fpAddr.setSize(curFaces.size());
+
+            // Collect globally shared point labels
+            const labelList& curSpl = sharedData.sharedPointLabels()[procI];
+
+            forAll (curSpl, splI)
+            {
+                // From other processors, check if point is already marked
+                // If not, mark it; otherwise compare (and correct?) with local
+                // mark
+                if (globalPointMapping[curSpl[splI]] < 0)
+                {
+                    globalPointMapping[curSpl[splI]] = ppAddr[curSpl[splI]];
+                }
+                else
+                {
+                    // Compare.  Is this needed - should always be OK.
+                    if
+                    (
+                        globalPointMapping[curSpl[splI]]
+                     != ppAddr[curSpl[splI]]
+                    )
+                    {
+                        WarningIn
+                        (
+                            "autoPtr<fvMesh> "
+                            "processorMeshesReconstructor::"
+                            "reconstructMesh(const Time& db)"
+                        )   << "Loss of sync???"
+                            << abort(FatalError);
+                    }
+                }
+            }
+
+            for (label faceI = 0; faceI < curMesh.nInternalFaces(); faceI++)
+            {
+                // Renumber face in new vertices
+                face newFace = curFaces[faceI];
+                inplaceRenumber(ppAddr, newFace);
+
+                reconFaces[nReconFaces] = newFace;
+                reconOwner[nReconFaces] = curOwner[faceI] + cellOffset[procI];
+                reconNeighbour[nReconFaces] = curNeighbour[faceI]
+                    + cellOffset[procI];
+                fpAddr[faceI] = nReconFaces + 1;
+                nReconFaces++;
+            }
+
+            // Go through all patches.  For regular patches
+            // dump the faces into patch lists
+            forAll (procPatches, patchI)
+            {
+                if (isA<processorPolyPatch>(procPatches[patchI]))
+                {
+                    // Processor patch: faces become internal faces
+                    const processorPolyPatch& curPatch =
+                        refCast<const processorPolyPatch>(procPatches[patchI]);
+
+                    // Record boundary-processor addressing: unmapped patch
+                    bpAddr[patchI] = -1;
+
+                    const label patchStart = curPatch.start();
+
+                    // If patch is a master, drop the faces and fill the
+                    // owner side addressing
+                    if (curPatch.master())
+                    {
+                        for
+                        (
+                            label faceI = patchStart;
+                            faceI < patchStart + curPatch.size();
+                            faceI++
+                        )
+                        {
+                            // Renumber face in new vertices
+                            face newFace = curFaces[faceI];
+                            inplaceRenumber(ppAddr, newFace);
+
+                            reconFaces[nReconFaces] = newFace;
+                            fpAddr[faceI] = nReconFaces + 1;
+                            reconOwner[nReconFaces] = curOwner[faceI]
+                                + cellOffset[procI];
+
+                            // For partially completed neighbour, set nbr to -2
+                            // for easier debugging
+                            reconNeighbour[nReconFaces] = -2;
+
+                            nReconFaces++;
+                        }
+                    }
+                    else
+                    {
+                        // Fill the addressing for the neighbour side
+
+                        const label masterProcID = curPatch.neighbProcNo();
+
+                        // Get local face-cell addressing: it will become
+                        // a neighbour
+                        // addressing for the already inserted faces
+                        const labelList procFaceCells = curPatch.faceCells();
+
+                        // Get the neighbour side patch
+                        const processorPolyPatch& masterProcPatch =
+                            neighbourProcPatch(curPatch);
+
+                        // Find the addressing of the master side
+                        // and insert the neighbour with offset
+
+                        const labelList& masterFaceAddr =
+                            faceProcAddressing_[masterProcID];
+
+                        for
+                        (
+                            label faceI = patchStart;
+                            faceI < patchStart + curPatch.size();
+                            faceI++
+                        )
+                        {
+                            label faceInPatch = faceI - patchStart;
+
+                            // Calculate master index
+                            label masterIndex = masterProcPatch.start()
+                                + faceInPatch;
+
+                            label masterFp = masterFaceAddr[masterIndex] - 1;
+
+                            // Record face-cells for the neighbour
+                            fpAddr[faceI] = -masterFaceAddr[masterIndex];
+
+                            reconNeighbour[masterFp] =
+                                procFaceCells[faceInPatch] + cellOffset[procI];
+                        }
+                    }
+                }
+                else if (isA<passiveProcessorPolyPatch>(procPatches[patchI]))
+                {
+                    // For passive processor patch, faces need to be inserted in
+                    // the increasing global face index
+                    const passiveProcessorPolyPatch& curPatch =
+                        refCast<const passiveProcessorPolyPatch>
+                        (
+                            procPatches[patchI]
+                        );
+
+                    // Find processor patch index in reconstructed boundary
+                    const label pnIndex =
+                        patchNameLookup.find(curPatch.name())();
+
+                    // Record boundary-processor addressing: mapped patch
+                    bpAddr[patchI] = pnIndex;
+
+                    faceList& curRpFaces = reconPatchFaces[pnIndex];
+                    labelList& curRpfOwner = reconPatchOwner[pnIndex];
+                    label& nRpf = reconPatchSizes[pnIndex];
+
+                    const labelList& indices =
+                        passivePatchInsertOrder[procI][patchI];
+
+                    const label patchStart = curPatch.start();
+
+                    forAll (indices, i)
+                    {
+                        // Location in reconstructed patch where the face
+                        // is inserted
+                        const label insertSlot = indices[i];
+
+                        // Calculate face index depending on the ordering
+                        const label faceI = patchStart + i;
+
+                        face newFace = curFaces[faceI];
+
+                        inplaceRenumber(ppAddr, newFace);
+
+                        // Insert into correct slot
+                        curRpFaces[insertSlot] = newFace;
+                        curRpfOwner[insertSlot] =
+                            curOwner[faceI] + cellOffset[procI];
+
+                        // Temporarily record position of face in the patch.
+                        // Offset for nInternalFaces will be added in the end
+                        // when the complete list of faces is assembled
+                        // HJ, 16/Feb/2011
+                        fpAddr[faceI] = insertSlot + 1;
+                        nRpf++;
+                    }
+                }
+                else
+                {
+                    // Regular patch: dump faces into patch face list
+
+                    const polyPatch& curPatch = procPatches[patchI];
+
+                    // Find processor patch index in reconstructed boundary
+                    const label pnIndex =
+                        patchNameLookup.find(curPatch.name())();
+
+                    // Record boundary-processor addressing: mapped patch
+                    bpAddr[patchI] = pnIndex;
+
+                    faceList& curRpFaces = reconPatchFaces[pnIndex];
+                    labelList& curRpfOwner = reconPatchOwner[pnIndex];
+                    label& nRpf = reconPatchSizes[pnIndex];
+
+                    const label patchStart = curPatch.start();
+
+                    for
+                    (
+                        label faceI = patchStart;
+                        faceI < patchStart + curPatch.size();
+                        faceI++
+                    )
+                    {
+                        // Renumber face in new vertices
+                        face newFace = curFaces[faceI];
+                        inplaceRenumber(ppAddr, newFace);
+
+                        curRpFaces[nRpf] = newFace;
+                        curRpfOwner[nRpf] = curOwner[faceI] + cellOffset[procI];
+
+                        // Temporarily record position of face in the patch.
+                        // Offset for nInternalFaces will be added in the end
+                        // when the complete list of faces is assembled
+                        // HJ, 16/Feb/2011
+                        fpAddr[faceI] = nRpf + 1;
+                        nRpf++;
+                    }
+                }
+            }
+
+            // Cell-processor addressing
+            forAll (cpAddr, cellI)
+            {
+                cpAddr[cellI] = cellI + cellOffset[procI];
+            }
+
+            // Set cell offset for the next mesh
+            if (cellOffset.size() > procI + 1)
+            {
+                cellOffset[procI + 1] = cellOffset[procI] + meshes_[procI].nCells();
+            }
+        }
+        else
+        {
+            // No valid mesh.  Propagate cell offset
+            if (cellOffset.size() > procI + 1)
+            {
+                cellOffset[procI + 1] = cellOffset[procI];
+            }
+        }
+    }
+
+    // Resize the lists
+    reconPoints.setSize(nReconPoints);
+
+    // Resize the neighbour list to the size of internalFaces
+    label nInternalFaces = nReconFaces;
+
+    reconNeighbour.setSize(nInternalFaces);
+
+    // Resize the patch lists
+    forAll (reconPatchFaces, patchI)
+    {
+        reconPatchFaces[patchI].setSize(reconPatchSizes[patchI]);
+        reconPatchOwner[patchI].setSize(reconPatchSizes[patchI]);
+    }
+
+    // Complete the global list of faces
+    labelList reconPatchStarts(reconPatchSizes, 0);
+
+    // Copy the faces into face list
+    forAll (reconPatchFaces, patchI)
+    {
+        reconPatchStarts[patchI] = nReconFaces;
+
+        const faceList& curPatchFaces = reconPatchFaces[patchI];
+        const labelList& curPatchOwner = reconPatchOwner[patchI];
+
+        forAll (curPatchFaces, fI)
+        {
+            reconFaces[nReconFaces] = curPatchFaces[fI];
+            reconOwner[nReconFaces] = curPatchOwner[fI];
+            nReconFaces++;
+        }
+    }
+
+    reconFaces.setSize(nReconFaces);
+    reconOwner.setSize(nReconFaces);
+
+    // Mesh assembly completed
+
+    Info<< "Global mesh size (final): " << nl
+        << "    nPoints = " << reconPoints.size() << nl
+        << "    nFaces = " << reconFaces.size() << nl
+        << "    nCells = " << nReconCells << nl
+        << "    nPatches = " << reconPatchSizes.size() << nl
+        << "    nPatchFaces = " << reconPatchSizes << endl;
+
+    // Renumber the face-processor addressing list for all pieces
+    // now that the number of internal faces is known
+    forAll (meshes_, procI)
+    {
+        if (meshes_.set(procI))
+        {
+            // Get processor mesh and boundary
+            const polyMesh& curMesh = meshes_[procI];
+            const polyBoundaryMesh& procPatches = curMesh.boundaryMesh();
+
+            // Get face-processor addressing for corrent prorcessor
+            labelList& fpAddr = faceProcAddressing_[procI];
+
+            const labelList& bpAddr = boundaryProcAddressing_[procI];
+
+            forAll (procPatches, patchI)
+            {
+                if (!isA<processorPolyPatch>(procPatches[patchI]))
+                {
+                    // Get master processor patch
+                    const label reconPatchID = bpAddr[patchI];
+
+                    // Skip processor patches: bpAddr = -1
+                    if (reconPatchID > -1)
+                    {
+                        const label reconStart = reconPatchStarts[reconPatchID];
+
+                        const polyPatch& curPatch = procPatches[patchI];
+
+                        const label patchStart = curPatch.start();
+
+                        for
+                        (
+                            label faceI = patchStart;
+                            faceI < patchStart + curPatch.size();
+                            faceI++
+                        )
+                        {
+                            // Add patch start
+                            fpAddr[faceI] += reconStart;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Create global mesh with given region name
+    autoPtr<fvMesh> globalMeshPtr
+    (
+        new fvMesh
+        (
+            IOobject
+            (
+                meshName_,
+                db.timeName(),
+                db,
+                IOobject::NO_READ
+            ),
+            xferCopy(reconPoints),
+            xferCopy(reconFaces),
+            xferCopy(reconOwner),
+            xferCopy(reconNeighbour)
+        )
+    );
+    fvMesh& globalMesh = globalMeshPtr();
+
+    // Create patch list by cloning meshes.  If all processors hold all live
+    // patches, it is sufficient to rebuilt the patches only from the first
+    // valid processor
+    // Note:
+    List<polyPatch*> reconPatches(nReconPatches, NULL);
+
+    forAll (meshes_, procI)
+    {
+        if (meshes_.set(procI))
+        {
+            const polyBoundaryMesh& procPatches = meshes_[procI].boundaryMesh();
+
+            forAll (procPatches, patchI)
+            {
+                // Processor patches have disappeared: skip them
+                if (!isA<processorPolyPatch>(procPatches[patchI]))
+                {
+                    // Find processor patch index in reconstructed boundary
+                    const label pnIndex = patchNameLookup.find
+                    (
+                        procPatches[patchI].name()
+                    )();
+
+                    // Check if the patch has already been set
+                    if (reconPatches[pnIndex] == NULL)
+                    {
+                        // Patch not set: clone it
+                        // Note: watch indices: setting pnIndex from patchI
+
+                        if (isA<passiveProcessorPolyPatch>(procPatches[patchI]))
+                        {
+                            // For a passive processor patch, create new
+                            // processor patch
+                            const passiveProcessorPolyPatch& ppPatch =
+                                refCast<const passiveProcessorPolyPatch>
+                                (
+                                    procPatches[patchI]
+                                );
+
+                            reconPatches[pnIndex] = new processorPolyPatch
+                            (
+                                ppPatch.name(),
+                                reconPatchSizes[pnIndex],
+                                reconPatchStarts[pnIndex],
+                                pnIndex,
+                                globalMesh.boundaryMesh(),
+                                Pstream::myProcNo(),   // Use correct local proc
+                                ppPatch.neighbProcNo()
+                            );
+                        }
+                        else
+                        {
+                            // Regular patch: clone
+                            reconPatches[pnIndex] =
+                                procPatches[patchI].clone
+                                (
+                                    globalMesh.boundaryMesh(),
+                                    patchI,
+                                    reconPatchSizes[pnIndex],
+                                    reconPatchStarts[pnIndex]
+                                ).ptr();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Check the list and fill in the missing slots
+    forAll (reconPatches, patchI)
+    {
+        if (reconPatches[patchI] == NULL)
+        {
+            // Patch not set.  Check its type
+            FatalErrorIn
+            (
+                "autoPtr<fvMesh> processorMeshesReconstructor::"
+                "reconstructMesh(const Time& db)"
+            )   << "Reconstructed patch " << patchI
+                << " name " << reconPatchNames[patchI]
+                << " type " << reconPatchTypes[patchI]
+                << " not set."
+                << abort(FatalError);
+        }
+    }
+
+    // Add boundary patches to polyMesh and fvMesh
+    // Note: Mark boundary as invalid to disable analysis
+    // due to the presence of old/new patches
+    globalMesh.addFvPatches(reconPatches, false);
+
+    // TODO: point, face and cell zones
+
+    Info<< "Reconstructed addressing: " << nl;
+    forAll (meshes_, procI)
+    {
+        if (meshes_.set(procI))
+        {
+            Info<< "Proc " << procI
+                << " point addr: " << pointProcAddressing_[procI].size()
+                << " face addr: " << faceProcAddressing_[procI].size()
+                << " cell addr: " << cellProcAddressing_[procI].size()
+                << " boundary addr: " << boundaryProcAddressing_[procI].size()
+                << endl;
+        }
+    }
+
+    return globalMeshPtr;
+}
+
+
+
+// ************************************************************************* //

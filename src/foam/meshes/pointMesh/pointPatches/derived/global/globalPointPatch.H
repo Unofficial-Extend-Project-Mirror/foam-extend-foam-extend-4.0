@@ -56,9 +56,6 @@ class globalPointPatch
 {
     // Private data
 
-        // //- Reference to the basic globalMeshData
-        // const globalMeshData& globalMeshData_;
-
         //- Index in the boundary mesh
         label index_;
 
@@ -108,6 +105,7 @@ public:
 
     //- Runtime type information
     TypeName("global");
+
 
     // Constructors
 

@@ -41,6 +41,13 @@ namespace Foam
 }
 
 
+const Foam::debug::tolerancesSwitch Foam::faPatch::matchTol_
+(
+    "faPatchFaceMatchTol",
+    1e-5
+);
+
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 void Foam::faPatch::clearOut()

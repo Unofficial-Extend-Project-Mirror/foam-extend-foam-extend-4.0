@@ -427,6 +427,7 @@ globalMeshData = $(polyMesh)/globalMeshData
 $(globalMeshData)/globalMeshData.C
 $(globalMeshData)/globalPoints.C
 $(globalMeshData)/globalIndex.C
+$(globalMeshData)/globalProcFaceIndex.C
 
 $(polyMesh)/syncTools/syncTools.C
 

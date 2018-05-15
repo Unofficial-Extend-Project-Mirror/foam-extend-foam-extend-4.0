@@ -83,11 +83,16 @@ class Field
 
 public:
 
-    //- Component type
-    typedef typename pTraits<Type>::cmptType cmptType;
+    // Public typedefs
 
-    //- Declare type of subField
-    typedef SubField<Type> subField;
+        //- Field element type (eg. scalar, vector)
+        typedef Type PrimitiveType;
+
+        //- Component type
+        typedef typename pTraits<Type>::cmptType cmptType;
+
+        //- Declare type of subField
+        typedef SubField<Type> subField;
 
 
     // Static data members

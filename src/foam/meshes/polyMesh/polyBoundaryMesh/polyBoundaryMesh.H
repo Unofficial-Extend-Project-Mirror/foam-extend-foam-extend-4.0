@@ -62,7 +62,7 @@ class polyBoundaryMesh
     public polyPatchList,
     public regIOobject
 {
-    // private data
+    // Private data
 
         //- Reference to mesh
         const polyMesh& mesh_;
@@ -117,9 +117,17 @@ public:
             const label size
         );
 
+        //- Construct from Istream
+        polyBoundaryMesh
+        (
+            const IOobject&,
+            const polyMesh&,
+            Istream&
+        );
+
 
     //- Destructor
-    ~polyBoundaryMesh();
+    virtual ~polyBoundaryMesh();
 
 
         //- Clear geometry at this level and at patches

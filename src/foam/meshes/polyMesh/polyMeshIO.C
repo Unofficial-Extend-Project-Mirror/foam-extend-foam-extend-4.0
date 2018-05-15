@@ -25,10 +25,174 @@ License
 
 #include "polyMesh.H"
 #include "foamTime.H"
+#include "IOstream.H"
 #include "cellIOList.H"
 #include "meshObjectBase.H"
 #include "mapPolyMesh.H"
 
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::polyMesh::polyMesh
+(
+    const IOobject& io,
+    Istream& is,
+    const bool syncPar
+)
+:
+    objectRegistry(io),
+    primitiveMesh(),
+    allPoints_
+    (
+        IOobject
+        (
+            "points",
+            instance(),
+            meshSubDir,
+            *this,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        pointField(is)
+    ),
+    // To be re-sliced later.  HJ, 19/Oct/2008
+    points_(allPoints_, allPoints_.size()),
+    allFaces_
+    (
+        IOobject
+        (
+            "faces",
+            instance(),
+            meshSubDir,
+            *this,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        faceList(is)
+    ),
+    // To be re-sliced later.  HJ, 19/Oct/2008
+    faces_(allFaces_, allFaces_.size()),
+    owner_
+    (
+        IOobject
+        (
+            "owner",
+            instance(),
+            meshSubDir,
+            *this,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        labelList(is)
+    ),
+    neighbour_
+    (
+        IOobject
+        (
+            "neighbour",
+            instance(),
+            meshSubDir,
+            *this,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        labelList(is)
+    ),
+    clearedPrimitives_(false),
+    boundary_
+    (
+        IOobject
+        (
+            "boundary",
+            instance(),
+            meshSubDir,
+            *this,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        *this,
+        is
+    ),
+    bounds_(allPoints_, syncPar),
+    geometricD_(Vector<label>::zero),
+    solutionD_(Vector<label>::zero),
+    comm_(Pstream::worldComm),
+    pointZones_
+    (
+        IOobject
+        (
+            "pointZones",
+            instance(),
+            meshSubDir,
+            *this,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        *this,
+        is
+    ),
+    faceZones_
+    (
+        IOobject
+        (
+            "faceZones",
+            instance(),
+            meshSubDir,
+            *this,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        *this,
+        is
+    ),
+    cellZones_
+    (
+        IOobject
+        (
+            "cellZones",
+            instance(),
+            meshSubDir,
+            *this,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        *this,
+        is
+    ),
+    globalMeshDataPtr_(NULL),
+    moving_(false),
+    changing_(false),
+    curMotionTimeIndex_(time().timeIndex()),
+    oldAllPointsPtr_(NULL),
+    oldPointsPtr_(NULL)
+{
+    // Check if the faces and cells are valid
+    forAll (allFaces_, faceI)
+    {
+        const face& curFace = allFaces_[faceI];
+
+        if (min(curFace) < 0 || max(curFace) > allPoints_.size())
+        {
+            FatalErrorIn
+            (
+                "polyMesh::polyMesh\n"
+                "(\n"
+                "    const IOobject& io,\n"
+                "    const pointField& points,\n"
+                "    const faceList& faces,\n"
+                "    const cellList& cells\n"
+                ")\n"
+            )   << "Face " << faceI << "contains vertex labels out of range: "
+                << curFace << " Max point index = " << allPoints_.size()
+                << abort(FatalError);
+        }
+    }
+
+    // Set the primitive mesh
+    initMesh();
+}
+
+
+    
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void Foam::polyMesh::setInstance(const fileName& inst)
@@ -479,6 +643,23 @@ Foam::polyMesh::readUpdateState Foam::polyMesh::readUpdate()
 
         return polyMesh::UNCHANGED;
     }
+}
+
+
+// * * * * * * * * * * * * IOstream operators  * * * * * * * * * * * * * * * //
+
+Foam::Ostream& Foam::operator<<(Ostream& os, const polyMesh& m)
+{
+    os  << m.allPoints() << nl
+        << m.allFaces() << nl
+        << m.faceOwner() << nl
+        << m.faceNeighbour() << nl
+        << m.boundaryMesh() << nl
+        << m.pointZones() << nl
+        << m.faceZones() << nl
+        << m.cellZones();
+
+    return os;
 }
 
 

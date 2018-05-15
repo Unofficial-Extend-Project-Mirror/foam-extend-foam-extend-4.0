@@ -47,7 +47,7 @@ class fvMesh;
 class polyBoundaryMesh;
 
 /*---------------------------------------------------------------------------*\
-                           Class fvBoundaryMesh Declaration
+                       Class fvBoundaryMesh Declaration
 \*---------------------------------------------------------------------------*/
 
 class fvBoundaryMesh
@@ -70,14 +70,19 @@ private:
         //- Disallow assignment
         void operator=(const fvBoundaryMesh&);
 
-        //- Add fvPatches corresponding to the given polyBoundaryMesh
-        void addPatches(const polyBoundaryMesh&);
+        //- Add fvPatches corresponding to the polyBoundaryMesh
+        void addFvPatches();
+
+        //- Reset fvPatches corresponding to the polyBoundaryMesh
+        //  When the mesh is resized, the existing patches may be preserved
+        //  or reset depending on the resetFlag
+        void resetFvPatches(const boolList& resetFvPatchFlag);
 
 
 protected:
 
         //- Update boundary based on new polyBoundaryMesh
-        void readUpdate(const polyBoundaryMesh&);
+        void readUpdate();
 
 
 public:
@@ -87,18 +92,8 @@ public:
 
     // Constructors
 
-        //- Construct with zero size
-        fvBoundaryMesh
-        (
-            const fvMesh&
-        );
-
         //- Construct from polyBoundaryMesh
-        fvBoundaryMesh
-        (
-            const fvMesh&,
-            const polyBoundaryMesh&
-        );
+        explicit fvBoundaryMesh(const fvMesh&);
 
 
     // Destructor - default

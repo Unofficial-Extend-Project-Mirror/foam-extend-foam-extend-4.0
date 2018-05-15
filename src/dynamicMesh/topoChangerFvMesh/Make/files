@@ -1,4 +1,5 @@
 topoChangerFvMesh/topoChangerFvMesh.C
+topoChangerFvMesh/topoChangerFvMeshLoadBalance.C
 
 attachDetachFvMesh/attachDetachFvMesh.C
 linearValveFvMesh/linearValveFvMesh.C

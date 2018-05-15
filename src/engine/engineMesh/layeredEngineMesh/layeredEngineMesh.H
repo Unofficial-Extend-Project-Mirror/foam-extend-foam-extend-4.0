@@ -44,7 +44,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class layeredEngineMesh Declaration
+                    Class layeredEngineMesh Declaration
 \*---------------------------------------------------------------------------*/
 
 class layeredEngineMesh
@@ -77,9 +77,8 @@ public:
         layeredEngineMesh(const IOobject& io);
 
 
-    // Destructor
-
-        ~layeredEngineMesh();
+    //- Destructor
+    virtual ~layeredEngineMesh();
 
 
     // Member Functions

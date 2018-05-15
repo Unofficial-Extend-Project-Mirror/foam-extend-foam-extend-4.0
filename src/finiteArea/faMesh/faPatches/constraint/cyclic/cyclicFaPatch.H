@@ -38,7 +38,6 @@ SourceFiles
 #include "coupledFaPatch.H"
 #include "cyclicLduInterface.H"
 #include "cyclicPolyPatch.H"
-#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -61,12 +60,6 @@ class cyclicFaPatch
     void calcTransforms();
 
 protected:
-
-    // Protected static data
-
-        //- Relative tolerance (for geometric matching). Is factor of
-        //  maximum edge length per face.
-        static const debug::tolerancesSwitch matchTol_;
 
     // Protected Member functions
 

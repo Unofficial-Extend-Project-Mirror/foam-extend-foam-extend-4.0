@@ -338,30 +338,39 @@ autoPtr<mapPolyMesh> reorderMesh
     (
         new mapPolyMesh
         (
-            mesh,                       //const polyMesh& mesh,
+            mesh,                       // const polyMesh& mesh,
             mesh.nPoints(),             // nOldPoints,
             mesh.nFaces(),              // nOldFaces,
             mesh.nCells(),              // nOldCells,
+
             identity(mesh.nPoints()),   // pointMap,
             List<objectMap>(0),         // pointsFromPoints,
+
             faceOrder,                  // faceMap,
             List<objectMap>(0),         // facesFromPoints,
             List<objectMap>(0),         // facesFromEdges,
             List<objectMap>(0),         // facesFromFaces,
+
             cellOrder,                  // cellMap,
             List<objectMap>(0),         // cellsFromPoints,
             List<objectMap>(0),         // cellsFromEdges,
             List<objectMap>(0),         // cellsFromFaces,
             List<objectMap>(0),         // cellsFromCells,
+
             identity(mesh.nPoints()),   // reversePointMap,
             reverseFaceOrder,           // reverseFaceMap,
             reverseCellOrder,           // reverseCellMap,
+
             labelHashSet(0),            // flipFaceFlux,
+
             patchPointMap,              // patchPointMap,
             labelListList(0),           // pointZoneMap,
             labelListList(0),           // faceZonePointMap,
             labelListList(0),           // faceZoneFaceMap,
             labelListList(0),           // cellZoneMap,
+
+            boolList(mesh.boundaryMesh().size(), false), // resetPatchFlag
+
             pointField(0),              // preMotionPoints,
             patchStarts,                // oldPatchStarts,
             oldPatchNMeshPoints         // oldPatchNMeshPoints

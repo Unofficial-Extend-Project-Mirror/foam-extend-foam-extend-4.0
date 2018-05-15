@@ -147,6 +147,7 @@ tmp<vectorField> fvPatch::Cn() const
     // Bugfix: access cell centres from fvMesh data, not polyMesh.
     // HJ, 30/Nov/2017
     const vectorField& gcc = boundaryMesh().mesh().C().internalField();
+    // const vectorField& gcc = boundaryMesh().mesh().cellCentres();
 
     forAll (faceCells, faceI)
     {

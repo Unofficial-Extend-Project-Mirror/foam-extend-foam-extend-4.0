@@ -171,9 +171,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~attachDetach();
+    //- Destructor
+    virtual ~attachDetach();
 
 
     // Member Functions

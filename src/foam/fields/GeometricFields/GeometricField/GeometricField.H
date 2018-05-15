@@ -82,7 +82,7 @@ class GeometricField
 :
     public DimensionedField<Type, GeoMesh>
 {
-    // Private member functions
+    // Private Member Functions
 
         //- Read from file if it is present
         bool readIfPresent();
@@ -95,12 +95,29 @@ public:
 
     // Public typedefs
 
+        //- Field mesh type (eg. volMesh, surfaceMesh, areaMesh)
+        typedef GeoMesh GeoMeshType;
+
+        //- Type of mesh on which this GeometricField is instantiated
         typedef typename GeoMesh::Mesh Mesh;
+
+        //- Type of boundary mesh on which this
+        //  GeometricField::Boundary is instantiated
         typedef typename GeoMesh::BoundaryMesh BoundaryMesh;
 
+        //- Type of the internal field from which this GeometricField is derived
         typedef DimensionedField<Type, GeoMesh> DimensionedInternalField;
         typedef Field<Type> InternalField;
+
+        //- Type of the patch field of which the
+        //  GeometricField::Boundary is composed
         typedef PatchField<Type> PatchFieldType;
+
+        //- Field element type (eg. scalar, vector)
+        typedef Type PrimitiveType;
+
+        //- Field element component type
+        typedef typename Field<Type>::cmptType cmptType;
 
 
     class GeometricBoundaryField
@@ -260,10 +277,6 @@ public:
     //- Runtime type information
     TypeName("GeometricField");
 
-
-    // Public typedefs
-
-        typedef typename Field<Type>::cmptType cmptType;
 
     // Static Member Functions
 
@@ -573,7 +586,6 @@ public:
 
     // Ostream operators
 
-#ifndef SWIG
         friend Ostream& operator<< <Type, PatchField, GeoMesh>
         (
             Ostream&,
@@ -585,7 +597,6 @@ public:
             Ostream&,
             const tmp<GeometricField<Type, PatchField, GeoMesh> >&
         );
-#endif
 };
 
 
