@@ -26,6 +26,7 @@ Author
 
 Contributor
     Hrvoje Jasak, Wikki Ltd.
+    Gregor Cvijetic, FMENA Zagreb.
 
 GE CONFIDENTIAL INFORMATION 2016 General Electric Company. All Rights Reserved
 
@@ -38,7 +39,6 @@ Note on parallelisation
 \*---------------------------------------------------------------------------*/
 
 #include "jumpGgiFvPatchField.H"
-//#include "symmTransformField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -122,44 +122,46 @@ void jumpGgiFvPatchField<Type>::initInterfaceMatrixUpdate
     const unallocLabelList& sfc = this->ggiPatch().shadow().faceCells();
 
     scalarField sField(sfc.size());
+
+    forAll (sField, i)
+    {
+        sField[i] = psiInternal[sfc[i]];
+    }
+
+    Field<Type> pnf = this->ggiPatch().interpolate(sField);
+
+
+    // Multiply the field by coefficients and add into the result
+    const unallocLabelList& fc = this->ggiPatch().faceCells();
+
+    const Field<scalar> jf = jump()().component(cmpt);
+
     if
     (
         reinterpret_cast<const void*>(&psiInternal)
      == reinterpret_cast<const void*>(&this->internalField())
     )
     {
-        const scalarField jf = jump()().component(cmpt);
-
-        forAll (sField, i)
+        forAll(pnf, elemI)
         {
-            sField[i] = psiInternal[sfc[i]] + jf[i];
-        }
-    }
-    else
-    {
-        forAll (sField, i)
-        {
-            sField[i] = psiInternal[sfc[i]];
+            pnf[elemI] += jf[elemI];
         }
     }
 
-    scalarField pnf = this->ggiPatch().interpolate(sField);
-
-    // Multiply the field by coefficients and add into the result
-    const unallocLabelList& fc = this->ggiPatch().faceCells();
+    multiply(pnf, coeffs, pnf);
 
     if (switchToLhs)
     {
         forAll(fc, elemI)
         {
-            result[fc[elemI]] += coeffs[elemI]*pnf[elemI];
+            result[fc[elemI]] += pnf[elemI];
         }
     }
     else
     {
         forAll(fc, elemI)
         {
-            result[fc[elemI]] -= coeffs[elemI]*pnf[elemI];
+            result[fc[elemI]] -= pnf[elemI];
         }
     }
 }

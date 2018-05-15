@@ -40,12 +40,6 @@ namespace Foam
 
 template<class Type> class wedgeFaPatchField;
 
-// typedef wedgeFaPatchField<scalar> wedgeFaPatchScalarField;
-// typedef wedgeFaPatchField<vector> wedgeFaPatchVectorField;
-// typedef wedgeFaPatchField<tensor> wedgeFaPatchTensorField;
-
-// template<class Type> class wedgeFaPatchField;
-
 makeFaPatchTypeFieldTypedefs(wedge)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

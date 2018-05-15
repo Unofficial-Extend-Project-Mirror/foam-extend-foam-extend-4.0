@@ -249,9 +249,6 @@ class primitiveMesh
                 scalarField& cellVols
             ) const;
 
-            //- Calculate edge vectors
-            void calcEdgeVectors() const;
-
 
         // Helper functions for mesh checking
 

@@ -84,7 +84,7 @@ lduSolverPerformance faMatrix<Type>::solve(const dictionary& solverControls)
         // copy field and source
 
         scalarField psiCmpt = psi_.internalField().component(cmpt);
-        addBoundaryDiag(diag(), solvingComponent);
+        addBoundaryDiag(diag(), cmpt);
 
         scalarField sourceCmpt = source.component(cmpt);
 
@@ -147,12 +147,6 @@ lduSolverPerformance faMatrix<Type>::solve(const dictionary& solverControls)
     return solverPerfVec.max();
 }
 
-
-template<class Type>
-autoPtr<typename faMatrix<Type>::faSolver> faMatrix<Type>::solver()
-{
-    return solver(psi_.mesh().solutionDict().solverDict(psi_.name()));
-}
 
 template<class Type>
 lduSolverPerformance faMatrix<Type>::faSolver::solve()

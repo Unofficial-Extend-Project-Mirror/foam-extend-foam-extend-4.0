@@ -90,9 +90,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~translation();
+    //- Destructor
+    virtual ~translation();
 
 
     // Member Functions

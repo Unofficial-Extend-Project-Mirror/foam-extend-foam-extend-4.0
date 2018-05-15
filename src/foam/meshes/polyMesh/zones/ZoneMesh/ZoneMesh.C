@@ -150,6 +150,42 @@ ZoneMesh<ZoneType, MeshType>::ZoneMesh
 {}
 
 
+// Read constructor given IOobject, a MeshType reference and Istream
+template<class ZoneType, class MeshType>
+ZoneMesh<ZoneType, MeshType>::ZoneMesh
+(
+    const IOobject& io,
+    const MeshType& mesh,
+    Istream& is
+)
+:
+    PtrList<ZoneType>(),
+    regIOobject(io),
+    mesh_(mesh),
+    zoneMapPtr_(NULL)
+{
+    PtrList<ZoneType>& zones = *this;
+
+    PtrList<entry> zoneEntries(is);
+    zones.setSize(zoneEntries.size());
+
+    forAll(zones, zoneI)
+    {
+        zones.set
+        (
+            zoneI,
+            ZoneType::New
+            (
+                zoneEntries[zoneI].keyword(),
+                zoneEntries[zoneI].dict(),
+                zoneI,
+                *this
+            )
+        );
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class ZoneType, class MeshType>

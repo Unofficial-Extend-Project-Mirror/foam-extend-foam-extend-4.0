@@ -19,7 +19,7 @@ $1    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 $2
 !s;
 s!^(([#%]*) *)\\\\      /  F ield         \|.*!$1\\\\      /  F ield         | foam-extend: Open Source CFD!m;
-s!^(([#%]*) *) \\\\    /   O peration     \|.*!$1 \\\\    /   O peration     | Version:     3.2!m;
+s!^(([#%]*) *) \\\\    /   O peration     \|.*!$1 \\\\    /   O peration     | Version:     4.0!m;
 s!^(([#%]*) *)  \\\\  /    A nd           \|.*!$1  \\\\  /    A nd           | Web:         http://www.foam-extend.org!m;
 s!^(([#%]*) *)   \\\\/     M anipulation  \|.*!$1   \\\\/     M anipulation  | For copyright notice see file Copyright!m;
 s!README file for version 3.[01]\*!README file for version 3.2*!;

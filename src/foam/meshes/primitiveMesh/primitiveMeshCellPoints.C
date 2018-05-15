@@ -104,6 +104,4 @@ const Foam::labelList& Foam::primitiveMesh::cellPoints(const label cellI) const
 }
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 // ************************************************************************* //

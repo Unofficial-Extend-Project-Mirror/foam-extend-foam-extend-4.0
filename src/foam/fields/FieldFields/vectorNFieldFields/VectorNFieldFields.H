@@ -43,21 +43,21 @@ SourceFiles
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#define VectorN_FieldFunctions(tensorType, diagTensorType, sphericalTensorType,         \
-    vectorType, CmptType, args...)                                                      \
-                                                                                        \
-UNARY_FUNCTION(CmptType, vectorType, cmptSum)                                           \
-                                                                                        \
-BINARY_FUNCTION(vectorType, vectorType, vectorType, cmptMultiply)                       \
-BINARY_TYPE_FUNCTION(vectorType, vectorType, vectorType, cmptMultiply)                  \
-                                                                                        \
-BINARY_OPERATOR(vectorType, vectorType, CmptType, /,divide)                             \
-BINARY_TYPE_OPERATOR(vectorType, vectorType, CmptType, /,divide)                        \
-                                                                                        \
-BINARY_OPERATOR(vectorType, vectorType, vectorType, +, add)                             \
-BINARY_OPERATOR(vectorType, vectorType, vectorType, -, subtract)                        \
-                                                                                        \
-BINARY_TYPE_OPERATOR(vectorType, vectorType, vectorType, +, add)                        \
+#define VectorN_FieldFunctions(tensorType, diagTensorType, sphericalTensorType, \
+    vectorType, CmptType, args...)                                              \
+                                                                                \
+UNARY_FUNCTION(CmptType, vectorType, cmptSum)                                   \
+                                                                                \
+BINARY_FUNCTION(vectorType, vectorType, vectorType, cmptMultiply)               \
+BINARY_TYPE_FUNCTION(vectorType, vectorType, vectorType, cmptMultiply)          \
+                                                                                \
+BINARY_OPERATOR(vectorType, vectorType, CmptType, /,divide)                     \
+BINARY_TYPE_OPERATOR(vectorType, vectorType, CmptType, /,divide)                \
+                                                                                \
+BINARY_OPERATOR(vectorType, vectorType, vectorType, +, add)                     \
+BINARY_OPERATOR(vectorType, vectorType, vectorType, -, subtract)                \
+                                                                                \
+BINARY_TYPE_OPERATOR(vectorType, vectorType, vectorType, +, add)                \
 BINARY_TYPE_OPERATOR(vectorType, vectorType, vectorType, -, subtract)
 
 

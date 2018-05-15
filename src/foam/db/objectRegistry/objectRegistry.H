@@ -45,7 +45,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class objectRegistry Declaration
+                       Class objectRegistry Declaration
 \*---------------------------------------------------------------------------*/
 
 class objectRegistry

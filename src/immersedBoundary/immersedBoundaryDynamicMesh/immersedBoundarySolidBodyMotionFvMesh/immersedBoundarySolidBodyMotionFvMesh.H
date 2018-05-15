@@ -55,11 +55,11 @@ class immersedBoundarySolidBodyMotionFvMesh
 {
     // Private data
 
-        //- Dictionary of motion control parameters
-        dictionary dynamicMeshCoeffs_;
-
         //- Immersed boundary motion control function
         PtrList<movingImmersedBoundary> ibMotions_;
+
+        //- Current mesh motion time index
+        label curTimeIndex_;
 
 
     // Private Member Functions

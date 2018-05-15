@@ -28,14 +28,12 @@ gradSchemes
 
 divSchemes
 {
-    default             none;
-    div(phis,Cs)        Gauss linear;
+    default             Gauss linear;
 }
 
 laplacianSchemes
 {
-    default             none;
-    laplacian(Ds,Cs)    Gauss linear corrected;
+    default             Gauss linear corrected;
 }
 
 interpolationSchemes

@@ -24,24 +24,43 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "lduInterface.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
+#include "crMatrix.H"
+#include "autoPtr.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(lduInterface, 0);
+namespace Foam
+{
+    defineTypeNameAndDebug(lduInterface, 0);
+
+} // End namespace Foam
+
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-lduInterface::~lduInterface()
+Foam::lduInterface::~lduInterface()
 {}
 
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Foam::autoPtr<Foam::crMatrix> Foam::lduInterface::prolongationTransfer
+(
+    const Pstream::commsTypes commsType,
+    const crMatrix& P
+) const
+{
+    notImplemented
+    (
+        "autoPtr<crMatrix> lduInterface::prolongationTransfer\n"
+        "(\n"
+        "    const Pstream::commsTypes commsType\n"
+        ") const for type " +
+        this->type()
+    );
 
-} // End namespace Foam
+    // Dummy return to make the compiler happy
+    return autoPtr<crMatrix>(new crMatrix(1, 1, labelList(1, 0)));
+}
+
 
 // ************************************************************************* //

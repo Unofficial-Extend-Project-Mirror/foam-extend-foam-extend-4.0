@@ -23,7 +23,7 @@ solvers
         preconditioner  diagonal;
         tolerance        1e-06;
         relTol           0;
-    };
+    }
     p
     {
         solver          BiCGStab;

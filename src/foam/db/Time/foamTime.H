@@ -114,30 +114,37 @@ public:
             scientific = ios_base::scientific
         };
 
+        //- Stop at control names
+        static const NamedEnum<stopAtControls, 4> stopAtControlNames_;
+
+        //- Write control names
+        static const NamedEnum<writeControls, 5> writeControlNames_;
+
 
 protected:
 
     // Protected data
 
+        //- Start time index
         label  startTimeIndex_;
+
+        //- Start time
         scalar startTime_;
-        mutable scalar endTime_;
 
-        static const NamedEnum<stopAtControls, 4> stopAtControlNames_;
-        mutable stopAtControls stopAt_;
+        //- End time
+        scalar endTime_;
 
-        static const NamedEnum<writeControls, 5> writeControlNames_;
+        //- Stop at
+        stopAtControls stopAt_;
+
+        //- Write control
         writeControls writeControl_;
 
+        //- Write interval
         scalar writeInterval_;
 
-        // Additional writing
-
-            writeControls secondaryWriteControl_;
-
-            scalar secondaryWriteInterval_;
-
-        label  purgeWrite_;
+        //- Purge write
+        label purgeWrite_;
         mutable FIFOStack<word> previousOutputTimes_;
 
         // Additional purging
@@ -154,7 +161,6 @@ protected:
 
         //- If time is being sub-cycled this is the previous TimeState
         autoPtr<TimeState> prevTimeState_;
-
 
         //- Time directory name format
         static fmtflags format_;
@@ -389,8 +395,7 @@ public:
                 IOstream::compressionType
             ) const;
 
-            //- Write the objects now (not at end of iteration) and continue
-            //  the run
+            //- Write the objects now and continue the run
             bool writeNow();
 
             //- Write the objects now (not at end of iteration) and end the run

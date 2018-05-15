@@ -1,10 +1,11 @@
 {
     // Solve the rothalpy equation
+    T.storePrevIter();
 
     fvScalarMatrix iEqn
     (
-        fvm::ddt(rho, i)
-      + fvm::div(phi, i)
+        fvm::div(phi, i)
+      + fvm::SuSp(-fvc::div(phi), i)
       - fvm::laplacian(turbulence->alphaEff(), i)
      ==
         // Viscous heating: note sign (devRhoReff has a minus in it)
@@ -12,7 +13,6 @@
     );
 
     iEqn.relax();
-
     iEqn.solve();
 
     // Calculate enthalpy out of rothalpy

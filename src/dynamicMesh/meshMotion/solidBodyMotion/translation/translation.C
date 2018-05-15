@@ -147,7 +147,7 @@ Foam::solidBodyMotionFunctions::translation::velocity() const
     septernion TV
     (
         rampFactor()*velocity_,
-        quaternion::I/time_.deltaT().value()
+        quaternion::zero/time_.deltaT().value()
     );
 
     Info<< "solidBodyMotionFunctions::translation::transformation(): "

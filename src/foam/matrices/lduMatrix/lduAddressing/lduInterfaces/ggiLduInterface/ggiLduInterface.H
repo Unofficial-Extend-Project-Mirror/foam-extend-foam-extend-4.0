@@ -40,6 +40,7 @@ SourceFiles
 
 #include "lduInterface.H"
 #include "primitiveFieldsFwd.H"
+#include "crMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -66,11 +67,15 @@ protected:
         //- Field transfer buffer
         mutable scalarField fieldTransferBuffer_;
 
+        //- crMatrix transfer buffer
+        mutable crMatrix crMatrixTransferBuffer_;
+
 
 public:
 
     //- Runtime type information
     TypeName("ggiLduInterface");
+
 
     // Constructors
 
@@ -110,7 +115,7 @@ public:
         virtual const labelList& zoneAddressing() const = 0;
 
         //- Return fine level addressing
-        virtual const labelListList& addressing() const = 0;
+        virtual const labelListList& ggiAddressing() const = 0;
 
         //- Is the patch localised on a single processor
         virtual bool localParallel() const = 0;
@@ -119,7 +124,7 @@ public:
         virtual const mapDistribute& map() const = 0;
 
         //- Return weights
-        virtual const scalarListList& weights() const = 0;
+        virtual const scalarListList& ggiWeights() const = 0;
 
         //- Return face transformation tensor
         virtual const tensorField& forwardT() const = 0;
@@ -130,6 +135,10 @@ public:
         //- Expand addressing to zone
         //  Used in optimised AMG coarsening
         virtual void expandAddrToZone(labelField&) const = 0;
+
+        //- Expand crMatrix to zone
+        //  Used in optimised SAMG coarsening
+        virtual void expandCrMatrixToZone(crMatrix&) const = 0;
 
 
         // Communications support
@@ -153,6 +162,12 @@ public:
             const scalarField& fieldTransferBuffer() const
             {
                 return fieldTransferBuffer_;
+            }
+
+            //- Return contents of the crMatrix transfer buffer
+            const crMatrix& crMatrixTransferBuffer() const
+            {
+                return crMatrixTransferBuffer_;
             }
 };
 

@@ -34,7 +34,7 @@ Author
 template<class Type>
 Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
 (
-    const Field<Type>& ff
+    const UList<Type>& ff
 ) const
 {
     // Check and expand the field from patch size to zone size

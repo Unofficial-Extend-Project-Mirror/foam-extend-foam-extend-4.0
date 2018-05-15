@@ -227,10 +227,10 @@ void ggiFvPatchField<Type>::initEvaluate
 template<class Type>
 void ggiFvPatchField<Type>::evaluate
 (
-    const Pstream::commsTypes
+    const Pstream::commsTypes commsTypes
 )
 {
-    fvPatchField<Type>::evaluate();
+    coupledFvPatchField<Type>::evaluate(commsTypes);
 }
 
 

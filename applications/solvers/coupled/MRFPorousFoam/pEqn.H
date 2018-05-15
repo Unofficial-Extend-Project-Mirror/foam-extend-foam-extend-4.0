@@ -2,7 +2,7 @@
 tmp<fvScalarMatrix> tpEqn;
 tmp<surfaceScalarField> tpresSource;
 
-if (addPorosity)
+if (addMRF || addPorosity)
 {
     // Collect pressure source with tensorial 1/Ap
     const volTensorField& rTU = trTU();
@@ -10,7 +10,7 @@ if (addPorosity)
     tpresSource =
     (
         (mesh.Sf() & fvc::interpolate(rTU))
-        & fvc::interpolate(fvc::grad(p))
+      & fvc::interpolate(fvc::grad(p))
     );
     const surfaceScalarField& presSource = tpresSource();
 

@@ -22,7 +22,7 @@ solvers
         preconditioner   DIC;
         tolerance        1e-6;
         relTol           0;
-    };
+    }
     p
     {
         solver           GAMG;
@@ -35,7 +35,7 @@ solvers
         nCellsInCoarsestLevel 10;
         agglomerator     faceAreaPair;
         mergeLevels      1;
-    };
+    }
     pFinal
     {
         solver           GAMG;
@@ -48,21 +48,21 @@ solvers
         nCellsInCoarsestLevel 10;
         agglomerator     faceAreaPair;
         mergeLevels      1;
-    };
+    }
     U
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-08;
         relTol           0;
-    };
+    }
     h
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-06;
         relTol           0;
-    };
+    }
     hFinal
     {
         solver           BiCGStab;
@@ -76,21 +76,21 @@ solvers
         preconditioner   DILU;
         tolerance        1e-06;
         relTol           0;
-    };
+    }
     epsilon
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-06;
         relTol           0;
-    };
+    }
     R
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-06;
         relTol           0;
-    };
+    }
 }
 
 PIMPLE

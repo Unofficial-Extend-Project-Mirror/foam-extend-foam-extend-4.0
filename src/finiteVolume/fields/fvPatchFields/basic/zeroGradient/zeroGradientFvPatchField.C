@@ -65,7 +65,9 @@ zeroGradientFvPatchField<Type>::zeroGradientFvPatchField
     const dictionary& dict
 )
 :
-    fvPatchField<Type>(p, iF, dict)
+    // Do not read value from the dictionary even if it is there
+    // HJ, 30/Nov/2017
+    fvPatchField<Type>(p, iF)
 {
     fvPatchField<Type>::operator=(this->patchInternalField());
 }

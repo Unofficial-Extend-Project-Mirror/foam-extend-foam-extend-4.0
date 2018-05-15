@@ -471,7 +471,7 @@ void Foam::processorPolyPatch::initOrder(const primitivePatch& pp) const
 
     // Master side sends the data and slave side rotates the faces
     // HJ, 10/Mar/2011
-    if (owner())
+    if (master())
     {
         pointField ctrs(calcFaceCentres(pp, pp.points()));
 
@@ -538,7 +538,7 @@ bool Foam::processorPolyPatch::order
     rotation.setSize(pp.size());
     rotation = 0;
 
-    if (owner())
+    if (master())
     {
         // Do nothing (i.e. identical mapping, zero rotation).
         // See comment at top.
@@ -807,7 +807,7 @@ void Foam::processorPolyPatch::syncOrder() const
     }
 
     // Read and discard info from owner side from the neighbour
-    if (neighbour())
+    if (slave())
     {
         vectorField masterCtrs;
         vectorField masterAnchors;

@@ -25,7 +25,7 @@ Class
     BlockAMGPrecon
 
 Description
-    AMG preconditioning
+    Algebraic Multigrid preconditioning for block matrices
 
 Author
     Klas Jareteg, 2012-12-13
@@ -55,7 +55,7 @@ template<class Type>
 class BlockAMGCycle;
 
 /*---------------------------------------------------------------------------*\
-                       Class BlockAMGPrecon Declaration
+                         Class BlockAMGPrecon Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -141,6 +141,9 @@ public:
             Field<Type>& x,
             const Field<Type>& b
         ) const;
+
+        //- Re-initialise preconditioner after matrix coefficient update
+        virtual void initMatrix();
 };
 
 

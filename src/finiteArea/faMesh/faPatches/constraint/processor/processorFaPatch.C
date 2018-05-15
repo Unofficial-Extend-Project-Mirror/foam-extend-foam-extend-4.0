@@ -29,6 +29,7 @@ Description
 #include "addToRunTimeSelectionTable.H"
 #include "IPstream.H"
 #include "OPstream.H"
+#include "IOmanip.H"
 #include "transformField.H"
 #include "faBoundaryMesh.H"
 #include "faMesh.H"
@@ -209,17 +210,25 @@ void processorFaPatch::calcGeometry()
         forAll(magEl, edgei)
         {
             scalar nmagEl = mag(neighbEdgeLengths_[edgei]);
-            scalar avEl = (magEl[edgei] + nmagEl)/2.0;
+            scalar maxEl = Foam::max(magEl[edgei], nmagEl);
 
-            if (mag(magEl[edgei] - nmagEl)/avEl > 1e-6)
+            if (mag(magEl[edgei] - nmagEl) > faPatch::matchTol_()*maxEl)
             {
                 FatalErrorIn
                 (
-                    "processorFvPatch::makeWeights(scalarField& w) const"
+                    "processorFaPatch::makeWeights(scalarField& w) const"
                 )   << "edge " << edgei
                     << " length does not match neighbour by "
-                    << 100*mag(magEl[edgei] - nmagEl)/avEl
-                    << "% -- possible edge ordering problem"
+                    << 100*mag(magEl[edgei] - nmagEl)/maxEl
+                    << "% -- possible edge ordering problem." << nl
+                    << "Local: " << magEl[edgei]
+                    << " Remote: " << nmagEl
+                    << " diff: " << magEl[edgei] - nmagEl << nl
+                    << "Edge: "
+                    << boundaryMesh().mesh().edges()[start() + edgei]
+                    << " points: "
+                    << boundaryMesh().mesh().edges()[start() + edgei]
+                           .line(boundaryMesh().mesh().points())
                     << exit(FatalError);
             }
         }

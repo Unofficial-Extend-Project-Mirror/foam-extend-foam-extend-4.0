@@ -427,8 +427,11 @@ public:
             //- Return global edge index for local edges
             const labelList& meshEdges() const;
 
+            //- Clear geometry
+            virtual void clearGeom();
+
             //- Clear addressing
-            void clearAddressing();
+            virtual void clearAddressing();
 
 
         // Other patch operations
@@ -460,6 +463,13 @@ public:
         //  Used in cases when no topological change happens locally,
         //  but is happening on other processors
         virtual void syncOrder() const;
+
+        //- Reset patch
+        virtual void resetPatch
+        (
+            const label newSize,
+            const label newStart
+        );
 
 
     // Member operators

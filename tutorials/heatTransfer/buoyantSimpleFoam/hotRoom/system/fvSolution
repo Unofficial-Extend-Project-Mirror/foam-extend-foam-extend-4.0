@@ -22,42 +22,42 @@ solvers
         preconditioner   DIC;
         tolerance        1e-08;
         relTol           0;
-    };
+    }
     U
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
-    };
+    }
     h
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
-    };
+    }
     k
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
-    };
+    }
     epsilon
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
-    };
+    }
     R
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
-    };
+    }
 }
 
 SIMPLE

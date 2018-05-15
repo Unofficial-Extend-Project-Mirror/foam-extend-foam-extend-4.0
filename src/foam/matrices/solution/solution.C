@@ -432,4 +432,49 @@ Foam::dictionary& Foam::solution::solverPerformanceDict() const
     return solverPerformance_;
 }
 
+
+void Foam::solution::setSolverPerformance
+(
+    const word& name,
+    const lduSolverPerformance& sp
+) const
+{
+    List<lduSolverPerformance> perfs;
+
+    if (prevTimeIndex_ != this->time().timeIndex())
+    {
+        // Reset solver performance between iterations
+        prevTimeIndex_ = this->time().timeIndex();
+        solverPerformance_.clear();
+    }
+    else
+    {
+        solverPerformance_.readIfPresent(name, perfs);
+    }
+
+    // Only first iteration and current iteration residuals are required, so
+    // the current iteration residual replaces the previous one and only the
+    // first iteration is always present
+    if (perfs.size() < 2)
+    {
+        // Append to list
+        perfs.setSize(perfs.size() + 1, sp);
+    }
+    else
+    {
+        perfs.last() = sp;
+    }
+
+    solverPerformance_.set(name, perfs);
+}
+
+
+void Foam::solution::setSolverPerformance
+(
+    const lduSolverPerformance& sp
+) const
+{
+    setSolverPerformance(sp.fieldName(), sp);
+}
+
 // ************************************************************************* //

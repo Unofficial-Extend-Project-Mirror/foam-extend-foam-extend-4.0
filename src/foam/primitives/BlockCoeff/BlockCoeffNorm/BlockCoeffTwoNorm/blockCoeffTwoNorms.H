@@ -38,6 +38,7 @@ SourceFiles
 #ifndef blockCoeffTwoNorms_H
 #define blockCoeffTwoNorms_H
 
+#include "scalarBlockCoeffTwoNorm.H"
 #include "tensorBlockCoeffTwoNorm.H"
 #include "BlockCoeffTwoNorm.H"
 

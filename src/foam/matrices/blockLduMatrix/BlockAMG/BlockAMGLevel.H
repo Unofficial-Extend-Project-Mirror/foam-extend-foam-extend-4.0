@@ -86,6 +86,9 @@ public:
 
     // Member Functions
 
+        //- Return reference to matrix
+        virtual BlockLduMatrix<Type>& matrix() = 0;
+
         //- Return reference to x
         virtual Field<Type>& x() = 0;
 
@@ -144,6 +147,12 @@ public:
 
         //- Create next level from current level
         virtual autoPtr<BlockAMGLevel> makeNextLevel() const = 0;
+
+        //- Re-initialise AMG level after matrix coefficient update
+        virtual void initLevel
+        (
+            autoPtr<Foam::BlockAMGLevel<Type> >& coarseLevelPtr
+        ) = 0;
 };
 
 

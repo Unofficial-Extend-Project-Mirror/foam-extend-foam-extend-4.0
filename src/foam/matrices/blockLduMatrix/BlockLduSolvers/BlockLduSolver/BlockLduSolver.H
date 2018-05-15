@@ -189,10 +189,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~BlockLduSolver()
-        {}
+    //- Destructor
+    virtual ~BlockLduSolver()
+    {}
 
 
     // Member functions
@@ -209,6 +208,9 @@ public:
             TypeField& x,
             const TypeField& b
         ) = 0;
+
+        //- Re-initialise solver after matrix coefficient update
+        virtual void initMatrix() = 0;
 };
 
 

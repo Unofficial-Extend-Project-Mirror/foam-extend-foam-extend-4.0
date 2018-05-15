@@ -534,6 +534,12 @@ const Foam::labelList& Foam::polyPatch::meshEdges() const
 }
 
 
+void Foam::polyPatch::clearGeom()
+{
+    primitivePatch::clearGeom();
+}
+
+
 void Foam::polyPatch::clearAddressing()
 {
     // Missing base level clear-out  HJ, 1/Mar/2009
@@ -571,6 +577,34 @@ bool Foam::polyPatch::order
 
 void Foam::polyPatch::syncOrder() const
 {}
+
+
+void Foam::polyPatch::resetPatch
+(
+    const label newSize,
+    const label newStart
+)
+{
+    // Clear all data
+    clearAddressing();
+    
+    // Reset start and primitive patch
+    start_ = newStart;
+    
+    primitivePatch::operator=
+    (
+        primitivePatch
+        (
+            faceSubList
+            (
+                boundaryMesh_.mesh().allFaces(),
+                newSize,
+                newStart
+            ),
+            boundaryMesh_.mesh().allPoints()
+        )
+    );
+}
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //

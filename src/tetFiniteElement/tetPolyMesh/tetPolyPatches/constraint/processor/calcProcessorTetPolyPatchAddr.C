@@ -479,7 +479,7 @@ const labelList& processorTetPolyPatch::localEdgeIndices() const
 {
     if (!localEdgeIndicesPtr_)
     {
-        if (isMaster())
+        if (master())
         {
             localEdgeIndicesPtr_ =
                 new labelList(calcProcLocalEdgesIndices(procPolyPatch_));

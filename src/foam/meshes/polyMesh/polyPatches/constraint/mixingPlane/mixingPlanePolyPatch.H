@@ -314,15 +314,9 @@ public:
         // Interpolation data
 
             //- Is this the master side?
-            bool master() const
+            virtual bool master() const
             {
                 return index() < shadowIndex();
-            }
-
-            //- Is this the slave side?
-            bool slave() const
-            {
-                return !master();
             }
 
             //- Return coordinate system

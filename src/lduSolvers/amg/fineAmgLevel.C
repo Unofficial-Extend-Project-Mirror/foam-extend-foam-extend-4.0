@@ -60,7 +60,16 @@ Foam::fineAmgLevel::fineAmgLevel
     dict_(dict),
     policyPtr_
     (
-        amgPolicy::New(policyType, matrix_, groupSize, minCoarseEqns)
+        amgPolicy::New
+        (
+            policyType,
+            matrix_,
+            coupleBouCoeffs_,
+            coupleIntCoeffs_,
+            interfaceFields_,
+            groupSize,
+            minCoarseEqns
+        )
     ),
     smootherPtr_
     (
@@ -298,12 +307,7 @@ Foam::autoPtr<Foam::amgLevel> Foam::fineAmgLevel::makeNextLevel() const
         (
             new coarseAmgLevel
             (
-                policyPtr_->restrictMatrix
-                (
-                    coupleBouCoeffs_,
-                    coupleIntCoeffs_,
-                    interfaceFields_
-                ),
+                policyPtr_->restrictMatrix(),
                 dict(),
                 policyPtr_->type(),
                 policyPtr_->groupSize(),

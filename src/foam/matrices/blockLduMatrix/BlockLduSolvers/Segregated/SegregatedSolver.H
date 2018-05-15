@@ -95,10 +95,9 @@ public:
         );
 
 
-        // Destructor
-
-            virtual ~SegregatedSolver()
-            {}
+        //- Destructor
+        virtual ~SegregatedSolver()
+        {}
 
 
     // Member Functions
@@ -110,6 +109,9 @@ public:
             const Field<Type>& b
         );
 
+        //- Re-initialise solver after matrix coefficient update
+        virtual void initMatrix()
+        {}
 };
 
 

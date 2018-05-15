@@ -96,10 +96,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~patchConstrainedDecomp()
-        {}
+    //- Destructor
+    virtual ~patchConstrainedDecomp()
+    {}
 
 
     // Member Functions

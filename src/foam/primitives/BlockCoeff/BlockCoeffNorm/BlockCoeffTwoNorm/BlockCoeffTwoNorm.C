@@ -37,7 +37,8 @@ Foam::BlockCoeffTwoNorm<Type>::BlockCoeffTwoNorm
 )
 :
     BlockCoeffNorm<Type>(dict),
-    dict_(dict)
+    dict_(dict),
+    cmpt_(readInt(this->dict().lookup("normComponent")))
 {}
 
 
@@ -51,21 +52,30 @@ Foam::scalar Foam::BlockCoeffTwoNorm<Type>::normalize
 {
     if (a.activeType() == Foam::BlockCoeff<Type>::SCALAR)
     {
-        return mag(a.asScalar());
+        // Note: for two-norm, use mag
+        return sign(a.component(cmpt_))*mag(a.asScalar());
     }
     else if (a.activeType() == Foam::BlockCoeff<Type>::LINEAR)
     {
-        return mag(a.asLinear());
+        // Note: for two-norm, use mag
+        return sign(a.component(cmpt_))*mag(a.asLinear());
     }
     else if (a.activeType() == Foam::BlockCoeff<Type>::SQUARE)
     {
-        return mag(a.asSquare());
+        // Note: for two-norm, use mag of diag
+        typedef typename BlockCoeff<Type>::linearType linearType;
+
+        linearType diag;
+        contractLinear(diag, a.asSquare());
+
+        return sign(diag.component(cmpt_))*mag(diag);
     }
     else
     {
         FatalErrorIn
         (
-            "scalar BlockCoeffTwoNorm<Type>(const BlockCoeff<Type>& a)"
+            "scalar BlockCoeffTwoNorm<Type>::normalize"
+            "(const BlockCoeff<Type>& a)"
         )   << "Unknown type" << abort(FatalError);
 
         return 0;
@@ -77,23 +87,34 @@ Foam::scalar Foam::BlockCoeffTwoNorm<Type>::normalize
 
 
 template<class Type>
-void Foam::BlockCoeffTwoNorm<Type>::coeffMag
+void Foam::BlockCoeffTwoNorm<Type>::normalize
 (
-    const Foam::CoeffField<Type>& a,
-    Foam::Field<scalar>& b
+    Field<scalar>& b,
+    const CoeffField<Type>& a
 )
 {
     if (a.activeType() == Foam::BlockCoeff<Type>::SCALAR)
     {
-        b = mag(a.asScalar());
+        // Note: for two-norm, use mag
+        // However, the norm is signed
+        // b = mag(a.asScalar());
+        b = a.asScalar();
     }
     else if (a.activeType() == Foam::BlockCoeff<Type>::LINEAR)
     {
-        b = mag(a.asLinear());
+        // Note: for two-norm, use mag = sqrt(sum magSqr(cmpt))
+        // However, the norm is signed
+        b = sign(a.component(cmpt_))*mag(a.asLinear());
     }
     else if (a.activeType() == Foam::BlockCoeff<Type>::SQUARE)
     {
-        b = mag(a.asSquare());
+        // Note: for two-norm, use mag of diag
+        typedef typename BlockCoeff<Type>::linearTypeField linearTypeField;
+
+        linearTypeField diag(a.size());
+        contractLinear(diag, a.asSquare());
+
+        b = sign(diag.component(cmpt_))*mag(diag);
     }
     else
     {

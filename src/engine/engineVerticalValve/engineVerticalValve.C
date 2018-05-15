@@ -128,12 +128,11 @@ void Foam::engineVerticalValve::writeDict(Ostream& os) const
 {
     engineValve::writeDict(os);
 
-
     os  << "headPatch " << valveHeadPatch_.name() << token::END_STATEMENT << nl
         << "bottomLayerOffset " << bottomLayerOffset_
         << token::END_STATEMENT << nl
         << "bottomLayerOffsetayerTol " << bottomLayerTol_
-       << token::END_STATEMENT << nl
+        << token::END_STATEMENT << nl
         << "topLayerOffset " << topLayerOffset_ << token::END_STATEMENT << nl
         << "topLayerTol " << topLayerTol_ << token::END_STATEMENT << nl
         << "detachDistance " << detachDistance_ << token::END_STATEMENT << nl

@@ -30,7 +30,6 @@ License
 #include "processorPolyPatch.H"
 #include "demandDrivenData.H"
 #include "globalPoints.H"
-//#include "geomGlobalPoints.H"
 #include "labelIOList.H"
 #include "PackedList.H"
 #include "mergePoints.H"

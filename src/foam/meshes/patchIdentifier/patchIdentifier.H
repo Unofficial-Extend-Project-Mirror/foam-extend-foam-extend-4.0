@@ -35,9 +35,8 @@ SourceFiles
 #ifndef patchIdentifier_H
 #define patchIdentifier_H
 
-#include "wordList.H"
+#include "word.H"
 #include "label.H"
-#include "ListOps.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -102,8 +101,7 @@ public:
 
 
     //- Destructor
-
-        virtual ~patchIdentifier();
+    virtual ~patchIdentifier();
 
 
     // Member Functions

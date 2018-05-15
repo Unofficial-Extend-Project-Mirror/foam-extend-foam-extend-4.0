@@ -118,9 +118,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~ILUC0();
+    //- Destructor
+    virtual ~ILUC0();
 
 
     // Member Functions

@@ -45,6 +45,7 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
         << "Trying to construct an genericFvPatchField on patch "
         << this->patch().name()
         << " of field " << this->dimensionedInternalField().name()
+        << ".  Actual type: " << actualTypeName_
         << abort(FatalError);
 }
 

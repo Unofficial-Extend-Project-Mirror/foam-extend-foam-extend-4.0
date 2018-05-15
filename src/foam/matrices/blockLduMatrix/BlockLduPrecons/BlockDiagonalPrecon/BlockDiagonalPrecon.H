@@ -84,10 +84,9 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~BlockDiagonalPrecon()
-        {}
+    //- Destructor
+    virtual ~BlockDiagonalPrecon()
+    {}
 
 
     // Member Functions
@@ -108,6 +107,10 @@ public:
         {
             return precondition(xT, bT);
         }
+
+        //- Re-initialise preconditioner after matrix coefficient update
+        virtual void initMatrix()
+        {}
 };
 
 

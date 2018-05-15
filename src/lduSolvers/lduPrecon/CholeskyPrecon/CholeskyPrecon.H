@@ -99,9 +99,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~CholeskyPrecon();
+    //- Destructor
+    virtual ~CholeskyPrecon();
 
 
     // Member Functions

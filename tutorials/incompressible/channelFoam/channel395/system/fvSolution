@@ -16,42 +16,48 @@ FoamFile
 
 solvers
 {
-    p PCG
+    p
     {
-        preconditioner   DIC;
+        solver           CG;
+        preconditioner   Cholesky;
         tolerance        1e-06;
         relTol           0.05;
-    };
-    pFinal PCG
+    }
+    pFinal
     {
-        preconditioner   DIC;
+        solver           CG;
+        preconditioner   Cholesky;
         tolerance        1e-06;
         relTol           0;
-    };
-    U BiCGStab
+    }
+    U
     {
-        preconditioner   DILU;
+        solver           BiCGStab;
+        preconditioner   ILU0;
         tolerance        1e-05;
         relTol           0;
-    };
-    k BiCGStab
+    }
+    k
     {
-        preconditioner   DILU;
+        solver           BiCGStab;
+        preconditioner   ILU0;
         tolerance        1e-05;
         relTol           0;
-    };
-    B BiCGStab
+    }
+    B
     {
-        preconditioner   DILU;
+        solver           BiCGStab;
+        preconditioner   ILU0;
         tolerance        1e-05;
         relTol           0;
-    };
-    nuTilda BiCGStab
+    }
+    nuTilda
     {
-        preconditioner   DILU;
+        solver           BiCGStab;
+        preconditioner   ILU0;
         tolerance        1e-05;
         relTol           0;
-    };
+    }
 }
 
 PISO

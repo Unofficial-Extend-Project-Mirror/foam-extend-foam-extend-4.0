@@ -46,6 +46,7 @@ SourceFiles
 
 #include "fvPatch.H"
 #include "DimensionedField.H"
+#include "coeffFields.H"
 #include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -329,6 +330,14 @@ public:
                 return false;
             }
 
+            //- Return true if this patch field is block-coupled in the
+            // boundary condition, ie. if the coupling coefficient is a
+            // rank x rank implicit block
+            virtual bool blockCoupled() const
+            {
+                return false;
+            }
+
             //- Return true if the boundary condition has already been updated
             bool updated() const
             {
@@ -370,7 +379,7 @@ public:
             //- Return patchField on the opposite patch of a coupled patch
             virtual tmp<Field<Type> > patchNeighbourField() const
             {
-                notImplemented(type() + "patchNeighbourField()");
+                notImplemented(type() + "::patchNeighbourField()");
                 return *this;
             }
 
@@ -388,51 +397,125 @@ public:
             );
 
 
-            //- Return the matrix diagonal coefficients corresponding to the
-            //  evaluation of the value of this patchField with given weights
-            virtual tmp<Field<Type> > valueInternalCoeffs
-            (
-                const tmp<Field<scalar> >&
-            ) const
-            {
-                notImplemented
+            // Decoupled matrix coefficients
+
+                //- Return the matrix diagonal coefficients corresponding to the
+                //  evaluation of the value of this patchField with
+                //  given weights
+                virtual tmp<Field<Type> > valueInternalCoeffs
                 (
-                    type()
-                  + "::valueInternalCoeffs(const tmp<Field<scalar> >&)"
-                );
-                return *this;
-            }
+                    const tmp<Field<scalar> >&
+                ) const
+                {
+                    notImplemented
+                    (
+                        type()
+                      + "::valueInternalCoeffs(const tmp<Field<scalar> >&)"
+                    );
 
-            //- Return the matrix source coefficients corresponding to the
-            //  evaluation of the value of this patchField with given weights
-            virtual tmp<Field<Type> > valueBoundaryCoeffs
-            (
-                const tmp<Field<scalar> >&
-            ) const
-            {
-                notImplemented
+                    return *this;
+                }
+
+                //- Return the matrix source coefficients corresponding to the
+                //  evaluation of the value of this patchField with given
+                //  weights
+                virtual tmp<Field<Type> > valueBoundaryCoeffs
                 (
-                    type()
-                  + "::valueBoundaryCoeffs(const tmp<Field<scalar> >&)"
-                );
-                return *this;
-            }
+                    const tmp<Field<scalar> >&
+                ) const
+                {
+                    notImplemented
+                    (
+                        type()
+                      + "::valueBoundaryCoeffs(const tmp<Field<scalar> >&)"
+                    );
+                    return *this;
+                }
 
-            //- Return the matrix diagonal coefficients corresponding to the
-            //  evaluation of the gradient of this patchField
-            virtual tmp<Field<Type> > gradientInternalCoeffs() const
-            {
-                notImplemented(type() + "::gradientInternalCoeffs()");
-                return *this;
-            }
+                //- Return the matrix diagonal coefficients corresponding to the
+                //  evaluation of the gradient of this patchField
+                virtual tmp<Field<Type> > gradientInternalCoeffs() const
+                {
+                    notImplemented(type() + "::gradientInternalCoeffs()");
+                    return *this;
+                }
 
-            //- Return the matrix source coefficients corresponding to the
-            //  evaluation of the gradient of this patchField
-            virtual tmp<Field<Type> > gradientBoundaryCoeffs() const
-            {
-                notImplemented(type() + "::gradientBoundaryCoeffs()");
-                return *this;
-            }
+                //- Return the matrix source coefficients corresponding to the
+                //  evaluation of the gradient of this patchField
+                virtual tmp<Field<Type> > gradientBoundaryCoeffs() const
+                {
+                    notImplemented(type() + "::gradientBoundaryCoeffs()");
+                    return *this;
+                }
+
+
+            // Block-coupled matrix coefficients
+
+                //- Return the matrix diagonal coefficients corresponding to the
+                //  evaluation of the value of this patchField with given
+                //  weights
+                virtual tmp<CoeffField<Type> > blockValueInternalCoeffs
+                (
+                    const tmp<scalarField>&
+                ) const
+                {
+                    notImplemented
+                    (
+                        type()
+                      + "::blockValueInternalCoeffs(const tmp<Field<scalar> >&)"
+                    );
+
+                    return tmp<CoeffField<Type> >
+                    (
+                        new CoeffField<Type>(this->size())
+                    );
+                }
+
+                //- Return the matrix source coefficients corresponding to the
+                //  evaluation of the value of this patchField with given
+                //  weights
+                virtual tmp<Field<Type> > blockValueBoundaryCoeffs
+                (
+                    const tmp<scalarField>&
+                ) const
+                {
+                    notImplemented
+                    (
+                        type()
+                      + "::blockValueBoundaryCoeffs(const tmp<Field<scalar> >&)"
+                    );
+
+                    return *this;
+                }
+
+                //- Return the matrix diagonal coefficients corresponding to the
+                //  evaluation of the gradient of this patchField
+                virtual tmp<CoeffField<Type> >
+                blockGradientInternalCoeffs() const
+                {
+                    notImplemented
+                    (
+                        type() + "blockGradientInternalCoeffs() const"
+                    );
+
+                    return tmp<CoeffField<Type> >
+                    (
+                        new CoeffField<Type>(this->size())
+                    );
+                }
+
+                //- Return the matrix source coefficients corresponding to the
+                //  evaluation of the gradient of this patchField
+                virtual tmp<Field<Type> >
+                blockGradientBoundaryCoeffs() const
+                {
+                    notImplemented
+                    (
+                        type() + "::blockGradientBoundaryCoeffs()"
+                    );
+
+                    return *this;
+                }
 
 
         // Patch interpolation and patch flux

@@ -417,7 +417,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
 
     if (debug)
     {
-        Pout<< "Added retired points: modified = "
+        Pout<< " modified = "
             << nNewPoints - debugPointCounter;
 
         debugPointCounter = nNewPoints;
@@ -498,7 +498,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
 
     if (debug)
     {
-        Info << "Inserted untouched faces into cells" << endl;
+        Pout<< "Inserted untouched faces into cells" << endl;
     }
 
     // Add the modified internal faces
@@ -546,7 +546,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
 
     if (debug)
     {
-        Info << "Inserted modified faces into cells" << endl;
+        Pout<< "Inserted modified faces into cells" << endl;
     }
 
     // Add the new faces
@@ -1148,7 +1148,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
 
             if (rotate != 0)
             {
-                Info<< "Rotating face" << endl;
+                Pout<< "Rotating face" << endl;
                 newFaces[faceI] = rotateFace(newFaces[faceI], rotate);
             }
         }
@@ -2267,7 +2267,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
 
         if (debug)
         {
-            Info<< " nOldPoints: " << points.size()
+            Pout<< " nOldPoints: " << points.size()
                 << " nPoints: " << newPointsZeroVol.size()
                 << " nUsedFaces: " << nUsedFaces
                 << " newFaces: " << newFaces.size()
@@ -2416,6 +2416,10 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
     List<objectMap> facesFromFaces;
     List<objectMap> cellsFromCells;
 
+    // Patch reset map is currently dummy: does not support change in number
+    // of boundary patches
+    // HJ, 23/Apr/2018
+    boolList resetPatchFlag(boundary.size(), false);
 
     autoPtr<mapPolyMesh> topoChangeMap
     (
@@ -2452,6 +2456,8 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
             fzPointRenumber,
             fzFaceRenumber,
             czRenumber,
+
+            resetPatchFlag,
 
             newPointsMotion,
             oldPatchStarts,

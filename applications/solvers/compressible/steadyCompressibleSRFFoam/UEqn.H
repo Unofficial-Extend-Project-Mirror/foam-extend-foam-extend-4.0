@@ -3,8 +3,7 @@
 
     fvVectorMatrix UrelEqn
     (
-        fvm::ddt(rho, Urel)
-      + fvm::div(phi, Urel)
+        fvm::div(phi, Urel)
       + turbulence->divDevRhoReff()
       + rho*SRF->Su()
     );

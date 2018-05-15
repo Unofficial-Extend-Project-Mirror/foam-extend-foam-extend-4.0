@@ -240,7 +240,7 @@ public:
                 return mesh_;
             }
 
-            //- cellZone number
+            //- Return cellZone number
             label zoneId() const
             {
                 return cellZoneID_;

@@ -102,6 +102,9 @@ public:
         }
 
         //- Calculate for each searchPoint inside/outside status.
+        bool calcInside(const point& p) const;
+
+        //- Calculate for each searchPoint inside/outside status.
         boolList calcInside(const pointField& searchPoints) const;
 
         //- Calculate index of nearest triangle (or -1) for each sample.

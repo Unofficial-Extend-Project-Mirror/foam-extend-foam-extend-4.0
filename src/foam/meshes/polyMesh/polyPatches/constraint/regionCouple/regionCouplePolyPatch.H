@@ -363,15 +363,9 @@ public:
         // Interpolation data
 
             //- Is this the master side?
-            bool master() const
+            virtual bool master() const
             {
                 return master_;
-            }
-
-            //- Is this the slave side?
-            bool slave() const
-            {
-                return !master();
             }
 
             //- Use bridging to fix overlap error in interpolation

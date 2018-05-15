@@ -25,7 +25,7 @@ solvers
         maxIter          1000;
         tolerance        1e-02;
         relTol           0;
-    };
+    }
 
     p
     {
@@ -36,7 +36,7 @@ solvers
         maxIter          1000;
         tolerance        1e-06;
         relTol           0.0;
-    };
+    }
 
     pFinal
     {
@@ -47,7 +47,7 @@ solvers
         maxIter          1000;
         tolerance        1e-06;
         relTol           0;
-    };
+    }
 
     U
     {
@@ -58,7 +58,7 @@ solvers
         maxIter          1000;
         tolerance        1e-05;
         relTol           0;
-    };
+    }
 }
 
 PISO

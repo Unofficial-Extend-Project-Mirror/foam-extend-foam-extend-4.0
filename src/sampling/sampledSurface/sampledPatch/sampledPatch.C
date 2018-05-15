@@ -154,7 +154,7 @@ void Foam::sampledPatch::remapFaces
 )
 {
     // recalculate the cells cut
-    if (&faceMap && faceMap.size())
+    if (!faceMap.empty())
     {
         MeshStorage::remapFaces(faceMap);
     }

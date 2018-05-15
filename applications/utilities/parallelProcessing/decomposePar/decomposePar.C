@@ -235,26 +235,45 @@ int main(int argc, char *argv[])
     }
 
     Info<< "Create mesh for region " << regionName << endl;
-    domainDecomposition mesh
+    fvMesh mesh
     (
         IOobject
         (
             regionName,
             runTime.timeName(),
-            runTime
+            runTime,
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE
         )
     );
+
+    domainDecomposition meshDecomp
+    (
+        mesh,
+        IOdictionary
+        (
+            IOobject
+            (
+                "decomposeParDict",
+                runTime.system(),
+                mesh,
+                IOobject::MUST_READ,
+                IOobject::NO_WRITE
+            )
+        )
+    );
+
 
     // Decompose the mesh
     if (!decomposeFieldsOnly)
     {
-        mesh.decomposeMesh(filterPatches);
+        meshDecomp.decomposeMesh(filterPatches);
 
-        mesh.writeDecomposition();
+        meshDecomp.writeDecomposition();
 
         if (writeCellDist)
         {
-            const labelList& procIds = mesh.cellToProc();
+            const labelList& procIds = meshDecomp.cellToProc();
 
             // Write the decomposition as labelList for use with 'manual'
             // decomposition method.
@@ -345,7 +364,7 @@ int main(int argc, char *argv[])
 
     // Construct the point fields
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~
-    pointMesh pMesh(mesh);
+    const pointMesh& pMesh = pointMesh::New(mesh);
 
     PtrList<pointScalarField> pointScalarFields;
     readFields(pMesh, objects, pointScalarFields);
@@ -595,7 +614,7 @@ int main(int argc, char *argv[])
     Info<< endl;
 
     // Split the fields over processors
-    for (label procI = 0; procI < mesh.nProcs(); procI++)
+    for (label procI = 0; procI < meshDecomp.nProcs(); procI++)
     {
         Info<< "Processor " << procI << ": field transfer" << endl;
 
@@ -632,6 +651,7 @@ int main(int argc, char *argv[])
                 processorDb
             )
         );
+        procMesh.syncUpdateMesh();
 
         labelIOList cellProcAddressing
         (
@@ -872,7 +892,7 @@ int main(int argc, char *argv[])
         {
             const fileName timePath = processorDb.timePath();
 
-            if (copyUniform || mesh.distributed())
+            if (copyUniform || meshDecomp.distributed())
             {
                 cp
                 (
@@ -962,7 +982,7 @@ int main(int argc, char *argv[])
         Info << endl;
 
         // Split the fields over processors
-        for (label procI = 0; procI < mesh.nProcs(); procI++)
+        for (label procI = 0; procI < meshDecomp.nProcs(); procI++)
         {
             Info<< "Processor " << procI
                 << ": finite area field transfer" << endl;

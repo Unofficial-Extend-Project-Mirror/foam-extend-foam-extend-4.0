@@ -65,7 +65,7 @@ template<class Type, class GeoMesh> Ostream& operator<<
 
 
 /*---------------------------------------------------------------------------*\
-                           Class DimensionedField Declaration
+                     Class DimensionedField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type, class GeoMesh>
@@ -79,7 +79,17 @@ public:
 
     // Public typedefs
 
+        //- Field mesh type (eg. volMesh, surfaceMesh, areaMesh)
+        typedef GeoMesh GeoMeshType;
+
+        //- Actual mesh type on which the DimensionedField is instantiated
+        //  (eg fvMesh, faMesh)
         typedef typename GeoMesh::Mesh Mesh;
+
+        //- Field element type (eg. scalar, vector)
+        typedef Type PrimitiveType;
+
+        //- Field element component type
         typedef typename Field<Type>::cmptType cmptType;
 
 

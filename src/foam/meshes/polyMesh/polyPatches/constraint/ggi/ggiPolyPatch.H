@@ -322,15 +322,9 @@ public:
         // Interpolation data
 
             //- Is this the master side?
-            bool master() const
+            virtual bool master() const
             {
                 return index() < shadowIndex();
-            }
-
-            //- Is this the slave side?
-            bool slave() const
-            {
-                return !master();
             }
 
             //- Use bridging to fix overlap error in interpolation
@@ -361,7 +355,7 @@ public:
 
             //- Expand face field to full zone size, including reduction
             template<class Type>
-            tmp<Field<Type> > fastExpand(const Field<Type>& pf) const;
+            tmp<Field<Type> > fastExpand(const UList<Type>& pf) const;
 
             //- Interpolate face field: given field on a the shadow side,
             //  create an interpolated field on this side

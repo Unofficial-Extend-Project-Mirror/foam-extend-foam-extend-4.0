@@ -25,8 +25,6 @@ Class
     Foam::proxySurfaceWriter
 
 Description
-    A surfaceWriter that writes the geometry via the MeshedSurfaceProxy, but
-    which does not support any fields.
 
 SourceFiles
     proxySurfaceWriter.C
@@ -44,12 +42,13 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                     Class proxySurfaceWriter Declaration
+                      Class proxySurfaceWriter Declaration
 \*---------------------------------------------------------------------------*/
 
+template<class Type>
 class proxySurfaceWriter
 :
-    public surfaceWriter
+    public surfaceWriter<Type>
 {
 
     // Private data
@@ -75,31 +74,50 @@ public:
 
     // Member Functions
 
-
-        //- True if the surface format supports geometry in a separate file.
-        //  False if geometry and field must be in a single file
-        virtual bool separateGeometry()
+        //- Always write separate geometry file
+        virtual bool separateFiles()
         {
             return true;
         }
 
+        // Write
 
-        //- Write single surface geometry to file.
-        virtual void write
-        (
-            const fileName& outputDir,
-            const fileName& surfaceName,
-            const pointField& points,
-            const faceList& faces,
-            const bool verbose = false
-        ) const;
+            //- Write geometry to file.
+            virtual void write
+            (
+                const fileName& outputDir,
+                const fileName& surfaceName,
+                const pointField& points,
+                const faceList& faces,
+                const bool verbose = false
+            ) const;
 
+
+            //- Writes single surface to file.
+            virtual void write
+            (
+                const fileName& outputDir,
+                const fileName& surfaceName,
+                const pointField& points,
+                const faceList& faces,
+                const fileName& fieldName,
+                const Field<Type>& values,
+                const surfaceWriterBase::surfaceData sdType,
+                const bool verbose = false
+            ) const
+            {}
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "proxySurfaceWriter.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

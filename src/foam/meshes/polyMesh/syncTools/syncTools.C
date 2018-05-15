@@ -132,7 +132,7 @@ Foam::PackedBoolList Foam::syncTools::getMasterPoints(const polyMesh& mesh)
                     {
                         donePoint.set(pointI, 1u);
 
-                        if (pp.owner())
+                        if (pp.master())
                         {
                             isMasterPoint.set(pointI, 1u);
                         }
@@ -251,7 +251,7 @@ Foam::PackedBoolList Foam::syncTools::getMasterEdges(const polyMesh& mesh)
                     {
                         doneEdge.set(edgeI, 1u);
 
-                        if (pp.owner())
+                        if (pp.master())
                         {
                             isMasterEdge.set(edgeI, 1u);
                         }
@@ -325,7 +325,7 @@ Foam::PackedBoolList Foam::syncTools::getMasterFaces(const polyMesh& mesh)
                 const processorPolyPatch& pp =
                     refCast<const processorPolyPatch>(patches[patchI]);
 
-                if (!pp.owner())
+                if (!pp.master())
                 {
                     forAll(pp, i)
                     {

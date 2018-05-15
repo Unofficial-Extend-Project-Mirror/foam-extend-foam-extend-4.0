@@ -99,9 +99,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~coarseAmgLevel();
+    //- Destructor
+    virtual ~coarseAmgLevel();
 
 
     // Member Functions
@@ -172,7 +171,6 @@ public:
             const direction cmpt,
             scalarField& xBuffer
         ) const;
-
 
         //- Create next level from current level
         virtual autoPtr<amgLevel> makeNextLevel() const;

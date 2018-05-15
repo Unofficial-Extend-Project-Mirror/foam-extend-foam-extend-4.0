@@ -203,7 +203,7 @@ WedgePointPatchField
 )
 {
     // ZT, 26/02/2017: Size of the patch could be zero in parallel runs
-    if (this->patch().meshPoints().size())
+    if (!this->patch().meshPoints().empty())
     {
         // In order to ensure that the wedge patch is always flat, take the
         // normal vector from the first point

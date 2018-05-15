@@ -116,9 +116,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~cyclicPointPatch();
+    //- Destructor
+    virtual ~cyclicPointPatch();
 
 
     // Member Functions

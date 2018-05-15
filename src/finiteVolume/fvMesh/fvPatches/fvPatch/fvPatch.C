@@ -43,6 +43,35 @@ defineRunTimeSelectionTable(fvPatch, polyPatch);
 addToRunTimeSelectionTable(fvPatch, fvPatch, polyPatch);
 
 
+// * * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * //
+
+void fvPatch::makeWeights(fvsPatchScalarField& w) const
+{
+    w = 1.0;
+}
+
+
+void fvPatch::makeDeltaCoeffs(fvsPatchScalarField& dc) const
+{
+    dc = 1.0/(nf() & delta());
+}
+
+
+void fvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
+{
+    cv = vector::zero;
+}
+
+
+void fvPatch::initMovePoints()
+{}
+
+
+void fvPatch::movePoints()
+{}
+
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 fvPatch::fvPatch(const polyPatch& p, const fvBoundaryMesh& bm)
@@ -115,7 +144,10 @@ tmp<vectorField> fvPatch::Cn() const
     const unallocLabelList& faceCells = this->faceCells();
 
     // Get reference to global cell centres
-    const vectorField& gcc = boundaryMesh().mesh().cellCentres();
+    // Bugfix: access cell centres from fvMesh data, not polyMesh.
+    // HJ, 30/Nov/2017
+    const vectorField& gcc = boundaryMesh().mesh().C().internalField();
+    // const vectorField& gcc = boundaryMesh().mesh().cellCentres();
 
     forAll (faceCells, faceI)
     {
@@ -148,32 +180,6 @@ tmp<vectorField> fvPatch::delta() const
 {
     return Cf() - Cn();
 }
-
-
-void fvPatch::makeWeights(scalarField& w) const
-{
-    w = 1.0;
-}
-
-
-void fvPatch::makeDeltaCoeffs(scalarField& dc) const
-{
-    dc = 1.0/(nf() & delta());
-}
-
-
-void fvPatch::makeCorrVecs(vectorField& cv) const
-{
-    cv = vector::zero;
-}
-
-
-void fvPatch::initMovePoints()
-{}
-
-
-void fvPatch::movePoints()
-{}
 
 
 const scalarField& fvPatch::deltaCoeffs() const

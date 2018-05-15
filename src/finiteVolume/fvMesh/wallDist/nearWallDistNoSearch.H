@@ -47,7 +47,7 @@ namespace Foam
 class fvMesh;
 
 /*---------------------------------------------------------------------------*\
-                           Class nearWallDistNoSearch Declaration
+                     Class nearWallDistNoSearch Declaration
 \*---------------------------------------------------------------------------*/
 
 class nearWallDistNoSearch
@@ -81,8 +81,7 @@ public:
 
 
     // Destructor
-
-        virtual ~nearWallDistNoSearch();
+    virtual ~nearWallDistNoSearch();
 
 
     // Member Functions

@@ -79,7 +79,7 @@ solvers
         maxIter          1000;
         tolerance        1e-08;
         relTol           0;
-    };
+    }
 }
 
 SIMPLE

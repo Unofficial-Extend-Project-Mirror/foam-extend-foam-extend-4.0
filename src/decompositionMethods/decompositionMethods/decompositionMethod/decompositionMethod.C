@@ -431,20 +431,7 @@ Foam::autoPtr<Foam::decompositionMethod> Foam::decompositionMethod::New
     const dictionary& decompositionDict
 )
 {
-    // HR 11.02.18: Library table is member of runtime (like in
-    // vanilla). Therefore need runtime here and we get it by
-    // traversing to the top of the dict in the hope that it is
-    // an IOdictionary.
-    const dictionary& topDict = decompositionDict.topDict();
-    if (isA<IOdictionary>(topDict))
-    {
-        Time& time = const_cast<Time&>
-        (
-            reinterpret_cast<const Time&>(topDict)
-        );
-
-        loadExternalLibraries(time);
-    }
+    loadExternalLibraries();
 
     word decompositionMethodTypeName(decompositionDict.lookup("method"));
 
@@ -470,13 +457,14 @@ Foam::autoPtr<Foam::decompositionMethod> Foam::decompositionMethod::New
     return autoPtr<decompositionMethod>(cstrIter()(decompositionDict));
 }
 
+
 Foam::autoPtr<Foam::decompositionMethod> Foam::decompositionMethod::New
 (
     const dictionary& decompositionDict,
     const polyMesh& mesh
 )
 {
-    loadExternalLibraries(const_cast<Time&>(mesh.time()));
+    loadExternalLibraries();
 
     word decompositionMethodTypeName(decompositionDict.lookup("method"));
 
@@ -503,25 +491,27 @@ Foam::autoPtr<Foam::decompositionMethod> Foam::decompositionMethod::New
     return autoPtr<decompositionMethod>(cstrIter()(decompositionDict, mesh));
 }
 
-
-void Foam::decompositionMethod::loadExternalLibraries(Time& time)
+void Foam::decompositionMethod::loadExternalLibraries()
 {
     wordList libNames(3);
-    libNames[0]=word("scotchDecomp");
-    libNames[1]=word("metisDecomp");
-    libNames[2]=word("parMetisDecomp");
+    
+    libNames[0] = word("scotchDecomp");
+    libNames[1] = word("metisDecomp");
+    libNames[2] = word("parMetisDecomp");
 
-    forAll(libNames,i)
+    forAll (libNames,i)
     {
         const word libName("lib"+libNames[i]+".so");
 
-        if(!time.libs().open(libName))
+        bool ok = dlLibraryTable::open(libName);
+
+        if (!ok)
         {
             WarningIn("decompositionMethod::loadExternalLibraries()")
                 << "Loading of decomposition library " << libName
-                    << " unsuccesful. Some decomposition methods may not be "
-                    << " available"
-                    << endl;
+                << " unsuccesful. Some decomposition methods may not be "
+                << "available"
+                << endl;
         }
     }
 }

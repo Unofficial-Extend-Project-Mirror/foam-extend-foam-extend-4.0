@@ -468,7 +468,7 @@ Foam::polyMesh* Foam::blockMesh::createTopology
                     << endl;
             }
 
-            // Override neighbourpatch name
+            // Override neighbour patch name
             if (nbrPatchNames[patchI] != word::null)
             {
                 dict.set("neighbourPatch", nbrPatchNames[patchI]);

@@ -344,7 +344,7 @@ void syncPoints
             (
                 isA<processorPolyPatch>(pp)
              && pp.nPoints() > 0
-             && refCast<const processorPolyPatch>(pp).owner()
+             && refCast<const processorPolyPatch>(pp).master()
             )
             {
                 const processorPolyPatch& procPatch =
@@ -381,7 +381,7 @@ void syncPoints
             (
                 isA<processorPolyPatch>(pp)
              && pp.nPoints() > 0
-             && !refCast<const processorPolyPatch>(pp).owner()
+             && !refCast<const processorPolyPatch>(pp).master()
             )
             {
                 const processorPolyPatch& procPatch =

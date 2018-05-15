@@ -165,6 +165,8 @@ bool Foam::primitiveMesh::checkClosedCells
         }
     }
 
+    reduce(nErrorClosed, sumOp<label>());
+    
     if (nErrorClosed > 0)
     {
         if (debug || report)
@@ -196,6 +198,8 @@ bool Foam::primitiveMesh::checkClosedCells
             nErrorOwnNei++;
         }
     }
+
+    reduce(nErrorOwnNei, sumOp<label>());
 
     if (nErrorOwnNei > 0)
     {

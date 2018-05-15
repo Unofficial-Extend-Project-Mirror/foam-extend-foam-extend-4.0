@@ -113,8 +113,10 @@ private:
         //- Disallow default bitwise assignment
         void operator=(const decompositionMethod&);
 
-        //- load missing libraries to avoid compile-time linking to external dependencies
-        static void loadExternalLibraries(Time& time);
+        //- Load missing libraries to avoid compile-time linking
+        //  to external dependencies
+        static void loadExternalLibraries();
+
 
 public:
 
@@ -177,10 +179,9 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~decompositionMethod()
-        {}
+    //- Destructor
+    virtual ~decompositionMethod()
+    {}
 
 
     // Member Functions
@@ -201,7 +202,6 @@ public:
             const scalarField& pointWeights
         ) = 0;
 
-
         //- Decompose cell clusters
         //  Calls decompose (below) with uniform weights
         virtual labelList decompose
@@ -218,7 +218,6 @@ public:
             const scalarField& coarseWeights
         );
 
-
         //- Decompose cells with weights with explicitly provided connectivity
         virtual labelList decompose
         (
@@ -226,7 +225,6 @@ public:
             const pointField& cc,
             const scalarField& cWeights
         ) = 0;
-
 };
 
 

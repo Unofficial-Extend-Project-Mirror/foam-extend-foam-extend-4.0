@@ -30,8 +30,6 @@ License
 #include "slicedVolFields.H"
 #include "slicedSurfaceFields.H"
 #include "SubField.H"
-#include "cyclicFvPatchFields.H"
-#include "cyclicGgiFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -71,6 +69,15 @@ void fvMesh::makeSf() const
         dimArea,
         faceAreas()
     );
+
+    // Boundary update.  Used in complex geometries, eg. immersed boundary
+    // HJ, 29/Nov/2017
+    slicedSurfaceVectorField& S = *SfPtr_;
+
+    forAll (S.boundaryField(), patchI)
+    {
+        boundary()[patchI].makeSf(S);
+    }
 }
 
 
@@ -109,6 +116,9 @@ void fvMesh::makeMagSf() const
         ),
         mag(Sf()) + dimensionedScalar("vs", dimArea, VSMALL)
     );
+
+    // Note: boundary update not required, as magSf is calculated from Sf
+    // HJ, 29/Nov/2017
 }
 
 
@@ -145,7 +155,8 @@ void fvMesh::makeC() const
         *this,
         dimLength,
         cellCentres(),
-        faceCentres()
+        faceCentres(),
+        false             // Do not preserve couples in geometry fields
     );
 
     // This piece of code is necessary for cyclic and cyclicGgi interfaces
@@ -157,12 +168,12 @@ void fvMesh::makeC() const
     // only pertinent for 3D coordinates, and the method ::patchNeighbourField()
     // does not discriminate the type of field it is operating on.
     // So, because the separationOffset transform is not applied, the evaluation
-    // of a 3D position field like 'C' will always be wrong on the shadow patches
-    // of translational cyclic and cyclicGgi interfaces.
+    // of a 3D position field like 'C' will always be wrong on the shadow
+    // patches of translational cyclic and cyclicGgi interfaces.
     // For cyclic and cyclicGgi interfaces using a rotational transform, the
     // evaluation of the field C will be valid, but since we are only
-    // interested in the patch face centers for these interfaces, we can override
-    // those values as well.
+    // interested in the patch face centers for these interfaces, we can
+    // override those values as well.
     // See also:
     //    https://sourceforge.net/apps/mantisbt/openfoam-extend/view.php?id=42
     // MB, 12/Dec/2010
@@ -170,26 +181,22 @@ void fvMesh::makeC() const
     // Need to correct for cyclics transformation since absolute quantity.
     // Ok on processor patches since hold opposite cell centre (no
     // transformation)
+
+    // Note: moved into virtual functions
+    // HJ, 29/Nov/2017
+
+    // Boundary update.  Used in complex geometries, eg. immersed boundary
+    // HJ, 29/Nov/2017
     slicedVolVectorField& C = *CPtr_;
 
-    forAll(C.boundaryField(), patchi)
+    forAll (C.boundaryField(), patchI)
     {
-        if
-        (
-            isA<cyclicFvPatchVectorField>(C.boundaryField()[patchi])
-         || isA<cyclicGgiFvPatchVectorField>(C.boundaryField()[patchi])
-        )
-        {
-            // Note: cyclic is not slice but proper field
-            C.boundaryField()[patchi] == static_cast<const vectorField&>
-            (
-                static_cast<const List<vector>&>
-                (
-                    boundary_[patchi].patchSlice(faceCentres())
-                )
-            );
-        }
+        boundary()[patchI].makeC(C);
     }
+    // Note:
+    // Functionality for cyclic and cyclicGgiFvPatch, which used to be here
+    // with RTTI is moved into respective patched under virtual functions
+    // HJ, 29/Nov/2017
 }
 
 
@@ -225,8 +232,18 @@ void fvMesh::makeCf() const
         ),
         *this,
         dimLength,
-        faceCentres()
+        faceCentres(),
+        false             // Do not preserve couples in geometry fields
     );
+
+    // Boundary update.  Used in complex geometries, eg. immersed boundary
+    // HJ, 29/Nov/2017
+    slicedSurfaceVectorField& Cf = *CfPtr_;
+
+    forAll (Cf.boundaryField(), patchI)
+    {
+        boundary()[patchI].makeCf(Cf);
+    }
 }
 
 
@@ -234,9 +251,8 @@ void fvMesh::makePhi() const
 {
     if (debug)
     {
-        Info<< "void fvMesh::makePhi() const : "
-            << "reading old time flux field if present and creating "
-            << "zero current time flux field"
+        InfoIn("void fvMesh::makePhi() const")
+            << "Preparing mesh flux field"
             << endl;
     }
 
@@ -252,12 +268,12 @@ void fvMesh::makePhi() const
     // Reading old time mesh motion flux if it exists and
     // creating zero current time mesh motion flux
 
-    scalar t0 = this->time().value() - this->time().deltaT().value();
+    scalar t0 = time().value() - time().deltaT().value();
 
     IOobject meshPhiHeader
     (
         "meshPhi",
-        this->time().timeName(t0),
+        time().timeName(t0),
         *this,
         IOobject::NO_READ
     );
@@ -275,7 +291,7 @@ void fvMesh::makePhi() const
             IOobject
             (
                 "meshPhi",
-                this->time().timeName(t0),
+                time().timeName(t0),
                 *this,
                 IOobject::MUST_READ,
                 IOobject::AUTO_WRITE
@@ -302,7 +318,7 @@ void fvMesh::makePhi() const
             IOobject
             (
                 "meshPhi",
-                this->time().timeName(),
+                time().timeName(),
                 *this,
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
@@ -323,19 +339,38 @@ void fvMesh::updatePhi(const scalarField& sweptVols) const
         makePhi();
     }
 
-    surfaceScalarField& phi = *phiPtr_;
-
     scalar rDeltaT = 1.0/time().deltaT().value();
+
+    surfaceScalarField& phi = *phiPtr_;
 
     phi.internalField() = scalarField::subField(sweptVols, nInternalFaces());
     phi.internalField() *= rDeltaT;
 
     const fvPatchList& patches = boundary();
 
+    // Calculate regular values first and then allow patches to update them
+    // HJ, 15/Dec/2017
     forAll (patches, patchI)
     {
         phi.boundaryField()[patchI] = patches[patchI].patchSlice(sweptVols);
         phi.boundaryField()[patchI] *= rDeltaT;
+    }
+
+    // Make sure V and V0 are constructed before the correction
+    // HJ, 22/Dec/2017
+    V0();
+    V();
+
+    // Boundary update.  Used in complex geometries, eg. immersed boundary
+    // HJ, 29/Nov/2017
+    forAll (phi.boundaryField(), patchI)
+    {
+        boundary()[patchI].updatePhi
+        (
+            *VPtr_,
+            *V0Ptr_,
+            phi
+        );
     }
 }
 
@@ -369,6 +404,15 @@ const volScalarField::DimensionedInternalField& fvMesh::V() const
             dimVolume,
             cellVolumes()
         );
+
+        // Boundary update.  Used in complex geometries, eg. immersed boundary
+        // HJ, 29/Nov/2017
+        scalarField& V = *VPtr_;
+
+        forAll (boundary(), patchI)
+        {
+            boundary()[patchI].makeV(V);
+        }
     }
 
     return *VPtr_;
@@ -400,6 +444,9 @@ DimensionedField<scalar, volMesh>& fvMesh::setV0()
         InfoIn("DimensionedField<scalar, volMesh>& fvMesh::setV0()")
             << "Setting old cell volumes" << endl;
     }
+
+    // Update time index
+    curTimeIndex_ = time().timeIndex();
 
     V0Ptr_ = new DimensionedField<scalar, volMesh>
     (
@@ -548,6 +595,9 @@ const surfaceScalarField& fvMesh::phi() const
 {
     if (!phiPtr_)
     {
+        // If making mesh motion fluxes from nothing, old volumes
+        // must be recorded as well.  HJ, 10/Aug/2017
+        const_cast<fvMesh&>(*this).setV0();
         makePhi();
     }
 

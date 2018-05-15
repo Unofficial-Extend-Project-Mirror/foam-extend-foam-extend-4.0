@@ -178,6 +178,14 @@ public:
         //- Construct from IOobject
         explicit fvMesh(const IOobject& io);
 
+        //- Construct from Istream
+        fvMesh
+        (
+            const IOobject& io,
+            Istream& is,
+            const bool syncPar = true
+        );
+
         //- Construct from components without boundary.
         //  Boundary is added using addFvPatches() member function
         fvMesh
@@ -226,6 +234,8 @@ public:
         // Helpers
 
             //- Add boundary patches. Constructor helper
+            //  Note: adding polyPatches to polyMesh patches and
+            //  fvPatches to fvMesh
             void addFvPatches
             (
                 const List<polyPatch*>&,
@@ -288,7 +298,7 @@ public:
             // Communication support
 
                 //- Return communicator used for parallel communication
-                label comm() const
+                virtual int comm() const
                 {
                     return polyMesh::comm();
                 }
@@ -350,10 +360,29 @@ public:
             //  these fvPatches.
             void removeFvBoundary();
 
+            //- Reset mesh primitive data. Assumes all patch info correct
+            //  (so does e.g. parallel communication). If not, use
+            //  validBoundary = false
+            //  (still assumes patchStarts[0] = nInternalFaces and last
+            //  patch ends at nActiveFaces) and change patches with addPatches.
+            //  resetFvPatchFlag indicates which fvPatches will be rebuilt
+            //  if the flag is set to false, original patch is preserved
+            void resetFvPrimitives
+            (
+                const Xfer<pointField>& points,
+                const Xfer<faceList>& faces,
+                const Xfer<labelList>& owner,
+                const Xfer<labelList>& neighbour,
+                const labelList& patchSizes,
+                const labelList& patchStarts,
+                const boolList& resetFvPatchFlag,
+                const bool validBoundary = true
+            );
+
             //- Return cell face motion fluxes
             surfaceScalarField& setPhi();
 
-            //- Return old-time cell volumes
+            //- Set old-time cell volumes
             DimensionedField<scalar, volMesh>& setV0();
 
 

@@ -95,7 +95,9 @@ public:
 
         //- Correct the laminar viscosity (not appropriate, viscosity constant)
         virtual void correct()
-        {}
+        {
+            nu_.correctBoundaryConditions();
+        }
 
         //- Read transportProperties dictionary
         virtual bool read(const dictionary& viscosityProperties);

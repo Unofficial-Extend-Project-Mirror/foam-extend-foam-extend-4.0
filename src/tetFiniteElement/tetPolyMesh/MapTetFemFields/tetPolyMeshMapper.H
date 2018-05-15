@@ -36,6 +36,7 @@ SourceFiles
 #define tetPolyMeshMapper_H
 
 #include "tetPointMapper.H"
+#include "mapPolyMesh.H"
 #include "pointMapper.H"
 #include "faceMapper.H"
 #include "cellMapper.H"
@@ -76,6 +77,9 @@ class tetPolyMeshMapper
         //- Boundary mapper
         tetPolyBoundaryMapper boundaryMap_;
 
+        //- Reset patch flag.  Set true for the rebuilt patch (no mapping)
+        boolList resetPatchFlag_;
+
 
     // Private Member Functions
 
@@ -94,15 +98,16 @@ public:
         tetPolyMeshMapper
         (
             const tetPolyMesh& mesh,
-            const mapPolyMesh& meshMap
+            const mapPolyMesh& mpm
         )
         :
             mesh_(mesh),
-            pointMap_(meshMap),
-            faceMap_(meshMap),
-            cellMap_(meshMap),
-            tetPointMap_(mesh, meshMap, pointMap_, faceMap_, cellMap_),
-            boundaryMap_(mesh, meshMap, pointMap_, faceMap_)
+            pointMap_(mpm),
+            faceMap_(mpm),
+            cellMap_(mpm),
+            tetPointMap_(mesh, mpm, pointMap_, faceMap_, cellMap_),
+            boundaryMap_(mesh, mpm, pointMap_, faceMap_),
+            resetPatchFlag_(mpm.resetPatchFlag())
         {}
 
 
@@ -137,6 +142,12 @@ public:
         const tetPolyBoundaryMapper& boundaryMap() const
         {
             return boundaryMap_;
+        }
+
+        //- Return reset patch flag
+        const boolList& resetPatchFlag() const
+        {
+            return resetPatchFlag_;
         }
 };
 

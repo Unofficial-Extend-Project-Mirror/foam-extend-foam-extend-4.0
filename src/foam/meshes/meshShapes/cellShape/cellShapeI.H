@@ -30,7 +30,7 @@ License
 
 inline Foam::cellShape::cellShape()
 :
-    m(NULL)
+    m_(NULL)
 {}
 
 
@@ -42,7 +42,7 @@ inline Foam::cellShape::cellShape
 )
 :
     labelList(l),
-    m(&M)
+    m_(&M)
 {
     if (doCollapse)
     {
@@ -85,9 +85,15 @@ inline Foam::pointField Foam::cellShape::points
 }
 
 
+inline bool Foam::cellShape::validModel() const
+{
+    return m_ != NULL;
+}
+
+
 inline const Foam::cellModel& Foam::cellShape::model() const
 {
-    return *m;
+    return *m_;
 }
 
 
@@ -161,7 +167,7 @@ inline Foam::labelList Foam::cellShape::meshEdges
 
 inline Foam::faceList Foam::cellShape::faces() const
 {
-    return m->faces(*this);
+    return m_->faces(*this);
 }
 
 
@@ -216,19 +222,19 @@ inline Foam::faceList Foam::cellShape::collapsedFaces() const
 
 inline Foam::label Foam::cellShape::nFaces() const
 {
-    return m->nFaces();
+    return m_->nFaces();
 }
 
 
 inline Foam::edgeList Foam::cellShape::edges() const
 {
-    return m->edges(*this);
+    return m_->edges(*this);
 }
 
 
 inline Foam::label Foam::cellShape::nEdges() const
 {
-    return m->nEdges();
+    return m_->nEdges();
 }
 
 
@@ -240,13 +246,13 @@ inline Foam::label Foam::cellShape::nPoints() const
 
 inline Foam::point Foam::cellShape::centre(const pointField& points) const
 {
-    return m->centre(*this, points);
+    return m_->centre(*this, points);
 }
 
 
 inline Foam::scalar Foam::cellShape::mag(const pointField& points) const
 {
-    return m->mag(*this, points);
+    return m_->mag(*this, points);
 }
 
 

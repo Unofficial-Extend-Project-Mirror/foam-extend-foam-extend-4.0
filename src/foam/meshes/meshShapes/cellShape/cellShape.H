@@ -74,7 +74,7 @@ class cellShape
     // Private data
 
         //- Access to the cellShape's model
-        const cellModel *m;
+        const cellModel* m_;
 
 
 public:
@@ -103,6 +103,9 @@ public:
 
         //- Return the points corresponding to this cellShape
         inline pointField points(const pointField& meshPoints) const;
+
+        //- Is model reference valid (model exists)
+        inline bool validModel() const;
 
         //- Model reference
         inline const cellModel& model() const;

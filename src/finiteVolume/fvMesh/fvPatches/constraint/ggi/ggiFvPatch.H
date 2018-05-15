@@ -67,13 +67,13 @@ protected:
     // Protected Member functions
 
         //- Make patch weighting factors
-        virtual void makeWeights(scalarField&) const;
+        virtual void makeWeights(fvsPatchScalarField&) const;
 
         //- Make patch face - neighbour cell distances
-        virtual void makeDeltaCoeffs(scalarField&) const;
+        virtual void makeDeltaCoeffs(fvsPatchScalarField&) const;
 
         //- Make patch face non-orthogonality correction vectors
-        virtual void makeCorrVecs(vectorField&) const;
+        virtual void makeCorrVecs(fvsPatchVectorField&) const;
 
 
 public:
@@ -220,7 +220,7 @@ public:
 
             //- Return addressing.  Master side returns own addressing and
             //  slave side returns addressing from master
-            virtual const labelListList& addressing() const;
+            virtual const labelListList& ggiAddressing() const;
 
             //- Is the patch localised on a single processor
             virtual bool localParallel() const;
@@ -230,7 +230,7 @@ public:
 
             //- Return weights.  Master side returns own weights and
             //  slave side returns weights from master
-            virtual const scalarListList& weights() const;
+            virtual const scalarListList& ggiWeights() const;
 
             //- Return face transformation tensor
             virtual const tensorField& forwardT() const
@@ -247,6 +247,10 @@ public:
             //- Expand addressing to zone
             //  Used in optimised AMG coarsening
             virtual void expandAddrToZone(labelField&) const;
+
+            //- Expand crMatrix to zone
+            //  Used in optimised SAMG coarsening
+            virtual void expandCrMatrixToZone(crMatrix&) const;
 
 
             //- Return the values of the given internal data adjacent to
@@ -282,6 +286,21 @@ public:
             (
                 const Pstream::commsTypes commsType,
                 const unallocLabelList& internalData
+            ) const;
+
+            //- Initialise transfer of prolongation matrix to the interface
+            virtual void initProlongationTransfer
+            (
+                const Pstream::commsTypes commsType,
+                const crMatrix& iF
+            ) const;
+
+            //- Transfer and return prolongation matrix adjacent to
+            //  the interface
+            virtual autoPtr<crMatrix> prolongationTransfer
+            (
+                const Pstream::commsTypes commsType,
+                const crMatrix& iF
             ) const;
 };
 

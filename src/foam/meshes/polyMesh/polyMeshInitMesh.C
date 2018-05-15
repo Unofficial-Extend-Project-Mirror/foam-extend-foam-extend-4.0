@@ -78,10 +78,6 @@ void Foam::polyMesh::initMesh()
             }
         }
 
-        InfoIn("void polyMesh::initMesh()")
-            << "Truncating neighbour list at " << nIntFaces
-            << " for backward compatibility" << endl;
-
         neighbour_.setSize(nIntFaces);
     }
 

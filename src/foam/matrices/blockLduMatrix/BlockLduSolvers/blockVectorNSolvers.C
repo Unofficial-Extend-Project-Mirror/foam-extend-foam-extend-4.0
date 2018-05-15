@@ -43,13 +43,15 @@ License
 #include "BlockBiCGStabSolver.H"
 #include "BlockCGSolver.H"
 #include "BlockGaussSeidelSolver.H"
+#include "BlockILUSolver.H"
 #include "BlockGMRESSolver.H"
 
 // KRJ: 2012-12-15: Multigrid solver
 #include "blockAMGSolvers.H"
 #include "blockAMGPrecons.H"
 #include "blockMatrixCoarsenings.H"
-#include "blockMatrixAgglomerations.H"
+#include "blockMatrixClusterings.H"
+#include "blockMatrixSelections.H"
 #include "blockCoeffNorms.H"
 #include "blockCoeffTwoNorms.H"
 #include "blockCoeffMaxNorms.H"
@@ -135,6 +137,11 @@ makeBlockSolverTypeName(block##Type##GaussSeidelSolver);                      \
 addSolverToBlockMatrix(Type, block##Type##GaussSeidelSolver, symMatrix);      \
 addSolverToBlockMatrix(Type, block##Type##GaussSeidelSolver, asymMatrix);     \
                                                                               \
+typedef BlockILUSolver<type > block##Type##ILUSolver;                         \
+makeBlockSolverTypeName(block##Type##ILUSolver);                              \
+addSolverToBlockMatrix(Type, block##Type##ILUSolver, symMatrix);              \
+addSolverToBlockMatrix(Type, block##Type##ILUSolver, asymMatrix);             \
+                                                                              \
 typedef BlockGMRESSolver<type > block##Type##GMRESSolver;                     \
 makeBlockSolverTypeName(block##Type##GMRESSolver);                            \
 addSolverToBlockMatrix(Type, block##Type##GMRESSolver, symMatrix);            \
@@ -144,8 +151,11 @@ typedef BlockMatrixCoarsening<type > block##Type##MatrixCoarsening;           \
 defineNamedTemplateTypeNameAndDebug(block##Type##MatrixCoarsening, 0);        \
 defineTemplateRunTimeSelectionTable(block##Type##MatrixCoarsening, matrix);   \
                                                                               \
-typedef BlockMatrixAgglomeration<type > block##Type##MatrixAgglomeration;     \
-makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixAgglomeration); \
+typedef BlockMatrixClustering<type > block##Type##MatrixClustering;           \
+makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixClustering); \
+                                                                              \
+typedef BlockMatrixSelection<type > block##Type##MatrixSelection;             \
+makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixSelection); \
                                                                               \
 typedef BlockCoeffNorm<type > block##Type##CoeffNorm;                         \
 defineNamedTemplateTypeNameAndDebug(block##Type##CoeffNorm, 0);               \

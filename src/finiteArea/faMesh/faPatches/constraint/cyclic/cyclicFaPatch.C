@@ -38,12 +38,6 @@ namespace Foam
 defineTypeNameAndDebug(cyclicFaPatch, 0);
 addToRunTimeSelectionTable(faPatch, cyclicFaPatch, dictionary);
 
-const Foam::debug::tolerancesSwitch cyclicFaPatch::matchTol_
-(
-    "patchFaceMatchTol",
-    1e-3
-);
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void Foam::cyclicFaPatch::calcTransforms()
@@ -194,7 +188,7 @@ void cyclicFaPatch::makeWeights(scalarField& w) const
     }
 
     // Check for error in matching
-    if (maxMatchError > polyPatch::matchTol_())
+    if (maxMatchError > matchTol_())
     {
         scalar avL = (magL[errorEdge] + magL[errorEdge + sizeby2])/2.0;
 
@@ -204,7 +198,7 @@ void cyclicFaPatch::makeWeights(scalarField& w) const
             << 100*mag(magL[errorEdge] - magL[errorEdge + sizeby2])/avL
             << "% -- possible edge ordering problem." << nl
             << "Cyclic area match tolerance = "
-            << polyPatch::matchTol_() << " patch: " << name()
+            << matchTol_() << " patch: " << name()
             << abort(FatalError);
     }
 }

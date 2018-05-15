@@ -34,8 +34,9 @@ Contributor
 \*---------------------------------------------------------------------------*/
 
 #include "ggiFvPatch.H"
-#include "addToRunTimeSelectionTable.H"
+#include "fvPatchFields.H"
 #include "fvBoundaryMesh.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -55,17 +56,13 @@ Foam::ggiFvPatch::~ggiFvPatch()
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 // Make patch weighting factors
-void Foam::ggiFvPatch::makeWeights(scalarField& w) const
+void Foam::ggiFvPatch::makeWeights(fvsPatchScalarField& w) const
 {
     // Calculation of weighting factors is performed from the master
     // position, using reconstructed shadow cell centres
     // HJ, 2/Aug/2007
     if (ggiPolyPatch_.master())
     {
-        // Master side. No need to scale partially uncovered or set fully
-        // uncovered faces since delta already takes it into account.
-        // VV, 25/Feb/2018.
-
         const vectorField n = nf();
 
         // Note: mag in the dot-product.
@@ -76,104 +73,98 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
         const scalarField nfc =
             mag(n & (ggiPolyPatch_.reconFaceCellCentres() - Cf()));
 
-        w = nfc/(mag(n & (Cf() - Cn())) + nfc + SMALL);
-    }
-    else
-    {
-        // Slave side. Interpolate the master side weights, scale them for
-        // partially covered faces and set weights for fully uncovered faces if
-        // the bridge overlap is switched on. VV, 15/Feb/2018.
-
-        scalarField masterWeights(shadow().size());
-        shadow().makeWeights(masterWeights);
-
-        // Interpolate master weights to this side
-        w = interpolate(masterWeights);
+        w = nfc/(mag(n & (Cf() - Cn())) + nfc);
 
         if (bridgeOverlap())
         {
-            // Weights for fully uncovered faces
-            const scalarField uncoveredWeights(w.size(), 0.5);
+            // Set overlap weights to 0.5 and use mirrored neighbour field
+            // for interpolation.  HJ, 21/Jan/2009
+            const scalarField bridgedField(size(), 0.5);
 
-            // Set weights for uncovered faces
-            setUncoveredFaces(uncoveredWeights, w);
-
-            // Scale partially overlapping faces
-            scalePartialFaces(w);
+            bridge(bridgedField, w);
         }
+    }
+    else
+    {
+        // Pick up weights from the master side
+        fvsPatchScalarField masterWeights
+        (
+            shadow(),
+            w.dimensionedInternalField()
+        );
 
-        // Finally construct these weights as 1 - master weights
-        w = 1 - w;
+        shadow().makeWeights(masterWeights);
+
+        const scalarField oneMinusW = 1 - masterWeights;
+
+        w = interpolate(oneMinusW);
+
+        if (bridgeOverlap())
+        {
+            // Set overlap weights to 0.5 and use mirrored neighbour field
+            // for interpolation.  HJ, 21/Jan/2009
+            const scalarField bridgedField(size(), 0.5);
+
+            bridge(bridgedField, w);
+        }
     }
 }
 
 
 // Make patch face - neighbour cell distances
-void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
+void Foam::ggiFvPatch::makeDeltaCoeffs(fvsPatchScalarField& dc) const
 {
     if (ggiPolyPatch_.master())
     {
-        // Master side. No need to scale partially uncovered or set fully
-        // uncovered faces since delta already takes it into account.
-        // VV, 25/Feb/2018.
-
         // Stabilised form for bad meshes.  HJ, 24/Aug/2011
         const vectorField d = delta();
 
         dc = 1.0/max(nf() & d, 0.05*mag(d));
+
+        // Note: no need to bridge the overlap since delta already takes it into
+        // account. VV, 18/Oct/2017.
     }
     else
     {
-        // Slave side. Interpolate the master side, scale it for partially
-        // covered faces and set deltaCoeffs for fully uncovered faces if the
-        // bridge overlap is switched on. VV, 15/Feb/2018.
+        fvsPatchScalarField masterDeltas
+        (
+            shadow(),
+            dc.dimensionedInternalField()
+        );
 
-        scalarField masterDeltas(shadow().size());
         shadow().makeDeltaCoeffs(masterDeltas);
+
         dc = interpolate(masterDeltas);
 
         if (bridgeOverlap())
         {
-            // Delta coeffs for fully uncovered faces obtained from deltas on
-            // this side
-            const vectorField d = delta();
-            const scalarField uncoveredDeltaCoeffs =
-                1.0/max(nf() & d, 0.05*mag(d));
+            // Note: double the deltaCoeffs because this is symmetry treatment
+            // and fvPatch::deltaCoeffs() is cell to face inverse distance,
+            // while we need cell to "symmetry neighbour cell" distance.
+            // VV, 18/Oct/2017.
+            const scalarField bridgeDeltas = 2.0*fvPatch::deltaCoeffs();
 
-            // Set delta coeffs for uncovered faces
-            setUncoveredFaces(uncoveredDeltaCoeffs, dc);
-
-            // Scale partially overlapping faces
-            scalePartialFaces(dc);
+            bridge(bridgeDeltas, dc);
         }
     }
 }
 
 
 // Make patch face non-orthogonality correction vectors
-void Foam::ggiFvPatch::makeCorrVecs(vectorField& cv) const
+void Foam::ggiFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
 {
     // Non-orthogonality correction on a ggi interface
     // MB, 7/April/2009
 
-    // No non-orthognal correction if the bridge overlap is switched on to
-    // ensure conservative interpolation for partially overlapping faces
-    if (bridgeOverlap())
-    {
-        cv = vector::zero;
-    }
-    else
-    {
-        // Calculate correction vectors on coupled patches
-        const scalarField& patchDeltaCoeffs = deltaCoeffs();
+    // Calculate correction vectors on coupled patches
+    const scalarField& patchDeltaCoeffs = deltaCoeffs();
 
-        const vectorField patchDeltas = delta();
-        const vectorField n = nf();
+    const vectorField patchDeltas = delta();
+    const vectorField n = nf();
 
-        // If non-orthogonality is over 90 deg, kill correction vector
-        // HJ, 6/Jan/2011
-        cv = pos(patchDeltas & n)*(n - patchDeltas*patchDeltaCoeffs);
-    }
+    // If non-orthogonality is over 90 deg, kill correction vector
+    // HJ, 6/Jan/2011
+    cv = pos(patchDeltas & n)*(n - patchDeltas*patchDeltaCoeffs);
 }
 
 
@@ -182,38 +173,38 @@ Foam::tmp<Foam::vectorField> Foam::ggiFvPatch::delta() const
 {
     if (ggiPolyPatch_.master())
     {
-        // Master side. Note: scaling partially covered faces and setting deltas
-        // to fully uncovered faces correctly taken into account in
-        // reconFaceCellCentres function. VV, 15/Feb/2018.
+        tmp<vectorField> tDelta = ggiPolyPatch_.reconFaceCellCentres() - Cn();
 
-        tmp<vectorField> tdelta = ggiPolyPatch_.reconFaceCellCentres() - Cn();
+        if (bridgeOverlap())
+        {
+            // Note: double the deltas because this is symmetry treatment and
+            // fvPatch::delta() is cell to face distance, while we need cell to
+            // "symmetry neighbour cell" distance. VV, 18/Oct/2017.
+            const vectorField bridgeDeltas = 2.0*fvPatch::delta();
 
-        return tdelta;
+            bridge(bridgeDeltas, tDelta());
+        }
+
+        return tDelta;
     }
     else
     {
-        // Slave side. Interpolate the master side, scale it for partially
-        // covered faces and set deltas for fully uncovered faces if the bridge
-        // overlap is switched on. VV, 15/Feb/2018.
-
-        tmp<vectorField> tdelta = interpolate
+        tmp<vectorField> tDelta = interpolate
         (
             shadow().Cn() - ggiPolyPatch_.shadow().reconFaceCellCentres()
         );
 
         if (bridgeOverlap())
         {
-            // Deltas for fully uncovered faces
-            const vectorField uncoveredDeltas(2.0*fvPatch::delta());
+            // Note: double the deltas because this is symmetry treatment and
+            // fvPatch::delta() is cell to face distance, while we need cell to
+            // "symmetry neighbour cell" distance. VV, 18/Oct/2017.
+            const vectorField bridgeDeltas = 2.0*fvPatch::delta();
 
-            // Set deltas for fully uncovered faces
-            setUncoveredFaces(uncoveredDeltas, tdelta());
-
-            // Scale for partially covered faces
-            scalePartialFaces(tdelta());
+            bridge(bridgeDeltas, tDelta());
         }
 
-        return tdelta;
+        return tDelta;
     }
 }
 
@@ -270,7 +261,7 @@ const Foam::labelList& Foam::ggiFvPatch::zoneAddressing() const
 }
 
 
-const Foam::labelListList& Foam::ggiFvPatch::addressing() const
+const Foam::labelListList& Foam::ggiFvPatch::ggiAddressing() const
 {
     if (ggiPolyPatch_.master())
     {
@@ -295,7 +286,7 @@ const Foam::mapDistribute& Foam::ggiFvPatch::map() const
 }
 
 
-const Foam::scalarListList& Foam::ggiFvPatch::weights() const
+const Foam::scalarListList& Foam::ggiFvPatch::ggiWeights() const
 {
     if (ggiPolyPatch_.master())
     {
@@ -311,6 +302,86 @@ const Foam::scalarListList& Foam::ggiFvPatch::weights() const
 void Foam::ggiFvPatch::expandAddrToZone(labelField& lf) const
 {
     lf = ggiPolyPatch_.fastExpand(lf);
+}
+
+
+void Foam::ggiFvPatch::expandCrMatrixToZone(crMatrix& patchP) const
+{
+    if (!localParallel())
+    {
+        // Split the crMatrix into rows and expand it
+        const crAddressing& patchCrAddr = patchP.crAddr();
+        const labelList& patchRowStart = patchCrAddr.rowStart();
+        const labelList& patchCol = patchCrAddr.column();
+        const scalarField& patchCoeff = patchP.coeffs();
+
+        List<labelField> cols(patchCrAddr.nRows());
+        List<scalarField> coeffs(patchCrAddr.nRows());
+
+        for (register label faceI = 0; faceI < patchCrAddr.nRows(); faceI++)
+        {
+            // Unpack row
+            const label rowStart = patchRowStart[faceI];
+            const label rowLength = patchRowStart[faceI + 1] - rowStart;
+
+            cols[faceI].setSize(rowLength);
+            labelField& curCols = cols[faceI];
+
+            coeffs[faceI].setSize(rowLength);
+            scalarField& curCoeffs = coeffs[faceI];
+
+            for (register label coeffI = 0; coeffI < rowLength; coeffI++)
+            {
+                curCols[coeffI] = patchCol[rowStart + coeffI];
+                curCoeffs[coeffI] = patchCoeff[rowStart + coeffI];
+            }
+        }
+
+        // Expand to zone size
+        List<labelField> zoneColsFF = ggiPolyPatch_.fastExpand(cols);
+        List<scalarField> zoneCoeffsFF = ggiPolyPatch_.fastExpand(coeffs);
+
+        scalar nZoneEntries = 0;
+
+        forAll (zoneColsFF, zfI)
+        {
+            nZoneEntries += zoneColsFF[zfI].size();
+        }
+
+        // Reconstruct matrix
+        labelList zoneRowStart(zoneSize() + 1);
+        labelList zoneCols(nZoneEntries);
+        scalarField zoneCoeffs(nZoneEntries);
+
+        zoneRowStart[0] = 0;
+        // Reset nZoneEntries for use as a counter
+        nZoneEntries = 0;
+
+        forAll(zoneColsFF, zfI)
+        {
+            const labelField& curCols = zoneColsFF[zfI];
+            const scalarField& corCoeffs = zoneCoeffsFF[zfI];
+
+            zoneRowStart[zfI + 1] = zoneRowStart[zfI] + curCols.size();
+
+            forAll (curCols, coeffI)
+            {
+                zoneCols[nZoneEntries] = curCols[coeffI];
+                zoneCoeffs[nZoneEntries] = corCoeffs[coeffI];
+                nZoneEntries++;
+            }
+        }
+        patchP = crMatrix
+        (
+            zoneSize(),
+            patchCrAddr.nCols(),
+            zoneRowStart,
+            zoneCols
+        );
+
+        // Set coeffs
+        patchP.coeffs() = zoneCoeffs;
+    }
 }
 
 
@@ -363,6 +434,28 @@ Foam::tmp<Foam::labelField> Foam::ggiFvPatch::internalFieldTransfer
     return shadow().labelTransferBuffer();
 }
 
+
+void Foam::ggiFvPatch::initProlongationTransfer
+(
+    const Pstream::commsTypes commsType,
+    const crMatrix& filteredP
+) const
+{
+    // crMatrix transfer is local without global reduction
+    crMatrixTransferBuffer_ = filteredP;
+}
+
+
+Foam::autoPtr<Foam::crMatrix> Foam::ggiFvPatch::prolongationTransfer
+(
+    const Pstream::commsTypes commsType,
+    const crMatrix& filteredP
+) const
+{
+    autoPtr<crMatrix> tnbrP(new crMatrix(shadow().crMatrixTransferBuffer()));
+
+    return tnbrP;
+}
 
 
 // ************************************************************************* //

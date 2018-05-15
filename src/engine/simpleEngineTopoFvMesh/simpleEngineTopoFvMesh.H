@@ -105,10 +105,9 @@ public:
         explicit simpleEngineTopoFvMesh(const IOobject& io);
 
 
-    // Destructor
-
-        virtual ~simpleEngineTopoFvMesh()
-        {}
+    //- Destructor
+    virtual ~simpleEngineTopoFvMesh()
+    {}
 
 
     // Member Functions

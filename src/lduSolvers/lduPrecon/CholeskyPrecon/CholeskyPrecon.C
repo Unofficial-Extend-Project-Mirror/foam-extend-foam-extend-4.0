@@ -132,34 +132,77 @@ void Foam::CholeskyPrecon::precondition
 (
     scalarField& x,
     const scalarField& b,
-    const direction
+    const direction cmpt
 ) const
 {
-    forAll(x, i)
+    if (matrix_.asymmetric())
     {
-        x[i] = b[i]*preconDiag_[i];
+        FatalErrorIn
+        (
+            "void CholeskyPrecon::precondition\n"
+            "(\n"
+            "    scalarField& x,\n"
+            "    const scalarField& b,\n"
+            "    const direction cmpt\n"
+            ") const"
+        )   << "Calling CholeskyPrecon on an assymetric matrix.  "
+            << "Please use ILU0 instead"
+            << abort(FatalError);
+    }
+
+    // Note: coupled boundary updated is not needed because x is zero
+    // HJ and VV, 19/Jun/2017
+    
+    // Diagonal block
+    {
+        scalar* __restrict__ xPtr = x.begin();
+
+        const scalar* __restrict__ preconDiagPtr = preconDiag_.begin();
+
+        const scalar* __restrict__ bPtr = b.begin();
+
+        const label nRows = x.size();
+
+        // Note: multiplication over-write x: no need to initialise
+        // HJ, and VV, 19/Jun/2017
+        for (register label rowI = 0; rowI < nRows; rowI++)
+        {
+            xPtr[rowI] = bPtr[rowI]*preconDiagPtr[rowI];
+        }
     }
 
     if (matrix_.symmetric())
     {
-        const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
-        const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
+        scalar* __restrict__ xPtr = x.begin();
 
-        // Get off-diagonal matrix coefficients
-        const scalarField& upper = matrix_.upper();
+        // Addressing
+        const label* const __restrict__ uPtr =
+            matrix_.lduAddr().upperAddr().begin();
 
-        forAll (upper, coeffI)
+        const label* const __restrict__ lPtr =
+            matrix_.lduAddr().lowerAddr().begin();
+
+        // Coeffs
+        const scalar* __restrict__ preconDiagPtr = preconDiag_.begin();
+
+        const scalar* const __restrict__ upperPtr = matrix_.upper().begin();
+
+        const label nCoeffs = matrix_.upper().size();
+
+        // Forward sweep
+        for (register label coeffI = 0; coeffI < nCoeffs; coeffI++)
         {
-            x[upperAddr[coeffI]] -=
-                preconDiag_[upperAddr[coeffI]]*
-                upper[coeffI]*x[lowerAddr[coeffI]];
+            xPtr[uPtr[coeffI]] -=
+                preconDiagPtr[uPtr[coeffI]]*
+                upperPtr[coeffI]*xPtr[lPtr[coeffI]];
         }
 
-        forAllReverse (upper, coeffI)
+        // Reverse sweep
+        for (register label coeffI = nCoeffs - 1; coeffI >= 0; coeffI--)
         {
-            x[lowerAddr[coeffI]] -=
-                preconDiag_[lowerAddr[coeffI]]*
-                upper[coeffI]*x[upperAddr[coeffI]];
+            xPtr[lPtr[coeffI]] -=
+                preconDiagPtr[lPtr[coeffI]]*
+                upperPtr[coeffI]*xPtr[uPtr[coeffI]];
         }
     }
 }

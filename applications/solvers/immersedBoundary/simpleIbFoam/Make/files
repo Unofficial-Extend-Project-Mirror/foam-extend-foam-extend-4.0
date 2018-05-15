@@ -1,3 +1,0 @@
-simpleIbFoam.C
-
-EXE = $(FOAM_APPBIN)/simpleIbFoam

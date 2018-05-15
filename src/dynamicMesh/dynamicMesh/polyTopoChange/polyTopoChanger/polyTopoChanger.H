@@ -124,10 +124,9 @@ public:
         explicit polyTopoChanger(polyMesh&);
 
 
-    // Destructor
-
-        virtual ~polyTopoChanger()
-        {}
+    //- Destructor
+    virtual ~polyTopoChanger()
+    {}
 
 
     // Member functions

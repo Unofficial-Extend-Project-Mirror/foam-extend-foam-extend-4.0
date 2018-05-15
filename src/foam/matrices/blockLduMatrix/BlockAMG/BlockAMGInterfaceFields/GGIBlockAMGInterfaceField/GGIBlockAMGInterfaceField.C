@@ -72,7 +72,7 @@ void Foam::GGIBlockAMGInterfaceField<Type>::agglomerateBlockType
     const scalarField& restrictWeights = ggiInterface_.restrictWeights();
 
     // Restrict coefficients
-    forAll(restrictAddressing, ffi)
+    forAll (restrictAddressing, ffi)
     {
         zoneCoarseCoeffs[restrictAddressing[ffi]] +=
             restrictWeights[ffi]*zoneFineCoeffs[fineAddressing[ffi]];
@@ -237,14 +237,14 @@ void Foam::GGIBlockAMGInterfaceField<Type>::updateInterfaceMatrix
 
     if (switchToLhs)
     {
-        forAll(faceCells, elemI)
+        forAll (faceCells, elemI)
         {
             result[faceCells[elemI]] += pnf[elemI];
         }
     }
     else
     {
-        forAll(faceCells, elemI)
+        forAll (faceCells, elemI)
         {
             result[faceCells[elemI]] -= pnf[elemI];
         }

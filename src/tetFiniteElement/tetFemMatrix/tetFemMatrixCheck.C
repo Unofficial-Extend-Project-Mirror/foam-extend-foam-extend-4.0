@@ -43,7 +43,7 @@ void tetFemMatrix<Type>::check()
             << endl;
     }
 
-    Pout << "First check diagonal dominance" << endl;
+    Pout<< "First check diagonal dominance" << endl;
 
     // Get constant matrix access
     const tetFemMatrix<Type>& constMatrix = *this;
@@ -102,7 +102,7 @@ void tetFemMatrix<Type>::check()
 
     eliminateCouplingCoeffs();
 
-    Pout << "Second check diagonal dominance" << endl;
+    Pout<< "Second check diagonal dominance" << endl;
     // Calculate local matrix off-diag sum
     {
         scalarField matrixSumOffDiag(lduAddr().size(), 0.0);

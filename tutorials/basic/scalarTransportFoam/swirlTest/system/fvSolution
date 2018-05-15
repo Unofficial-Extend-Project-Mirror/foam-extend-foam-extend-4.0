@@ -22,7 +22,7 @@ solvers
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
-    };
+    }
 }
 
 SIMPLE

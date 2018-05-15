@@ -25,7 +25,7 @@ Class
     BlockCholeskyPrecon
 
 Description
-    Incomplete Cholesky preconditioning with no fill-in.
+    Incomplete Cholesky preconditioning with no fill-in for block matrices.
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
@@ -96,6 +96,16 @@ class BlockCholeskyPrecon
             Field<DiagType>& dDiag,
             const Field<ULType>& lower,
             const Field<ULType>& upper
+        );
+
+        //- Diagonal interface multiplication
+        template<class DiagType, class ULType>
+        void diagInterfaceMultiply
+        (
+            const unallocLabelList& fc,
+            Field<DiagType>& dDiag,
+            const Field<ULType>& coupleUpper,
+            const Field<ULType>& coupleLower
         );
 
         //- ILU multiplication, symmetric matrix
@@ -186,8 +196,8 @@ public:
 
 
     // Destructor
-
-        virtual ~BlockCholeskyPrecon();
+    virtual ~BlockCholeskyPrecon()
+    {}
 
 
     // Member Functions
@@ -205,6 +215,9 @@ public:
             Field<Type>& xT,
             const Field<Type>& bT
         ) const;
+
+        //- Re-initialise preconditioner after matrix coefficient update
+        virtual void initMatrix();
 };
 
 

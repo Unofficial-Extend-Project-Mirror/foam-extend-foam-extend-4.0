@@ -35,7 +35,7 @@ inline const DimensionedField<Type, GeoMesh>&
 DimensionedField<Type, GeoMesh>::null()
 {
     // Dangerous, but no null constructor.  Reconsider.  HJ, 10/Apr/2013
-    return *reinterpret_cast< DimensionedField<Type, GeoMesh>* >(0);
+    return *reinterpret_cast<DimensionedField<Type, GeoMesh>* >(0);
 }
 
 

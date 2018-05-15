@@ -85,7 +85,6 @@ $(fvPatchFields)/fvPatchField/fvPatchFields.C
 $(fvPatchFields)/fvPatchField/fvPatchVectorNFields.C
 
 basicFvPatchFields = $(fvPatchFields)/basic
-$(basicFvPatchFields)/basicSymmetry/basicSymmetryFvPatchFields.C
 $(basicFvPatchFields)/basicSymmetry/basicSymmetryFvPatchScalarField.C
 $(basicFvPatchFields)/calculated/calculatedFvPatchFields.C
 $(basicFvPatchFields)/calculated/calculatedFvPatchVectorNFields.C
@@ -125,6 +124,7 @@ $(constraintFvPatchFields)/ggi/ggiFvPatchVectorNFields.C
 $(constraintFvPatchFields)/jumpGgi/jumpGgiFvPatchFields.C
 $(constraintFvPatchFields)/cyclicGgi/cyclicGgiFvPatchFields.C
 $(constraintFvPatchFields)/overlapGgi/overlapGgiFvPatchFields.C
+$(constraintFvPatchFields)/jumpOverlapGgi/jumpOverlapGgiFvPatchFields.C
 $(constraintFvPatchFields)/mixingPlane/mixingPlaneFvPatchFields.C
 $(constraintFvPatchFields)/jumpMixingPlane/jumpMixingPlaneFvPatchFields.C
 $(constraintFvPatchFields)/regionCoupling/regionCouplingFvPatchFields.C

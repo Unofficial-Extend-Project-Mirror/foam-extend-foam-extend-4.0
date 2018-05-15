@@ -257,6 +257,10 @@ $(LUscalarMatrix)/LUscalarMatrix.C
 $(LUscalarMatrix)/procLduMatrix.C
 $(LUscalarMatrix)/procLduInterface.C
 
+crMatrix = matrices/crMatrix
+$(crMatrix)/crAddressing.C
+$(crMatrix)/crMatrix.C
+
 lduMatrix = matrices/lduMatrix
 $(lduMatrix)/lduMatrix/lduMatrix.C
 $(lduMatrix)/lduMatrix/lduMatrixOperations.C
@@ -315,7 +319,7 @@ $(AMG)/GAMGSolverAgglomerateMatrix.C
 $(AMG)/GAMGSolverScalingFactor.C
 $(AMG)/GAMGSolverSolve.C
 
-AMGInterfaces = $(AMG)/interfaces
+AMGInterfaces = $(AMG)/interfaces/AMGInterfaces
 $(AMGInterfaces)/AMGInterface/AMGInterface.C
 $(AMGInterfaces)/AMGInterface/newAMGInterface.C
 $(AMGInterfaces)/processorAMGInterface/processorAMGInterface.C
@@ -325,7 +329,13 @@ $(AMGInterfaces)/cyclicGGIAMGInterface/cyclicGGIAMGInterface.C
 $(AMGInterfaces)/regionCoupleAMGInterface/regionCoupleAMGInterface.C
 $(AMGInterfaces)/mixingPlaneAMGInterface/mixingPlaneAMGInterface.C
 
-AMGInterfaceFields = $(AMG)/interfaceFields
+SAMGInterfaces = $(AMG)/interfaces/SAMGInterfaces
+$(SAMGInterfaces)/SAMGInterface/SAMGInterface.C
+$(SAMGInterfaces)/SAMGInterface/newSAMGInterface.C
+$(SAMGInterfaces)/processorSAMGInterface/processorSAMGInterface.C
+$(SAMGInterfaces)/ggiSAMGInterface/ggiSAMGInterface.C
+
+AMGInterfaceFields = $(AMG)/interfaceFields/AMGInterfaceFields
 $(AMGInterfaceFields)/AMGInterfaceField/AMGInterfaceField.C
 $(AMGInterfaceFields)/AMGInterfaceField/newAMGInterfaceField.C
 $(AMGInterfaceFields)/processorAMGInterfaceField/processorAMGInterfaceField.C
@@ -334,6 +344,12 @@ $(AMGInterfaceFields)/ggiAMGInterfaceField/ggiAMGInterfaceField.C
 $(AMGInterfaceFields)/cyclicGgiAMGInterfaceField/cyclicGgiAMGInterfaceField.C
 $(AMGInterfaceFields)/regionCoupleAMGInterfaceField/regionCoupleAMGInterfaceField.C
 $(AMGInterfaceFields)/mixingPlaneAMGInterfaceField/mixingPlaneAMGInterfaceField.C
+
+SAMGInterfaceFields = $(AMG)/interfaceFields/SAMGInterfaceFields
+$(SAMGInterfaceFields)/SAMGInterfaceField/SAMGInterfaceField.C
+$(SAMGInterfaceFields)/SAMGInterfaceField/newSAMGInterfaceField.C
+$(SAMGInterfaceFields)/processorSAMGInterfaceField/processorSAMGInterfaceField.C
+$(SAMGInterfaceFields)/ggiSAMGInterfaceField/ggiSAMGInterfaceField.C
 
 AMGAgglomerations = $(AMG)/AMGAgglomerations
 
@@ -430,6 +446,7 @@ globalMeshData = $(polyMesh)/globalMeshData
 $(globalMeshData)/globalMeshData.C
 $(globalMeshData)/globalPoints.C
 $(globalMeshData)/globalIndex.C
+$(globalMeshData)/globalProcFaceIndex.C
 
 $(polyMesh)/syncTools/syncTools.C
 
@@ -721,9 +738,16 @@ $(BlockAMGInterfaceFields)/BlockAMGInterfaceField/blockVectorNAMGInterfaceFields
 $(BlockAMGInterfaceFields)/ProcessorBlockAMGInterfaceField/ProcessorBlockAMGInterfaceFields.C
 $(BlockAMGInterfaceFields)/GGIBlockAMGInterfaceField/GGIBlockAMGInterfaceFields.C
 
+BlockSAMGInterfaceFields = $(BlockAMG)/BlockSAMGInterfaceFields
+$(BlockSAMGInterfaceFields)/BlockSAMGInterfaceField/blockSAMGInterfaceFields.C
+$(BlockSAMGInterfaceFields)/BlockSAMGInterfaceField/blockVectorNSAMGInterfaceFields.C
+$(BlockSAMGInterfaceFields)/ProcessorBlockSAMGInterfaceField/ProcessorBlockSAMGInterfaceFields.C
+$(BlockSAMGInterfaceFields)/GGIBlockSAMGInterfaceField/GGIBlockSAMGInterfaceFields.C
+
 BlockMatrixCoarsening = $(BlockAMG)/BlockMatrixCoarsening
 $(BlockMatrixCoarsening)/BlockMatrixCoarsening/blockMatrixCoarsenings.C
-$(BlockMatrixCoarsening)/BlockMatrixAgglomeration/blockMatrixAgglomerations.C
+$(BlockMatrixCoarsening)/BlockMatrixClustering/blockMatrixClusterings.C
+$(BlockMatrixCoarsening)/BlockMatrixSelection/blockMatrixSelections.C
 
 BlockLduPrecons = matrices/blockLduMatrix/BlockLduPrecons
 $(BlockLduPrecons)/BlockLduPrecon/blockLduPrecons.C
@@ -758,6 +782,7 @@ $(BlockLduSolvers)/blockVectorNSolvers.C
 $(BlockLduSolvers)/BlockLduSolver/blockLduSolvers.C
 $(BlockLduSolvers)/BlockDiagonal/blockDiagonalSolvers.C
 $(BlockLduSolvers)/BlockGaussSeidel/blockGaussSeidelSolvers.C
+$(BlockLduSolvers)/BlockILU/blockILUSolvers.C
 $(BlockLduSolvers)/BlockCG/blockCGSolvers.C
 $(BlockLduSolvers)/BlockBiCGStab/blockBiCGStabSolvers.C
 $(BlockLduSolvers)/BlockGMRES/blockGMRESSolvers.C

@@ -31,6 +31,10 @@ License
 template<class Type>
 const char* const Foam::CoeffField<Type>::typeName("CoeffField");
 
+template<class Type>
+const Foam::CoeffField<Type> Foam::CoeffField<Type>::zero(0);
+
+
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 

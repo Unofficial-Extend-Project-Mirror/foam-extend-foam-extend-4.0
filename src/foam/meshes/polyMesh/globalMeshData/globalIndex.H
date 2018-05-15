@@ -31,7 +31,6 @@ Description
     globalIndex globalFaces(mesh.nFaces());
     label globalFaceI = globalFaces.toGlobal(faceI);
 
-
 SourceFiles
     globalIndex.C
 
@@ -56,14 +55,14 @@ Ostream& operator<<(Ostream& os, const globalIndex& gi);
 
 
 /*---------------------------------------------------------------------------*\
-                           Class globalIndex Declaration
+                        Class globalIndex Declaration
 \*---------------------------------------------------------------------------*/
 
 class globalIndex
 {
     // Private data
 
-        //- Start off procI+1. (so like CompactListList)
+        //- Processor offsets
         labelList offsets_;
 
 
@@ -78,11 +77,10 @@ public:
         globalIndex(Istream& is);
 
 
+    // Destructor - default
+
+
     // Member Functions
-
-        ////- Start of procI+1 data
-        //inline const labelList& offsets() const;
-
 
         // Queries relating to my processor
 

@@ -77,9 +77,6 @@ typename Foam::BlockSolverPerformance<Type> Foam::BlockCGSolver<Type>::solve
 
     scalar norm = this->normFactor(x, b);
 
-    // Multiplication helper
-    typename BlockCoeff<Type>::multiply mult;
-
     Field<Type> wA(x.size());
 
     // Calculate initial residual

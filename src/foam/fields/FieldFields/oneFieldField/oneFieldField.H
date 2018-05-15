@@ -45,7 +45,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class oneField Declaration
+                       Class oneFieldField Declaration
 \*---------------------------------------------------------------------------*/
 
 class oneFieldField

@@ -33,8 +33,7 @@
         {
             fvScalarMatrix pEqn
             (
-                fvm::ddt(psis, p)
-              + fvm::div(phid, p)
+                fvm::div(phid, p)
               + fvc::div(phid2)
               - fvm::laplacian(rho*rUA, p)
             );
@@ -48,8 +47,8 @@
             }
         }
 
-        // Use custom continuity error check
-#       include "universalContinuityErrs.H"
+        // Use incompressible continuity error check: div(rho U) = 0
+#       include "continuityErrs.H"
 
         // Relax the pressure
         p.relax();

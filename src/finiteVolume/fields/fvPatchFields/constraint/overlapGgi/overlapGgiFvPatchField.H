@@ -125,6 +125,14 @@ public:
 
 
     // Member functions
+        //- Access
+
+            // Return overlapGgiFvPatch
+            const overlapGgiFvPatch& overlapGgiPatch() const
+            {
+                return overlapGgiPatch_;
+            }
+
 
         // Evaluation functions
 

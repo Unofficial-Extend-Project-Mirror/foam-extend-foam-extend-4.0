@@ -19,15 +19,15 @@ solvers
     p
     {
         solver          amgSolver;
-        cycle           W-cycle;
-        policy          PAMG;
+        cycle           V-cycle;
+        policy          cluster;
         nPreSweeps      2;
         nPostSweeps     2;
         groupSize       4;
         minCoarseEqns   4;
         nMaxLevels      100;
         scale           on;
-        smoother        symGaussSeidel;
+        smoother        ILUC0;
 
         minIter         1;
         maxIter         100;
@@ -38,20 +38,20 @@ solvers
     pFinal
     {
         solver          amgSolver;
-        cycle           W-cycle;
-        policy          PAMG;
+        cycle           V-cycle;
+        policy          cluster;
         nPreSweeps      2;
         nPostSweeps     2;
         groupSize       4;
         minCoarseEqns   4;
         nMaxLevels      100;
         scale           on;
-        smoother        symGaussSeidel;
+        smoother        ILUC0;
 
         minIter         1;
         maxIter         100;
         tolerance       1e-7;
-        relTol          0.0;
+        relTol          0.01;
     }
 
     U
@@ -60,8 +60,8 @@ solvers
         preconditioner   ILU0;
 
         minIter          1;
-        maxIter          1000;
-        tolerance        1e-08;
+        maxIter          100;
+        tolerance        1e-07;
         relTol           0;
     }
 }

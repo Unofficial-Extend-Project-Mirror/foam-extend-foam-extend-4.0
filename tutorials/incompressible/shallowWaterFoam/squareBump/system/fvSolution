@@ -22,7 +22,7 @@ solvers
         preconditioner  DIC;
         tolerance       1e-6;
         relTol          0.01;
-    };
+    }
 
     hFinal
     {
@@ -30,7 +30,7 @@ solvers
         preconditioner  DIC;
         tolerance       1e-8;
         relTol          0;
-    };
+    }
 
     hU
     {

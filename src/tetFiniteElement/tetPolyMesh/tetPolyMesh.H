@@ -63,7 +63,7 @@ Description
         is -1, this global index has not been seen before: allocate
         next free local index to the vertex.
 
-        3) For every element in the local-to-global, fidn the matrix
+        3) For every element in the local-to-global, find the matrix
         row in ldu addressing.  For each element in a row, using
         global-to-local, find the local off-diagonal index and zero it
         out.  These are the only ones being used!
