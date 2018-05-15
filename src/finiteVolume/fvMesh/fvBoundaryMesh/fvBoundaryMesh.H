@@ -93,7 +93,7 @@ public:
     // Constructors
 
         //- Construct from polyBoundaryMesh
-        fvBoundaryMesh(const fvMesh&);
+        explicit fvBoundaryMesh(const fvMesh&);
 
 
     // Destructor - default
