@@ -94,7 +94,7 @@ void Foam::Time::adjustDeltaT()
         adjustTime = true;
         timeToNextWrite = max
         (
-            0.0,
+            scalar(0),
             (outputTimeIndex_ + 1)*writeInterval_ - (value() - startTime_)
         );
     }

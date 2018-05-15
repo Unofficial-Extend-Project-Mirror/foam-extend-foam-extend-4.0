@@ -110,6 +110,12 @@ public:
             return rootPath_;
         }
 
+        //- Return global case name
+        const fileName& globalCaseName() const
+        {
+            return globalCaseName_;
+        }
+
         //- Return case name
         const fileName& caseName() const
         {

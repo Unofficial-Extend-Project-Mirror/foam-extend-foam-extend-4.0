@@ -109,8 +109,8 @@ public:
         //- Supported time directory name formats
         enum fmtflags
         {
-            general    = 0,
-            fixed      = ios_base::fixed,
+            general = 0,
+            fixed = ios_base::fixed,
             scientific = ios_base::scientific
         };
 
@@ -132,16 +132,24 @@ protected:
         scalar startTime_;
 
         //- End time
-        scalar endTime_;
+        mutable scalar endTime_;
 
         //- Stop at
-        stopAtControls stopAt_;
+        mutable stopAtControls stopAt_;
 
         //- Write control
         writeControls writeControl_;
 
         //- Write interval
         scalar writeInterval_;
+
+        // Additional writing
+
+            //- Secondary write control
+            writeControls secondaryWriteControl_;
+
+            //- Secondary write interval
+            scalar secondaryWriteInterval_;
 
         //- Purge write
         label purgeWrite_;
@@ -161,6 +169,7 @@ protected:
 
         //- If time is being sub-cycled this is the previous TimeState
         autoPtr<TimeState> prevTimeState_;
+
 
         //- Time directory name format
         static fmtflags format_;
@@ -395,7 +404,8 @@ public:
                 IOstream::compressionType
             ) const;
 
-            //- Write the objects now and continue the run
+            //- Write the objects now (not at end of iteration) and continue
+            //  the run
             bool writeNow();
 
             //- Write the objects now (not at end of iteration) and end the run
