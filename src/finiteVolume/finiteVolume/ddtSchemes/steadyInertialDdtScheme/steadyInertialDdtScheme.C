@@ -751,7 +751,8 @@ steadyInertialDdtScheme<Type>::fvcDdtPhiCorr
                     (
                         fvc::interpolate(rDeltaT*rA)*phi
                       - (
-                            fvc::interpolate(rDeltaT*rA*U.prevIter()) & mesh().Sf()
+                            fvc::interpolate(rDeltaT*rA*U.prevIter())
+                          & mesh().Sf()
                         )
                     )
                 )
@@ -781,7 +782,7 @@ steadyInertialDdtScheme<Type>::fvcDdtConsistentPhiCorr
 )
 {
     tmp<fluxFieldType> toldTimeFlux =
-        (mesh().Sf() & faceU.oldTime())*rAUf*CofrDeltaT();
+        (mesh().Sf() & faceU.oldTime())*rAUf*convectionCofrDeltaT();
 
     if (mesh().moving())
     {
