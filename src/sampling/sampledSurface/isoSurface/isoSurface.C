@@ -2065,7 +2065,7 @@ Foam::isoSurface::isoSurface
     }
 
 
-//if (false)
+if (false)
 {
     List<FixedList<label, 3> > faceEdges;
     labelList edgeFace0, edgeFace1;
