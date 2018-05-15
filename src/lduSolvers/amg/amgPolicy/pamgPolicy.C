@@ -64,7 +64,6 @@ void Foam::pamgPolicy::calcChild()
     if (matrix().diagonal())
     {
         // Diag only matrix.  Reset and return
-        child_ = 0;
         nCoarseEqns_ = 1;
 
         return;
@@ -152,14 +151,7 @@ void Foam::pamgPolicy::calcChild()
     {
         magOffDiag = mag(matrix().upper());
     }
-    else
-    {
-        // Diag only matrix.  Reset and return
-        child_ = 0;
-        nCoarseEqns_ = 1;
-
-        return;
-    }
+    // Diag only matrix already handled.  HJ, 21/Feb/2018
 
     nCoarseEqns_ = 0;
 
@@ -349,7 +341,7 @@ Foam::pamgPolicy::pamgPolicy
         groupSize,
         minCoarseEqns
     ),
-    child_(matrix.lduAddr().size()),
+    child_(),
     nSolo_(0),
     nCoarseEqns_(0),
     coarsen_(false)
