@@ -35,7 +35,7 @@ SourceFiles
 #ifndef patchIdentifier_H
 #define patchIdentifier_H
 
-#include "word.H"
+#include "wordList.H"
 #include "label.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
