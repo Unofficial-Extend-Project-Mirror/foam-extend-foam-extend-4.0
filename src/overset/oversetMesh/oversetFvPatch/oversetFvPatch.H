@@ -68,10 +68,10 @@ protected:
     // Protected Member functions
 
         //- Make patch weighting factors
-        void makeWeights(scalarField&) const;
+        void makeWeights(fvsPatchScalarField&) const;
 
         //- Make patch face - neighbour cell distances
-        void makeDeltaCoeffs(scalarField&) const;
+        void makeDeltaCoeffs(fvsPatchScalarField&) const;
 
 
 public:

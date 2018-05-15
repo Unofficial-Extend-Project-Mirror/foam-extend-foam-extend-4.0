@@ -200,9 +200,8 @@ public:
         }
 
 
-    // Destructor
-
-        ~oversetFvPatchField();
+    //- Destructor
+    virtual ~oversetFvPatchField();
 
 
     // Static member functions

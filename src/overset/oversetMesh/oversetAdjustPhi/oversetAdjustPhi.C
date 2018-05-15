@@ -155,7 +155,7 @@ void Foam::oversetAdjustPhi
                         mesh.boundaryMesh()[patchI]
                     );
 
-                if (procPatch.owner())
+                if (procPatch.master())
                 {
                     // Processor patch, master side
 
@@ -264,7 +264,7 @@ void Foam::oversetAdjustPhi
             // Get reference to the flux for scaling
             scalar& curPhi = phi.boundaryField()[patchI][faceI];
 
-            if (procPatch.owner()) // Owner side
+            if (procPatch.master()) // Owner side
             {
                 // Scale outgoing flux to match the incoming one
                 if (curFlip && (curPhi > 0))
