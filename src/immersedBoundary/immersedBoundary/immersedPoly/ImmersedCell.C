@@ -604,11 +604,11 @@ Foam::ImmersedCell<Distance>::ImmersedCell
         {
             // Make two faces: wet and dry
             // Wet face: wet points and intersection points
-            face wetFace(enrichedFaces.size());
+            face wetFace(newFace.size());
             label nWet = 0;
 
             // Dry face: dry points and intersection points
-            face dryFace(enrichedFaces.size());
+            face dryFace(newFace.size());
             label nDry = 0;
 
             forAll (newFace, pointI)
