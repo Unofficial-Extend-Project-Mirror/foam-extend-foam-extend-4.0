@@ -1,0 +1,8 @@
+#!/bin/sh
+
+( cd laplacianFoam ; ./Allrun )
+( cd potentialFoam ; ./Allrun )
+( cd scalarTransportFoam ; ./Allrun )
+( cd icoFoam ; ./Allrun )
+( cd simpleFoam ; ./Allrun )
+( cd dynamicMesh ; ./Allrun )

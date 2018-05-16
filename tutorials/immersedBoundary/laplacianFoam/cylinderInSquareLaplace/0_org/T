@@ -1,0 +1,65 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      T;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions [0 0 0 0 1 0 0];
+
+internalField uniform 0;
+
+boundaryField
+{
+    ibCylinder
+    {
+        type mixedIb;
+        patchType immersedBoundary;
+        triValue uniform 1;
+        triGradient  uniform 0;
+        triValueFraction uniform 1;
+        value uniform 0;
+
+        setDeadValue   yes;
+        deadValue      1;
+    }
+    in
+    {
+        type fixedValue;
+        value uniform 0;
+    }
+    out
+    {
+        type fixedValue;
+        value uniform 0;
+    }
+
+    top
+    {
+        type fixedValue;
+        value uniform 0;
+    }
+
+    bottom
+    {
+        type fixedValue;
+        value uniform 0;
+    }
+
+    frontAndBack
+    {
+        type empty;
+    }
+}
+
+
+// ************************************************************************* //
