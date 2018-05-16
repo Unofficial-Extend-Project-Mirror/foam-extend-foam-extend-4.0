@@ -1,5 +1,0 @@
-#!/bin/sh
-
-( cd movingCylinderInChannelIco ; ./Allclean )
-( cd movingCylinderInChannelIcoFine ; ./Allclean )
-( cd refiningMovingCylinderInChannelIco ; ./Allclean )
