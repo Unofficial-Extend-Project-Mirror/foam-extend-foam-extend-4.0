@@ -31,11 +31,13 @@ License
 #include "blockDiagonalPrecons.H"
 #include "blockGaussSeidelPrecons.H"
 #include "BlockCholeskyPrecon.H"
+#include "blockILUC0Precons.H"
 #include "BlockILUCpPrecon.H"
 
 #include "blockLduSmoothers.H"
 #include "blockGaussSeidelSmoothers.H"
 #include "BlockILUSmoother.H"
+#include "blockILUC0Smoothers.H"
 #include "BlockILUCpSmoother.H"
 
 #include "blockLduSolvers.H"
@@ -87,6 +89,9 @@ makeBlockPrecon(block##Type##Precon, block##Type##GaussSeidelPrecon);         \
 typedef BlockCholeskyPrecon<type > block##Type##CholeskyPrecon;               \
 makeBlockPrecon(block##Type##Precon, block##Type##CholeskyPrecon);            \
                                                                               \
+typedef BlockILUC0Precon<type > block##Type##ILUC0Precon;                     \
+makeBlockPrecon(block##Type##Precon, block##Type##ILUC0Precon);               \
+                                                                              \
 typedef BlockILUCpPrecon<type > block##Type##ILUCpPrecon;                     \
 makeBlockPrecon(block##Type##Precon, block##Type##ILUCpPrecon);               \
                                                                               \
@@ -100,6 +105,9 @@ makeBlockSmoother(block##Type##Smoother, block##Type##GaussSeidelSmoother);   \
                                                                               \
 typedef BlockILUSmoother<type > block##Type##ILUSmoother;                     \
 makeBlockSmoother(block##Type##Smoother, block##Type##ILUSmoother);           \
+                                                                              \
+typedef BlockILUC0Smoother<type > block##Type##ILUC0Smoother;                 \
+makeBlockSmoother(block##Type##Smoother, block##Type##ILUC0Smoother);         \
                                                                               \
 typedef BlockILUCpSmoother<type > block##Type##ILUCpSmoother;                 \
 makeBlockSmoother(block##Type##Smoother, block##Type##ILUCpSmoother);         \
