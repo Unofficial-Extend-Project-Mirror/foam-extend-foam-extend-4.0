@@ -653,6 +653,32 @@ int main(int argc, char *argv[])
         );
         procMesh.syncUpdateMesh();
 
+        labelIOList pointProcAddressing
+        (
+            IOobject
+            (
+                "pointProcAddressing",
+                procMesh.facesInstance(),
+                procMesh.meshSubDir,
+                procMesh,
+                IOobject::MUST_READ,
+                IOobject::NO_WRITE
+            )
+        );
+
+        labelIOList faceProcAddressing
+        (
+            IOobject
+            (
+                "faceProcAddressing",
+                procMesh.facesInstance(),
+                procMesh.meshSubDir,
+                procMesh,
+                IOobject::MUST_READ,
+                IOobject::NO_WRITE
+            )
+        );
+
         labelIOList cellProcAddressing
         (
             IOobject
@@ -694,19 +720,6 @@ int main(int argc, char *argv[])
          || surfaceTensorFields.size()
         )
         {
-            labelIOList faceProcAddressing
-            (
-                IOobject
-                (
-                    "faceProcAddressing",
-                    procMesh.facesInstance(),
-                    procMesh.meshSubDir,
-                    procMesh,
-                    IOobject::MUST_READ,
-                    IOobject::NO_WRITE
-                )
-            );
-
             fvFieldDecomposer fieldDecomposer
             (
                 mesh,
@@ -740,20 +753,7 @@ int main(int argc, char *argv[])
          || pointTensorFields.size()
         )
         {
-            labelIOList pointProcAddressing
-            (
-                IOobject
-                (
-                    "pointProcAddressing",
-                    procMesh.facesInstance(),
-                    procMesh.meshSubDir,
-                    procMesh,
-                    IOobject::MUST_READ,
-                    IOobject::NO_WRITE
-                )
-            );
-
-            pointMesh procPMesh(procMesh, true);
+            const pointMesh& procPMesh = pointMesh::New(procMesh);
 
             pointFieldDecomposer fieldDecomposer
             (
@@ -776,34 +776,6 @@ int main(int argc, char *argv[])
         {
             const tetPolyMesh& tetMesh = *tetMeshPtr;
             tetPolyMesh procTetMesh(procMesh);
-
-            // Read the point addressing information
-            labelIOList pointProcAddressing
-            (
-                IOobject
-                (
-                    "pointProcAddressing",
-                    procMesh.facesInstance(),
-                    procMesh.meshSubDir,
-                    procMesh,
-                    IOobject::MUST_READ,
-                    IOobject::NO_WRITE
-                )
-            );
-
-            // Read the point addressing information
-            labelIOList faceProcAddressing
-            (
-                IOobject
-                (
-                    "faceProcAddressing",
-                    procMesh.facesInstance(),
-                    procMesh.meshSubDir,
-                    procMesh,
-                    IOobject::MUST_READ,
-                    IOobject::NO_WRITE
-                )
-            );
 
             tetPointFieldDecomposer fieldDecomposer
             (
