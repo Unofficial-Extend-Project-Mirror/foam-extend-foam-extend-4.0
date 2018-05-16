@@ -767,6 +767,10 @@ $(BlockLduPrecons)/BlockCholeskyPrecon/blockCholeskyPrecons.C
 
 $(BlockLduPrecons)/BlockAMGPrecon/blockAMGPrecons.C
 
+$(BlockLduPrecons)/BlockILUC0Precon/scalarBlockILUC0Precon.C
+$(BlockLduPrecons)/BlockILUC0Precon/tensorBlockILUC0Precon.C
+$(BlockLduPrecons)/BlockILUC0Precon/blockILUC0Precons.C
+
 $(BlockLduPrecons)/BlockILUCpPrecon/scalarBlockILUCpPrecon.C
 $(BlockLduPrecons)/BlockILUCpPrecon/tensorBlockILUCpPrecon.C
 $(BlockLduPrecons)/BlockILUCpPrecon/blockILUCpPrecons.C
@@ -775,6 +779,7 @@ BlockLduSmoothers = matrices/blockLduMatrix/BlockLduSmoothers
 $(BlockLduSmoothers)/BlockLduSmoother/blockLduSmoothers.C
 $(BlockLduSmoothers)/BlockGaussSeidelSmoother/blockGaussSeidelSmoothers.C
 $(BlockLduSmoothers)/BlockILUSmoother/blockILUSmoothers.C
+$(BlockLduSmoothers)/BlockILUC0Smoother/blockILUC0Smoothers.C
 $(BlockLduSmoothers)/BlockILUCpSmoother/blockILUCpSmoothers.C
 
 BlockLduSolvers = matrices/blockLduMatrix/BlockLduSolvers
