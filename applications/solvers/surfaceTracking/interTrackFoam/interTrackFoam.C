@@ -62,6 +62,10 @@ int main(int argc, char *argv[])
 #       include "CourantNo.H"
         //#       include "setSurfaceStabilityDeltaT.H"
 
+        runTime++;
+
+        Info<< "Time = " << runTime.timeName() << nl << endl;
+
         interface.moveMeshPointsForOldFreeSurfDisplacement();
 
         interface.updateDisplacementDirections();
