@@ -336,6 +336,7 @@ void fvMesh::updatePhi(const scalarField& sweptVols) const
 
     // Make sure V and V0 are constructed before the correction
     // HJ, 22/Dec/2017
+    V();
     if (!V0Ptr_)
     {
         const_cast<fvMesh&>(*this).setV0();
@@ -363,7 +364,7 @@ void fvMesh::updatePhi(const scalarField& sweptVols) const
         phi.boundaryField()[patchI] *= rDeltaT;
     }
 
-    // Boundary update.  Used in complex geometries, eg. immersed boundary
+    // Boundary update.  Used in complex geometry updates, eg. immersed boundary
     // HJ, 29/Nov/2017
     forAll (phi.boundaryField(), patchI)
     {
