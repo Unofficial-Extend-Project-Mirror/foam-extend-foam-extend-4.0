@@ -18,24 +18,10 @@ FoamFile
 // dynamicFvMesh   immersedBoundarySolidBodyMotionFvMesh;
 dynamicFvMesh      immersedBoundaryDynamicRefineSolidBodyMotionFvMesh;
 
-immersedBoundarySolidBodyMotionFvMeshCoeffs
-{
-    motionFunctions
-    (
-        ibCylinder
-        {
-            solidBodyMotionFunction     linearOscillation;
-            linearOscillationCoeffs
-            {
-                amplitude    (0.5 0 0);
-                period       2.5;
-            }
-        }
-    );
-}
-
-
 immersedBoundaryDynamicRefineSolidBodyMotionFvMeshCoeffs
+{}
+
+dynamicPolyRefinementFvMeshCoeffs
 {
     motionFunctions
     (
@@ -50,17 +36,22 @@ immersedBoundaryDynamicRefineSolidBodyMotionFvMeshCoeffs
         }
     );
 
-    refineInterval   2;
+    refinementSelection
+    {
+        type immersedBoundaryRefinement;
 
-    maxRefLevel      2;
+        coarseningDistance 0.15;
+        refinementDistance 0.1;
+    }
 
-    maxCells         20000;
+    active                     yes;
+    refineInterval             2;
+    unrefineInterval           2;
 
-    coarseningDistance 0.15;
-
-    refinementDistance 0.1;
-
-    nBufferLayers     1;
+    maxRefinementLevel         3;
+    nRefinementBufferLayers    1;
+    nUnrefinementBufferLayers  5;
+    maxCells                   20000;
 }
 
 
