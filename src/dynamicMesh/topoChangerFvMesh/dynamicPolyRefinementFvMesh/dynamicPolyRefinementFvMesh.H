@@ -116,6 +116,15 @@ public:
 
     // Member Functions
 
+        //- Return access to dictionary
+        inline const dictionary& refinementDict() const
+        {
+            return refinementDict_;
+        }
+
+        //- Is this the first update in the current time-step?
+        bool firstUpdate() const;
+    
         //- Update the mesh for topology change
         virtual bool update();
 };

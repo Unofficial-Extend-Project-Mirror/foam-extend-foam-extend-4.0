@@ -111,7 +111,7 @@ Foam::fieldBoundsRefinement::refinementCellCandidates() const
 
     // Create storage for collection of cells. Assume that one in five cells
     // will be refined to prevent excessive resizing.
-    dynamicLabelList refinementCandidates(mesh().nCells()/5);
+    dynamicLabelList refinementCandidates(Foam::max(100, mesh().nCells()/5));
 
     // Loop through internal field and collect cells to refine
     const scalarField& vfIn = vf.internalField();
@@ -157,7 +157,10 @@ Foam::fieldBoundsRefinement::unrefinementPointCandidates() const
 
     // Create storage for collection of candidates. Assume that one in ten
     // mesh points will be unrefined to prevent excessive resizing
-    dynamicLabelList unrefinementCandidates(mesh().nPoints()/10);
+    dynamicLabelList unrefinementCandidates
+    (
+        Foam::max(100, mesh().nPoints()/10)
+    );
 
     // Loop through all split points and select candidates to unrefine
     forAll (pField, pointI)

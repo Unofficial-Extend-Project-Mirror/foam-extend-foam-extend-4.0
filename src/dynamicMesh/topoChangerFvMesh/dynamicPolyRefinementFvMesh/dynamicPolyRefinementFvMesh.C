@@ -51,6 +51,7 @@ void Foam::dynamicPolyRefinementFvMesh::readDict()
 {
     // Read and check refinement and unrefinement intervals
     refineInterval_ = readLabel(refinementDict_.lookup("refineInterval"));
+
     if (refineInterval_ < 1)
     {
         FatalErrorIn("dynamicPolyRefinementFvMesh::readDict()")
@@ -61,6 +62,7 @@ void Foam::dynamicPolyRefinementFvMesh::readDict()
     }
 
     unrefineInterval_ = readLabel(refinementDict_.lookup("unrefineInterval"));
+
     if (refineInterval_ < 1)
     {
         FatalErrorIn("dynamicPolyRefinementFvMesh::readDict()")
@@ -139,6 +141,12 @@ Foam::dynamicPolyRefinementFvMesh::~dynamicPolyRefinementFvMesh()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+bool Foam::dynamicPolyRefinementFvMesh::firstUpdate() const
+{
+    return curTimeIndex_ < time().timeIndex();
+}
+
 
 bool Foam::dynamicPolyRefinementFvMesh::update()
 {
