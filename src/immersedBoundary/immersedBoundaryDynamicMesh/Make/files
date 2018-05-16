@@ -2,6 +2,9 @@ movingImmersedBoundary/movingImmersedBoundary.C
 refineImmersedBoundaryMesh/refineImmersedBoundaryMesh.C
 
 immersedBoundarySolidBodyMotionFvMesh/immersedBoundarySolidBodyMotionFvMesh.C
+
+immersedBoundaryRefinement/immersedBoundaryRefinement.C
+
 immersedBoundaryDynamicRefineSolidBodyMotionFvMesh/immersedBoundaryDynamicRefineSolidBodyMotionFvMesh.C
 
 LIB = $(FOAM_LIBBIN)/libimmersedBoundaryDynamicMesh

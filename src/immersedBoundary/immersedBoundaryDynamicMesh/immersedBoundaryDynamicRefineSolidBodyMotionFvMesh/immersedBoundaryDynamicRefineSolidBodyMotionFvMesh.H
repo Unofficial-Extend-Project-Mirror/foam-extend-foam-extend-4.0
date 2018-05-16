@@ -45,11 +45,8 @@ Notes
 #ifndef immersedBoundaryDynamicRefineSolidBodyMotionFvMesh_H
 #define immersedBoundaryDynamicRefineSolidBodyMotionFvMesh_H
 
-#include "dynamicFvMesh.H"
-#include "polyRef.H"
-#include "PackedBoolList.H"
+#include "dynamicPolyRefinementFvMesh.H"
 #include "movingImmersedBoundary.H"
-#include "triSurfaceDistance.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -62,22 +59,13 @@ namespace Foam
 
 class immersedBoundaryDynamicRefineSolidBodyMotionFvMesh
 :
-    public dynamicFvMesh
+    public dynamicPolyRefinementFvMesh
 {
 
     // Private data
 
         //- Immersed boundary motion control function
         PtrList<movingImmersedBoundary> ibMotions_;
-
-        //- Mesh cutting engine
-        polyRef meshCutter_;
-
-        //- Current mesh motion time index
-        label curTimeIndex_;
-
-        //- Number of refinement/unrefinement steps done so far.
-        label nRefinementIterations_;
 
 
     // Private Member Functions
@@ -93,38 +81,6 @@ class immersedBoundaryDynamicRefineSolidBodyMotionFvMesh
         (
             const immersedBoundaryDynamicRefineSolidBodyMotionFvMesh&
         );
-
-
-        //- Count set/unset elements in packedlist.
-        static label count(const PackedBoolList&, const unsigned int);
-
-        //- Refine cells. Update mesh and fields.
-        autoPtr<mapPolyMesh> refine(const labelList&);
-
-        //- Unrefine cells. Gets passed in centre points of cells to combine.
-        autoPtr<mapPolyMesh> unrefine(const labelList&);
-
-
-        // Selection of cells to refine and coarsen
-
-            //- Subset candidate cells for refinement
-            labelList selectRefineCells
-            (
-                const label maxCells,
-                const label maxRefLevel,
-                const scalar refinementDistance,
-                PackedBoolList& candidateCell
-            ) const;
-
-            //- Select points that can be unrefined
-            labelList selectUnrefinePoints
-            (
-                const scalar coarsenDistance,
-                const PackedBoolList& markedCell
-            ) const;
-
-            //- Extend markedCell with cell-face-cell
-            void extendMarkedCells(PackedBoolList& markedCell) const;
 
 
 public:
@@ -147,12 +103,6 @@ public:
 
 
     // Member Functions
-
-        //- Direct access to the refinement engine
-        const polyRef& meshCutter() const
-        {
-            return meshCutter_;
-        }
 
         //- Update the mesh for both mesh motion and topology change
         virtual bool update();
