@@ -13,4 +13,3 @@ mkdir 0
 
 runApplication potentialFoam
 runApplication $application
-runApplication writeIbMasks
