@@ -40,6 +40,8 @@ SourceFiles
 
 #include "dynamicFvMesh.H"
 #include "polyTopoChanger.H"
+#include "mapPolyMesh.H"
+#include "fvMeshMapper.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -100,7 +102,7 @@ class topoChangerFvMesh
                 const HashTable<const GeoField*>& geoFields,
                 const Reconstructor& reconstructor,
                 const List<PtrList<GeoField> >& receivedFields,
-                const boolList& patchesToReplace
+                const mapPolyMesh& meshMap
             ) const;
 
 

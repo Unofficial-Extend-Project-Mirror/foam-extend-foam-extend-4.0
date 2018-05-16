@@ -157,11 +157,14 @@ void Foam::topoChangerFvMesh::rebuildFields
     const HashTable<const GeoField*>& geoFields,
     const Reconstructor& reconstructor,
     const List<PtrList<GeoField> >& receivedFields,
-    const boolList& patchesToReplace
+    const mapPolyMesh& meshMap
 ) const
 {
     label fieldI = 0;
 
+    // Make an fvMesh mapper
+    const fvMeshMapper mapper(*this, meshMap);
+    
     forAllConstIter
     (
         typename HashTable<const GeoField*>,
@@ -221,12 +224,17 @@ void Foam::topoChangerFvMesh::rebuildFields
                 "    const HashTable<const GeoField*>& geoFields,\n"
                 "    const Reconstructor& reconstructor,\n"
                 "    const List<PtrList<GeoField> >& receivedFields,\n"
+                "    const mapPolyMesh& meshMap,\n"
                 ") const"
             )   << "Name mismatch when rebuilding field " << masterField.name()
                 << abort(FatalError);
         }
 
-        if (patchesToReplace.size() != masterField.mesh().boundary().size())
+        if
+        (
+            meshMap.resetPatchFlag().size()
+         != masterField.mesh().boundary().size()
+        )
         {
             FatalErrorIn
             (
@@ -235,10 +243,11 @@ void Foam::topoChangerFvMesh::rebuildFields
                 "    const HashTable<const GeoField*>& geoFields,\n"
                 "    const Reconstructor& reconstructor,\n"
                 "    const List<PtrList<GeoField> >& receivedFields,\n"
+                "    const mapPolyMesh& meshMap,\n"
                 ") const"
             )   << "Bad size of patches to replace.  Boundary: "
                 << masterField.mesh().boundary().size()
-                << " patchesToReplace: " << patchesToReplace.size()
+                << " resetPatchFlag: " << meshMap.resetPatchFlag().size()
                 << abort(FatalError);
         }
 
@@ -280,7 +289,7 @@ void Foam::topoChangerFvMesh::rebuildFields
         // Resize patch fields
         forAll (patchFields, patchI)
         {
-            if (patchesToReplace[patchI])
+            if (meshMap.resetPatchFlag()[patchI])
             {
                 // Create a new constrained patch field
                 Pout<< "Inserting constrained patch field for patch "
@@ -319,9 +328,10 @@ void Foam::topoChangerFvMesh::rebuildFields
                     << masterField.mesh().boundary()[patchI].size()
                     << endl;
 
-                patchFields[patchI].resetSize
+                // Reset patch field size
+                patchFields[patchI].autoMap
                 (
-                    masterField.mesh().boundary()[patchI].size()
+                    mapper.boundaryMap()[patchI]
                 );
             }
         }

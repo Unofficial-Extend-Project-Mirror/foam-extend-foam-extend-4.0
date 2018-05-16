@@ -28,10 +28,8 @@ License
 #include "fvFieldDecomposer.H"
 #include "processorMeshesReconstructor.H"
 #include "fvFieldReconstructor.H"
-#include "mapPolyMesh.H"
-#include "addToRunTimeSelectionTable.H"
-
 #include "passiveProcessorPolyPatch.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -543,6 +541,60 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         }
     }
 
+    // Create mesh map.  Note: map is dummy and it is used only for resizing
+    // HJ, 16/May/2018
+    const polyBoundaryMesh& patches = boundaryMesh();
+    labelList patchStarts(patches.size());
+    labelList oldPatchNMeshPoints(patches.size());
+    labelListList patchPointMap(patches.size());
+    forAll(patches, patchI)
+    {
+        patchStarts[patchI] = patches[patchI].start();
+        oldPatchNMeshPoints[patchI] = patches[patchI].nPoints();
+        patchPointMap[patchI].setSize(patches[patchI].nPoints(), -1);
+    }
+
+    mapPolyMesh meshMap
+    (
+        *this,                 // const polyMesh& mesh,
+        nPoints(),             // nOldPoints,
+        nFaces(),              // nOldFaces,
+        nCells(),              // nOldCells,
+
+        labelList(reconMesh.nPoints(), -1),   // pointMap,
+        List<objectMap>(0),         // pointsFromPoints,
+
+        labelList(reconMesh.nFaces(), -1),   // faceMap,
+        List<objectMap>(0),         // facesFromPoints,
+        List<objectMap>(0),         // facesFromEdges,
+        List<objectMap>(0),         // facesFromFaces,
+
+        labelList(),                // cellMap,
+        List<objectMap>(0),         // cellsFromPoints,
+        List<objectMap>(0),         // cellsFromEdges,
+        List<objectMap>(0),         // cellsFromFaces,
+        List<objectMap>(0),         // cellsFromCells,
+
+        labelList(nPoints(), -1),   // reversePointMap,
+        labelList(nFaces(), -1),    // reverseFaceMap,
+        labelList(nCells(), -1),    // reverseCellMap,
+
+        labelHashSet(0),            // flipFaceFlux,
+
+        labelListList(0),           // patchPointMap,
+        labelListList(0),           // pointZoneMap,
+        labelListList(0),           // faceZonePointMap,
+        labelListList(0),           // faceZoneFaceMap,
+        labelListList(0),           // cellZoneMap,
+
+        resetFvPatchFlag,           // resetPatchFlag
+
+        pointField(0),              // preMotionPoints,
+        patchStarts,                // oldPatchStarts,
+        oldPatchNMeshPoints         // oldPatchNMeshPoints
+    );
+
+    
     // Reset fvMesh and patches
     resetFvPrimitives
     (
@@ -573,7 +625,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         volScalarFields,
         fieldReconstructor,
         receivedVolScalarFields,
-        resetFvPatchFlag
+        meshMap
     );
 
     rebuildFields
@@ -581,7 +633,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         volVectorFields,
         fieldReconstructor,
         receivedVolVectorFields,
-        resetFvPatchFlag
+        meshMap
     );
 
     rebuildFields
@@ -589,7 +641,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         surfaceScalarFields,
         fieldReconstructor,
         receivedSurfaceScalarFields,
-        resetFvPatchFlag
+        meshMap
     );
 
     // Debug
