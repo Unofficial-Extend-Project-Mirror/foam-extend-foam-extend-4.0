@@ -334,6 +334,13 @@ void fvMesh::updatePhi(const scalarField& sweptVols) const
 {
     // Fill in mesh motion fluxes given swept volumes for all faces
 
+    // Make sure V and V0 are constructed before the correction
+    // HJ, 22/Dec/2017
+    if (!V0Ptr_)
+    {
+        const_cast<fvMesh&>(*this).setV0();
+    }
+
     if (!phiPtr_)
     {
         makePhi();
@@ -355,11 +362,6 @@ void fvMesh::updatePhi(const scalarField& sweptVols) const
         phi.boundaryField()[patchI] = patches[patchI].patchSlice(sweptVols);
         phi.boundaryField()[patchI] *= rDeltaT;
     }
-
-    // Make sure V and V0 are constructed before the correction
-    // HJ, 22/Dec/2017
-    V0();
-    V();
 
     // Boundary update.  Used in complex geometries, eg. immersed boundary
     // HJ, 29/Nov/2017
