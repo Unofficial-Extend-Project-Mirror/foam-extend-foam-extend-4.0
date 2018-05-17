@@ -18,10 +18,7 @@ FoamFile
 // dynamicFvMesh   immersedBoundarySolidBodyMotionFvMesh;
 dynamicFvMesh      immersedBoundaryDynamicRefineSolidBodyMotionFvMesh;
 
-immersedBoundaryDynamicRefineSolidBodyMotionFvMeshCoeffs
-{}
-
-dynamicPolyRefinementFvMeshCoeffs
+immersedBoundarySolidBodyMotionFvMeshCoeffs
 {
     motionFunctions
     (
@@ -35,23 +32,84 @@ dynamicPolyRefinementFvMeshCoeffs
             }
         }
     );
+}
 
+
+immersedBoundaryDynamicRefineSolidBodyMotionFvMeshCoeffs
+{
+    motionFunctions
+    (
+        ibCylinder
+        {
+            solidBodyMotionFunction     linearOscillation;
+            linearOscillationCoeffs
+            {
+                amplitude    (0.5 0 0);
+                period       2.5;
+            }
+        }
+    );
+}
+
+
+dynamicPolyRefinementFvMeshCoeffs
+{
+    // Dynamic mesh procedure controls
+
+    // Refine every refineInterval step
+    refineInterval   1;
+
+    // Unrefine every unrefineInterval step
+    unrefineInterval 1;
+
+    // Separate refinement/unrefinement steps. In case this is switched on,
+    // if both refinement and unrefinement should have been performed in a
+    // single step, unrefinement is skipped. Switched off by default, meaning
+    // that it should be safe to perform both at the same time
+    separateUpdates false;
+
+    // Refinement selection criteria
     refinementSelection
     {
-        type immersedBoundaryRefinement;
-
-        coarseningDistance 0.15;
-        refinementDistance 0.1;
+        type        immersedBoundaryRefinement;
+        refinementDistance   0.1;
+        coarseningDistance   0.1;
     }
 
-    active                     yes;
-    refineInterval             2;
-    unrefineInterval           2;
+    // Polyhedral refinement engine controls
+    active               yes;
 
-    maxRefinementLevel         3;
-    nRefinementBufferLayers    1;
-    nUnrefinementBufferLayers  5;
-    maxCells                   20000;
+    // Maximum number of cells to allow (not strictly controlled)
+    maxCells             20000;
+
+    // Maximum refinement level
+    maxRefinementLevel   2;
+
+    // Number of buffer layers between refinement levels
+    nRefinementBufferLayers        0;
+
+    // Number of buffer layers for unrefinement in order to run away from the
+    // region that is getting refined at the same time in order to avoid point
+    // level inconsistencies
+    nUnrefinementBufferLayers      2;
+
+    // Whether to use edge based consistency check. Needed when one allows more
+    // than 2 refinement levels (automatically switched on)
+    edgeBasedConsistency           true;
+
+    // Motion functions for IBM
+    motionFunctions
+    (
+        ibCylinder
+        {
+            solidBodyMotionFunction     linearOscillation;
+            linearOscillationCoeffs
+            {
+                amplitude    (0.5 0 0);
+                period       2.5;
+            }
+        }
+    );
 }
 
 
