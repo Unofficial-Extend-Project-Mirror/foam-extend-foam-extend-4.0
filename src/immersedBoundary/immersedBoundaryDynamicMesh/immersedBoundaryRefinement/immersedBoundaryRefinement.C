@@ -57,8 +57,14 @@ Foam::immersedBoundaryRefinement::immersedBoundaryRefinement
 )
 :
     refinementSelection(mesh, dict),
-    refinementDistance_(readScalar(coeffDict().lookup("refinementDistance"))),
-    coarseningDistance_(readScalar(coeffDict().lookup("coarseningDistance")))
+    refinementDistance_
+    (
+        readScalar(coeffDict().lookup("refinementDistance"))
+    ),
+    unrefinementDistance_
+    (
+        readScalar(coeffDict().lookup("unrefinementDistance"))
+    )
 {}
 
 
@@ -110,7 +116,7 @@ Foam::immersedBoundaryRefinement::refinementCellCandidates() const
     }
 
     Info<< "Cell distance (min, max): (" << min(cellDistance)
-        << " " << max(cellDistance) << ")" << endl;
+        << ", " << max(cellDistance) << ")" << endl;
         
     // Create storage for collection of cells. Assume that almost all of the
     // cells will be marked to prevent excessive resizing.
@@ -122,7 +128,7 @@ Foam::immersedBoundaryRefinement::refinementCellCandidates() const
         if
         (
              cellDistance[cellI] > -refinementDistance_
-           && cellDistance[cellI] < 0
+          && cellDistance[cellI] < 0
         )
         {
             // Found a refinement cell
@@ -144,11 +150,8 @@ Foam::immersedBoundaryRefinement::refinementCellCandidates() const
 Foam::Xfer<Foam::labelList>
 Foam::immersedBoundaryRefinement::unrefinementPointCandidates() const
 {
-    // Mark all points as unrefinement candidates since only split points may be
-    // considered for actual unrefinement and since this refinement criterion
-    // will be usually used in combination with others. VV, 15/Mar/2018.
-
-    // All points are unrefinement candidates
+    // All points are unrefinement candidates (not just split points, these are
+    // filtered out in polyhedralRefinement engine)
     dynamicLabelList unrefinementCandidates(mesh().nPoints());
 
     // Calculate distance to immersed boundary
@@ -185,15 +188,16 @@ Foam::immersedBoundaryRefinement::unrefinementPointCandidates() const
     }
 
     Info<< "Split point distance(min, max): (" << min(pointDistance)
-        << " " << max(pointDistance) << ")" << endl;
+        << ", " << max(pointDistance) << ")" << endl;
 
     forAll (pointDistance, pointI)
     {
-        // Coarse live cells next to immersed boundary or dead cells
+        // Unrefine both live cells and dead cells far from the immersed
+        // boundary or dead cells
         if
         (
-            pointDistance[pointI] < -coarseningDistance_
-         || pointDistance[pointI] > SMALL
+            pointDistance[pointI] < -unrefinementDistance_
+         || pointDistance[pointI] > unrefinementDistance_
         )
         {
             unrefinementCandidates.append(pointI);

@@ -58,8 +58,8 @@ class immersedBoundaryRefinement
         //- Refinement distance to immersed boundary
         scalar refinementDistance_;
 
-        //- Coarsening distance to immersed boundary
-        scalar coarseningDistance_;
+        //- Unrefinement distance to immersed boundary
+        scalar unrefinementDistance_;
 
 
     // Private Member Functions
