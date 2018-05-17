@@ -90,10 +90,9 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~oversetFvPatch()
-        {}
+    //- Destructor
+    virtual ~oversetFvPatch()
+    {}
 
 
     // Member functions

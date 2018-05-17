@@ -217,7 +217,7 @@ void Foam::domainDecomposition::distributeCells()
             }
         }
     }
-    
+
     Info<< "\nFinished decomposition in "
         << decompositionTime.elapsedCpuTime()
         << " s" << endl;
