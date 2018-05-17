@@ -175,7 +175,7 @@ bool triSurface::readAC(const fileName& ACfileName)
 
     for (label patchI = 0; patchI < nPatches; patchI++)
     {
-        readUpto("OBJECT", ACfile, args, " while reading patch " + patchI);
+        readUpto("OBJECT", ACfile, args, " while reading patch " + name(patchI));
 
         // Object global values
         string patchName = string("patch") + name(patchI);
