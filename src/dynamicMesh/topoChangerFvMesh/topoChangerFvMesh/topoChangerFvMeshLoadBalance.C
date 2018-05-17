@@ -132,6 +132,9 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
     HashTable<const surfaceScalarField*> surfaceScalarFields =
         thisDb().lookupClass<surfaceScalarField>();
 
+    HashTable<const surfaceVectorField*> surfaceVectorFields =
+        thisDb().lookupClass<surfaceVectorField>();
+
     //HJ, HERE: remove the fields that should not be load balanced
 
     // Prepare fields for reconstruction
@@ -152,6 +155,11 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         surfaceScalarFields.size()
     );
 
+    List<PtrList<surfaceVectorField> > receivedSurfaceVectorFields
+    (
+        surfaceVectorFields.size()
+    );
+
     forAll (receivedVolScalarFields, fieldI)
     {
         receivedVolScalarFields[fieldI].setSize(Pstream::nProcs());
@@ -165,6 +173,11 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
     forAll (receivedSurfaceScalarFields, fieldI)
     {
         receivedSurfaceScalarFields[fieldI].setSize(Pstream::nProcs());
+    }
+
+    forAll (receivedSurfaceVectorFields, fieldI)
+    {
+        receivedSurfaceVectorFields[fieldI].setSize(Pstream::nProcs());
     }
 
     for (label procI = 0; procI < meshDecomp.nProcs(); procI++)
@@ -211,6 +224,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                 sendFields(volScalarFields, fieldDecomposer, toProc);
                 sendFields(volVectorFields, fieldDecomposer, toProc);
                 sendFields(surfaceScalarFields, fieldDecomposer, toProc);
+                sendFields(surfaceVectorFields, fieldDecomposer, toProc);
             }
             else
             {
@@ -246,6 +260,13 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                     surfaceScalarFields,
                     fieldDecomposer,
                     receivedSurfaceScalarFields
+                );
+
+                insertFields
+                (
+                    surfaceVectorFields,
+                    fieldDecomposer,
+                    receivedSurfaceVectorFields
                 );
             }
         }
@@ -311,6 +332,14 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                 (
                     procI,
                     receivedSurfaceScalarFields,
+                    procMeshes[procI],
+                    fromProc
+                );
+
+                receiveFields
+                (
+                    procI,
+                    receivedSurfaceVectorFields,
                     procMeshes[procI],
                     fromProc
                 );
@@ -641,6 +670,14 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         surfaceScalarFields,
         fieldReconstructor,
         receivedSurfaceScalarFields,
+        meshMap
+    );
+
+    rebuildFields
+    (
+        surfaceVectorFields,
+        fieldReconstructor,
+        receivedSurfaceVectorFields,
         meshMap
     );
 

@@ -125,7 +125,6 @@ public:
         //- Construct from objectRegistry, and read/write options
         explicit topoChangerFvMesh(const IOobject& io);
 
-
         //- Construct from components without boundary.
         //  Boundary is added using addPatches() member function
         topoChangerFvMesh
@@ -137,7 +136,6 @@ public:
             const Xfer<labelList>& allNeighbour,
             const bool syncPar = true
         );
-
 
         //- Construct from components with cells rather than owner
         //  and neighbour without boundary.
@@ -160,7 +158,7 @@ public:
 
         //- Load balance the mesh in parallel execution
         bool loadBalance(const dictionary& dict);
-    
+
         //- Update the mesh for both mesh motion and topology change
         virtual bool update() = 0;
 };
