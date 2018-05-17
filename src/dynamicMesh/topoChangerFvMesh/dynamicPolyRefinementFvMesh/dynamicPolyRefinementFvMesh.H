@@ -106,8 +106,15 @@ public:
 
     // Constructors
 
-        //- Construct from IOobject
-        explicit dynamicPolyRefinementFvMesh(const IOobject& io);
+        //- Construct from IOobject and optional name for the subdictionary
+        //  containing the refinement (and possibly other controls). The second
+        //  parameter is useful if we derive another dynamic mesh class from
+        //  this one instead of topoChangerFvMesh base class. VV, 17/May/2018.
+        dynamicPolyRefinementFvMesh
+        (
+            const IOobject& io,
+            const word subDictName = typeName
+        );
 
 
     //- Destructor

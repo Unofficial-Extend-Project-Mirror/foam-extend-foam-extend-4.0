@@ -18,25 +18,10 @@ FoamFile
 // dynamicFvMesh   immersedBoundarySolidBodyMotionFvMesh;
 dynamicFvMesh      immersedBoundaryDynamicRefineSolidBodyMotionFvMesh;
 
-immersedBoundarySolidBodyMotionFvMeshCoeffs
-{
-    motionFunctions
-    (
-        ibCylinder
-        {
-            solidBodyMotionFunction     linearOscillation;
-            linearOscillationCoeffs
-            {
-                amplitude    (0.5 0 0);
-                period       2.5;
-            }
-        }
-    );
-}
-
 
 immersedBoundaryDynamicRefineSolidBodyMotionFvMeshCoeffs
 {
+    // Immersed boundary controls
     motionFunctions
     (
         ibCylinder
@@ -49,18 +34,14 @@ immersedBoundaryDynamicRefineSolidBodyMotionFvMeshCoeffs
             }
         }
     );
-}
 
-
-dynamicPolyRefinementFvMeshCoeffs
-{
     // Dynamic mesh procedure controls
 
     // Refine every refineInterval step
-    refineInterval   1;
+    refineInterval   2;
 
     // Unrefine every unrefineInterval step
-    unrefineInterval 1;
+    unrefineInterval 2;
 
     // Separate refinement/unrefinement steps. In case this is switched on,
     // if both refinement and unrefinement should have been performed in a
@@ -72,8 +53,8 @@ dynamicPolyRefinementFvMeshCoeffs
     refinementSelection
     {
         type        immersedBoundaryRefinement;
-        refinementDistance   0.1;
-        coarseningDistance   0.1;
+        refinementDistance   0.08;
+        unrefinementDistance 0.08;
     }
 
     // Polyhedral refinement engine controls
@@ -86,31 +67,16 @@ dynamicPolyRefinementFvMeshCoeffs
     maxRefinementLevel   2;
 
     // Number of buffer layers between refinement levels
-    nRefinementBufferLayers        0;
+    nRefinementBufferLayers        1;
 
     // Number of buffer layers for unrefinement in order to run away from the
     // region that is getting refined at the same time in order to avoid point
     // level inconsistencies
-    nUnrefinementBufferLayers      2;
+    nUnrefinementBufferLayers      3;
 
     // Whether to use edge based consistency check. Needed when one allows more
     // than 2 refinement levels (automatically switched on)
     edgeBasedConsistency           true;
-
-    // Motion functions for IBM
-    motionFunctions
-    (
-        ibCylinder
-        {
-            solidBodyMotionFunction     linearOscillation;
-            linearOscillationCoeffs
-            {
-                amplitude    (0.5 0 0);
-                period       2.5;
-            }
-        }
-    );
 }
-
 
 // ************************************************************************* //

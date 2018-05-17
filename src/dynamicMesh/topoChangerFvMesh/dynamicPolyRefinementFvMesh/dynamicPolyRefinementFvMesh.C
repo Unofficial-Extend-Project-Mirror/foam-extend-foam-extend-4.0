@@ -82,7 +82,8 @@ void Foam::dynamicPolyRefinementFvMesh::readDict()
 
 Foam::dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh
 (
-    const IOobject& io
+    const IOobject& io,
+    const word subDictName
 )
 :
     topoChangerFvMesh(io),
@@ -99,7 +100,7 @@ Foam::dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh
                 IOobject::NO_WRITE,
                 false
             )
-        ).subDict(typeName + "Coeffs")
+        ).subDict(subDictName + "Coeffs")
     ),
     refineInterval_(readLabel(refinementDict_.lookup("refineInterval"))),
     unrefineInterval_(readLabel(refinementDict_.lookup("unrefineInterval"))),

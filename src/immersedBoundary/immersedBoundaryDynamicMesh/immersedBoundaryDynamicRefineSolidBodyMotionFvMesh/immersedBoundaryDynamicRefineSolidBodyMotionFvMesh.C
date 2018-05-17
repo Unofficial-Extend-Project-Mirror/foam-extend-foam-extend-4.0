@@ -60,25 +60,14 @@ addToRunTimeSelectionTable
 Foam::immersedBoundaryDynamicRefineSolidBodyMotionFvMesh::
 immersedBoundaryDynamicRefineSolidBodyMotionFvMesh(const IOobject& io)
 :
-    dynamicPolyRefinementFvMesh(io),
+    // Create base class with the name of this class to be able to define all
+    // the controls in immersedBoundaryDynamicRefineSolidBodyMotionFvMeshCoeffs
+    // subdictionary in dynamicMeshDict (see dynamicPolyRefinementFvMesh
+    // constructor). VV, 17/May/2018.
+    dynamicPolyRefinementFvMesh(io, typeName),
     ibMotions_()
 {
-    // Read motion function for all regions
-    dictionary dynamicMeshCoeffs
-    (
-        IOdictionary
-        (
-            IOobject
-            (
-                "dynamicMeshDict",
-                time().constant(),
-                *this,
-                IOobject::MUST_READ,
-                IOobject::NO_WRITE
-            )
-        ).subDict(typeName + "Coeffs")
-    );
-
+    // Read Immersed Boundary motion functions from base class dictionary
     PtrList<entry> motionDicts(refinementDict().lookup("motionFunctions"));
 
     ibMotions_.setSize(motionDicts.size());

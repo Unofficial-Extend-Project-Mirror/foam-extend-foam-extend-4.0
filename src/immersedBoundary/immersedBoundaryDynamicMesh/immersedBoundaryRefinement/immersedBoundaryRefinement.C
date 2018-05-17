@@ -197,7 +197,7 @@ Foam::immersedBoundaryRefinement::unrefinementPointCandidates() const
         if
         (
             pointDistance[pointI] < -unrefinementDistance_
-         || pointDistance[pointI] > unrefinementDistance_
+         || pointDistance[pointI] > SMALL
         )
         {
             unrefinementCandidates.append(pointI);
