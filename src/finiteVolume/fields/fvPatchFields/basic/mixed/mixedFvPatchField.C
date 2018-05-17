@@ -150,8 +150,7 @@ void mixedFvPatchField<Type>::evaluate(const Pstream::commsTypes)
     Field<Type>::operator=
     (
         valueFraction_*refValue_
-      +
-        (1.0 - valueFraction_)*
+      + (1.0 - valueFraction_)*
         (
             this->patchInternalField()
           + refGrad_/this->patch().deltaCoeffs()

@@ -55,7 +55,7 @@ Foam::EulerImplicit<CompType, ThermoType>::~EulerImplicit()
 template<class CompType, class ThermoType>
 Foam::scalar Foam::EulerImplicit<CompType, ThermoType>::solve
 (
-    scalarField &c,
+    scalarField& c,
     const scalar T,
     const scalar p,
     const scalar t0,

@@ -66,6 +66,12 @@ class immersedBoundaryFvsPatchField
         const immersedBoundaryFvPatch& ibPatch_;
 
 
+    // Private Member Functions
+
+        //- Update field size to match the patch
+        void updateSize();
+
+
 public:
 
     //- Runtime type information
@@ -141,31 +147,39 @@ public:
 
     // Member functions
 
+        // Access
+
+            //- Return reference to immersed boundary patch
+            const immersedBoundaryFvPatch& ibPatch() const
+            {
+                return ibPatch_;
+            }
+
+
         // Mapping functions
 
             //- Map (and resize as needed) from self given a mapping object
             virtual void autoMap
             (
                 const fvPatchFieldMapper&
-            )
-            {}
+            );
 
             //- Reverse map the given fvsPatchField onto this fvsPatchField
             virtual void rmap
             (
-                const fvPatchField<Type>&,
+                const fvsPatchField<Type>&,
                 const labelList&
-            )
-            {}
+            );
 
 
-    // Member functions
+        // Evaluation functions
 
-        //- Return reference to immersed boundary patch
-        const immersedBoundaryFvPatch& ibPatch() const
-        {
-            return ibPatch_;
-        }
+            //- Evaluate the patch field, sets Updated to false
+            virtual void evaluate
+            (
+                const Pstream::commsTypes commsType = Pstream::blocking
+            );
+
 
         //- Write
         virtual void write(Ostream&) const;
@@ -173,7 +187,23 @@ public:
 
     // Member operators
 
-//         virtual void operator=(const fvPatchField<Type>&);
+        // Note: All assignment operators can check size and resize
+        // Other operators cannot, as they assume an existing valid value
+        // HJ, 13/Dec/2017
+
+
+        virtual void operator=(const UList<Type>&);
+        virtual void operator=(const fvsPatchField<Type>&);
+        virtual void operator=(const fvPatchField<Type>&);
+
+        virtual void operator=(const Type&);
+
+
+        // Force an assignment irrespective of form of patch
+
+        virtual void operator==(const fvsPatchField<Type>&);
+        virtual void operator==(const Field<Type>&);
+        virtual void operator==(const Type&);
 };
 
 

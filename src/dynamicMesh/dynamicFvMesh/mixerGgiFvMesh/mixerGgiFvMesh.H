@@ -100,9 +100,8 @@ public:
         explicit mixerGgiFvMesh(const IOobject& io);
 
 
-    // Destructor
-
-        virtual ~mixerGgiFvMesh();
+    //- Destructor
+    virtual ~mixerGgiFvMesh();
 
 
     // Member Functions

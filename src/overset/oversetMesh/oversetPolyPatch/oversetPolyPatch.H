@@ -170,6 +170,12 @@ public:
 
         // Access
 
+            //- Does this side own the patch ?
+            virtual bool master() const
+            {
+                return true;
+            }
+
 
         //- Initialize ordering for primitivePatch. Does not
         //  refer to *this (except for name() and type() etc.)

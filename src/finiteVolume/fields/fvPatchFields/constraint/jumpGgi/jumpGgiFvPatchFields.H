@@ -26,6 +26,7 @@ Author
 
 Contributor
     Hrvoje Jasak, Wikki Ltd.
+    Gregor Cvijetic, FMENA Zagreb.
 
 GE CONFIDENTIAL INFORMATION 2016 General Electric Company. All Rights Reserved
 

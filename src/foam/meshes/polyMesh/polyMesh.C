@@ -719,6 +719,9 @@ void Foam::polyMesh::resetPrimitives
     // Clear addressing. Keep geometric props for mapping.
     clearAddressing();
 
+    // Clear everything
+    clearOut();
+
     // Take over new primitive data.
     // Optimized to avoid overwriting data at all
     if (!pts().empty())
@@ -750,16 +753,12 @@ void Foam::polyMesh::resetPrimitives
     // Reset patch sizes and starts
     forAll (boundary_, patchI)
     {
-        boundary_[patchI] = polyPatch
+        boundary_[patchI].resetPatch
         (
-            boundary_[patchI].name(),
             patchSizes[patchI],
-            patchStarts[patchI],
-            patchI,
-            boundary_
+            patchStarts[patchI]
         );
     }
-
 
     // Flags the mesh files as being changed
     setInstance(time().timeName());
@@ -804,11 +803,9 @@ void Foam::polyMesh::resetPrimitives
         }
     }
 
-
     // Set the primitive mesh from the owner_, neighbour_.
     // Works out from patch end where the active faces stop.
     initMesh();
-
 
     if (validBoundary)
     {
@@ -1267,7 +1264,7 @@ void Foam::polyMesh::setOldPoints
                 "    const pointField& setPoints\n"
                 ")\n"
             )   << "setPoints size " << setPoints.size()
-                << "different from the mesh points size "
+                << " is different from the mesh points size "
                 << allPoints_.size()
                 << abort(FatalError);
     }
@@ -1296,65 +1293,9 @@ const Foam::globalMeshData& Foam::polyMesh::globalData() const
                 << "Constructing parallelData from processor topology"
                 << endl;
         }
+
         // Construct globalMeshData using processorPatch information only.
         globalMeshDataPtr_ = new globalMeshData(*this);
-
-        // Old method.  HJ, 6/Dec/2006
-
-//         // Check for parallel boundaries
-//         bool parBoundaries = false;
-
-//         forAll (boundaryMesh(), patchI)
-//         {
-//             if
-//             (
-//                 typeid(boundaryMesh()[patchI])
-//              == typeid(processorPolyPatch)
-//             )
-//             {
-//                 parBoundaries = true;
-//                 break;
-//             }
-//         }
-
-//         if (parBoundaries)
-//         {
-//             // All is well - read the parallel data
-
-//             globalDataPtr_ =
-//                 new globalMeshData
-//                 (
-//                     IOobject
-//                     (
-//                         "globalData",
-//                         time().findInstance(meshDir(), "globalData"),
-//                         meshSubDir,
-//                         *this,
-//                         IOobject::MUST_READ,
-//                         IOobject::NO_WRITE
-//                     ),
-//                     *this
-//                 );
-//         }
-//         else
-//         {
-//             // The mesh has no parallel boundaries.  Create and hook a
-//             // "non-parallel" parallel info
-//             globalDataPtr_ =
-//                 new globalMeshData
-//                 (
-//                     *this,
-//                     false,
-//                     false,  // cyclicParallel.  Remove when fixed
-//                     nPoints(),
-//                     nFaces(),
-//                     nCells(),
-//                     0,
-//                     labelList(0),
-//                     labelList(0),
-//                     labelList(0)
-//                 );
-//         }
     }
 
     return *globalMeshDataPtr_;

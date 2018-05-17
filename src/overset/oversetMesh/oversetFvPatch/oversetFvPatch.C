@@ -44,13 +44,13 @@ addToRunTimeSelectionTable(fvPatch, oversetFvPatch, polyPatch);
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-void Foam::oversetFvPatch::makeWeights(scalarField& w) const
+void Foam::oversetFvPatch::makeWeights(fvsPatchScalarField& w) const
 {
     fvPatch::makeWeights(w);
 }
 
 
-void Foam::oversetFvPatch::makeDeltaCoeffs(scalarField& dc) const
+void Foam::oversetFvPatch::makeDeltaCoeffs(fvsPatchScalarField& dc) const
 {
     fvPatch::makeDeltaCoeffs(dc);
 }

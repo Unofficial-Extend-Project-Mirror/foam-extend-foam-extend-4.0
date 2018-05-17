@@ -229,7 +229,7 @@ tmp<Field<Type> > regionCouplingFvPatchField<Type>::patchNeighbourField() const
         Field<Type> bridgeField =
             transform(I - 2.0*sqr(nHat), this->patchInternalField());
 
-        regionCouplePatch_.bridge(bridgeField, pnf);
+        regionCouplePatch_.setUncoveredFaces(bridgeField, pnf);
     }
 
     return tpnf;
@@ -304,7 +304,7 @@ void regionCouplingFvPatchField<Type>::initEvaluate
         Field<Type> bridgeField =
             0.5*(pif + transform(I - 2.0*sqr(nHat), pif));
 
-        regionCouplePatch_.bridge(bridgeField, *this);
+        regionCouplePatch_.setUncoveredFaces(bridgeField, *this);
     }
 }
 
@@ -357,7 +357,7 @@ void regionCouplingFvPatchField<Type>::updateCoeffs()
         Field<Type> bridgeField =
             0.5*(pif + transform(I - 2.0*sqr(nHat), pif));
 
-        regionCouplePatch_.bridge(bridgeField, *this);
+        regionCouplePatch_.setUncoveredFaces(bridgeField, *this);
     }
 }
 

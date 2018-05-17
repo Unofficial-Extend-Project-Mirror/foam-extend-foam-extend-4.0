@@ -10,6 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
+    location    "0";
     object      epsilon;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -25,37 +26,50 @@ boundaryField
         type            fixedValue;
         value           uniform 14.855;
     }
-
     outlet
     {
         type            zeroGradient;
     }
-
     upperWall
     {
-        type            zeroGradient;
+        type            epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
     }
-
     lowerWall
     {
-        type            zeroGradient;
+        type            epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
     }
-
-    lowerWallInlet
-    {
-        type            zeroGradient;
-    }
-
     lowerWallInterface
     {
-        type            zeroGradient;
+        type            epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
     }
-
+    lowerWallInlet
+    {
+        type            epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+    }
     interface
     {
         type            zeroGradient;
     }
-
     defaultFaces
     {
         type            empty;

@@ -51,6 +51,7 @@ boundaryField
         type            zeroGradient;
     }
 
+    // Note: patch merged with lowerWallInterface - zero size
     interface
     {
         type            zeroGradient;

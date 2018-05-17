@@ -37,7 +37,6 @@ SourceFiles
 
 #include "wordList.H"
 #include "label.H"
-#include "ListOps.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -102,8 +101,7 @@ public:
 
 
     //- Destructor
-
-        virtual ~patchIdentifier();
+    virtual ~patchIdentifier();
 
 
     // Member Functions

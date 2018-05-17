@@ -115,6 +115,12 @@ public:
             Field<Type>& x,
             const Field<Type>& b
         );
+
+        //- Re-initialise solver after matrix coefficient update
+        virtual void initMatrix()
+        {
+            preconPtr_->initMatrix();
+        }
 };
 
 

@@ -17,9 +17,21 @@ FoamFile
 libs
 (
     "liblduSolvers.so"
+    "libfoam.so"
+    "libsurfMesh.so"
+    "libsampling.so"
+    "libimmersedBoundary.so"
 )
 
-application     potentialIbFoam;
+Tolerances
+{
+    immersedBoundaryLiveFactor  0.05;
+//     immersedBoundaryNonOrthogonalFactor 0.5;
+}
+
+
+
+application     potentialFoam;
 
 startFrom       startTime;
 

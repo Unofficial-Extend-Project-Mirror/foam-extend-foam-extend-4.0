@@ -47,7 +47,7 @@ class polyMesh;
 class engineTime;
 
 /*---------------------------------------------------------------------------*\
-                           Class simpleEnginePiston Declaration
+                     Class simpleEnginePiston Declaration
 \*---------------------------------------------------------------------------*/
 
 class simpleEnginePiston

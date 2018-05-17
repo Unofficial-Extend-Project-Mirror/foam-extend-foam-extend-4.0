@@ -25,7 +25,7 @@ Class
     Foam::setUpdater
 
 Description
-    Keeps cell/face/vertex sets uptodate. Both the ones loaded and the ones
+    Keeps cell/face/vertex sets up-to-date: both the ones loaded and the ones
     on disk.
 
 SourceFiles
@@ -116,6 +116,7 @@ public:
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #ifdef NoRepository
 #   include "setUpdaterTemplates.C"
 #endif

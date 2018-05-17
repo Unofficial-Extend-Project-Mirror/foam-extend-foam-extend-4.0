@@ -204,6 +204,7 @@ protected:
         //- Update of the patch topology
         virtual void updateMesh();
 
+
 public:
 
     //- Runtime type information
@@ -268,12 +269,17 @@ public:
         }
 
 
-    // Destructor
-
-        virtual ~cyclicPolyPatch();
+    //- Destructor
+    virtual ~cyclicPolyPatch();
 
 
     // Member Functions
+
+        //- Is this the master side?  Yes: it contains both sets of faces
+        virtual bool master() const
+        {
+            return true;
+        }
 
         //- Return connected points (in patch local point indexing). Demand
         //  driven calculation. Does primitivePatch::clearOut

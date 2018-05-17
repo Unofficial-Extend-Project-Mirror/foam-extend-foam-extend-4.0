@@ -109,9 +109,17 @@ public:
             const label size
         );
 
-    // Destructor
+        //- Construct from Istream
+        ZoneMesh
+        (
+            const IOobject&,
+            const MeshType&,
+            Istream&
+        );
 
-        ~ZoneMesh();
+
+    //- Destructor
+    ~ZoneMesh();
 
 
     // Member functions

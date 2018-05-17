@@ -53,8 +53,11 @@ Foam::autoPtr<Foam::amgPolicy> Foam::amgPolicy::New
 (
     const word& policyType,
     const lduMatrix& matrix,
+    const FieldField<Field, scalar>& bouCoeffs,
+    const FieldField<Field, scalar>& intCoeffs,
+    const lduInterfaceFieldPtrsList& interfaceFields,
     const label groupSize,
-    const label nCoarseCells
+    const label minCoarseEqns
 )
 {
     matrixConstructorTable::iterator constructorIter =
@@ -68,8 +71,11 @@ Foam::autoPtr<Foam::amgPolicy> Foam::amgPolicy::New
             "(\n"
             "    const word& policyType,\n"
             "    const lduMatrix& matrix,\n"
+            "    const FieldField<Field, scalar>& bouCoeffs,\n"
+            "    const FieldField<Field, scalar>& intCoeffs,\n"
+            "    const lduInterfaceFieldPtrsList& interfaceFields,\n"
             "    const label groupSize\n"
-            "    const label nCoarseCells\n"
+            "    const label minCoarseEqns\n"
             ")"
         )   << "Unknown AMG policy " << policyType
             << endl << endl
@@ -83,8 +89,11 @@ Foam::autoPtr<Foam::amgPolicy> Foam::amgPolicy::New
         constructorIter()
         (
             matrix,
+            bouCoeffs,
+            intCoeffs,
+            interfaceFields,
             groupSize,
-            nCoarseCells
+            minCoarseEqns
         )
     );
 }

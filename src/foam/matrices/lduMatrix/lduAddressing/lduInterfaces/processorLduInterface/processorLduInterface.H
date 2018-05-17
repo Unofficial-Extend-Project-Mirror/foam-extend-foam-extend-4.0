@@ -84,6 +84,9 @@ public:
 
         // Access
 
+            //- Return interface size
+            virtual label interfaceSize() const = 0;
+
             //- Return processor number
             virtual int myProcNo() const = 0;
 

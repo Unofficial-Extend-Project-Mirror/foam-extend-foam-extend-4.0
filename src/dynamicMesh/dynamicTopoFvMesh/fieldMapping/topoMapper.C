@@ -192,6 +192,7 @@ topoMapper::topoMapper
     cellMap_(NULL),
     surfaceMap_(NULL),
     boundaryMap_(NULL),
+    resetPatchFlag_(mesh.boundaryMesh().size(), false), // Disabled
     fluxCorrector_(fluxCorrector::New(mesh, dict)),
     cellVolumesPtr_(NULL),
     cellCentresPtr_(NULL)

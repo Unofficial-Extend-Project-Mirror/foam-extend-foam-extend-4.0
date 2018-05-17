@@ -170,18 +170,6 @@ public:
             //- Update the coefficients associated with the patch field
             virtual void updateCoeffs();
 
-            //- Return patch-normal gradient: set to zero
-            virtual tmp<scalarField> snGrad() const;
-
-            //- Return the matrix diagonal coefficients corresponding to the
-            //  evaluation of the gradient of this patchField
-            //  Removed gradient contribution
-            virtual tmp<scalarField> gradientInternalCoeffs() const;
-
-            //- Return the matrix source coefficients corresponding to the
-            //  evaluation of the gradient of this patchField
-            virtual tmp<scalarField> gradientBoundaryCoeffs() const;
-
 
         //- Write
         virtual void write(Ostream&) const;

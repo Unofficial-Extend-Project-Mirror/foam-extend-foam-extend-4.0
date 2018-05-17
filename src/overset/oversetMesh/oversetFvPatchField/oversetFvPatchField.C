@@ -666,7 +666,7 @@ void oversetFvPatchField<Type>::correctFringeConservation
                     fringeConservationError -= lfc*psiOwn;
 
                     // Only owner processor patch contributes to sum off diag
-                    if (procPatch.owner())
+                    if (procPatch.master())
                     {
                         fringeSumOffDiag -= lfc;
                     }
@@ -678,7 +678,7 @@ void oversetFvPatchField<Type>::correctFringeConservation
                     fringeConservationError += lfc*psiOwn;
 
                     // Only owner processor patch contributes to sum off diag
-                    if (procPatch.owner())
+                    if (procPatch.master())
                     {
                         fringeSumOffDiag -= lfc;
                     }

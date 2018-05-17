@@ -48,8 +48,19 @@ namespace Foam
 }
 
 
-const Foam::scalar Foam::layerAdditionRemoval::addDelta_ = 0.3;
-const Foam::scalar Foam::layerAdditionRemoval::removeDelta_ = 0.1;
+const Foam::debug::tolerancesSwitch
+Foam::layerAdditionRemoval::motionDelta_
+(
+    "layerAdditionRemoval::motionDelta",
+    0.01
+);
+
+const Foam::debug::tolerancesSwitch
+Foam::layerAdditionRemoval::addDelta_
+(
+    "layerAdditionRemoval::addDelta",
+    0.3
+);
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -354,7 +365,12 @@ bool Foam::layerAdditionRemoval::changeTopology() const
 
         topologicalChange = false;
     }
-    else if (avgDelta < oldLayerThickness_)
+    // New criterion to avoid round-off triggering layer addition/removal
+    // HJ, 30/Mar/2018
+    else if
+    (
+        (oldLayerThickness_ - avgDelta) > motionDelta_()*minLayerThickness_
+    )
     {
         // Layers moving towards removal
         if (minDelta < minLayerThickness_)
@@ -397,7 +413,12 @@ bool Foam::layerAdditionRemoval::changeTopology() const
             oldLayerThickness_ = avgDelta;
         }
     }
-    else
+    // New criterion to avoid round-off triggering layer addition/removal
+    // HJ, 30/Mar/2018
+    else if
+    (
+        (avgDelta - oldLayerThickness_) > motionDelta_()*minLayerThickness_
+    )
     {
         // Layers moving towards addition
         if (maxDelta > maxLayerThickness_)
@@ -422,6 +443,8 @@ bool Foam::layerAdditionRemoval::changeTopology() const
             oldLayerThickness_ = avgDelta;
         }
     }
+    // else the motion change is smaller than the tolerance and the layer
+    // interface is practically static.  HJ, 30/Mar/2018
 
     return topologicalChange;
 }

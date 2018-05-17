@@ -50,7 +50,7 @@ void Foam::processorTetPolyPatch::calcMeshPoints() const
 
     labelList mp(0);
 
-    if (isMaster())
+    if (master())
     {
         mp = procPolyPatch_.meshPoints();
     }

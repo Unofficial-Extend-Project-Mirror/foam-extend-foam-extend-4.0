@@ -64,6 +64,12 @@ class constantThermal
         //- Thermal conductivity
         dimensionedScalar k_;
 
+        //- Thermal expansion coefficient
+        dimensionedScalar alpha_;
+
+        //- Reference temperature
+        dimensionedScalar T0_;
+
 
     // Private Member Functions
 
@@ -108,6 +114,12 @@ public:
 
         //- Return thermal conductivity
         virtual tmp<volScalarField> k() const;
+
+        //- Return thermal expansion coefficient
+        virtual tmp<volScalarField> alpha() const;
+
+        //- Return reference temperature
+        virtual tmp<volScalarField> T0() const;
 
         virtual void correct()
         {}

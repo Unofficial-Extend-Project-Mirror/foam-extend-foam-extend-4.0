@@ -152,10 +152,6 @@ Foam::scalar Foam::lduMatrix::solver::normFactor
     const direction cmpt
 ) const
 {
-    // Calculate A dot reference value of x
-//     matrix_.sumA(tmpField, coupleBouCoeffs_, interfaces_);
-//     tmpField *= gAverage(x);
-
     // Calculate normalisation factor using full multiplication
     // with mean value.  HJ, 5/Nov/2007
     scalarField xRef(x.size(), gAverage(x));

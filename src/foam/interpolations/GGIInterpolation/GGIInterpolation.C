@@ -436,7 +436,7 @@ slaveToMasterPointInterpolate
     {
         FatalErrorIn
         (
-            "ExtendedGGIInterpolation::slaveToMasterPointInterpolate"
+            "GGIInterpolation::slaveToMasterPointInterpolate"
             "(const Field<Type> pf)"
         )   << "given field does not correspond to patch. Patch size: "
             << this->slavePatch().nPoints() << " field size: " << pf.size()
@@ -487,7 +487,7 @@ slaveToMasterPointInterpolate
         {
             FatalErrorIn
             (
-                "ExtendedGGIInterpolation::masterToSlavePointInterpolate"
+                "GGIInterpolation::masterToSlavePointInterpolate"
                 "(const Field<Type> pf)"
             )   << "Master point addressing is not correct"
                 << abort(FatalError);
@@ -510,7 +510,7 @@ masterToSlavePointInterpolate
     {
         FatalErrorIn
         (
-            "ExtendedGGIInterpolation::masterToSlavePointInterpolate"
+            "GGIInterpolation::masterToSlavePointInterpolate"
             "(const Field<Type> pf)"
         )   << "given field does not correspond to patch. Patch size: "
             << this->masterPatch().nPoints() << " field size: " << pf.size()
@@ -561,7 +561,7 @@ masterToSlavePointInterpolate
         {
             FatalErrorIn
             (
-                "ExtendedGGIInterpolation::masterToSlavePointInterpolate"
+                "GGIInterpolation::masterToSlavePointInterpolate"
                 "(const Field<Type> pf)"
             )   << "Slave point addressing is not correct"
                 << abort(FatalError);

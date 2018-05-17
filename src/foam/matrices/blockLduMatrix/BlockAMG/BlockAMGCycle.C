@@ -99,11 +99,27 @@ void Foam::BlockAMGCycle<Type>::makeCoarseLevels(const label nMaxLevels)
             }
         }
 
-        if (BlockLduMatrix<Type>::debug >= 2)
+        if (blockLduMatrix::debug >= 2)
         {
             Info<< "Created " << nLevels_ << " AMG levels" << endl;
         }
     }
+}
+
+
+template<class Type>
+Foam::BlockLduMatrix<Type>& Foam::BlockAMGCycle<Type>::coarseMatrix()
+{
+    if (!coarseLevelPtr_)
+    {
+        FatalErrorIn
+        (
+            "BlockLduMatrix<Type>& BlockAMGCycle<Type>::coarseMatrix()"
+        )   << "Coarse level not available"
+            << abort(FatalError);
+    }
+
+    return coarseLevelPtr_->matrix();
 }
 
 
@@ -193,7 +209,21 @@ void Foam::BlockAMGCycle<Type>::fixedCycle
     else
     {
         // Call direct solver
-        levelPtr_->solve(x, b, 1e-9, 0);
+        levelPtr_->solve(x, b, 1e-7, 0);
+    }
+}
+
+
+template<class Type>
+void Foam::BlockAMGCycle<Type>::initMatrix()
+{
+    // If present, update coarse levels recursively
+    if (coarseLevelPtr_)
+    {
+        // Update current level
+        levelPtr_->initLevel(coarseLevelPtr_->levelPtr_);
+
+        coarseLevelPtr_->initMatrix();
     }
 }
 

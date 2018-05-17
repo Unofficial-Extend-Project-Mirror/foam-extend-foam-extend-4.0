@@ -108,10 +108,9 @@ public:
         }
 
 
-    // Destructor
-
-        virtual ~pointPatchField()
-        {}
+    //- Destructor
+    virtual ~pointPatchField()
+    {}
 
 
     // Member operators

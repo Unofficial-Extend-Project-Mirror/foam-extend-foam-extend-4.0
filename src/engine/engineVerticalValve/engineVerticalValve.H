@@ -51,7 +51,7 @@ class polyMesh;
 class engineTime;
 
 /*---------------------------------------------------------------------------*\
-                          Class engineVerticalValve Declaration
+                    Class engineVerticalValve Declaration
 \*---------------------------------------------------------------------------*/
 
 class engineVerticalValve
@@ -93,11 +93,7 @@ class engineVerticalValve
         void operator=(const engineVerticalValve&);
 
 
-
 public:
-
-    // Static data members
-
 
     // Constructors
 

@@ -22,7 +22,7 @@ libs
 
 applicationClass    interTrackFoam;
 
-startFrom           latestTime;
+startFrom           startTime;
 
 startTime           0;
 

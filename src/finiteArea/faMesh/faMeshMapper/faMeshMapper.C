@@ -46,7 +46,8 @@ Foam::faMeshMapper::faMeshMapper
     oldPatchEdgeFaces_(mesh.boundary().size()),
     areaMap_(mesh, mpm),
     edgeMap_(mesh, mpm),
-    boundaryMap_(mesh, mpm)
+    boundaryMap_(mesh, mpm),
+    resetPatchFlag_(mesh.boundary().size(), false)  // Disabled
 {
     // Capture old patch information
     const faBoundaryMesh& patches = mesh.boundary();

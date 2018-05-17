@@ -31,22 +31,21 @@ solvers
     Up
     {
         solver          AMG;
-        cycle           V-cycle;
-        coarseningType  AAMG;
+        cycle           W-cycle;
+        coarseningType  SAMG;
         norm            componentNorm;
-        normComponent   0;
+        normComponent   3;
 
+        minGroupSize    4;
+        maxGroupSize    6;
+        
         nPreSweeps      2;
         nPostSweeps     2;
         groupSize       2;
         minCoarseEqns   4;
         nMaxLevels      100;
         scale           on;
-        smoother
-        {
-            smoother        ILUCp;
-            fillInLevel     1;
-        }
+        smoother        ILUC0;
 
         minIter         0;
         maxIter         100;
@@ -89,7 +88,7 @@ fieldBounds
 
 relaxationFactors
 {
-//     U    0.95;
+     U    0.95;
 }
 
 

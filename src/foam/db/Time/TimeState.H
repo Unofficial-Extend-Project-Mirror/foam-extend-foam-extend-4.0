@@ -61,6 +61,7 @@ protected:
         bool deltaTchanged_;
 
         label outputTimeIndex_;
+
         //- Is outputTime because of primary?
         bool primaryOutputTime_;
 
@@ -88,10 +89,10 @@ public:
             virtual scalar timeToUserTime(const scalar t) const;
 
             //- Return current time value
-            scalar timeOutputValue() const;
+            virtual scalar timeOutputValue() const;
 
             //- Return current time index
-            label timeIndex() const;
+            virtual label timeIndex() const;
 
             //- Return time step value
             inline scalar deltaTValue() const
@@ -106,16 +107,16 @@ public:
             }
 
             //- Return time step
-            dimensionedScalar deltaT() const;
+            virtual dimensionedScalar deltaT() const;
 
             //- Return old time step
-            dimensionedScalar deltaT0() const;
+            virtual dimensionedScalar deltaT0() const;
 
 
         // Check
 
-            //- Return true if this is an output time (primary or secondary)
-            bool outputTime() const;
+            //- Return true if this is an output time
+            virtual bool outputTime() const;
 };
 
 

@@ -55,10 +55,6 @@ class basicSymmetryFaPatchField
 
 public:
 
-    //- Runtime type information
-    TypeName(symmetryFaPatch::typeName_());
-
-
     // Constructors
 
         //- Construct from patch and internal field

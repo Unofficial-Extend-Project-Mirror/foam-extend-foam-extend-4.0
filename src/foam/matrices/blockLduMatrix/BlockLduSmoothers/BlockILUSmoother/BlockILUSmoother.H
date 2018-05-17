@@ -95,10 +95,9 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~BlockILUSmoother()
-        {}
+    //- Destructor
+    virtual ~BlockILUSmoother()
+    {}
 
 
     // Member Functions
@@ -122,11 +121,23 @@ public:
                     residual_[i] = b[i] - residual_[i];
                 }
 
+                // Note.
+                // For the ILU smoother it is not necessary to initialise
+                // xCorr to zero, because it gets over-written by the product
+                // but for more complex smoothers it is
+                // HJ, 15/Jun/2017
+                // xCorr_ = pTraits<Type>::zero;
                 precon_.precondition(xCorr_, residual_);
 
                 // Add correction to x
                 x += xCorr_;
             }
+        }
+
+        //- Re-initialise preconditioner after matrix coefficient update
+        virtual void initMatrix()
+        {
+            precon_.initMatrix();
         }
 };
 

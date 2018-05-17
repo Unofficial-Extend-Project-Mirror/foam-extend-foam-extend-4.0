@@ -79,7 +79,7 @@ Foam::scalar Foam::BlockIterativeSolver<Type>::normFactor
 
     scalar normFactor = gSum(mag(wA - pA) + mag(b - pA)) + this->small_;
 
-    if (BlockLduMatrix<Type>::debug >= 2)
+    if (blockLduMatrix::debug >= 2)
     {
         Info<< "Iterative solver normalisation factor = "
             << normFactor << endl;

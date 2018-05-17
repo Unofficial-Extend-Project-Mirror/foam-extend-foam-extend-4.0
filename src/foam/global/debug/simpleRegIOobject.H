@@ -29,6 +29,7 @@ Description
     registration.
 
 SourceFiles
+    nullSurfaceWriter.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -50,7 +51,12 @@ class Ostream;
 
 class simpleRegIOobject
 {
+
 public:
+
+    //- Runtime type information
+    TypeName("null");
+
 
     // Constructors
 

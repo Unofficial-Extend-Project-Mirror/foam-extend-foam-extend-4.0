@@ -30,11 +30,13 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "regionCoupleFvPatch.H"
-#include "addToRunTimeSelectionTable.H"
+#include "foamTime.H"
 #include "fvMesh.H"
 #include "fvBoundaryMesh.H"
-#include "foamTime.H"
 #include "mapDistribute.H"
+#include "fvPatchFields.H"
+#include "fvsPatchFields.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -54,7 +56,7 @@ Foam::regionCoupleFvPatch::~regionCoupleFvPatch()
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 // Make patch weighting factors
-void Foam::regionCoupleFvPatch::makeWeights(scalarField& w) const
+void Foam::regionCoupleFvPatch::makeWeights(fvsPatchScalarField& w) const
 {
     if (rcPolyPatch_.coupled())
     {
@@ -76,13 +78,18 @@ void Foam::regionCoupleFvPatch::makeWeights(scalarField& w) const
             {
                 // Set overlap weights to 0.5 and use mirrored neighbour field
                 // for interpolation.  HJ, 21/Jan/2009
-                bridge(scalarField(size(), 0.5), w);
+                setUncoveredFaces(scalarField(size(), 0.5), w);
             }
         }
         else
         {
             // Pick up weights from the master side
-            scalarField masterWeights(shadow().size());
+            fvsPatchScalarField masterWeights
+            (
+                shadow(),
+                w.dimensionedInternalField()
+            );
+
             shadow().makeWeights(masterWeights);
 
             scalarField oneMinusW = 1 - masterWeights;
@@ -93,7 +100,7 @@ void Foam::regionCoupleFvPatch::makeWeights(scalarField& w) const
             {
                 // Set overlap weights to 0.5 and use mirrored neighbour field
                 // for interpolation.  HJ, 21/Jan/2009
-                bridge(scalarField(size(), 0.5), w);
+                setUncoveredFaces(scalarField(size(), 0.5), w);
             }
         }
     }
@@ -105,7 +112,7 @@ void Foam::regionCoupleFvPatch::makeWeights(scalarField& w) const
 
 
 // Make patch face - neighbour cell distances
-void Foam::regionCoupleFvPatch::makeDeltaCoeffs(scalarField& dc) const
+void Foam::regionCoupleFvPatch::makeDeltaCoeffs(fvsPatchScalarField& dc) const
 {
     if (rcPolyPatch_.coupled())
     {
@@ -120,20 +127,26 @@ void Foam::regionCoupleFvPatch::makeDeltaCoeffs(scalarField& dc) const
             {
                 scalarField bridgeDeltas = nf() & fvPatch::delta();
 
-                bridge(bridgeDeltas, dc);
+                setUncoveredFaces(bridgeDeltas, dc);
             }
         }
         else
         {
-            scalarField masterDeltas(shadow().size());
+            fvsPatchScalarField masterDeltas
+            (
+                shadow(),
+                dc.dimensionedInternalField()
+            );
+
             shadow().makeDeltaCoeffs(masterDeltas);
+
             dc = interpolate(masterDeltas);
 
             if (bridgeOverlap())
             {
                 scalarField bridgeDeltas = nf() & fvPatch::delta();
 
-                bridge(bridgeDeltas, dc);
+                setUncoveredFaces(bridgeDeltas, dc);
             }
         }
     }
@@ -145,7 +158,7 @@ void Foam::regionCoupleFvPatch::makeDeltaCoeffs(scalarField& dc) const
 
 
 // Make patch face non-orthogonality correction vectors
-void Foam::regionCoupleFvPatch::makeCorrVecs(vectorField& cv) const
+void Foam::regionCoupleFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
 {
     if (rcPolyPatch_.coupled())
     {
@@ -184,7 +197,7 @@ Foam::tmp<Foam::vectorField> Foam::regionCoupleFvPatch::delta() const
             {
                 vectorField bridgeDeltas = Cf() - Cn();
 
-                bridge(bridgeDeltas, tDelta());
+                setUncoveredFaces(bridgeDeltas, tDelta());
             }
 
             return tDelta;
@@ -200,7 +213,7 @@ Foam::tmp<Foam::vectorField> Foam::regionCoupleFvPatch::delta() const
             {
                 vectorField bridgeDeltas = Cf() - Cn();
 
-                bridge(bridgeDeltas, tDelta());
+                setUncoveredFaces(bridgeDeltas, tDelta());
             }
 
             return tDelta;
@@ -284,7 +297,7 @@ const Foam::labelList& Foam::regionCoupleFvPatch::zoneAddressing() const
 }
 
 
-const Foam::labelListList& Foam::regionCoupleFvPatch::addressing() const
+const Foam::labelListList& Foam::regionCoupleFvPatch::ggiAddressing() const
 {
     if (rcPolyPatch_.master())
     {
@@ -309,7 +322,7 @@ const Foam::mapDistribute& Foam::regionCoupleFvPatch::map() const
 }
 
 
-const Foam::scalarListList& Foam::regionCoupleFvPatch::weights() const
+const Foam::scalarListList& Foam::regionCoupleFvPatch::ggiWeights() const
 {
     if (rcPolyPatch_.master())
     {
@@ -328,6 +341,16 @@ void Foam::regionCoupleFvPatch::expandAddrToZone(labelField& lf) const
     notImplemented
     (
         "void regionCoupleFvPatch::expandAddrToZone(labelField& lf) const"
+    );
+}
+
+
+void Foam::regionCoupleFvPatch::expandCrMatrixToZone(crMatrix&) const
+{
+    // Missing code.  Activate for SAMG solvers across regionCoupleFvPatch
+    notImplemented
+    (
+        "void regionCoupleFvPatch::expandCrMatrixToZone(crMatrix&) const"
     );
 }
 

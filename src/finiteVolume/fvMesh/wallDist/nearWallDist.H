@@ -81,16 +81,10 @@ public:
 
 
     // Destructor
-
-        virtual ~nearWallDist();
+    virtual ~nearWallDist();
 
 
     // Member Functions
-
-        const volScalarField::GeometricBoundaryField& y() const
-        {
-            return *this;
-        }
 
         //- Correct for mesh geom/topo changes
         virtual void correct();

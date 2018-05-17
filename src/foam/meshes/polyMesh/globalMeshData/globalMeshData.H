@@ -241,12 +241,8 @@ public:
         globalMeshData(const IOobject& io, const polyMesh& mesh);
 
 
-    // Destructor
-
-        ~globalMeshData();
-
-        //- Remove all demand driven data
-        void clearOut();
+    //- Destructor
+    ~globalMeshData();
 
 
     // Member Functions
@@ -360,7 +356,6 @@ public:
             pointField geometricSharedPoints() const;
 
 
-
         // Globally shared edge addressing
 
             //- Return number of globally shared edges. Demand-driven
@@ -392,6 +387,9 @@ public:
             //  full parallel analysis to determine shared points and
             //  boundaries.
             void updateMesh();
+
+        //- Remove all demand driven data
+        void clearOut();
 
 
         // Write

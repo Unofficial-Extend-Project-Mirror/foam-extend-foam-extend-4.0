@@ -33,9 +33,6 @@ Description
 Author
     Klas Jareteg, 2013-01-30
 
-SourceFiles
-    BlockCoeffTwoNorm.C
-
 \*---------------------------------------------------------------------------*/
 
 #ifndef tensorBlockCoeffTwoNorm_H
@@ -52,11 +49,6 @@ SourceFiles
 namespace Foam
 {
 
-
-/*---------------------------------------------------------------------------*\
-                        Class BlockCoeffTwoNorm Declaration
-\*---------------------------------------------------------------------------*/
-
 template<>
 inline scalar BlockCoeffTwoNorm<tensor>::normalize
 (
@@ -65,11 +57,13 @@ inline scalar BlockCoeffTwoNorm<tensor>::normalize
 {
     if (a.activeType() == BlockCoeff<tensor>::SCALAR)
     {
-        return mag(a.asScalar());
+        // Note: for two-norm, use mag
+        return sign(a.component(cmpt_))*mag(a.asScalar());
     }
     else if (a.activeType() == BlockCoeff<tensor>::LINEAR)
     {
-        return mag(a.asLinear());
+        // Note: for two-norm, use mag
+        return sign(a.component(cmpt_))*mag(a.asLinear());
     }
     else
     {
@@ -84,19 +78,23 @@ inline scalar BlockCoeffTwoNorm<tensor>::normalize
 
 
 template<>
-inline void BlockCoeffTwoNorm<tensor>::coeffMag
+inline void BlockCoeffTwoNorm<tensor>::normalize
 (
-    const CoeffField<tensor>& a,
-    Field<scalar>& b
+    Field<scalar>& b,
+    const CoeffField<tensor>& a
 )
 {
     if (a.activeType() == BlockCoeff<tensor>::SCALAR)
     {
-        b = mag(a.asScalar());
+        // Note: for two-norm, use mag
+        // However, the norm is signed
+        // b = mag(a.asScalar());
+        b = a.asScalar();
     }
     else if (a.activeType() == BlockCoeff<tensor>::LINEAR)
     {
-        b = mag(a.asLinear());
+        // Note: for two-norm, use mag
+        b = sign(a.component(cmpt_))*mag(a.asLinear());
     }
     else
     {
@@ -111,9 +109,6 @@ inline void BlockCoeffTwoNorm<tensor>::coeffMag
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

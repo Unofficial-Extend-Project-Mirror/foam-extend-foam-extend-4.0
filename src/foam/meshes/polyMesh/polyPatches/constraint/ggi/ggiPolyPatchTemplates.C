@@ -34,7 +34,7 @@ Author
 template<class Type>
 Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
 (
-    const Field<Type>& ff
+    const UList<Type>& ff
 ) const
 {
     // Check and expand the field from patch size to zone size
@@ -201,9 +201,9 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::interpolate
 
 
 template<class Type>
-void Foam::ggiPolyPatch::bridge
+void Foam::ggiPolyPatch::setUncoveredFaces
 (
-    const Field<Type>& bridgeField,
+    const Field<Type>& fieldToSet,
     Field<Type>& ff
 ) const
 {
@@ -212,12 +212,12 @@ void Foam::ggiPolyPatch::bridge
     {
         FatalErrorIn
         (
-            "template<class Type> void ggiPolyPatch::bridge\n"
+            "template<class Type> void ggiPolyPatch::setUncoveredFaces\n"
             "(\n"
-            "    const Field<Type>& ff,\n"
+            "    const Field<Type>& fieldToSet,\n"
             "    Field<Type>& ff\n"
             ") const"
-        )   << "Incorrect patch field size for bridge.  Field size: "
+        )   << "Incorrect patch field size for setting.  Field size: "
             << ff.size() << " patch size: " << size()
             << abort(FatalError);
     }
@@ -234,11 +234,11 @@ void Foam::ggiPolyPatch::bridge
         {
             if (master())
             {
-                patchToPatch().bridgeMaster(bridgeField, ff);
+                patchToPatch().setUncoveredFacesMaster(fieldToSet, ff);
             }
             else
             {
-                patchToPatch().bridgeSlave(bridgeField, ff);
+                patchToPatch().setUncoveredFacesSlave(fieldToSet, ff);
             }
         }
         else
@@ -246,18 +246,18 @@ void Foam::ggiPolyPatch::bridge
             // Note: since bridging is only a local operation
             if (master())
             {
-                patchToPatch().maskedBridgeMaster
+                patchToPatch().maskedSetUncoveredFacesMaster
                 (
-                    bridgeField,
+                    fieldToSet,
                     ff,
                     zoneAddressing()
                 );
             }
             else
             {
-                patchToPatch().maskedBridgeSlave
+                patchToPatch().maskedSetUncoveredFacesSlave
                 (
-                    bridgeField,
+                    fieldToSet,
                     ff,
                     zoneAddressing()
                 );
@@ -268,9 +268,9 @@ void Foam::ggiPolyPatch::bridge
 
 
 template<class Type>
-void Foam::ggiPolyPatch::scaleForPartialCoverage
+void Foam::ggiPolyPatch::setPartialFaces
 (
-    const Field<Type>& uncoveredFaceField,
+    const Field<Type>& fieldToSet,
     Field<Type>& ff
 ) const
 {
@@ -279,14 +279,13 @@ void Foam::ggiPolyPatch::scaleForPartialCoverage
     {
         FatalErrorIn
         (
-            "template<class Type> ggiPolyPatch::scaleForPartialCoverage\n"
+            "template<class Type> void ggiPolyPatch::setPartialFaces\n"
             "(\n"
-            "    const Field<Type>& uncoveredFaceField,\n"
-            "    Field<Type>& ff,\n"
+            "    const Field<Type>& fieldToSet,\n"
+            "    Field<Type>& ff\n"
             ") const"
-        )   << "Incorrect patch field size for scaling.  Field size: "
-            << ff.size() << " uncovered field size: "
-            << uncoveredFaceField.size() << " patch size: " << size()
+        )   << "Incorrect patch field size for setting.  Field size: "
+            << ff.size() << " patch size: " << size()
             << abort(FatalError);
     }
 
@@ -302,11 +301,11 @@ void Foam::ggiPolyPatch::scaleForPartialCoverage
         {
             if (master())
             {
-                patchToPatch().scaleMaster(uncoveredFaceField, ff);
+                patchToPatch().setPartialFacesMaster(fieldToSet, ff);
             }
             else
             {
-                patchToPatch().scaleSlave(uncoveredFaceField, ff);
+                patchToPatch().setPartialFacesSlave(fieldToSet, ff);
             }
         }
         else
@@ -314,18 +313,146 @@ void Foam::ggiPolyPatch::scaleForPartialCoverage
             // Note: since bridging is only a local operation
             if (master())
             {
-                patchToPatch().maskedScaleMaster
+                patchToPatch().maskedSetPartialFacesMaster
                 (
-                    uncoveredFaceField,
+                    fieldToSet,
                     ff,
                     zoneAddressing()
                 );
             }
             else
             {
-                patchToPatch().maskedScaleSlave
+                patchToPatch().maskedSetPartialFacesSlave
                 (
-                    uncoveredFaceField,
+                    fieldToSet,
+                    ff,
+                    zoneAddressing()
+                );
+            }
+        }
+    }
+}
+
+
+template<class Type>
+void Foam::ggiPolyPatch::scalePartialFaces(Field<Type>& ff) const
+{
+    // Check and expand the field from patch size to zone size
+    if (ff.size() != size())
+    {
+        FatalErrorIn
+        (
+            "template<class Type> ggiPolyPatch::scalePartialFaces\n"
+            "(\n"
+            "    Field<Type>& ff,\n"
+            ") const"
+        )   << "Incorrect patch field size for scaling.  Field size: "
+            << ff.size() << " patch size: " << size()
+            << abort(FatalError);
+    }
+
+    if (bridgeOverlap())
+    {
+        if (empty())
+        {
+            // Patch empty, no bridging
+            return;
+        }
+
+        if (localParallel())
+        {
+            if (master())
+            {
+                patchToPatch().scalePartialMaster(ff);
+            }
+            else
+            {
+                patchToPatch().scalePartialSlave(ff);
+            }
+        }
+        else
+        {
+            // Note: since bridging is only a local operation
+            if (master())
+            {
+                patchToPatch().maskedScalePartialMaster
+                (
+                    ff,
+                    zoneAddressing()
+                );
+            }
+            else
+            {
+                patchToPatch().maskedScalePartialSlave
+                (
+                    ff,
+                    zoneAddressing()
+                );
+            }
+        }
+    }
+}
+
+
+template<class Type>
+void Foam::ggiPolyPatch::addToPartialFaces
+(
+    const Field<Type>& fieldToAdd,
+    Field<Type>& ff
+) const
+{
+    // Check and expand the field from patch size to zone size
+    if (ff.size() != size())
+    {
+        FatalErrorIn
+        (
+            "template<class Type> ggiPolyPatch::addToPartialFaces\n"
+            "(\n"
+            "    const Field<Type>& fieldToAdd,\n"
+            "    Field<Type>& ff,\n"
+            ") const"
+        )   << "Incorrect patch field size for adding.  Field size: "
+            << ff.size() << " field to add size: "
+            << fieldToAdd.size() << " patch size: " << size()
+            << abort(FatalError);
+    }
+
+    if (bridgeOverlap())
+    {
+        if (empty())
+        {
+            // Patch empty, no bridging
+            return;
+        }
+
+        if (localParallel())
+        {
+            if (master())
+            {
+                patchToPatch().addToPartialFacesMaster(fieldToAdd, ff);
+            }
+            else
+            {
+                patchToPatch().addToPartialFacesSlave(fieldToAdd, ff);
+            }
+        }
+        else
+        {
+            // Note: since bridging is only a local operation
+            if (master())
+            {
+                patchToPatch().maskedAddToPartialFacesMaster
+                (
+                    fieldToAdd,
+                    ff,
+                    zoneAddressing()
+                );
+            }
+            else
+            {
+                patchToPatch().maskedAddToPartialFacesSlave
+                (
+                    fieldToAdd,
                     ff,
                     zoneAddressing()
                 );

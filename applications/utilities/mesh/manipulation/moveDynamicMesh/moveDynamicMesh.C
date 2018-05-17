@@ -82,7 +82,11 @@ int main(int argc, char *argv[])
                 )
             );
 
-            magMeshCo.write();
+            if (runTime.outputTime())
+            {
+                Info<< "Writing mesh motion Co number" << endl;
+                magMeshCo.write();
+            }
         }
 
         runTime.write();

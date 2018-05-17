@@ -76,6 +76,7 @@ class thermalModel
         //- Thermal Source
         PtrList<thermalSource> sourcePtr_;
 
+
     // Private Member Functions
 
         //- Disallow copy construct
@@ -126,6 +127,18 @@ public:
         tmp<volScalarField> k() const
         {
             return lawPtr_->k();
+        }
+
+        //- Return thermal expansion coefficient
+        tmp<volScalarField> alpha() const
+        {
+            return lawPtr_->alpha();
+        }
+
+        //- Return reference temperature
+        tmp<volScalarField> T0() const
+        {
+            return lawPtr_->T0();
         }
 
         //- Add resistance for gaps

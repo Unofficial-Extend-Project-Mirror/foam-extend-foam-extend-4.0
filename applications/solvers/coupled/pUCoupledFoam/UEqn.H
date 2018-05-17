@@ -1,10 +1,4 @@
 {
-    volScalarField divPhi
-    (
-        "divPhi",
-        fvc::div(phi)
-    );
-
     // Momentum equation
     fvVectorMatrix UEqn
     (

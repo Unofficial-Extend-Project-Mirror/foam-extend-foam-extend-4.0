@@ -68,10 +68,10 @@ inline scalar BlockCoeffMaxNorm<scalar>::normalize
 
 
 template<>
-inline void BlockCoeffMaxNorm<scalar>::coeffMag
+inline void BlockCoeffMaxNorm<scalar>::normalize
 (
-    const CoeffField<scalar>& a,
-    Field<scalar>& b
+    Field<scalar>& b,
+    const CoeffField<scalar>& a
 )
 {
     b = mag(a.asScalar());

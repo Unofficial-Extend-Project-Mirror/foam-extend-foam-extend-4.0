@@ -10,7 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      kinematicCloud1Properties;
+    object      kinematicCloudProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -26,7 +26,8 @@ PostProcessingModel                      PatchPostProcessing;
 // Parcel basis type
 parcelBasisType                          mass;
 
-constantProperties{
+constantProperties
+{
     rhoMin          rhoMin [ 1 -3 0 0 0 ] 1e-15;
 
     // Minimum particle mass

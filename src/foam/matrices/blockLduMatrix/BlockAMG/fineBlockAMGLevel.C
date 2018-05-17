@@ -82,10 +82,22 @@ Foam::fineBlockAMGLevel<Type>::fineBlockAMGLevel
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
+Foam::BlockLduMatrix<Type>& Foam::fineBlockAMGLevel<Type>::matrix()
+{
+    FatalErrorIn("Field<Type>& Foam::fineBlockAMGLevel<Type>::matrix()")
+        << "Access to matrix is not available on fine level."
+        << abort(FatalError);
+
+    // Dummy return
+    return const_cast<BlockLduMatrix<Type>&>(matrix_);
+}
+
+
+template<class Type>
 Foam::Field<Type>& Foam::fineBlockAMGLevel<Type>::x()
 {
     FatalErrorIn("Field<Type>& Foam::fineBlockAMGLevel<Type>::x()")
-        << "x is not available."
+        << "x is not available on fine level."
         << abort(FatalError);
 
     // Dummy return
@@ -97,7 +109,7 @@ template<class Type>
 Foam::Field<Type>& Foam::fineBlockAMGLevel<Type>::b()
 {
     FatalErrorIn("Field<Type>& Foam::fineBlockAMGLevel<Type>::b()")
-        << "b is not available."
+        << "b is not available on fine level."
         << abort(FatalError);
 
     // Dummy return
@@ -113,11 +125,7 @@ void Foam::fineBlockAMGLevel<Type>::residual
     Field<Type>& res
 ) const
 {
-    matrix_.Amul
-    (
-        res,
-        x
-    );
+    matrix_.Amul(res, x);
 
     // residual = b - Ax
     forAll (b, i)
@@ -279,6 +287,25 @@ Foam::fineBlockAMGLevel<Type>::makeNextLevel() const
     {
         // Final level: cannot coarsen
         return autoPtr<Foam::BlockAMGLevel<Type> >();
+    }
+}
+
+
+template<class Type>
+void Foam::fineBlockAMGLevel<Type>::initLevel
+(
+    autoPtr<Foam::BlockAMGLevel<Type> >& coarseLevelPtr
+)
+{
+    // Fine matrix has been updated externally
+
+    // Update smoother for new matrix
+    smootherPtr_->initMatrix();
+
+    // Update coarse matrix if it exists
+    if (coarseLevelPtr.valid())
+    {
+        coarseningPtr_->updateMatrix(coarseLevelPtr->matrix());
     }
 }
 

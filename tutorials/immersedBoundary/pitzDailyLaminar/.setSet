@@ -1,0 +1,11 @@
+cellSet badCell new labelToCell ( 7265 )
+quit
+cellSet strangeCells new labelToCell ( 1445 1446 7015 13695 13696 )
+quit
+cellSet question new labelToCell ( 1438  1953  2211 )
+quit
+cellSet new irregular labelToCell (7250 7251 7252 7253 7254 7264 7265 )
+cellSet irregular new labelToCell (7250 7251 7252 7253 7254 7264 7265 )
+quit
+cellSet baaad new labelToCell ( 13938 13937 13695 13446 13204 13203 12962 12961 12485 12484 12243 12242 7015 2993 2992 2735 2734 2212 2211 1954 1953 1696 1445 1188 1187)
+quit

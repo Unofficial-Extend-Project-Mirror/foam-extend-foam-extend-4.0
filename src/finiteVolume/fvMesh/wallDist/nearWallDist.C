@@ -33,69 +33,19 @@ License
 
 void Foam::nearWallDist::doAll()
 {
-    // Correct all cells with face on wall
-    const volVectorField& cellCentres = mesh_.C();
+    const fvPatchList& patches = mesh_.boundary();
 
-    // HR 12.02.18: Use hashSet to determine nbs
-    // This should removes a possible error due to wrong sizing since
-    // getPointNeighbours may still run over AND should be faster
-    // since the linear search (again getPointNeighbours) is removed.
-    labelHashSet nbs(20);
-
-    // Correct all cells with face on wall
-    forAll(mesh_.boundary(), patchI)
+    forAll (patches, patchI)
     {
-        fvPatchScalarField& ypatch = operator[](patchI);
+        fvPatchScalarField& yPatch = operator[](patchI);
 
-        const fvPatch& patch = mesh_.boundary()[patchI];
-
-        if (patch.isWall())
+        if (patches[patchI].isWall())
         {
-            const polyPatch& pPatch = patch.patch();
-            const pointField& points = pPatch.points();
-            const unallocLabelList& faceCells = pPatch.faceCells();
-
-            // Check cells with face on wall
-            forAll(patch, patchFaceI)
-            {
-                const face& f = pPatch.localFaces()[patchFaceI];
-
-                scalar minDist = GREAT;
-
-                // Loop over points
-                forAll(f, fI)
-                {
-                    const labelList& pointNbs = pPatch.pointFaces()[f[fI]];
-
-                    // Loop over faces sharing current point
-                    // This will include the face itself
-                    forAll(pointNbs, pointNbsI)
-                    {
-                        const label nbr = pointNbs[pointNbsI];
-                        if (nbs.insert(nbr))
-                        {
-                            const pointHit curHit = pPatch[nbr].nearestPoint
-                            (
-                                cellCentres[faceCells[nbr]],
-                                points
-                            );
-
-                            if (curHit.distance() < minDist)
-                            {
-                                minDist = curHit.distance();
-                            }
-                        }
-                    }
-                }
-
-                ypatch[patchFaceI] = minDist;
-
-                nbs.clear();
-            }
+            yPatch = 1/patches[patchI].deltaCoeffs();
         }
         else
         {
-            ypatch = 0.0;
+            yPatch = 0.0;
         }
     }
 }

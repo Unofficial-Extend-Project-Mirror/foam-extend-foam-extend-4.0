@@ -363,15 +363,9 @@ public:
         // Interpolation data
 
             //- Is this the master side?
-            bool master() const
+            virtual bool master() const
             {
                 return master_;
-            }
-
-            //- Is this the slave side?
-            bool slave() const
-            {
-                return !master();
             }
 
             //- Use bridging to fix overlap error in interpolation
@@ -409,11 +403,11 @@ public:
             template<class Type>
             tmp<Field<Type> > interpolate(const tmp<Field<Type> >& tpf) const;
 
-            //- Bridge interpolated face field for uncovered faces
+            //- Set given field for fully uncovered faces
             template<class Type>
-            void bridge
+            void setUncoveredFaces
             (
-                const Field<Type>& bridgeField,
+                const Field<Type>& fieldToSet,
                 Field<Type>& ff
             ) const;
 

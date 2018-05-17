@@ -98,6 +98,15 @@ gaussConvectionScheme<Type>::fvmDiv
         fvm.boundaryCoeffs()[patchI] = -patchFlux*psf.valueBoundaryCoeffs(pw);
     }
 
+    // Manipulate internal and boundary coeffs for convection. Needed for very
+    // special treatment and is currently used only for ensuring implicit
+    // conservation across GGI interface that has partially covered faces. Does
+    // nothing for other fvPatchFields. VV, 8/Mar/2018.
+    forAll(fvm.psi().boundaryField(), patchI)
+    {
+        fvm.psi().boundaryField()[patchI].manipulateValueCoeffs(fvm);
+    }
+
     if (tinterpScheme_().corrected())
     {
         fvm += fvc::surfaceIntegrate(faceFlux*tinterpScheme_().correction(vf));

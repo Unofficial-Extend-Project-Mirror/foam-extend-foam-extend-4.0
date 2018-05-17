@@ -19,12 +19,11 @@ solvers
 {
     p
     {
-        solver          PCG;
-        preconditioner  DIC;
+        solver          CG;
+        preconditioner  Cholesky;
         tolerance       1e-06;
         relTol          0;
     }
-
     U
     {
         solver          BiCGStab;
@@ -36,9 +35,9 @@ solvers
 
 PIMPLE
 {
-    nOuterCorrectors            10;
+    nOuterCorrectors            4;
     nCorrectors                 2;
-    nNonOrthogonalCorrectors    1;
+    nNonOrthogonalCorrectors    0;
     pRefPoint (0.5 1.5 0);
     pRefValue 0;
 }

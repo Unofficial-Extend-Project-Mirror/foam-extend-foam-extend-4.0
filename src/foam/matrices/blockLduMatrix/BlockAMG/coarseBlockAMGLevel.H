@@ -49,7 +49,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class coarseBlockAMGLevel Declaration
+                    Class coarseBlockAMGLevel Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -125,6 +125,9 @@ public:
             return dict_;
         }
 
+        //- Return reference to matrix
+        virtual BlockLduMatrix<Type>& matrix();
+
         //- Return reference to x
         virtual Field<Type>& x();
 
@@ -184,6 +187,13 @@ public:
 
         //- Create next level from current level
         virtual autoPtr<BlockAMGLevel<Type> > makeNextLevel() const;
+
+        //- Re-initialise AMG level after matrix coefficient update
+        //  and update matrix coefficients on coarse level using same coarsening
+        virtual void initLevel
+        (
+            autoPtr<Foam::BlockAMGLevel<Type> >& coarseLevelPtr
+        );
 };
 
 

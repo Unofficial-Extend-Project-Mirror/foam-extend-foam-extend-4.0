@@ -64,7 +64,10 @@ namespace Foam
 class globalMeshData;
 class mapPolyMesh;
 
-/*---------------------------------------------------------------------------*\
+class polyMesh;
+Ostream& operator<<(Ostream&, const polyMesh&);
+
+/*---------------------------------------------------------------------------* \
                           Class polyMesh Declaration
 \*---------------------------------------------------------------------------*/
 
@@ -73,7 +76,6 @@ class polyMesh
     public objectRegistry,
     public primitiveMesh
 {
-
 public:
 
     // Public data types
@@ -241,6 +243,14 @@ public:
 
         //- Construct from IOobject
         explicit polyMesh(const IOobject& io);
+
+        //- Construct from Istream
+        polyMesh
+        (
+            const IOobject& io,
+            Istream& is,
+            const bool syncPar = true
+        );
 
         //- Construct from components without boundary.
         //  Boundary is added using addPatches() member function
@@ -529,8 +539,8 @@ public:
             void removeZones();
 
             //- Reset mesh primitive data. Assumes all patch info correct
-            //  (so does e.g. parallel communication). If not use
-            //  validBoundary=false
+            //  (so does e.g. parallel communication). If not, use
+            //  validBoundary = false
             //  (still assumes patchStarts[0] = nInternalFaces and last
             //  patch ends at nActiveFaces) and change patches with addPatches.
             void resetPrimitives
@@ -570,6 +580,11 @@ public:
 
             //- Find cell enclosing this location (-1 if not in mesh)
             label findCell(const point&) const;
+
+
+        // IOstream Operators
+
+            friend Ostream& operator<<(Ostream&, const polyMesh&);
 };
 
 

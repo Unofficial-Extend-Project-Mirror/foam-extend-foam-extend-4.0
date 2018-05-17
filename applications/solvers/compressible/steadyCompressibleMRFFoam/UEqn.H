@@ -1,10 +1,6 @@
-    // Solve the momentum equation
-    U.storePrevIter();
-
     fvVectorMatrix UEqn
     (
-        fvm::ddt(rho, U)
-      + fvm::div(phi, U)
+        fvm::div(phi, U)
       + turbulence->divDevRhoReff()
     );
 

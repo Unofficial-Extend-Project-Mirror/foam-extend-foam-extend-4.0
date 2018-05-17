@@ -34,17 +34,17 @@ solvers
             nCellsInCoarsestLevel 10;
             agglomerator     faceAreaPair;
             mergeLevels      1;
-        };
+        }
 
         tolerance        1e-5;
         relTol           0;
         maxIter          100;
-    };
+    }
 
     rho
     {
         solver           diagonal;
-    };
+    }
 
     p
     {
@@ -61,7 +61,7 @@ solvers
         nCellsInCoarsestLevel 10;
         agglomerator     faceAreaPair;
         mergeLevels      1;
-    };
+    }
 
     pFinal
     {
@@ -83,12 +83,12 @@ solvers
             nCellsInCoarsestLevel 10;
             agglomerator     faceAreaPair;
             mergeLevels      1;
-        };
+        }
 
         tolerance        1e-7;
         relTol           0;
         maxIter          20;
-    };
+    }
 
     U
     {
@@ -97,7 +97,7 @@ solvers
         tolerance        1e-6;
         relTol           0;
         nSweeps          1;
-    };
+    }
 
     k
     {
@@ -105,21 +105,21 @@ solvers
         preconditioner   DILU;
         tolerance        1e-08;
         relTol           0;
-    };
+    }
     B
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-08;
         relTol           0;
-    };
+    }
     nuTilda
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-08;
         relTol           0;
-    };
+    }
 }
 
 PISO

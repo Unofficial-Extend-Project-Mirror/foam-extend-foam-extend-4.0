@@ -34,7 +34,16 @@ namespace Foam
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
+template<class Type>
+void immersedBoundaryFvsPatchField<Type>::updateSize()
+{
+    if (this->patch().size() != this->size())
+    {
+        this->setSize(this->patch().size());
+    }
+}
 
+    
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
@@ -57,9 +66,11 @@ immersedBoundaryFvsPatchField<Type>::immersedBoundaryFvsPatchField
     const dictionary& dict
 )
 :
-    fvsPatchField<Type>(p, iF, dict),
+    fvsPatchField<Type>(p, iF),   // Do not read base data
     ibPatch_(refCast<const immersedBoundaryFvPatch>(p))
-{}
+{
+    operator=(pTraits<Type>::zero);
+}
 
 
 template<class Type>
@@ -71,7 +82,7 @@ immersedBoundaryFvsPatchField<Type>::immersedBoundaryFvsPatchField
     const fvPatchFieldMapper& mapper
 )
 :
-    fvsPatchField<Type>(ptf, p, iF, mapper),
+    fvsPatchField<Type>(p, iF),  // Do not map base data
     ibPatch_(refCast<const immersedBoundaryFvPatch>(p))
 {}
 
@@ -99,25 +110,136 @@ immersedBoundaryFvsPatchField<Type>::immersedBoundaryFvsPatchField
 {}
 
 
-// template<class Type>
-// void immersedBoundaryFvsPatchField<Type>::operator=
-// (
-//     const fvPatchField<Type>& ptf
-// )
-// {
-//     const immersedBoundaryFvPatchField<Type>& ibf =
-//         refCast<const immersedBoundaryFvPatchField<Type> > (ptf);
+template<class Type>
+void immersedBoundaryFvsPatchField<Type>::autoMap
+(
+    const fvPatchFieldMapper& m
+)
+{
+    Field<Type>::operator=
+    (
+        Field<Type>(this->patch().size(), pTraits<Type>::zero)
+    );
+}
 
-//     this->check(ptf);
-//     fvsPatchField<Type>::operator=(ptf);
-// }
+
+template<class Type>
+void immersedBoundaryFvsPatchField<Type>::rmap
+(
+    const fvsPatchField<Type>& ptf,
+    const labelList& addr
+)
+{
+    Field<Type>::operator=
+    (
+        Field<Type>(this->patch().size(), pTraits<Type>::zero)
+    );
+}
+
+
+template<class Type>
+void immersedBoundaryFvsPatchField<Type>::evaluate
+(
+    const Pstream::commsTypes
+)
+{
+    this->updateSize();
+    Field<Type>::operator=
+    (
+        Field<Type>(this->patch().size(), pTraits<Type>::zero)
+    );
+}
 
 
 template<class Type>
 void immersedBoundaryFvsPatchField<Type>::write(Ostream& os) const
 {
     fvsPatchField<Type>::write(os);
-    this->writeEntry("value", os);
+    // The value entry needs to be written with zero size
+    Field<Type>::null().writeEntry("value", os);
+    // this->writeEntry("value", os);
+}
+
+
+// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
+
+template<class Type>
+void immersedBoundaryFvsPatchField<Type>::operator=
+(
+    const UList<Type>& ul
+)
+{
+    this->updateSize();
+    Field<Type>::operator=(ul);
+}
+
+
+template<class Type>
+void immersedBoundaryFvsPatchField<Type>::operator=
+(
+    const fvsPatchField<Type>& ptf
+)
+{
+    this->check(ptf);
+    this->updateSize();
+    Field<Type>::operator=(ptf);
+}
+
+
+template<class Type>
+void immersedBoundaryFvsPatchField<Type>::operator=
+(
+    const fvPatchField<Type>& ptf
+)
+{
+    this->check(ptf);
+    this->updateSize();
+    fvsPatchField<Type>::operator=(ptf);
+}
+
+
+template<class Type>
+void immersedBoundaryFvsPatchField<Type>::operator=
+(
+    const Type& t
+)
+{
+    this->updateSize();
+    Field<Type>::operator=(t);
+}
+
+
+// Force an assignment, overriding fixedValue status
+template<class Type>
+void immersedBoundaryFvsPatchField<Type>::operator==
+(
+    const fvsPatchField<Type>& ptf
+)
+{
+    this->updateSize();
+    Field<Type>::operator=(ptf);
+}
+
+
+template<class Type>
+void immersedBoundaryFvsPatchField<Type>::operator==
+(
+    const Field<Type>& tf
+)
+{
+    this->updateSize();
+    Field<Type>::operator=(tf);
+}
+
+
+template<class Type>
+void immersedBoundaryFvsPatchField<Type>::operator==
+(
+    const Type& t
+)
+{
+    this->updateSize();
+    Field<Type>::operator=(t);
 }
 
 

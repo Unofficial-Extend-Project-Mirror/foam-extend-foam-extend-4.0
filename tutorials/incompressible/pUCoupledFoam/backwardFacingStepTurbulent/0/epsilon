@@ -17,14 +17,14 @@ FoamFile
 
 dimensions      [0 2 -3 0 0 0 0];
 
-internalField   uniform 0.0001;
+internalField   uniform 0.003;
 
 boundaryField
 {
     inlet
     {
         type            fixedValue;
-        value           uniform 0.0001;
+        value           uniform 0.003;
     }
     outlet
     {
@@ -34,7 +34,7 @@ boundaryField
     {
         type            epsilonWallFunction;
         refValue        uniform 0;
-        value           uniform 0.0001;
+        value           uniform 0.003;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -43,7 +43,7 @@ boundaryField
     {
         type            epsilonWallFunction;
         refValue        uniform 0;
-        value           uniform 0.0001;
+        value           uniform 0.003;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;

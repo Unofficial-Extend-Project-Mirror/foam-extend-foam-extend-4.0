@@ -1,0 +1,8 @@
+Bad cut cell, line 7288
+cell ID: 7265 This is a dead cell
+
+
+Problem face from below: 14003,
+centre: (-0.000152 -0.001 0)
+areas: (0 2.432e-06 0) (0 9.12e-07 0)
+This should be a dead face because it touches a dead cell

@@ -239,7 +239,6 @@ public:
 
             return is;
         }
-
 };
 
 

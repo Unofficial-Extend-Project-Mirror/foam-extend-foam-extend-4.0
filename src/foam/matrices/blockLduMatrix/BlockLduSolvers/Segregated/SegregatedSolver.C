@@ -109,7 +109,7 @@ Foam::BlockSolverPerformance<Type> Foam::SegregatedSolver<Type>::solve
 
     if (blockMatrix.componentCoupled())
     {
-        if (BlockLduMatrix<Type>::debug >= 2)
+        if (blockLduMatrix::debug >= 2)
         {
             Info << " Component coupled segregation" << endl;
         }

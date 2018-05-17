@@ -133,7 +133,7 @@ BasicSymmetryPointPatchField
 :
     ValuePointPatchField<PatchField, Mesh, PointPatch, MatrixType, Type>(p, iF)
 {
-    updateBoundaryField();
+    // Cannot update boundary: internal field not set.  HJ, 28/Feb/2018
 }
 
 
@@ -178,7 +178,7 @@ BasicSymmetryPointPatchField
     ValuePointPatchField
         <PatchField, Mesh, PointPatch, MatrixType, Type>(ptf, iF)
 {
-    updateBoundaryField();
+    // Cannot update boundary: internal field not set.  HJ, 28/Feb/2018
 }
 
 

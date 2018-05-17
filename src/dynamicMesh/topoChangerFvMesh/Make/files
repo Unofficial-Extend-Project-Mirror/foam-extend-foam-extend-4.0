@@ -1,4 +1,5 @@
 topoChangerFvMesh/topoChangerFvMesh.C
+topoChangerFvMesh/topoChangerFvMeshLoadBalance.C
 
 attachDetachFvMesh/attachDetachFvMesh.C
 linearValveFvMesh/linearValveFvMesh.C
@@ -14,5 +15,9 @@ multiMixerFvMesh/multiMixerFvMesh.C
 dynamicPolyRefinementFvMesh/dynamicPolyRefinementFvMesh.C
 dynamicPolyRefinementFvMesh/refinementSelection/refinementSelection/refinementSelection.C
 dynamicPolyRefinementFvMesh/refinementSelection/fieldBoundsRefinement/fieldBoundsRefinement.C
+dynamicPolyRefinementFvMesh/refinementSelection/minCellVolumeRefinement/minCellVolumeRefinement.C
+dynamicPolyRefinementFvMesh/refinementSelection/minCellSizeRefinement/minCellSizeRefinement.C
+dynamicPolyRefinementFvMesh/refinementSelection/minPatchDistanceRefinement/minPatchDistanceRefinement.C
+dynamicPolyRefinementFvMesh/refinementSelection/compositeRefinementSelection/compositeRefinementSelection.C
 
 LIB = $(FOAM_LIBBIN)/libtopoChangerFvMesh

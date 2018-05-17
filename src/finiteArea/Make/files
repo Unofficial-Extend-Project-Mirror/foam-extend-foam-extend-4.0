@@ -25,7 +25,6 @@ $(faPatchFields)/faPatchField/faPatchFields.C
 $(faPatchFields)/faPatchField/faPatchVectorNFields.C
 
 basicFaPatchFields = $(faPatchFields)/basic
-$(basicFaPatchFields)/basicSymmetry/basicSymmetryFaPatchFields.C
 $(basicFaPatchFields)/basicSymmetry/basicSymmetryFaPatchScalarField.C
 $(basicFaPatchFields)/calculated/calculatedFaPatchFields.C
 $(basicFaPatchFields)/calculated/calculatedFaPatchVectorNFields.C

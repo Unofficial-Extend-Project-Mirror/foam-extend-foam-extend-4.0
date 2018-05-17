@@ -187,13 +187,13 @@ freeSurface::freeSurface
     // Set point normal correction patches
     boolList& correction = aMesh().correctPatchPointNormals();
 
-    forAll(pointNormalsCorrectionPatches_, patchI)
+    forAll (pointNormalsCorrectionPatches_, patchI)
     {
         word patchName = pointNormalsCorrectionPatches_[patchI];
 
         label patchID = aMesh().boundary().findPatchID(patchName);
 
-        if(patchID == -1)
+        if (patchID == -1)
         {
             FatalErrorIn
             (
@@ -212,7 +212,7 @@ freeSurface::freeSurface
     // Detect the free surface patch
     forAll (mesh().boundary(), patchI)
     {
-        if(mesh().boundary()[patchI].name() == "freeSurface")
+        if (mesh().boundary()[patchI].name() == "freeSurface")
         {
             aPatchID_ = patchI;
 
@@ -221,7 +221,7 @@ freeSurface::freeSurface
         }
     }
 
-    if(aPatchID() == -1)
+    if (aPatchID() == -1)
     {
         FatalErrorIn("freeSurface::freeSurface(...)")
             << "Free surface patch not defined.  Please make sure that "
@@ -235,7 +235,7 @@ freeSurface::freeSurface
     {
         forAll (mesh().boundary(), patchI)
         {
-            if(mesh().boundary()[patchI].name() == "freeSurfaceShadow")
+            if (mesh().boundary()[patchI].name() == "freeSurfaceShadow")
             {
                 bPatchID_ = patchI;
 
@@ -244,7 +244,7 @@ freeSurface::freeSurface
             }
         }
 
-        if(bPatchID() == -1)
+        if (bPatchID() == -1)
         {
             FatalErrorIn("freeSurface::freeSurface(...)")
                 << "Free surface shadow patch not defined. "
@@ -257,7 +257,7 @@ freeSurface::freeSurface
 
     // Mark free surface boundary points
     // which belonge to processor patches
-    forAll(aMesh().boundary(), patchI)
+    forAll (aMesh().boundary(), patchI)
     {
         if
         (
@@ -268,7 +268,7 @@ freeSurface::freeSurface
             const labelList& patchPoints =
                 aMesh().boundary()[patchI].pointLabels();
 
-            forAll(patchPoints, pointI)
+            forAll (patchPoints, pointI)
             {
                 motionPointsMask()[patchPoints[pointI]] = -1;
             }
@@ -277,7 +277,7 @@ freeSurface::freeSurface
 
 
     // Mark fixed free surface boundary points
-    forAll(fixedFreeSurfacePatches_, patchI)
+    forAll (fixedFreeSurfacePatches_, patchI)
     {
         label fixedPatchID =
             aMesh().boundary().findPatchID
@@ -285,7 +285,7 @@ freeSurface::freeSurface
                 fixedFreeSurfacePatches_[patchI]
             );
 
-        if(fixedPatchID == -1)
+        if (fixedPatchID == -1)
         {
             FatalErrorIn("freeSurface::freeSurface(...)")
                 << "Wrong faPatch name in the fixedFreeSurfacePatches list"
@@ -296,7 +296,7 @@ freeSurface::freeSurface
         const labelList& patchPoints =
             aMesh().boundary()[fixedPatchID].pointLabels();
 
-        forAll(patchPoints, pointI)
+        forAll (patchPoints, pointI)
         {
             motionPointsMask()[patchPoints[pointI]] = 0;
         }
@@ -305,7 +305,7 @@ freeSurface::freeSurface
 
     // Mark free-surface boundary point
     // at the axis of 2-D axisymmetic cases
-    forAll(aMesh().boundary(), patchI)
+    forAll (aMesh().boundary(), patchI)
     {
         if
         (
@@ -316,7 +316,7 @@ freeSurface::freeSurface
             const wedgeFaPatch& wedgePatch =
                 refCast<const wedgeFaPatch>(aMesh().boundary()[patchI]);
 
-            if(wedgePatch.axisPoint() > -1)
+            if (wedgePatch.axisPoint() > -1)
             {
                 motionPointsMask()[wedgePatch.axisPoint()] = 0;
 
@@ -357,7 +357,7 @@ freeSurface::~freeSurface()
 
 void freeSurface::updateDisplacementDirections()
 {
-    if(normalMotionDir())
+    if (normalMotionDir())
     {
         // Update point displacement correction
         pointsDisplacementDir() = aMesh().pointAreaNormals();
@@ -365,9 +365,9 @@ void freeSurface::updateDisplacementDirections()
         // Correcte point displacement direction
         // at the "centerline" symmetryPlane which represents the axis
         // of an axisymmetric case
-        forAll(aMesh().boundary(), patchI)
+        forAll (aMesh().boundary(), patchI)
         {
-            if(aMesh().boundary()[patchI].type() == wedgeFaPatch::typeName)
+            if (aMesh().boundary()[patchI].type() == wedgeFaPatch::typeName)
             {
                 const wedgeFaPatch& wedgePatch =
                     refCast<const wedgeFaPatch>(aMesh().boundary()[patchI]);
@@ -377,12 +377,12 @@ void freeSurface::updateDisplacementDirections()
                 label centerLinePatchID =
                     aMesh().boundary().findPatchID("centerline");
 
-                if(centerLinePatchID != -1)
+                if (centerLinePatchID != -1)
                 {
                     const labelList& pointLabels =
                         aMesh().boundary()[centerLinePatchID].pointLabels();
 
-                    forAll(pointLabels, pointI)
+                    forAll (pointLabels, pointI)
                     {
                         vector dir =
                             pointsDisplacementDir()[pointLabels[pointI]];
@@ -449,8 +449,8 @@ bool freeSurface::correctPoints()
 {
     for
     (
-        int freeSurfCorr=0;
-        freeSurfCorr<nFreeSurfCorr_;
+        int freeSurfCorr = 0;
+        freeSurfCorr < nFreeSurfCorr_;
         freeSurfCorr++
     )
     {
@@ -463,7 +463,7 @@ bool freeSurface::correctPoints()
 
 bool freeSurface::movePoints(const scalarField& interfacePhi)
 {
-    pointField newMeshPoints = mesh().points();
+    pointField newMeshPoints = mesh().allPoints();
 
     scalarField sweptVolCorr =
         interfacePhi
@@ -535,7 +535,7 @@ bool freeSurface::movePoints(const scalarField& interfacePhi)
         newMeshPoints[meshPointsA[pointI]] += displacement[pointI];
     }
 
-    if(twoFluids_)
+    if (twoFluids_)
     {
         const labelList& meshPointsB =
             mesh().boundaryMesh()[bPatchID_].meshPoints();
@@ -554,12 +554,12 @@ bool freeSurface::movePoints(const scalarField& interfacePhi)
 
     // Update total displacement field
 
-    if(totalDisplacementPtr_ && (curTimeIndex_ < DB().timeIndex()))
+    if (totalDisplacementPtr_ && (curTimeIndex_ < DB().timeIndex()))
     {
         FatalErrorIn("freeSurface::movePoints()")
             << "Total displacement of free surface points "
-                << "from previous time step is not absorbed by the mesh."
-                << abort(FatalError);
+            << "from previous time step is not absorbed by the mesh."
+            << abort(FatalError);
     }
     else if (curTimeIndex_ < DB().timeIndex())
     {
@@ -585,7 +585,7 @@ bool freeSurface::movePoints(const scalarField& interfacePhi)
 
     // Move correctedFvPatchField fvSubMeshes
 
-    forAll(U().boundaryField(), patchI)
+    forAll (U().boundaryField(), patchI)
     {
         if
         (
@@ -615,7 +615,7 @@ bool freeSurface::movePoints(const scalarField& interfacePhi)
         }
     }
 
-    forAll(p().boundaryField(), patchI)
+    forAll (p().boundaryField(), patchI)
     {
         if
         (
@@ -651,7 +651,7 @@ bool freeSurface::movePoints(const scalarField& interfacePhi)
 
 bool freeSurface::moveMeshPointsForOldFreeSurfDisplacement()
 {
-    if(totalDisplacementPtr_)
+    if (totalDisplacementPtr_)
     {
         pointField newPoints = mesh().points();
 
@@ -708,7 +708,7 @@ bool freeSurface::moveMeshPointsForOldFreeSurfDisplacement()
                     totalDisplacement()/DB().deltaT().value()
                 );
 
-            if(twoFluids_)
+            if (twoFluids_)
             {
                 const labelList& meshPointsB =
                     mesh().boundaryMesh()[bPatchID()].meshPoints();
@@ -764,7 +764,7 @@ bool freeSurface::moveMeshPointsForOldFreeSurfDisplacement()
             motionUaPatch ==
                 totalDisplacement()/DB().deltaT().value();
 
-            if(twoFluids_)
+            if (twoFluids_)
             {
                 const labelList& meshPointsB =
                     mesh().boundaryMesh()[bPatchID()].meshPoints();
@@ -808,7 +808,7 @@ bool freeSurface::moveMeshPointsForOldFreeSurfDisplacement()
 
         // Move correctedFvPatchField fvSubMeshes
 
-        forAll(U().boundaryField(), patchI)
+        forAll (U().boundaryField(), patchI)
         {
             if
             (
@@ -838,7 +838,7 @@ bool freeSurface::moveMeshPointsForOldFreeSurfDisplacement()
             }
         }
 
-        forAll(p().boundaryField(), patchI)
+        forAll (p().boundaryField(), patchI)
         {
             if
             (
@@ -994,7 +994,7 @@ bool freeSurface::moveMeshPoints()
 
         // Move correctedFvPatchField fvSubMeshes
 
-        forAll(U().boundaryField(), patchI)
+        forAll (U().boundaryField(), patchI)
         {
             if
             (
@@ -1024,7 +1024,7 @@ bool freeSurface::moveMeshPoints()
             }
         }
 
-        forAll(p().boundaryField(), patchI)
+        forAll (p().boundaryField(), patchI)
         {
             if
             (
@@ -1068,7 +1068,7 @@ void freeSurface::updateBoundaryConditions()
 
 void freeSurface::updateVelocity()
 {
-    if(twoFluids())
+    if (twoFluids())
     {
         vectorField nA = mesh().boundary()[aPatchID()].nf();
 
@@ -1141,7 +1141,7 @@ void freeSurface::updateVelocity()
 
         vectorField tangentialSurfaceTensionForce(nA.size(), vector::zero);
 
-        if(!cleanInterface())
+        if (!cleanInterface())
         {
             tangentialSurfaceTensionForce =
                 surfaceTensionGrad()().internalField();
@@ -1262,7 +1262,7 @@ void freeSurface::updateVelocity()
 
         vectorField tangentialSurfaceTensionForce(nA.size(), vector::zero);
 
-        if(!cleanInterface())
+        if (!cleanInterface())
         {
             tangentialSurfaceTensionForce =
                 surfaceTensionGrad()().internalField();
@@ -1357,7 +1357,7 @@ void freeSurface::updatePressure()
 
     vectorField nA = mesh().boundary()[aPatchID()].nf();
 
-    if(twoFluids())
+    if (twoFluids())
     {
         scalarField pA =
             interpolatorBA().faceInterpolate
@@ -1371,7 +1371,7 @@ void freeSurface::updatePressure()
             << ", max = " << gMax(K)
             << ", average = " << gAverage(K) << endl << flush;
 
-        if(cleanInterface())
+        if (cleanInterface())
         {
 //             pA -= cleanInterfaceSurfTension().value()*(K - gAverage(K));
             pA -= cleanInterfaceSurfTension().value()*K;
@@ -1422,7 +1422,7 @@ void freeSurface::updatePressure()
             << ", max = " << gMax(K) << ", average = " << gAverage(K)
             << endl;
 
-        if(cleanInterface())
+        if (cleanInterface())
         {
 //             pA -= cleanInterfaceSurfTension().value()*(K - gAverage(K));
             pA -= cleanInterfaceSurfTension().value()*K;
@@ -1474,7 +1474,7 @@ void freeSurface::updateSurfaceFlux()
 
 void freeSurface::updateSurfactantConcentration()
 {
-    if(!cleanInterface())
+    if (!cleanInterface())
     {
         Info << "Correct surfactant concentration" << endl << flush;
 
@@ -1493,7 +1493,7 @@ void freeSurface::updateSurfactantConcentration()
         );
 
 
-        if(surfactant().soluble())
+        if (surfactant().soluble())
         {
             const scalarField& C =
                 mesh().boundary()[aPatchID()]
@@ -1541,7 +1541,7 @@ void freeSurface::updateSurfactantConcentration()
            *log(1.0 - surfactantConcentration()
            /surfactant().surfactSaturatedConc());
 
-        if(neg(min(surfaceTension().internalField())))
+        if (neg(min(surfaceTension().internalField())))
         {
             FatalErrorIn
             (
@@ -1555,7 +1555,7 @@ void freeSurface::updateSurfactantConcentration()
 
 void freeSurface::correctUsBoundaryConditions()
 {
-    forAll(Us().boundaryField(), patchI)
+    forAll (Us().boundaryField(), patchI)
     {
         if
         (
@@ -1570,7 +1570,7 @@ void freeSurface::correctUsBoundaryConditions()
             label ngbPolyPatchID =
                 aMesh().boundary()[patchI].ngbPolyPatchIndex();
 
-            if(ngbPolyPatchID != -1)
+            if (ngbPolyPatchID != -1)
             {
                 if
                 (
@@ -1646,7 +1646,7 @@ vector freeSurface::totalSurfaceTensionForce() const
 
     vectorField surfTensionForces(n.size(), vector::zero);
 
-    if(cleanInterface())
+    if (cleanInterface())
     {
         surfTensionForces =
             S*cleanInterfaceSurfTension().value()
@@ -1678,7 +1678,7 @@ void freeSurface::initializeControlPointsPosition()
 
     scalarField sweptVol(faces.size(), 0.0);
 
-    forAll(faces, faceI)
+    forAll (faces, faceI)
     {
         sweptVol[faceI] = -faces[faceI].sweptVol(points, newPoints);
     }
@@ -1690,7 +1690,7 @@ void freeSurface::initializeControlPointsPosition()
         faceArea[faceI] = faces[faceI].normal(newPoints);
     }
 
-    forAll(deltaH, faceI)
+    forAll (deltaH, faceI)
     {
         deltaH[faceI] = sweptVol[faceI]/
             (faceArea[faceI] & facesDisplacementDir()[faceI]);
@@ -1704,9 +1704,9 @@ scalar freeSurface::maxCourantNumber()
 {
     scalar CoNum = 0;
 
-    if(cleanInterface())
+    if (cleanInterface())
     {
-        const scalarField& dE =aMesh().lPN();
+        const scalarField& dE = aMesh().lPN();
 
         CoNum = gMax
         (
@@ -1781,7 +1781,7 @@ void freeSurface::writeVTKControlPoints()
         << "DATASET POLYDATA" << nl
         << "POINTS " << controlPoints().size() << " float" << nl;
 
-    forAll(controlPoints(), pointI)
+    forAll (controlPoints(), pointI)
     {
         mps << controlPoints()[pointI].x() << ' '
             << controlPoints()[pointI].y() << ' '
@@ -1792,7 +1792,7 @@ void freeSurface::writeVTKControlPoints()
     mps << "VERTICES " << controlPoints().size() << ' '
         << controlPoints().size()*2 << nl;
 
-    forAll(controlPoints(), pointI)
+    forAll (controlPoints(), pointI)
     {
         mps << 1 << ' ' << pointI << nl;
     }

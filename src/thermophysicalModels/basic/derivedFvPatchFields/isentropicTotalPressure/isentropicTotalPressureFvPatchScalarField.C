@@ -39,6 +39,7 @@ isentropicTotalPressureFvPatchScalarField
 )
 :
     fixedValueFvPatchScalarField(p, iF),
+    phiName_("phi"),
     UName_("U"),
     TName_("T"),
     p0_(p.size(), 0.0)
@@ -54,6 +55,7 @@ isentropicTotalPressureFvPatchScalarField
 )
 :
     fixedValueFvPatchScalarField(p, iF),
+    phiName_(dict.lookupOrDefault<word>("phi", "phi")),
     UName_(dict.lookupOrDefault<word>("U", "U")),
     TName_(dict.lookupOrDefault<word>("T", "T")),
     p0_("p0", dict, p.size())
@@ -82,6 +84,7 @@ isentropicTotalPressureFvPatchScalarField
 )
 :
     fixedValueFvPatchScalarField(ptf, p, iF, mapper),
+    phiName_(ptf.phiName_),
     UName_(ptf.UName_),
     TName_(ptf.TName_),
     p0_(ptf.p0_, mapper)
@@ -95,6 +98,7 @@ isentropicTotalPressureFvPatchScalarField
 )
 :
     fixedValueFvPatchScalarField(ptf),
+    phiName_(ptf.phiName_),
     UName_(ptf.UName_),
     TName_(ptf.TName_),
     p0_(ptf.p0_)
@@ -109,6 +113,7 @@ isentropicTotalPressureFvPatchScalarField
 )
 :
     fixedValueFvPatchScalarField(ptf, iF),
+    phiName_(ptf.phiName_),
     UName_(ptf.UName_),
     TName_(ptf.TName_),
     p0_(ptf.p0_)
@@ -149,9 +154,38 @@ void Foam::isentropicTotalPressureFvPatchScalarField::updateCoeffs()
         return;
     }
 
+    if
+    (
+        !this->db().objectRegistry::found(phiName_)
+     || !this->db().objectRegistry::found(UName_)
+     || !this->db().objectRegistry::found(TName_)
+    )
+    {
+        // Flux not available, do not update
+        InfoIn
+        (
+            "void isentropicTotalPressureFvPatchScalarField::updateCoeffs()"
+        )   << "Flux, pressure or velocity field not found.  "
+            << "Performing fixed value update" << endl;
+
+        fixedValueFvPatchScalarField::updateCoeffs();
+
+        return;
+    }
+
+    // Get flux
+    const surfaceScalarField& phi =
+        db().lookupObject<surfaceScalarField>(phiName_);
+
+    const scalarField& phip = 
+        patch().patchField<surfaceScalarField, scalar>(phi);
+    
     // Get velocity
-    const fvPatchVectorField& U =
-        patch().lookupPatchField<volVectorField, scalar>(UName_);
+    // const fvPatchVectorField& U =
+    //     patch().lookupPatchField<volVectorField, scalar>(UName_);
+
+    // Get pressure
+    const scalarField& p = *this;
 
     // Get temperature
     const fvPatchScalarField& T =
@@ -166,14 +200,27 @@ void Foam::isentropicTotalPressureFvPatchScalarField::updateCoeffs()
     scalarField gamma = Cp/Cv;
     scalarField R = Cp - Cv;
 
-    scalarField Ma = -(patch().nf() & U)/sqrt(gamma*R*T);
+    scalarField rho = p/(R*T);
+
+    // Velocity
+    // scalarField Un = -(patch().nf() & U);
+
+    // Velocity from incoming flux
+    scalarField Un = max(-phip/(patch().magSf()*rho), scalar(0));
+
+    scalarField Ma = Un/sqrt(gamma*R*T);
 
     scalarField a = 1 + 0.5*(gamma - 1)*sqr(Ma);
 
-    operator==(p0_*pow(a, -gamma/(gamma - 1)));
+    operator==
+    (
+        pos(Ma - 1)*p0_
+      + neg(Ma - 1)*p0_*pow(a, -gamma/(gamma - 1))
+    );
 
     fixedValueFvPatchScalarField::updateCoeffs();
 }
+
 
 void Foam::isentropicTotalPressureFvPatchScalarField::updateCoeffs
 (
@@ -190,6 +237,8 @@ void Foam::isentropicTotalPressureFvPatchScalarField::write
 ) const
 {
     fixedValueFvPatchScalarField::write(os);
+    writeEntryIfDifferent<word>(os, "phi", "phi", phiName_);
+    writeEntryIfDifferent<word>(os, "U", "U", UName_);
     writeEntryIfDifferent<word>(os, "T", "T", TName_);
     p0_.writeEntry("p0", os);
 }

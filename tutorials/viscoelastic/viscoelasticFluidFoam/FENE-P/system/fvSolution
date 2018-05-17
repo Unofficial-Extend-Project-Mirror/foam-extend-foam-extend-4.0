@@ -49,7 +49,7 @@ solvers
         minIter           0;
         maxIter           1000;
 
-    };
+    }
 
 }
 

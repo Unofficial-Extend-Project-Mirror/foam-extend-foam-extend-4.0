@@ -67,11 +67,19 @@ protected:
 
     // Protected Member functions
 
-        //- Make patch weighting factors
-        virtual void makeWeights(scalarField&) const;
+        // Geometry correction functions
 
-        //- Make patch face - neighbour cell distances
-        virtual void makeDeltaCoeffs(scalarField&) const;
+            //- Make mesh cell centres.  Moved from fvMeshGeometry
+            virtual void makeC(slicedSurfaceVectorField&) const;
+
+
+    // Discretisation correction functions
+
+            //- Make patch weighting factors
+            void makeWeights(fvsPatchScalarField&) const;
+
+            //- Make patch face - neighbour cell distances
+            void makeDeltaCoeffs(fvsPatchScalarField&) const;
 
 
 public:

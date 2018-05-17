@@ -46,9 +46,14 @@ Foam::BlockCoeffMaxNorm<Type>::BlockCoeffMaxNorm
 template<class Type>
 Foam::scalar Foam::BlockCoeffMaxNorm<Type>::normalize
 (
-    const Foam::BlockCoeff<Type>& a
+    const BlockCoeff<Type>& a
 )
 {
+    // Note.  This does not properly account for the sign of the
+    // off-diagonal coefficient.  If the off-diag is negative
+    // the function should look for cmptMin and vice-versa
+    // HJ, 28/Feb/2017
+
     if (a.activeType() == BlockCoeff<Type>::SCALAR)
     {
         return mag(a.asScalar());
@@ -74,23 +79,23 @@ Foam::scalar Foam::BlockCoeffMaxNorm<Type>::normalize
 
 
 template<class Type>
-void Foam::BlockCoeffMaxNorm<Type>::coeffMag
+void Foam::BlockCoeffMaxNorm<Type>::normalize
 (
-    const Foam::CoeffField<Type>& a,
-    Foam::Field<scalar>& b
+    Field<scalar>& b,
+    const CoeffField<Type>& a
 )
 {
     if (a.activeType() == BlockCoeff<Type>::SCALAR)
     {
-        b = mag(a.asScalar());
+        b = a.asScalar();
     }
     else if (a.activeType() == BlockCoeff<Type>::LINEAR)
     {
-        b = cmptMax(cmptMag(a.asLinear()));
+        b = cmptMax(a.asLinear());
     }
     else if (a.activeType() == BlockCoeff<Type>::SQUARE)
     {
-        b = cmptMax(cmptMag(a.asSquare()));
+        b = cmptMax(a.asSquare());
     }
     else
     {

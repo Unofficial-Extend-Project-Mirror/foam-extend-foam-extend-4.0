@@ -24,8 +24,11 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "cyclicFvPatch.H"
-#include "addToRunTimeSelectionTable.H"
 #include "fvMesh.H"
+#include "fvPatchFields.H"
+#include "fvsPatchFields.H"
+#include "slicedSurfaceFields.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -40,8 +43,18 @@ addToRunTimeSelectionTable(fvPatch, cyclicFvPatch, polyPatch);
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+// Make mesh cell centres.  Moved from fvMeshGeometry
+void cyclicFvPatch::makeC(slicedSurfaceVectorField& C) const
+{
+    C.boundaryField()[index()].UList<vector>::operator=
+    (
+        patchSlice(cyclicPolyPatch_.boundaryMesh().mesh().faceCentres())
+    );
+}
+
+    
 // Make patch weighting factors
-void cyclicFvPatch::makeWeights(scalarField& w) const
+void cyclicFvPatch::makeWeights(fvsPatchScalarField& w) const
 {
     const scalarField& magFa = magSf();
 
@@ -89,7 +102,7 @@ void cyclicFvPatch::makeWeights(scalarField& w) const
     {
         scalar avFa = (magFa[errorFace] + magFa[errorFace + sizeby2])/2.0;
 
-        FatalErrorIn("cyclicFvPatch::makeWeights(scalarField& w) const")
+        FatalErrorIn("cyclicFvPatch::makeWeights(fvsPatchScalarField& w) const")
             << "face " << errorFace << " and " << errorFace + sizeby2
             <<  " areas do not match by "
             << 100*mag(magFa[errorFace] - magFa[errorFace + sizeby2])/avFa
@@ -102,7 +115,7 @@ void cyclicFvPatch::makeWeights(scalarField& w) const
 
 
 // Make patch face - neighbour cell distances
-void cyclicFvPatch::makeDeltaCoeffs(scalarField& dc) const
+void cyclicFvPatch::makeDeltaCoeffs(fvsPatchScalarField& dc) const
 {
     vectorField d = delta();
     vectorField n = nf();

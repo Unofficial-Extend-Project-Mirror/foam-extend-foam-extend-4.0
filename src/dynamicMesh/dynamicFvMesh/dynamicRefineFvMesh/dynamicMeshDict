@@ -16,26 +16,6 @@ FoamFile
 
 //dynamicFvMeshLib   "libtopoChangerFvMesh.so";
 dynamicFvMesh      dynamicRefineFvMesh;
-//staticFvMesh;
-
-mixerFvMeshCoeffs
-{
-    coordinateSystem
-    {
-        type            cylindrical;
-        origin          (0 0 0);
-        axis            (0 0 1);
-        direction       (1 0 0);
-    }
-
-    rpm             10;
-
-    slider
-    {
-        inside      insideSlider;
-        outside     outsideSlider;
-    }
-}
 
 // Refinement
 dynamicRefineFvMeshCoeffs

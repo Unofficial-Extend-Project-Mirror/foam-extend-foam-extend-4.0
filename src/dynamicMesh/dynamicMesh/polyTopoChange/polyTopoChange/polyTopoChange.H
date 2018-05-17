@@ -130,9 +130,8 @@ public:
         polyTopoChange(const polyMesh&);
 
 
-    // Destructor
-
-        ~polyTopoChange();
+    //- Destructor
+    ~polyTopoChange();
 
 
     // Member Functions

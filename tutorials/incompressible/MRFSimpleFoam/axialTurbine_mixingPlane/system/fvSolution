@@ -26,28 +26,28 @@ solvers
         preconditioner   DILU;
         tolerance        1e-08;
         relTol           0.05;
-    };
+    }
     U
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-07;
         relTol           0.1;
-    };
+    }
     k
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-07;
         relTol           0.1;
-    };
+    }
     epsilon
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-07;
         relTol           0.1;
-    };
+    }
 }
 
 SIMPLE

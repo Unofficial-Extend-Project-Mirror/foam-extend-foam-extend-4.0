@@ -24,8 +24,10 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "processorFvPatch.H"
-#include "addToRunTimeSelectionTable.H"
+#include "crMatrix.H"
 #include "transformField.H"
+#include "fvPatchFields.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -40,7 +42,7 @@ addToRunTimeSelectionTable(fvPatch, processorFvPatch, polyPatch);
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-void processorFvPatch::makeWeights(scalarField& w) const
+void processorFvPatch::makeWeights(fvsPatchScalarField& w) const
 {
     if (Pstream::parRun())
     {
@@ -74,7 +76,7 @@ void processorFvPatch::makeWeights(scalarField& w) const
 }
 
 
-void processorFvPatch::makeDeltaCoeffs(scalarField& dc) const
+void processorFvPatch::makeDeltaCoeffs(fvsPatchScalarField& dc) const
 {
     if (Pstream::parRun())
     {
@@ -171,6 +173,32 @@ tmp<labelField> processorFvPatch::internalFieldTransfer
 ) const
 {
     return receive<label>(commsType, this->size());
+}
+
+
+void processorFvPatch::initProlongationTransfer
+(
+    const Pstream::commsTypes commsType,
+    const crMatrix& filteredP
+) const
+{
+    // Send prolongation matrix, using IOstream operators
+    OPstream toNbr(Pstream::blocking, neighbProcNo());
+    toNbr<< filteredP;
+}
+
+
+autoPtr<crMatrix> processorFvPatch::prolongationTransfer
+(
+    const Pstream::commsTypes commsType,
+    const crMatrix& filteredP
+) const
+{
+    IPstream fromNbr(Pstream::blocking, neighbProcNo());
+
+    autoPtr<crMatrix> tnbrP(new crMatrix(fromNbr));
+
+    return tnbrP;
 }
 
 

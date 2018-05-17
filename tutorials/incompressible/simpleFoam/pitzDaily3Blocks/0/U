@@ -16,7 +16,7 @@ FoamFile
 
 dimensions      [0 1 -1 0 0 0 0];
 
-internalField   uniform (0 0 0);
+internalField   uniform (10 0 0);
 
 boundaryField
 {
@@ -55,9 +55,11 @@ boundaryField
         value           uniform (0 0 0);
     }
 
+    // Note: patch merged with lowerWallInterface - zero size
     interface
     {
-        type            zeroGradient;
+        type            fixedValue;
+        value           uniform (0 0 0);
     }
 
     defaultFaces

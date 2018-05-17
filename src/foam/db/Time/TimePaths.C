@@ -54,7 +54,7 @@ Foam::TimePaths::TimePaths
         }
         else
         {
-            globalCaseName_ = caseName(pos-1);
+            globalCaseName_ = caseName(pos - 1);
         }
     }
     else

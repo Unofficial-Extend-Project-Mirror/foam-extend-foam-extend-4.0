@@ -109,35 +109,50 @@ public:
         //- Supported time directory name formats
         enum fmtflags
         {
-            general    = 0,
-            fixed      = ios_base::fixed,
+            general = 0,
+            fixed = ios_base::fixed,
             scientific = ios_base::scientific
         };
+
+        //- Stop at control names
+        static const NamedEnum<stopAtControls, 4> stopAtControlNames_;
+
+        //- Write control names
+        static const NamedEnum<writeControls, 5> writeControlNames_;
 
 
 protected:
 
     // Protected data
 
+        //- Start time index
         label  startTimeIndex_;
+
+        //- Start time
         scalar startTime_;
+
+        //- End time
         mutable scalar endTime_;
 
-        static const NamedEnum<stopAtControls, 4> stopAtControlNames_;
+        //- Stop at
         mutable stopAtControls stopAt_;
 
-        static const NamedEnum<writeControls, 5> writeControlNames_;
+        //- Write control
         writeControls writeControl_;
 
+        //- Write interval
         scalar writeInterval_;
 
         // Additional writing
 
+            //- Secondary write control
             writeControls secondaryWriteControl_;
 
+            //- Secondary write interval
             scalar secondaryWriteInterval_;
 
-        label  purgeWrite_;
+        //- Purge write
+        label purgeWrite_;
         mutable FIFOStack<word> previousOutputTimes_;
 
         // Additional purging

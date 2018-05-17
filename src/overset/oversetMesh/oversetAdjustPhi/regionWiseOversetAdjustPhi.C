@@ -207,7 +207,7 @@ void Foam::regionWiseOversetAdjustPhi
                         mesh.boundaryMesh()[patchI]
                     );
 
-                if (procPatch.owner())
+                if (procPatch.master())
                 {
                     // Processor patch, master side
 
@@ -357,7 +357,7 @@ void Foam::regionWiseOversetAdjustPhi
             // Get reference to the flux for scaling
             scalar& curPhi = phi.boundaryField()[patchI][faceI];
 
-            if (procPatch.owner()) // Owner side
+            if (procPatch.master()) // Owner side
             {
                 // Get region index
                 const label curRegion =

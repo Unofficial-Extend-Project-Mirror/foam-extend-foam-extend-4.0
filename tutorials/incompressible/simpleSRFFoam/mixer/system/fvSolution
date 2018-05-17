@@ -22,49 +22,49 @@ solvers
         preconditioner   DIC;
         tolerance        1e-06;
         relTol           0.01;
-    };
+    }
     Urel
     {
         solver           smoothSolver;
         smoother         GaussSeidel;
         tolerance        1e-05;
         relTol           0.1;
-    };
+    }
     k
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
-    };
+    }
     epsilon
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
-    };
+    }
     omega
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
-    };
+    }
     R
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
-    };
+    }
     nuTilda
     {
         solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
-    };
+    }
 }
 
 SIMPLE

@@ -169,6 +169,9 @@ private:
         //- Face centres
         mutable Field<PointType>* faceCentresPtr_;
 
+        //- Face areas
+        mutable Field<PointType>* faceAreasPtr_;
+
         //- Face unit normals
         mutable Field<PointType>* faceNormalsPtr_;
 
@@ -214,8 +217,8 @@ private:
         //- Calculate face centres
         void calcFaceCentres() const;
 
-        //- Calculate unit face normals
-        void calcFaceNormals() const;
+        //- Calculate face areas
+        void calcFaceAreas() const;
 
         //- Calculate unit point normals
         void calcPointNormals() const;
@@ -262,17 +265,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~PrimitivePatch();
-
-        void clearOut();
-
-        void clearGeom();
-
-        void clearTopology();
-
-        void clearPatchMeshAddr();
+    //- Destructor
+    virtual ~PrimitivePatch();
 
 
     // Member Functions
@@ -380,6 +374,9 @@ public:
                 //- Return face centres for patch
                 const Field<PointType>& faceCentres() const;
 
+                //- Return face areas for patch.  Avoiding name clash
+                const Field<PointType>& areas() const;
+
                 //- Return face normals for patch
                 const Field<PointType>& faceNormals() const;
 
@@ -471,6 +468,21 @@ public:
 
             //- Correct patch after moving points
             virtual void movePoints(const Field<PointType>&);
+
+
+        // Clear functions
+
+            //- Clear everything
+            void clearOut();
+
+            //- Clear geometry
+            void clearGeom();
+
+            //- Clear topology
+            void clearTopology();
+
+            //- Clear patch-to-mesh addressing
+            void clearPatchMeshAddr();
 
 
     // Member operators

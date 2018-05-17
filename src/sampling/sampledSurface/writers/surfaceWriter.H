@@ -103,8 +103,7 @@ public:
 
 
     //- Destructor
-
-        virtual ~surfaceWriter();
+    virtual ~surfaceWriter();
 
 
     // Member Functions

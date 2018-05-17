@@ -52,7 +52,8 @@ void Foam::fvMatrix<Type>::addToInternalField
         (
             "fvMatrix<Type>::addToInternalField(const unallocLabelList&, "
             "const Field&, Field&)"
-        )   << "sizes of addressing and field are different"
+        )   << "sizes of addressing and field are different.  Addr: "
+            << addr.size() << " pf: " << pf.size()
             << abort(FatalError);
     }
 
@@ -92,7 +93,8 @@ void Foam::fvMatrix<Type>::subtractFromInternalField
         (
             "fvMatrix<Type>::addToInternalField(const unallocLabelList&, "
             "const Field&, Field&)"
-        )   << "sizes of addressing and field are different"
+        )   << "sizes of addressing and field are different.  Addr: "
+            << addr.size() << " pf: " << pf.size()
             << abort(FatalError);
     }
 

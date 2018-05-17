@@ -72,6 +72,11 @@ int main(int argc, char *argv[])
             U.internalField() = vector::zero;
         }
 
+        p.correctBoundaryConditions();
+        U.correctBoundaryConditions();
+
+        phi == (fvc::interpolate(U) & mesh.Sf());
+
 #       include "volContinuity.H"
 #       include "meshCourantNo.H"
 

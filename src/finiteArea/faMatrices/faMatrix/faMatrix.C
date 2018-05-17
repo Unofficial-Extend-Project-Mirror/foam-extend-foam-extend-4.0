@@ -200,8 +200,7 @@ faMatrix<Type>::faMatrix
     source_(psi.size(), pTraits<Type>::zero),
     internalCoeffs_(psi.mesh().boundary().size()),
     boundaryCoeffs_(psi.mesh().boundary().size()),
-    faceFluxCorrectionPtr_(NULL),
-    solvingComponent(0)
+    faceFluxCorrectionPtr_(NULL)
 {
     if (debug)
     {
@@ -255,8 +254,7 @@ faMatrix<Type>::faMatrix(const faMatrix<Type>& fam)
     source_(fam.source_),
     internalCoeffs_(fam.internalCoeffs_),
     boundaryCoeffs_(fam.boundaryCoeffs_),
-    faceFluxCorrectionPtr_(NULL),
-    solvingComponent(fam.solvingComponent)
+    faceFluxCorrectionPtr_(NULL)
 {
     if (debug)
     {
@@ -289,8 +287,7 @@ faMatrix<Type>::faMatrix
     source_(is),
     internalCoeffs_(psi.mesh().boundary().size()),
     boundaryCoeffs_(psi.mesh().boundary().size()),
-    faceFluxCorrectionPtr_(NULL),
-    solvingComponent(0)
+    faceFluxCorrectionPtr_(NULL)
 {
     if (debug)
     {
@@ -360,7 +357,7 @@ void faMatrix<Type>::setValues
     // Record face labels of eliminated equations
     forAll (faceLabels, i)
     {
-        eliminatedEqns().insert(faceLabels[i]);
+        this->eliminatedEqns().insert(faceLabels[i]);
     }
 
     const labelListList& edges = mesh.patch().faceEdges();

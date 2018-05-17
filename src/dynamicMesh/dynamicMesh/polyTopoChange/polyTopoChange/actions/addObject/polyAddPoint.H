@@ -64,6 +64,32 @@ class polyAddPoint
         bool inCell_;
 
 
+    // Private Member Functions
+
+        //- Check
+        void check() const
+        {
+            if (zoneID_ < 0 && !inCell_)
+            {
+                FatalErrorIn
+                (
+                    "polyAddPoint\n"
+                    "(\n"
+                    "    const point& p,\n"
+                    "    const label masterPointID,\n"
+                    "    const label zoneID,\n"
+                    "    const bool inCell\n"
+                    ")"
+                )   << "Point is not in a cell and not in a zone.  "
+                    << "This is not allowed.\n"
+                    << "point: " << p_
+                    << " master: " << masterPointID_
+                    << " zone: " << zoneID_
+                    << abort(FatalError);
+            }
+        }
+
+
 public:
 
     // Static data members
@@ -97,25 +123,18 @@ public:
             zoneID_(zoneID),
             inCell_(inCell)
         {
-            if (zoneID_ < 0 && !inCell)
-            {
-                FatalErrorIn
-                (
-                    "polyAddPoint\n"
-                    "(\n"
-                    "    const point& p,\n"
-                    "    const label masterPointID,\n"
-                    "    const label zoneID,\n"
-                    "    const bool inCell\n"
-                    ")"
-                )   << "Point is not in a cell and not in a zone.  "
-                    << "This is not allowed.\n"
-                    << "point: " << p
-                    << " master: " << masterPointID_
-                    << " zone: " << zoneID_
-                    << abort(FatalError);
-            }
+            check();
+        }
 
+        //- Construct from Istream
+        polyAddPoint(Istream& is)
+        :
+            p_(is),
+            masterPointID_(readLabel(is)),
+            zoneID_(readLabel(is)),
+            inCell_(readBool(is))
+        {
+            check();
         }
 
         //- Construct and return a clone
@@ -164,6 +183,16 @@ public:
         bool inCell() const
         {
             return inCell_;
+        }
+
+
+    // IOstream Operators
+
+        friend Ostream& operator<<(Ostream& os , const polyAddPoint& pap)
+        {
+            os << pap.p_ << pap.masterPointID_ << pap.zoneID_ << pap.inCell_;
+
+            return os;
         }
 };
 

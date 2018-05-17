@@ -64,10 +64,10 @@ Foam::GaussSeidelSmoother::GaussSeidelSmoother
 void Foam::GaussSeidelSmoother::smooth
 (
     scalarField& x,
-    const lduMatrix& matrix_,
+    const lduMatrix& matrix,
     const scalarField& b,
-    const FieldField<Field, scalar>& coupleBouCoeffs_,
-    const lduInterfaceFieldPtrsList& interfaces_,
+    const FieldField<Field, scalar>& coupleBouCoeffs,
+    const lduInterfaceFieldPtrsList& interfaces,
     const direction cmpt,
     const label nSweeps
 )
@@ -79,17 +79,17 @@ void Foam::GaussSeidelSmoother::smooth
     scalarField bPrime(nCells);
     register scalar* __restrict__ bPrimePtr = bPrime.begin();
 
-    register const scalar* const __restrict__ diagPtr = matrix_.diag().begin();
+    register const scalar* const __restrict__ diagPtr = matrix.diag().begin();
     register const scalar* const __restrict__ upperPtr =
-        matrix_.upper().begin();
+        matrix.upper().begin();
     register const scalar* const __restrict__ lowerPtr =
-        matrix_.lower().begin();
+        matrix.lower().begin();
 
     register const label* const __restrict__ uPtr =
-        matrix_.lduAddr().upperAddr().begin();
+        matrix.lduAddr().upperAddr().begin();
 
     register const label* const __restrict__ ownStartPtr =
-        matrix_.lduAddr().ownerStartAddr().begin();
+        matrix.lduAddr().ownerStartAddr().begin();
 
 
     // Coupled boundary initialisation.  The coupled boundary is treated
@@ -112,10 +112,10 @@ void Foam::GaussSeidelSmoother::smooth
         bPrime = b;
 
         // Update from lhs
-        matrix_.initMatrixInterfaces
+        matrix.initMatrixInterfaces
         (
-            coupleBouCoeffs_,
-            interfaces_,
+            coupleBouCoeffs,
+            interfaces,
             x,
             bPrime,
             cmpt,
@@ -123,10 +123,10 @@ void Foam::GaussSeidelSmoother::smooth
         );
 
         // Update from lhs
-        matrix_.updateMatrixInterfaces
+        matrix.updateMatrixInterfaces
         (
-            coupleBouCoeffs_,
-            interfaces_,
+            coupleBouCoeffs,
+            interfaces,
             x,
             bPrime,
             cmpt,

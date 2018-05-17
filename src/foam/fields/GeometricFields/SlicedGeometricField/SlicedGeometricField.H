@@ -158,13 +158,23 @@ public:
         );
 
 
-    // Destructor
-
-        ~SlicedGeometricField();
+    //- Destructor
+    ~SlicedGeometricField();
 
 
     // Member functions
 
+        //- Reset storage of a field to slice
+        void reset(const Field<Type>& completeField);
+    
+        //- Reset storage of a field to slice with separate fields for the
+        //  internal field and boundary field
+        void reset
+        (
+            const Field<Type>& completeIField,
+            const Field<Type>& completeBField
+        );
+    
         //- Correct boundary field
         void correctBoundaryConditions();
 };
@@ -202,9 +212,8 @@ public:
         );
 
 
-    // Destructor
-
-        ~DimensionedInternalField();
+    //- Destructor
+    ~DimensionedInternalField();
 };
 
 

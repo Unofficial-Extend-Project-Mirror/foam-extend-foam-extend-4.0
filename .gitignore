@@ -45,6 +45,7 @@ lnInclude
 linux*Gcc*/
 linux*Icc*/
 mingw*Gcc*/
+linuxARM*/
 darwin*Gcc*/
 darwin*Intel*/
 linuxming*/

@@ -24,7 +24,7 @@ boundaryField
     outer
     {
         type            calculated;
-        value           nonuniform List<vector>
+        value           nonuniform List<vector> 
 600
 (
 (-0.144039 -0.122998 0.0114965)

@@ -145,9 +145,8 @@ public:
         PtrList(Istream&);
 
 
-    // Destructor
-
-        ~PtrList();
+    //- Destructor
+    ~PtrList();
 
 
     // Member functions

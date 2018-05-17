@@ -63,8 +63,10 @@ Foam::autoPtr<Foam::hsCombustionThermo> Foam::hsCombustionThermo::New
 
     if (cstrIter == fvMeshConstructorTablePtr_->end())
     {
-        FatalErrorIn("hsCombustionThermo::New(const fvMesh&, const objectRegistry&)")
-            << "Unknown hsCombustionThermo type "
+        FatalErrorIn
+        (
+            "hsCombustionThermo::New(const fvMesh&, const objectRegistry&)"
+        )   << "Unknown hsCombustionThermo type "
             << hsCombustionThermoTypeName << nl << nl
             << "Valid hsCombustionThermo types are:" << nl
             << fvMeshConstructorTablePtr_->sortedToc() << nl

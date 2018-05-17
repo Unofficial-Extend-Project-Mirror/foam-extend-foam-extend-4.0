@@ -111,6 +111,41 @@ Foam::polyBoundaryMesh::polyBoundaryMesh
 {}
 
 
+Foam::polyBoundaryMesh::polyBoundaryMesh
+(
+    const IOobject& io,
+    const polyMesh& mesh,
+    Istream& is
+)
+:
+    polyPatchList(),
+    regIOobject(io),
+    mesh_(mesh),
+    neighbourEdgesPtr_(NULL)
+{
+    polyPatchList& patches = *this;
+    token firstToken(is);
+
+    PtrList<entry> patchEntries(is);
+    patches.setSize(patchEntries.size());
+
+    forAll (patches, patchI)
+    {
+        patches.set
+        (
+            patchI,
+            polyPatch::New
+            (
+                patchEntries[patchI].keyword(),
+                patchEntries[patchI].dict(),
+                patchI,
+                *this
+            )
+        );
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 Foam::polyBoundaryMesh::~polyBoundaryMesh()
@@ -991,7 +1026,7 @@ bool Foam::polyBoundaryMesh::writeData(Ostream& os) const
 
     os  << patches.size() << nl << token::BEGIN_LIST << incrIndent << nl;
 
-    forAll(patches, patchi)
+    forAll (patches, patchi)
     {
         os  << indent << patches[patchi].name() << nl
             << indent << token::BEGIN_BLOCK << nl

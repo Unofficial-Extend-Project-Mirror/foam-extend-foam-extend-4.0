@@ -14,7 +14,14 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application icoDyMFoam;
+DebugSwitches
+{
+    // immersedBoundary 1;
+    // polyMesh 2;
+    // fvMesh   2;
+}
+
+application     pimpleDyMFoam;
 
 startFrom       startTime;
 
@@ -24,13 +31,10 @@ stopAt          endTime;
 
 endTime         5;
 
-deltaT          0.01;
+deltaT          0.02;
 
 writeControl    runTime;
 writeInterval   0.2;
-
-// writeControl    timeStep;
-// writeInterval   1;
 
 purgeWrite      0;
 
@@ -38,7 +42,7 @@ writeFormat     ascii;
 
 writePrecision  6;
 
-writeCompression compressed;
+writeCompression uncompressed;
 
 timeFormat      general;
 
@@ -52,17 +56,16 @@ maxCo           0.2;
 
 libs
 (
-    "liblduSolvers.so"
     "libimmersedBoundary.so"
-    "libimmersedBoundaryDynamicFvMesh.so"
+    "libimmersedBoundaryDynamicMesh.so"
 );
 
 functions
 (
     forces
     {
-        type               immersedBoundaryForces;
-        functionObjectLibs ("libimmersedBoundaryForceFunctionObject.so");
+        type               forces;
+        functionObjectLibs ("libforces.so");
 
         outputControl timeStep;
         outputInterval 1;
@@ -78,6 +81,34 @@ functions
 
         Aref 0.05;
         Uref 1;
+    }
+    probes
+    {
+        type            probes;
+        functionObjectLibs ("libsampling.so");
+        outputControl   timeStep;
+        outputInterval  1;
+        probeLocations
+        (
+            ( 1.5 0 0)
+            ( 1.75 0 0)
+        );
+        fields
+        (
+            p
+        );
+    }
+    minMaxP
+    {
+        type minMaxField;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        name p;
+    }
+    minMaxU
+    {
+        type minMaxField;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        name U;
     }
 );
 

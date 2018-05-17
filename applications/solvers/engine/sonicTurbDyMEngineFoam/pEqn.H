@@ -1,6 +1,4 @@
 {
-    rho = thermo.rho();
-
     rUA = 1.0/UEqn.A();
     U = rUA*UEqn.H();
 
@@ -56,12 +54,10 @@
         p.relax();
     }
 
-#   include "rhoEqn.H"
 #   include "compressibleContinuityErrs.H"
 
     U -= rUA*fvc::grad(p);
     U.correctBoundaryConditions();
 
     DpDt = fvc::DDt(surfaceScalarField("phiU", phi/fvc::interpolate(rho)), p);
-    dpdt = fvc::ddt(p);
 }

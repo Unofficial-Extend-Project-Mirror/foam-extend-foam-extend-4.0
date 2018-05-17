@@ -49,7 +49,7 @@ Ostream& operator<<(Ostream&, const TroeFallOffFunction&);
 
 
 /*---------------------------------------------------------------------------*\
-                           Class TroeFallOffFunction Declaration
+               Class TroeFallOffFunction Declaration
 \*---------------------------------------------------------------------------*/
 
 class TroeFallOffFunction

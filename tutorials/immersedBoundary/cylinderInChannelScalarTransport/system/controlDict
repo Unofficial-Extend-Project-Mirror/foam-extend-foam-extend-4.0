@@ -23,7 +23,8 @@ libs
     "libimmersedBoundary.so"
 )
 
-application icoDyMFoam;
+
+application     scalarTransportFoam;
 
 startFrom       startTime;
 
@@ -31,13 +32,13 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         4;
+endTime         3;
 
 deltaT          0.02;
 
 writeControl    timeStep;
 
-writeInterval   2;
+writeInterval   10;
 
 purgeWrite      0;
 
@@ -56,6 +57,19 @@ runTimeModifiable yes;
 adjustTimeStep  no;
 
 maxCo           0.2;
+
+functions
+(
+    minMaxT
+    {
+        type        minMaxField;
+
+        // Where to load it from (if not already in solver)
+        functionObjectLibs ("libfieldFunctionObjects.so");
+
+        name T;
+    }
+);
 
 
 // ************************************************************************* //

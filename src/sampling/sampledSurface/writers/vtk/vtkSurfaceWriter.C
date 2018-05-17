@@ -55,7 +55,7 @@ void Foam::vtkSurfaceWriter::writeGeometry
         << "DATASET POLYDATA" << nl;
 
     // Write vertex coords
-    os  << "POINTS " << points.size() << " float" << nl;
+    os  << "POINTS " << points.size() << " double" << nl;
     forAll(points, pointI)
     {
         const point& pt = points[pointI];
@@ -100,7 +100,7 @@ namespace Foam
         const Field<scalar>& values
     )
     {
-        os  << "1 " << values.size() << " float" << nl;
+        os  << "1 " << values.size() << " double" << nl;
 
         forAll(values, elemI)
         {
@@ -129,7 +129,7 @@ namespace Foam
         const Field<vector>& values
     )
     {
-        os  << "3 " << values.size() << " float" << nl;
+        os  << "3 " << values.size() << " double" << nl;
 
         forAll(values, elemI)
         {
@@ -147,7 +147,7 @@ namespace Foam
         const Field<sphericalTensor>& values
     )
     {
-        os  << "1 " << values.size() << " float" << nl;
+        os  << "1 " << values.size() << " double" << nl;
 
         forAll(values, elemI)
         {
@@ -164,7 +164,7 @@ namespace Foam
         const Field<symmTensor>& values
     )
     {
-        os  << "6 " << values.size() << " float" << nl;
+        os  << "6 " << values.size() << " double" << nl;
 
         forAll(values, elemI)
         {
@@ -185,7 +185,7 @@ namespace Foam
         const Field<tensor>& values
     )
     {
-        os  << "9 " << values.size() << " float" << nl;
+        os  << "9 " << values.size() << " double" << nl;
 
         forAll(values, elemI)
         {
@@ -210,7 +210,7 @@ void Foam::vtkSurfaceWriter::writeData
     const Field<Type>& values
 )
 {
-    os  << "1 " << values.size() << " float" << nl;
+    os  << "1 " << values.size() << " double" << nl;
 
     forAll(values, elemI)
     {

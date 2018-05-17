@@ -50,6 +50,7 @@ SourceFiles
 #include "labelPair.H"
 #include "Pstream.H"
 #include "boolList.H"
+#include "Map.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -57,6 +58,7 @@ namespace Foam
 {
 
 class mapPolyMesh;
+class globalIndex;
 
 /*---------------------------------------------------------------------------*\
                         Class mapDistribute Declaration
@@ -88,8 +90,44 @@ class mapDistribute
             const label receivedSize
         );
 
+        void calcCompactAddressing
+        (
+            const globalIndex& globalNumbering,
+            const labelList& elements,
+            List<Map<label> >& compactMap
+        ) const;
+
+        void calcCompactAddressing
+        (
+            const globalIndex& globalNumbering,
+            const labelListList& elements,
+            List<Map<label> >& compactMap
+        ) const;
+
+        void exchangeAddressing
+        (
+            const int tag,
+            const globalIndex& globalNumbering,
+            labelList& elements,
+            List<Map<label> >& compactMap,
+            labelList& compactStart
+        );
+
+        void exchangeAddressing
+        (
+            const int tag,
+            const globalIndex& globalNumbering,
+            labelListList& elements,
+            List<Map<label> >& compactMap,
+            labelList& compactStart
+        );
+
 
 public:
+
+    // Declare name of the class and its debug switch
+    ClassName("mapDistribute");
+
 
     // Constructors
 
@@ -116,6 +154,30 @@ public:
         (
             const labelList& sendProcs,
             const labelList& recvProcs
+        );
+
+
+        //- Construct from list of (possibly) remote elements in globalIndex
+        //  numbering (or -1). Determines compact numbering (see above) and
+        //  distribute map to get data into this ordering and renumbers the
+        //  elements to be in compact numbering.
+        mapDistribute
+        (
+            const globalIndex& globalNumbering,
+            labelList& elements,
+            List<Map<label> >& compactMap,
+            const int tag = Pstream::msgType()
+        );
+
+        //- Special variant that works with the info sorted into bins
+        //  according to local indices. E.g. think cellCells where
+        //  cellCells[localCellI] is a list of global cells
+        mapDistribute
+        (
+            const globalIndex&,
+            labelListList& cellCells,
+            List<Map<label> >& compactMap,
+            const int tag = Pstream::msgType()
         );
 
         //- Construct copy
@@ -175,6 +237,15 @@ public:
 
 
         // Other
+
+            //- Helper for construct from globalIndex. Renumbers element
+            //  (in globalIndex numbering) into compact indices.
+            static label renumber
+            (
+                const globalIndex&,
+                const List<Map<label> >& compactMap,
+                const label globalElement
+            );
 
             //- Compact maps. Gets per field a bool whether it is used locally
             //  and works out itself what this side and sender side can remove
@@ -264,6 +335,9 @@ public:
                     );
                 }
             }
+
+            //- Debug: print layout
+            void printLayout(Ostream& os) const;
 
             //- Correct for topo change
             void updateMesh(const mapPolyMesh&)

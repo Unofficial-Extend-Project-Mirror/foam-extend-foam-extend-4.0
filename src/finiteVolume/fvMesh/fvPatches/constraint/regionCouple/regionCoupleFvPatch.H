@@ -70,13 +70,13 @@ protected:
     // Protected Member functions
 
         //- Make patch weighting factors
-        virtual void makeWeights(scalarField&) const;
+        virtual void makeWeights(fvsPatchScalarField&) const;
 
         //- Make patch face - neighbour cell distances
-        virtual void makeDeltaCoeffs(scalarField&) const;
+        virtual void makeDeltaCoeffs(fvsPatchScalarField&) const;
 
         //- Make patch face non-orthogonality correction vectors
-        virtual void makeCorrVecs(vectorField&) const;
+        virtual void makeCorrVecs(fvsPatchVectorField&) const;
 
 
 public:
@@ -152,15 +152,16 @@ public:
                 return rcPolyPatch_.interpolate(tpf);
             }
 
-            //- Bridge interpolated face field for uncovered faces
+            //- Set given field for uncovered faces. Usually used for setting
+            //  mirrored field
             template<class Type>
-            void bridge
+            void setUncoveredFaces
             (
-                const Field<Type>& bridgeField,
+                const Field<Type>& fieldToSet,
                 Field<Type>& ff
             ) const
             {
-                return rcPolyPatch_.bridge(bridgeField, ff);
+                return rcPolyPatch_.setUncoveredFaces(fieldToSet, ff);
             }
 
 
@@ -189,7 +190,7 @@ public:
 
             //- Return addressing.  Master side returns own addressing and
             //  slave side returns addressing from master
-            virtual const labelListList& addressing() const;
+            virtual const labelListList& ggiAddressing() const;
 
             //- Is the patch localised on a single processor
             virtual bool localParallel() const;
@@ -199,7 +200,7 @@ public:
 
             //- Return weights.  Master side returns own weights and
             //  slave side returns weights from master
-            virtual const scalarListList& weights() const;
+            virtual const scalarListList& ggiWeights() const;
 
             //- Return face transformation tensor
             virtual const tensorField& forwardT() const
@@ -216,6 +217,10 @@ public:
             //- Expand addressing to zone
             //  Used in optimised AMG coarsening
             virtual void expandAddrToZone(labelField&) const;
+
+            //- Expand crMatrix to zone
+            //  Used in optimised SAMG coarsening
+            virtual void expandCrMatrixToZone(crMatrix&) const;
 
 
             //- Return the values of the given internal data adjacent to

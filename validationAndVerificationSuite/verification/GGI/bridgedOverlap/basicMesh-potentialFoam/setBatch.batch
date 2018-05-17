@@ -1,0 +1,3 @@
+faceSet staticSliderZone new patchToFace staticSlider
+faceSet movingSliderZone new patchToFace movingSlider
+quit

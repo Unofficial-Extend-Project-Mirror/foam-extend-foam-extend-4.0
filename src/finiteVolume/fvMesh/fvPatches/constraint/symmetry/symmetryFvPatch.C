@@ -26,6 +26,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "symmetryFvPatch.H"
+#include "fvPatchFields.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -40,7 +41,7 @@ addToRunTimeSelectionTable(fvPatch, symmetryFvPatch, polyPatch);
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void symmetryFvPatch::makeCorrVecs(vectorField& cv) const
+void symmetryFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
 {
     // Non-orthogonal correction not allowed.  HJ, 16/Apr/2009
     cv = vector::zero;

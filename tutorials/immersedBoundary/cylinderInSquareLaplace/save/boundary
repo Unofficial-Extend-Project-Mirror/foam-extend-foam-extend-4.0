@@ -24,6 +24,7 @@ FoamFile
         startFace       4900;
 
         internalFlow    no;
+        isWall          yes;
     }
     in
     {

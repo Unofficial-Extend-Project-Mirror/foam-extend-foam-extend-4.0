@@ -317,8 +317,8 @@ bool Foam::mixerGgiFvMesh::update()
         cs_.globalPosition
         (
             cs_.localPosition(allPoints())
-          + vector(0, rpm_*360.0*time().deltaT().value()/60.0, 0)
-            *movingPointsMask()
+          + vector(0, rpm_*360.0*time().deltaT().value()/60.0, 0)*
+            movingPointsMask()
         )
     );
 

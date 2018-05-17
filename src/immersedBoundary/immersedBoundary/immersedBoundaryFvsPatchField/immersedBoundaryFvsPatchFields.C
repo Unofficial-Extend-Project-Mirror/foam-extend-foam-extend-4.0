@@ -27,7 +27,6 @@ License
 #include "fvsPatchFields.H"
 #include "volFields.H"
 #include "surfaceFields.H"
-#include "immersedBoundaryFvPatchFields.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

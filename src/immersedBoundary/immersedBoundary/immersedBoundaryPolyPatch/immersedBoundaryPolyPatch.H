@@ -30,6 +30,7 @@ Description
 Author
     Zeljko Tukovic
     Reorganisation by Hrvoje Jasak
+    Complete rewrite of methodology, Hrvoje Jasak
 
 SourceFiles
     immersedBoundaryPolyPatch.C
@@ -43,6 +44,7 @@ SourceFiles
 #include "triSurfaceMesh.H"
 #include "triSurfaceTools.H"
 #include "triSurfaceSearch.H"
+#include "standAlonePatch.H"
 #include "Switch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -67,39 +69,116 @@ class immersedBoundaryPolyPatch
         //- Internal or external flow calculation
         Switch internalFlow_;
 
+        //- Is this a wall walls
+        Switch isWall_;
+
+        //- Moving immersed boundary
+        bool movingIb_;
+
+        //- Time index for last update of mesh or moving boundary
+        mutable label ibUpdateTimeIndex_;
+
+
+    // Static data
+
+        //- Live volume factor
+        //  Fraction of face/cell size within the IB for which the face/cell is
+        //  considered to be live
+        static const debug::tolerancesSwitch liveFactor_;
+
 
     // Demand-driven data
 
         //- Triangular surface search algorithm
         mutable triSurfaceSearch* triSurfSearchPtr_;
 
-        //- Moving immersed boundary
-        bool movingIb_;
+
+        // Immersed boundary patch data
+
+            //- PrimitivePatch of cell-intersected immersed boundary faces
+            //  Faces are calculated as intesection between the volume mesh
+            //  and the ibMesh_
+            mutable standAlonePatch* ibPatchPtr_;
+
+            //- Cells intersected by the ibMesh_
+            // This also corresponds to faceCells next to the IB patch
+            mutable labelList* ibCellsPtr_;
+
+            //- Centres of live part of intersected cells
+            mutable vectorField* ibCellCentresPtr_;
+
+            //- Volumes of live part of intersected cells
+            mutable scalarField* ibCellVolumesPtr_;
+
+            //- Intersected faces of the mesh
+            mutable labelList* ibFacesPtr_;
+
+            //- Centres of live part of intesected faces
+            mutable vectorField* ibFaceCentresPtr_;
+
+            //- Areas of live part of intesected faces
+            mutable vectorField* ibFaceAreasPtr_;
+
+            //- Nearest triangle for all immersed boundary patch faces
+            mutable labelList* nearestTriPtr_;
+
+
+        // Immersed boundary blanking
+
+            //- Dead cells list
+            mutable labelList* deadCellsPtr_;
+
+            //- Dead faces list
+            mutable labelList* deadFacesPtr_;
+
+
+        // Corrected mesh geometry
+
+            //- Corrected cell centres
+            mutable vectorField* correctedCellCentresPtr_;
+
+            //- Corrected face centres
+            mutable vectorField* correctedFaceCentresPtr_;
+
+            //- Corrected cell volumes
+            mutable scalarField* correctedCellVolumesPtr_;
+
+            //- Corrected face areas
+            mutable vectorField* correctedFaceAreasPtr_;
+
+            //- Corrected face areas for the immersed boundary patch
+            mutable vectorField* correctedIbPatchFaceAreasPtr_;
+
+
+        // Immersed boundary motion
+
+            //- Old points
+            mutable pointField* oldIbPointsPtr_;
 
 
     // Private Member Functions
 
-        // Storage management
-
-            //- Clear all demand-driven data
-            void clearOut();
+        //- Check cell intersection
+        vector cellSpan(const label cellID) const;
 
 
         // Make demand-driven data
 
             //- Make triSurface search algorithm
-            void makeTriSurfSearch() const;
+            void calcTriSurfSearch() const;
+
+            //- Calculate the immersed boundary patch geometry
+            void calcImmersedBoundary() const;
+
+            //- Calculate the corrected mesh geometry
+            void calcCorrectedGeometry() const;
 
 
 protected:
 
     // Protected Member Functions
 
-        //- Initialise the patches for moving points
-        virtual void initMovePoints(const pointField&)
-        {}
-
-        //- Correct patches after moving points
+        //- Correct patch after moving points
         virtual void movePoints(const pointField& p);
 
 
@@ -201,6 +280,12 @@ public:
                 return internalFlow_;
             }
 
+            // Is this a wall patch?
+            virtual bool isWall() const
+            {
+                return isWall_;
+            }
+
             //- Return triSurface search object
             const triSurfaceSearch& triSurfSearch() const;
 
@@ -211,11 +296,91 @@ public:
             }
 
 
-        // Edit
+        // Immersed boundary patch data
+
+            //- Return primitivePatch of cell-intersected faces
+            //  Faces are calculated as intesection between the volume mesh
+            //  and the ibMesh
+            const standAlonePatch& ibPatch() const;
+
+            //- Return cells intersected by the ibMesh
+            //  This also corresponds to faceCells next to the IB patch
+            const labelList& ibCells() const;
+
+            //- Return centres of live part of intersected cells
+            const vectorField& ibCellCentres() const;
+
+            //- Return volumes of live part of intersected cells
+            const scalarField& ibCellVolumes() const;
+
+            //- Return intersected faces of the mesh
+            const labelList& ibFaces() const;
+
+            //- Return centres of live part of intesected faces
+            const vectorField& ibFaceCentres() const;
+
+            //- Return areas of live part of intesected faces
+            const vectorField& ibFaceAreas() const;
+
+            //- Return nearest triangle for all immersed boundary patch faces
+            const labelList& nearestTri() const;
+
+
+        // Immersed boundary blanking
+
+            //- Return dead cells
+            const labelList& deadCells() const;
+
+            //- Return dead faces
+            const labelList& deadFaces() const;
+
+
+        // Corrected mesh geometry
+
+            //- Corrected cell centres
+            const vectorField& correctedCellCentres() const;
+
+            //- Corrected face centres
+            const vectorField& correctedFaceCentres() const;
+
+            //- Corrected cell volumes
+            const scalarField& correctedCellVolumes() const;
+
+            //- Corrected face areas
+            const vectorField& correctedFaceAreas() const;
+
+
+        // Corrected immersed patch geometry
+    
+            //- Corrected ib patch face areas
+            const vectorField& correctedIbPatchFaceAreas() const;
+
+
+        // Immersed boundary motion
 
             //- Correct patches after moving points
             void moveTriSurfacePoints(const pointField& p);
 
+            //- Return old IB points
+            const pointField& oldIbPoints() const;
+
+            //- Motion distance vector for triangular immersed boundary faces
+            tmp<vectorField> triMotionDistance() const;
+
+            //- Motion distance vector for active immersed boundary faces
+            tmp<vectorField> motionDistance() const;
+
+
+        // Clear
+
+            //- Clear geometry
+            virtual void clearGeom();
+
+            //- Clear addressing
+            virtual void clearAddressing();
+
+            //- Clear all demand-driven data
+            void clearOut() const;
 
 
         //- Write

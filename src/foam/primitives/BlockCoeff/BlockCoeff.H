@@ -304,9 +304,8 @@ public:
         BlockCoeff<Type> clone() const;
 
 
-    // Destructor
-
-        ~BlockCoeff();
+    //- Destructor
+    ~BlockCoeff();
 
         //- Clear data
         void clear();

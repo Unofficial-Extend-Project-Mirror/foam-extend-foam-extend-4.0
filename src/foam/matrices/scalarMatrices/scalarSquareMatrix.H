@@ -45,14 +45,13 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class scalarSquareMatrix Declaration
+                    Class scalarSquareMatrix Declaration
 \*---------------------------------------------------------------------------*/
 
 class scalarSquareMatrix
 :
     public SquareMatrix<scalar>
 {
-
 public:
 
     // Constructors
@@ -66,8 +65,11 @@ public:
         //- Construct given size and coefficient value
         scalarSquareMatrix(const label, const scalar v);
 
-        //- Construct as copy
-        scalarSquareMatrix(const scalarSquareMatrix&);
+        // //- Construct as copy
+        // scalarSquareMatrix(const scalarSquareMatrix&);
+
+        //- Construct as copy of base
+        scalarSquareMatrix(const SquareMatrix<scalar>&);
 
         //- Construct from Istream
         scalarSquareMatrix(Istream&);

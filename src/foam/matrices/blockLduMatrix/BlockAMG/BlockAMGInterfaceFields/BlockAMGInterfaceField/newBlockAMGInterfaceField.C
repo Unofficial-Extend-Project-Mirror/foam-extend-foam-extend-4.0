@@ -45,9 +45,11 @@ Foam::BlockAMGInterfaceField<Type>::New
     {
         FatalErrorIn
         (
-            "BlockAMGInterfaceField::New"
-            "(const AMGInterface& AMGCp, "
-            "const BlockLduInterfaceField<Type>& fineInterface)"
+            "BlockAMGInterfaceField::New\n"
+            "(\n"
+            "    const AMGInterface& AMGCp,\n"
+            "    const BlockLduInterfaceField<Type>& fineInterface\n"
+            ")"
         )   << "Unknown BlockAMGInterfaceField type " << coupleType << ".\n"
             << "Valid BlockAMGInterfaceField types are :"
             << lduInterfaceConstructorTablePtr_->sortedToc()

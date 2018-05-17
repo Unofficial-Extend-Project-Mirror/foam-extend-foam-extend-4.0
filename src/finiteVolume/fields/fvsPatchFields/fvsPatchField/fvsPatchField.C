@@ -156,7 +156,8 @@ const objectRegistry& fvsPatchField<Type>::db() const
 
 template<class Type>
 template<class GeometricField, class Type2>
-const typename GeometricField::PatchFieldType& Foam::fvsPatchField<Type>::lookupPatchField
+const typename GeometricField::PatchFieldType& Foam::fvsPatchField<Type>::
+lookupPatchField
 (
     const word& name,
     const GeometricField*,
@@ -165,7 +166,8 @@ const typename GeometricField::PatchFieldType& Foam::fvsPatchField<Type>::lookup
 {
     return patch_.patchField<GeometricField, Type2>
     (
-        internalField_.db().objectRegistry::template lookupObject<GeometricField>(name)
+        internalField_.db().objectRegistry::template
+        lookupObject<GeometricField>(name)
     );
 }
 

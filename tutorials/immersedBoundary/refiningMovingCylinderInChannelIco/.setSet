@@ -1,0 +1,5 @@
+cellSet badCell new labelToCell (1071)
+quit
+cellSet badCells new labelToCell ( 545 552 619 768 780 843 918 993 1068 1080 1219 1295 1302 )
+cellSet negVolCells new labelToCell ( 547 621 695 844 919 994 1145 1221 1297 )
+quit

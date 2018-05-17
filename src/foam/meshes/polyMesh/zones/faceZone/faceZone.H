@@ -307,9 +307,8 @@ public:
         //- Correct patch after moving points
         virtual void movePoints(const pointField&);
 
-        //- Update for changes in topology  Note: Zone has been rebuilt
-        //  and no mapping is required.  HJ, 1/Mar/2009
-        void updateMesh();
+        //- Update for changes in topology
+        virtual void updateMesh();
 
         //- Write
         virtual void write(Ostream&) const;

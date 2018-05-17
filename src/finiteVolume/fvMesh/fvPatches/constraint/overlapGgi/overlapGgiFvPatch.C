@@ -27,8 +27,10 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "overlapGgiFvPatch.H"
-#include "addToRunTimeSelectionTable.H"
+#include "fvPatchFields.H"
+#include "fvsPatchFields.H"
 #include "fvBoundaryMesh.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -42,7 +44,7 @@ namespace Foam
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 // Make patch weighting factors
-void Foam::overlapGgiFvPatch::makeWeights(scalarField& w) const
+void Foam::overlapGgiFvPatch::makeWeights(fvsPatchScalarField& w) const
 {
     // Calculation of weighting factors is performed from the master
     // position, using reconstructed shadow cell centres
@@ -64,7 +66,12 @@ void Foam::overlapGgiFvPatch::makeWeights(scalarField& w) const
     else
     {
         // Pick up weights from the master side
-        scalarField masterWeights(shadow().size());
+        fvsPatchScalarField masterWeights
+        (
+            shadow(),
+            w.dimensionedInternalField()
+        );
+
         shadow().makeWeights(masterWeights);
 
         w = interpolate(1 - masterWeights);
@@ -73,7 +80,7 @@ void Foam::overlapGgiFvPatch::makeWeights(scalarField& w) const
 
 
 // Make patch face - neighbour cell distances
-void Foam::overlapGgiFvPatch::makeDeltaCoeffs(scalarField& dc) const
+void Foam::overlapGgiFvPatch::makeDeltaCoeffs(fvsPatchScalarField& dc) const
 {
     if (overlapGgiPolyPatch_.master())
     {
@@ -84,14 +91,20 @@ void Foam::overlapGgiFvPatch::makeDeltaCoeffs(scalarField& dc) const
     }
     else
     {
-        scalarField masterDeltas(shadow().size());
+        fvsPatchScalarField masterDeltas
+        (
+            shadow(),
+            dc.dimensionedInternalField()
+        );
+
         shadow().makeDeltaCoeffs(masterDeltas);
+
         dc = interpolate(masterDeltas);
     }
 }
 
 
-void Foam::overlapGgiFvPatch::makeCorrVecs(vectorField& cv) const
+void Foam::overlapGgiFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
 {
     // Non-orthogonality correction on a ggi interface
     // MB, 7/April/2009

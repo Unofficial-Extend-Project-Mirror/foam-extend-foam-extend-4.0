@@ -170,6 +170,12 @@ public:
 
     // Member functions
 
+        //- Return interface size
+        virtual label interfaceSize() const
+        {
+            return size();
+        }
+
         //- Return processor number
         int myProcNo() const
         {
@@ -193,6 +199,12 @@ public:
             {
                 return false;
             }
+        }
+
+        //- Is this the master side?
+        virtual bool master() const
+        {
+            return (myProcNo_ < neighbProcNo_);
         }
 
 

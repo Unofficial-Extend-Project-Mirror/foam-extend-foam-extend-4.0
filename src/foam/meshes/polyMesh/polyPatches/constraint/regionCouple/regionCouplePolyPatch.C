@@ -77,8 +77,15 @@ bool Foam::regionCouplePolyPatch::active() const
 
         polyPatchID shadowPatch(shadowPatchName_, sr.boundaryMesh());
 
-        // If shadow patch is active, all components are ready
-        return shadowPatch.active();
+        if (!Pstream::parRun() && !localParallel())
+        {
+            // Patch is present in serial run, but zone is not the same size
+            // Probably doing decomposition and reconstruction
+            // HJ, 14/Sep/2016
+            return false;
+        }
+
+        return true;
     }
     else
     {
@@ -136,6 +143,12 @@ void Foam::regionCouplePolyPatch::calcRemoteZoneAddressing() const
             "void regionCouplePolyPatch::calcRemoteZoneAddressing() const"
         )   << "Patch to remote zone addressing already calculated"
             << abort(FatalError);
+    }
+
+    if (debug)
+    {
+        Pout<< "regionCouplePolyPatch::calcRemoteZoneAddressing() const for patch "
+            << name() << endl;
     }
 
     // Once zone addressing is established, visit the opposite side and find
@@ -213,6 +226,13 @@ void Foam::regionCouplePolyPatch::calcPatchToPatch() const
 
     if (master())
     {
+        if (debug)
+        {
+            InfoIn("void regionCouplePolyPatch::calcPatchToPatch() const")
+                << "Calculating patch to patch interpolation for patch"
+                << name() << endl;
+        }
+
         // Create interpolation for zones
         patchToPatchPtr_ =
             new ggiZoneInterpolation
@@ -317,41 +337,42 @@ void Foam::regionCouplePolyPatch::calcLocalParallel() const
     localParallelPtr_ = new bool(false);
     bool& emptyOrComplete = *localParallelPtr_;
 
-    // If running in parallel, all GGIs are expanded to zone size.
-    // This happens on decomposition and reconstruction where
-    // size and shadow size may be zero, but zone size may not
-    // HJ, 1/Jun/2011
-    if (!Pstream::parRun())
+    // Check that patch size is greater than the zone size.
+    // This is an indication of the error where the face zone is not global
+    // in a parallel run.  HJ, 9/Nov/2014
+    if (size() > zone().size())
     {
+        FatalErrorIn
+        (
+            "void regionCouplePolyPatch::calcLocalParallel() const"
+        )   << "Patch size is greater than zone size for GGI patch "
+            << name() << ".  This is not allowerd: "
+            << "the face zone must contain all patch faces and be "
+            << "global in parallel runs"
+            << abort(FatalError);
+    }
+    // Calculate localisation on master and shadow
+    if ((size() == 0 && shadow().size() == 0))
+    {
+        // No ggi on this processor
         emptyOrComplete = true;
+    }
+    else if (!zone().empty() || !shadow().zone().empty())
+    {
+        // GGI present on the processor and complete for both
+        emptyOrComplete =
+        (
+            zone().size() == size()
+         && shadow().zone().size() == shadow().size()
+        );
     }
     else
     {
-        // Check that patch size is greater than the zone size.
-        // This is an indication of the error where the face zone is not global
-        // in a parallel run.  HJ, 9/Nov/2014
-        if (size() > zone().size())
-        {
-            FatalErrorIn
-            (
-                "void regionCouplePolyPatch::calcLocalParallel() const"
-            )   << "Patch size is greater than zone size for GGI patch "
-                << name() << ".  This is not allowerd: "
-                << "the face zone must contain all patch faces and be "
-                << "global in parallel runs"
-                << abort(FatalError);
-        }
-
-        // Calculate localisation on master and shadow
-        emptyOrComplete =
-            (
-                zone().size() == size()
-             && shadow().zone().size() == shadow().size()
-            )
-         || (size() == 0 && shadow().size() == 0);
-
-        reduce(emptyOrComplete, andOp<bool>());
+        // Master and shadow on different processors
+        emptyOrComplete = false;
     }
+
+    reduce(emptyOrComplete, andOp<bool>());
 
     if (debug && Pstream::parRun())
     {
@@ -1065,7 +1086,7 @@ void Foam::regionCouplePolyPatch::initGeometry()
 {
     // Communication is allowed either before or after processor
     // patch comms.  HJ, 11/Jul/2011
-    if (active())
+    if (active() && attached_)
     {
         // Note: Only master calculates recon; slave uses master interpolation
         if (master())
@@ -1095,6 +1116,12 @@ void Foam::regionCouplePolyPatch::initMovePoints(const pointField& p)
 
     // Calculate transforms on mesh motion?
     calcTransforms();
+
+    if (master())
+    {
+        shadow().clearGeom();
+        shadow().calcTransforms();
+    }
 
     // Update interpolation for new relative position of GGI interfaces
     if (patchToPatchPtr_)
@@ -1144,8 +1171,8 @@ void Foam::regionCouplePolyPatch::initUpdateMesh()
 
 void Foam::regionCouplePolyPatch::updateMesh()
 {
-    polyPatch::updateMesh();
     clearOut();
+    polyPatch::updateMesh();
 }
 
 

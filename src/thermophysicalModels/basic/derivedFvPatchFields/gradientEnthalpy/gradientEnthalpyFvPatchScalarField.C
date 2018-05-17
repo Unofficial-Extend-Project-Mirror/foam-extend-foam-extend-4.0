@@ -122,13 +122,15 @@ void Foam::gradientEnthalpyFvPatchScalarField::updateCoeffs()
     )
     {
         // Get access to relative and rotational velocity
-        const word UrelName("Urel");
-        const word UrotName("Urot");
+        const word UName("U");
+        const word URotName("URot");
+        const word UThetaName("UTheta");
 
         if
         (
-            !this->db().objectRegistry::found(UrelName)
-         || !this->db().objectRegistry::found(UrotName)
+            !this->db().objectRegistry::found(UName)
+         || !this->db().objectRegistry::found(URotName)
+         || !this->db().objectRegistry::found(UThetaName)
         )
         {
              // Velocities not available, do not update
@@ -136,8 +138,9 @@ void Foam::gradientEnthalpyFvPatchScalarField::updateCoeffs()
             (
                 "void gradientEnthalpyFvPatchScalarField::"
                 "updateCoeffs(const vectorField& Up)"
-            )   << "Velocity fields " << UrelName << " or "
-                << UrotName << " not found.  "
+            )   << "Velocity fields " << UName << " or "
+                << URotName << " or "
+                << UThetaName << " not found.  "
                 << "Performing enthalpy value update for field "
                 << this->dimensionedInternalField().name()
                 << " and patch " << patchi
@@ -152,11 +155,14 @@ void Foam::gradientEnthalpyFvPatchScalarField::updateCoeffs()
         }
         else
         {
-            const fvPatchVectorField& Urelp =
-                lookupPatchField<volVectorField, vector>(UrelName);
+            const fvPatchVectorField& Up =
+                lookupPatchField<volVectorField, vector>(UName);
 
-            const fvPatchVectorField& Urotp =
-                lookupPatchField<volVectorField, vector>(UrotName);
+            const fvPatchVectorField& URotp =
+                lookupPatchField<volVectorField, vector>(URotName);
+
+            const fvPatchScalarField& UThetap =
+                lookupPatchField<volScalarField, scalar>(UThetaName);
 
             gradient() = thermo.Cp(Tw, patchi)*Tw.snGrad()
               + patch().deltaCoeffs()*
@@ -164,8 +170,8 @@ void Foam::gradientEnthalpyFvPatchScalarField::updateCoeffs()
                     thermo.h(Tw, patchi)
                   - thermo.h(Tw, patch().faceCells())
                 )
-              - mag(Urotp)*mag(Urotp.snGrad())
-              + mag(Urelp)*mag(Urelp.snGrad());
+              + 0.5*mag(Up)*mag(Up.snGrad())
+              - mag(UThetap)*mag(URotp.snGrad());
         }
     }
     else

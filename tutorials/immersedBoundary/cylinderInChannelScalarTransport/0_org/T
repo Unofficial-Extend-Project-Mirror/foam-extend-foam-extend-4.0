@@ -22,14 +22,15 @@ boundaryField
 {
     ibCylinder
     {
-        type immersedBoundary;
-        refValue uniform 0;
-        refGradient  uniform 0;
-        fixesValue no;
+        type mixedIb;
+        patchType immersedBoundary;
+        triValue uniform 0;
+        triGradient  uniform 0;
+        triValueFraction uniform 0;
         value uniform 0;
 
-        setDeadCellValue   yes;
-        deadCellValue      0;
+        setDeadValue   no;
+        deadValue      0;
     }
     in
     {

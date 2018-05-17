@@ -572,13 +572,13 @@ bool Foam::sampledIsoSurface::expire()
     facesPtr_.clear();
     subMeshPtr_.clear();
 
-    // already marked as expired
+    // Already marked as expired
     if (prevTimeIndex_ == -1)
     {
         return false;
     }
 
-    // force update
+    // Force update
     prevTimeIndex_ = -1;
     return true;
 }

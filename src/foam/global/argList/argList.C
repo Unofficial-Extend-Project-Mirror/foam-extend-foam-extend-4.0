@@ -780,6 +780,40 @@ void Foam::argList::parse
     }
 
 
+    // Managing the overrides for the global control switches:
+    //
+    // Here is the order of precedence for the definition/overriding of the
+    // control switches, from lowest to highest:
+    //  - source code definitions from the various libraries/solvers
+    //  - file specified by the env. variable FOAM_GLOBAL_CONTROLDICT
+    //  - case's system/controlDict file
+    //  - command-line parameters
+    //
+    // First, we allow the users to specify the location of a centralized
+    // global controlDict dictionary using the environment variable
+    // FOAM_GLOBAL_CONTROLDICT.
+    fileName optionalGlobControlDictFileName =
+    getEnv("FOAM_GLOBAL_CONTROLDICT");
+
+    if (optionalGlobControlDictFileName.size() )
+    {
+        debug::updateCentralDictVars
+        (
+            optionalGlobControlDictFileName,
+            Pstream::master() && bannerEnabled
+        );
+    }
+
+    // Now that the rootPath_/globalCase_ directory is known (following the
+    // call to getRootCase()), we grab any global control switches overrides
+    // from the current case's controlDict.
+
+    debug::updateCentralDictVars
+    (
+        rootPath_/globalCase_/"system/controlDict",
+        Pstream::master() && bannerEnabled
+    );
+
     // Finally, a command-line override for central controlDict's variables.
     // This is the ultimate override for the global control switches.
 
@@ -793,7 +827,7 @@ void Foam::argList::parse
 
     forAll (globalControlDictSwitchSetNames, gI)
     {
-        word switchSetName = globalControlDictSwitchSetNames.names[gI];
+        const word switchSetName = globalControlDictSwitchSetNames.names[gI];
 
         if (optionFound(switchSetName))
         {

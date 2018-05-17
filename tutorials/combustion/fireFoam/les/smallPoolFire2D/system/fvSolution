@@ -23,7 +23,7 @@ solvers
         preconditioner  DIC;
         tolerance       0;
         relTol          0;
-    };
+    }
 
     p
     {
@@ -35,7 +35,7 @@ solvers
         nCellsInCoarsestLevel   10;
         agglomerator    faceAreaPair;
         mergeLevels     1;
-    };
+    }
 
     pFinal
     {
@@ -47,7 +47,7 @@ solvers
         nCellsInCoarsestLevel 10;
         agglomerator     faceAreaPair;
         mergeLevels      1;
-    };
+    }
 
     ft
     {
@@ -56,7 +56,7 @@ solvers
         tolerance       1e-7;
         relTol          0;
         nSweeps         1;
-    };
+    }
 
     fu
     {
@@ -65,7 +65,7 @@ solvers
         tolerance       1e-7;
         relTol          0;
         nSweeps         1;
-    };
+    }
 
     U
     {
@@ -74,7 +74,7 @@ solvers
         tolerance       1e-7;
         relTol          0.1;
         nSweeps         1;
-    };
+    }
 
     UFinal
     {
@@ -83,7 +83,7 @@ solvers
         tolerance       1e-7;
         relTol          0;
         nSweeps         1;
-    };
+    }
 
     k
     {
@@ -92,7 +92,7 @@ solvers
         tolerance       1e-7;
         relTol          0;
         nSweeps         1;
-    };
+    }
 
     hs
     {
@@ -100,7 +100,7 @@ solvers
         preconditioner  DILU;
         tolerance       1e-7;
         relTol          0;
-    };
+    }
 
     Ii
     {

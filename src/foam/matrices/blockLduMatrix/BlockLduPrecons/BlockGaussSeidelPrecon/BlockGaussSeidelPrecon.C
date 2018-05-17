@@ -946,4 +946,14 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
 }
 
 
+template<class Type>
+void Foam::BlockGaussSeidelPrecon<Type>::initMatrix()
+{
+    invDiag_.clear();
+    LUDiag_.clear();
+
+    this->calcInvDiag();
+}
+
+
 // ************************************************************************* //

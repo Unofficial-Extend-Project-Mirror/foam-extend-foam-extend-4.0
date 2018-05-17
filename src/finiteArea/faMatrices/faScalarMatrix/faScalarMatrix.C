@@ -58,85 +58,6 @@ void faMatrix<scalar>::setComponentReference
 
 
 template<>
-autoPtr<faMatrix<scalar>::faSolver> faMatrix<scalar>::solver
-(
-    const dictionary& solverControls
-)
-{
-    if (debug)
-    {
-        Info<< "faMatrix<scalar>::solver(const dictionary&) : "
-               "solver for faMatrix<scalar>"
-            << endl;
-    }
-
-    scalarField saveDiag = diag();
-    addBoundaryDiag(diag(), 0);
-
-    // Make a copy of interfaces: no longer a reference
-    // HJ, 20/Nov/2007
-    lduInterfaceFieldPtrsList interfaces = psi_.boundaryField().interfaces();
-
-    autoPtr<faMatrix<scalar>::faSolver> solverPtr
-    (
-        new faMatrix<scalar>::faSolver
-        (
-            *this,
-            lduSolver::New
-            (
-                psi_.name(),
-                *this,
-                boundaryCoeffs_,
-                internalCoeffs_,
-                interfaces,
-                solverControls
-            )
-        )
-    );
-
-    diag() = saveDiag;
-
-    return solverPtr;
-}
-
-
-template<>
-lduSolverPerformance faMatrix<scalar>::faSolver::solve
-(
-    const dictionary& solverControls
-)
-{
-    scalarField saveDiag = faMat_.diag();
-    faMat_.addBoundaryDiag(faMat_.diag(), 0);
-
-    scalarField totalSource = faMat_.source();
-    faMat_.addBoundarySource(totalSource, false);
-
-    solver_->read(solverControls);
-
-    // Cast into a non-const to solve.  HJ, 6/May/2016
-    GeometricField<scalar, faPatchField, areaMesh>& psi =
-        const_cast<GeometricField<scalar, faPatchField, areaMesh>&>
-        (
-            faMat_.psi()
-        );
-
-    lduSolverPerformance solverPerf =
-        solver_->solve(psi.internalField(), totalSource);
-
-    solverPerf.print();
-
-    faMat_.diag() = saveDiag;
-
-    psi.correctBoundaryConditions();
-
-    psi.mesh().solutionDict().setSolverPerformance(psi.name(), solverPerf);
-
-    return solverPerf;
-}
-
-
-template<>
 lduSolverPerformance faMatrix<scalar>::solve
 (
     const dictionary& solverControls
@@ -178,8 +99,6 @@ lduSolverPerformance faMatrix<scalar>::solve
     diag() = saveDiag;
 
     psi.correctBoundaryConditions();
-
-    psi_.mesh().solutionDict().setSolverPerformance(psi_.name(), solverPerf);
 
     return solverPerf;
 }

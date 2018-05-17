@@ -109,9 +109,8 @@ public:
         explicit movingBodyTopoFvMesh(const IOobject& io);
 
 
-    // Destructor
-
-        virtual ~movingBodyTopoFvMesh();
+    //- Destructor
+    virtual ~movingBodyTopoFvMesh();
 
 
     // Member Functions

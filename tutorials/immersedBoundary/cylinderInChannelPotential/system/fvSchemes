@@ -21,8 +21,7 @@ ddtSchemes
 
 gradSchemes
 {
-    default         Gauss linear;
-    grad(p)         Gauss linear;
+    default         cellLimited Gauss linear 1;
 }
 
 divSchemes
@@ -33,22 +32,17 @@ divSchemes
 
 laplacianSchemes
 {
-    default         none;
-    laplacian(nu,U) Gauss linear corrected;
-    laplacian((1|A(U)),p) Gauss linear corrected;
-
-    laplacian(1,p) Gauss linear corrected;
+    default         Gauss linear limited 0.5;
 }
 
 interpolationSchemes
 {
     default         linear;
-    interpolate(HbyA) linear;
 }
 
 snGradSchemes
 {
-    default         corrected;
+    default         limited 0.5;
 }
 
 

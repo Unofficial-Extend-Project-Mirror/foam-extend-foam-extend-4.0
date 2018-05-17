@@ -136,8 +136,13 @@ int main(int argc, char *argv[])
     }
 
     // Read all meshes and addressing to reconstructed mesh
-    processorMeshesReconstructor procMeshes(databases, regionName);
+    processorMeshesReconstructor procMeshes
+    (
+        databases,
+        regionName
+    );
 
+    // Get reconstructed mesh
     autoPtr<fvMesh> meshPtr = procMeshes.reconstructMesh(runTime);
 
 
@@ -629,7 +634,7 @@ int main(int argc, char *argv[])
 
             faMesh aMesh(mesh);
 
-            processorFaMeshes procFaMeshes(procMeshes.meshes());
+            processorFaMeshes procFaMeshes(procMeshes.meshes(), true);
 
             faFieldReconstructor faReconstructor
             (

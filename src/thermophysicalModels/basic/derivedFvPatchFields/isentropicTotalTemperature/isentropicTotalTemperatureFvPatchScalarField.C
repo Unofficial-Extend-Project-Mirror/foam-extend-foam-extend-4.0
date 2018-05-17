@@ -144,6 +144,20 @@ void Foam::isentropicTotalTemperatureFvPatchScalarField::updateCoeffs()
         return;
     }
 
+    if (!this->db().objectRegistry::found(pName_))
+    {
+        // Flux not available, do not update
+        InfoIn
+        (
+            "void isentropicTotalPressureFvPatchScalarField::updateCoeffs()"
+        )   << "Pressure field " << pName_ << " not found.  "
+            << "Performing fixed value update" << endl;
+
+        fixedValueFvPatchScalarField::updateCoeffs();
+
+        return;
+    }
+
     // Get pressure and temperature
     const scalarField& T = *this;
 
@@ -171,38 +185,6 @@ void Foam::isentropicTotalTemperatureFvPatchScalarField::updateCoeffs
 )
 {
     updateCoeffs();
-}
-
-
-Foam::tmp<Foam::scalarField>
-Foam::isentropicTotalTemperatureFvPatchScalarField::snGrad() const
-{
-    return tmp<scalarField>
-    (
-        new scalarField(this->size(), 0.0)
-    );
-}
-
-
-Foam::tmp<Foam::scalarField>
-Foam::isentropicTotalTemperatureFvPatchScalarField::
-gradientInternalCoeffs() const
-{
-    return tmp<scalarField>
-    (
-        new scalarField(this->size(), 0.0)
-    );
-}
-
-
-Foam::tmp<Foam::scalarField>
-Foam::isentropicTotalTemperatureFvPatchScalarField::
-gradientBoundaryCoeffs() const
-{
-    return tmp<scalarField>
-    (
-        new scalarField(this->size(), 0.0)
-    );
 }
 
 

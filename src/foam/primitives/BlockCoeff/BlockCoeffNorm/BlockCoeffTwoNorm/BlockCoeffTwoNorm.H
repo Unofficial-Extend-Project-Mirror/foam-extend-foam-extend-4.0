@@ -66,6 +66,9 @@ class BlockCoeffTwoNorm
         //- Control data dictionary
         dictionary dict_;
 
+        //- Component from which the sign is determined
+        const direction cmpt_;
+
 
 protected:
 
@@ -92,10 +95,10 @@ public:
             const dictionary& dict
         );
 
-    // Destructor
 
-        virtual ~BlockCoeffTwoNorm()
-        {}
+    //- Destructor
+    virtual ~BlockCoeffTwoNorm()
+    {}
 
 
     // Member functions
@@ -106,10 +109,10 @@ public:
             const BlockCoeff<Type>& a
         );
 
-        virtual void coeffMag
+        virtual void normalize
         (
-            const CoeffField<Type>& a,
-            Field<scalar>& b
+            Field<scalar>& b,
+            const CoeffField<Type>& a
         );
 };
 

@@ -204,8 +204,7 @@ public:
         );
 
     //- Destructor
-
-        virtual ~argList();
+    virtual ~argList();
 
 
     // Member functions
@@ -401,7 +400,6 @@ public:
 
             //- Check root path and case path
             bool checkRootCase() const;
-
 };
 
 

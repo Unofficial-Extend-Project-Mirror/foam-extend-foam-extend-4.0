@@ -65,6 +65,13 @@ class dynamicPolyRefinementFvMesh
         //- Refinement interval
         label refineInterval_;
 
+        //- Unrefinement interval
+        label unrefineInterval_;
+
+        //- Separate refinement/unrefinement: off by default, meaning that
+        //  refinement and unrefinement can be performed in the same step
+        Switch separateUpdates_;
+
         //- Current time index (helper variable to skip multiple topo changes in
         //  a single time step)
         label curTimeIndex_;
@@ -90,6 +97,7 @@ class dynamicPolyRefinementFvMesh
             //- Disallow default bitwise assignment
             void operator=(const dynamicPolyRefinementFvMesh&);
 
+
 public:
 
     //- Runtime type information
@@ -98,8 +106,15 @@ public:
 
     // Constructors
 
-        //- Construct from IOobject
-        explicit dynamicPolyRefinementFvMesh(const IOobject& io);
+        //- Construct from IOobject and optional name for the subdictionary
+        //  containing the refinement (and possibly other controls). The second
+        //  parameter is useful if we derive another dynamic mesh class from
+        //  this one instead of topoChangerFvMesh base class. VV, 17/May/2018.
+        dynamicPolyRefinementFvMesh
+        (
+            const IOobject& io,
+            const word subDictName = typeName
+        );
 
 
     //- Destructor
@@ -108,6 +123,15 @@ public:
 
     // Member Functions
 
+        //- Return access to dictionary
+        inline const dictionary& refinementDict() const
+        {
+            return refinementDict_;
+        }
+
+        //- Is this the first update in the current time-step?
+        bool firstUpdate() const;
+    
         //- Update the mesh for topology change
         virtual bool update();
 };

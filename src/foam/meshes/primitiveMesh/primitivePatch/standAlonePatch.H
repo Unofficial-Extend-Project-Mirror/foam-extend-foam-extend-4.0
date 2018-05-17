@@ -25,7 +25,7 @@ Typedef
     Foam::standAlonePatch
 
 Description
-    standAlonePatch is a primiteve patch that holds its point and face list.
+    standAlonePatch is a primitive patch that holds its point and face list.
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.

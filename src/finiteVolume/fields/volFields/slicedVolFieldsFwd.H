@@ -29,7 +29,6 @@ InClass
 #ifndef slicedVolFieldsFwd_H
 #define slicedVolFieldsFwd_H
 
-#include "fvPatchField.H"
 #include "fieldTypes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

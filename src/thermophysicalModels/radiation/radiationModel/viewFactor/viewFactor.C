@@ -39,13 +39,7 @@ namespace Foam
     namespace radiation
     {
         defineTypeNameAndDebug(viewFactor, 0);
-
-        addToRunTimeSelectionTable
-        (
-            radiationModel,
-            viewFactor,
-            dictionary
-        );
+        addToRadiationRunTimeSelectionTables(viewFactor);
     }
 }
 
@@ -58,9 +52,8 @@ void Foam::radiation::viewFactor::initialise()
     const volScalarField::GeometricBoundaryField& Qrp = Qr_.boundaryField();
 
     label count = 0;
-    forAll(Qrp, patchI)
+    forAll (Qrp, patchI)
     {
-        //const polyPatch& pp = mesh_.boundaryMesh()[patchI];
         const fvPatchScalarField& QrPatchI = Qrp[patchI];
 
         if ((isA<fixedValueFvPatchScalarField>(QrPatchI)))
@@ -113,7 +106,7 @@ void Foam::radiation::viewFactor::initialise()
         )
     );
 
-    IOList<label> consMapDim
+    labelIOList consMapDim
     (
         IOobject
         (
@@ -126,13 +119,21 @@ void Foam::radiation::viewFactor::initialise()
         )
     );
 
+    if (consMapDim.empty())
+    {
+        FatalErrorIn("void radiation::viewFactor::initialise()")
+            << "constructMap/consMapDim is empty: radiation model cannot be "
+            << "constructed"
+            << abort(FatalError);
+    }
+
     map_.reset
     (
         new mapDistribute
         (
             consMapDim[0],
-            Xfer<labelListList>(subMap),
-            Xfer<labelListList>(constructMap)
+            subMap,
+            constructMap
         )
     );
 
@@ -376,13 +377,13 @@ void Foam::radiation::viewFactor::insertMatrixElements
     scalarSquareMatrix& Fmatrix
 )
 {
-    forAll(viewFactors, faceI)
+    forAll (viewFactors, faceI)
     {
         const scalarList& vf = viewFactors[faceI];
         const labelList& globalFaces = globalFaceFaces[faceI];
 
         label globalI = globalNumbering.toGlobal(procI, faceI);
-        forAll(globalFaces, i)
+        forAll (globalFaces, i)
         {
             Fmatrix[globalI][globalFaces[i]] = vf[i];
         }
@@ -406,7 +407,7 @@ void Foam::radiation::viewFactor::calculate()
     DynamicList<scalar> localCoarseEave(nLocalCoarseFaces_);
     DynamicList<scalar> localCoarseHoave(nLocalCoarseFaces_);
 
-    forAll(selectedPatches_, i)
+    forAll (selectedPatches_, i)
     {
         label patchID = selectedPatches_[i];
 
@@ -439,7 +440,7 @@ void Foam::radiation::viewFactor::calculate()
 
             labelListList coarseToFine(invertOneToMany(nAgglom, agglom));
 
-            forAll(coarseToFine, coarseI)
+            forAll (coarseToFine, coarseI)
             {
                 const label coarseFaceID = coarsePatchFace[coarseI];
                 const labelList& fineFaces = coarseToFine[coarseFaceID];
@@ -450,7 +451,7 @@ void Foam::radiation::viewFactor::calculate()
                 );
                 scalar area = sum(fineSf());
                 // Temperature, emissivity and external flux area weighting
-                forAll(fineFaces, j)
+                forAll (fineFaces, j)
                 {
                     label faceI = fineFaces[j];
                     Tave[coarseI] += (Tp[faceI]*sf[faceI])/area;
@@ -466,10 +467,10 @@ void Foam::radiation::viewFactor::calculate()
     }
 
     // Fill the local values to distribute
-    SubList<scalar>(compactCoarseT,nLocalCoarseFaces_).assign(localCoarseTave);
-    SubList<scalar>(compactCoarseE,nLocalCoarseFaces_).assign(localCoarseEave);
+    SubList<scalar>(compactCoarseT, nLocalCoarseFaces_).assign(localCoarseTave);
+    SubList<scalar>(compactCoarseE, nLocalCoarseFaces_).assign(localCoarseEave);
     SubList<scalar>
-        (compactCoarseHo,nLocalCoarseFaces_).assign(localCoarseHoave);
+        (compactCoarseHo, nLocalCoarseFaces_).assign(localCoarseHoave);
 
     // Distribute data
     map_->distribute(compactCoarseT);
@@ -500,7 +501,7 @@ void Foam::radiation::viewFactor::calculate()
     scalarField QrExt(totalNCoarseFaces_, 0.0);
 
     // Fill lists from compact to global indexes.
-    forAll(compactCoarseT, i)
+    forAll (compactCoarseT, i)
     {
         T[compactGlobalIds[i]] = compactCoarseT[i];
         E[compactGlobalIds[i]] = compactCoarseE[i];
@@ -547,9 +548,11 @@ void Foam::radiation::viewFactor::calculate()
                 }
             }
 
-            Info<< "\nSolving view factor equations..." << endl;
+            Info<< "\nSolving view factor equations (" << CLU_().n()
+                << " ..." << flush;
             // Negative coming into the fluid
             scalarSquareMatrix::LUsolve(C, q);
+            Info<< "Done." << endl;
         }
         else //Constant emissivity
         {
@@ -571,8 +574,10 @@ void Foam::radiation::viewFactor::calculate()
                         }
                     }
                 }
-                Info<< "\nDecomposing C matrix..." << endl;
+                Info<< "\nDecomposing C matrix of size " << CLU_().n()
+                    << " ... " << endl;
                 scalarSquareMatrix::LUDecompose(CLU_(), pivotIndices_);
+                Info<< "Done." << endl;
             }
 
             for (label i=0; i<totalNCoarseFaces_; i++)
@@ -594,8 +599,9 @@ void Foam::radiation::viewFactor::calculate()
                 }
             }
 
-            Info<< "\nLU Back substitute C matrix.." << endl;
+            Info<< "\nLU Back substitute C matrix... " << endl;
             scalarSquareMatrix::LUBacksubstitute(CLU_(), pivotIndices_, q);
+            Info<< "Done." << endl;
             iterCounter_ ++;
         }
     }
@@ -606,7 +612,7 @@ void Foam::radiation::viewFactor::calculate()
 
 
     label globCoarseId = 0;
-    forAll(selectedPatches_, i)
+    forAll (selectedPatches_, i)
     {
         const label patchID = selectedPatches_[i];
         const polyPatch& pp = mesh_.boundaryMesh()[patchID];
@@ -623,13 +629,13 @@ void Foam::radiation::viewFactor::calculate()
                 coarseMesh_.patchFaceMap()[patchID];
 
             scalar heatFlux = 0.0;
-            forAll(coarseToFine, coarseI)
+            forAll (coarseToFine, coarseI)
             {
                 label globalCoarse =
                     globalNumbering.toGlobal(Pstream::myProcNo(), globCoarseId);
                 const label coarseFaceID = coarsePatchFace[coarseI];
                 const labelList& fineFaces = coarseToFine[coarseFaceID];
-                forAll(fineFaces, k)
+                forAll (fineFaces, k)
                 {
                     label faceI = fineFaces[k];
 
@@ -643,7 +649,7 @@ void Foam::radiation::viewFactor::calculate()
 
     if (debug)
     {
-        forAll(Qr_.boundaryField(), patchID)
+        forAll (Qr_.boundaryField(), patchID)
         {
             const scalarField& Qrp = Qr_.boundaryField()[patchID];
             const scalarField& magSf = mesh_.magSf().boundaryField()[patchID];

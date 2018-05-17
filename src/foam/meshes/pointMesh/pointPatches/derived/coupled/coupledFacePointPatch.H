@@ -86,9 +86,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~coupledFacePointPatch();
+    //- Destructor
+    virtual ~coupledFacePointPatch();
 
 
     // Member Functions
@@ -97,6 +96,15 @@ public:
 
             //- Return true because this patch is coupled
             virtual bool coupled() const
+            {
+                return true;
+            }
+
+            //- Does this side own the patch ?
+            //  HACKED: the patch contains both master and slave
+            //  This influences parallel Cholesky and ILU preconditioning
+            //  Please use cyclicGgi instead.  HJ, 22/Jun/2017
+            virtual bool master() const
             {
                 return true;
             }

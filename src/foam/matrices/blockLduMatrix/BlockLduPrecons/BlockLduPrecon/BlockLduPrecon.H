@@ -113,10 +113,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~BlockLduPrecon()
-        {}
+    //- Destructor
+    virtual ~BlockLduPrecon()
+    {}
 
 
     // Member Functions
@@ -141,6 +140,9 @@ public:
                 "(Field<Type>& xT, const Field<Type>& bT) const"
             );
         }
+
+        //- Re-initialise preconditioner after matrix coefficient update
+        virtual void initMatrix() = 0;
 };
 
 

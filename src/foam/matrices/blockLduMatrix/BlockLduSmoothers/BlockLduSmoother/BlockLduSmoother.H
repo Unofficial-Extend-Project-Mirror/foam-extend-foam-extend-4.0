@@ -125,6 +125,9 @@ public:
             const Field<Type>& b,
             const label nSweeps
         ) const = 0;
+
+        //- Re-initialise preconditioner after matrix coefficient update
+        virtual void initMatrix() = 0;
 };
 
 

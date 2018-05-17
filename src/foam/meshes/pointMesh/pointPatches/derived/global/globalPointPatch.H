@@ -56,9 +56,6 @@ class globalPointPatch
 {
     // Private data
 
-        // //- Reference to the basic globalMeshData
-        // const globalMeshData& globalMeshData_;
-
         //- Index in the boundary mesh
         label index_;
 
@@ -109,6 +106,7 @@ public:
     //- Runtime type information
     TypeName("global");
 
+
     // Constructors
 
         //- Construct from components
@@ -119,9 +117,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~globalPointPatch();
+    //- Destructor
+    virtual ~globalPointPatch();
 
 
     // Member functions
@@ -151,6 +148,15 @@ public:
             {
                 return false;
             }
+        }
+
+        //- Does this side own the patch ?
+        //  HACKED: the patch contains both master and slave
+        //  This influences parallel Cholesky and ILU preconditioning
+        //  HJ, 22/Jun/2017
+        virtual bool master() const
+        {
+            return true;
         }
 
         //- Return number of faces

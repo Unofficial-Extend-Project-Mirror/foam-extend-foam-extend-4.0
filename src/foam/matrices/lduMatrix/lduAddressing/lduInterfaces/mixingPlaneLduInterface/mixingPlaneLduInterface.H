@@ -98,10 +98,10 @@ public:
         virtual const mixingPlaneLduInterface& shadowInterface() const = 0;
 
         //- Return fine level addressing
-        virtual const labelListList& addressing() const = 0;
+        virtual const labelListList& ggiAddressing() const = 0;
 
         //- Return weights
-        virtual const scalarListList& weights() const = 0;
+        virtual const scalarListList& ggiWeights() const = 0;
 
         //- Return face transformation tensor
         virtual const tensorField& forwardT() const = 0;

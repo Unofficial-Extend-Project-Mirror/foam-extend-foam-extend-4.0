@@ -61,6 +61,7 @@ class multiMaterialZonesThermal
         //- Disallow default bitwise assignment
         void operator=(const multiMaterialZonesThermal&);
 
+
 public:
 
     //- Runtime type information
