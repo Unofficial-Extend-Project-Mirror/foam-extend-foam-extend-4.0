@@ -194,19 +194,18 @@ void Foam::sharedPoints::calcSharedPoints()
     labelListList patchPairs = procPatchPairs();
 
     // Communicate and count global points
-    labelList nGlobalPointsPerProc(meshes_.size(), 0);
 
     // Identify, count and communicate points across processor boundaries
     // Repeat until the number of points per processor stabilises,
     // ie. no further points are found through communication
-    label oldNTotalPoints, newNTotalPoints;
+
+    label nSynced;
+
     do
     {
-        oldNTotalPoints = sum(nGlobalPointsPerProc);
+        nSynced = 0;
 
-        // Reset the list
-        nGlobalPointsPerProc = 0;
-
+        // Sync mark across processor boundaries
         forAll (meshes_, meshI)
         {
             if (meshes_.set(meshI))
@@ -223,12 +222,15 @@ void Foam::sharedPoints::calcSharedPoints()
 
                     if (isA<processorPolyPatch>(pp))
                     {
-                        // Found processor patch
-                        const labelList& patchMeshPoints = pp.meshPoints();
-
                         // My processor patch
                         const processorPolyPatch& myProcPatch =
                             refCast<const processorPolyPatch>(pp);
+
+                        // Get local mesh points
+                        const labelList& patchMeshPoints = pp.meshPoints();
+
+                        // Get my local faces
+                        const faceList& patchLocalFaces = pp.localFaces();
 
                         // Get neighbour processor ID
                         const int nbrProcID = myProcPatch.neighbProcNo();
@@ -238,64 +240,114 @@ void Foam::sharedPoints::calcSharedPoints()
                             meshes_[nbrProcID].boundaryMesh()
                             [patchPairs[meshI][patchI]];
 
+                        // Get neighbour mesh points
                         const labelList& nbrMeshPoints = nbrPatch.meshPoints();
+                        
+                        // Get neighbour local faces
+                        const faceList& nbrLocalFaces = nbrPatch.localFaces();
+                        
+                        labelList& nbrMarkedPoints = markedPoints[nbrProcID];
 
-                        forAll (patchMeshPoints, mpI)
+                        // Note:
+                        // Cannot loop over mesh points because they are sorted
+                        // Use face loops as they are synchronised
+                        // HJ, 21/May/2018
+                        forAll (patchLocalFaces, faceI)
                         {
-                            if (curMarkedPoints[patchMeshPoints[mpI]] > 1)
+                            const face& curFace = patchLocalFaces[faceI];
+
+                            // Reverse neighbour face (copy)
+                            const face nbrFace =
+                                nbrLocalFaces[faceI].reverseFace();
+                            
+                            forAll (curFace, fpI)
                             {
-                                // Mark the point on the other processor/side
-                                markedPoints[nbrProcID][nbrMeshPoints[mpI]] =
-                                    curMarkedPoints[patchMeshPoints[mpI]];
+                                const label patchMpI =
+                                    patchMeshPoints[curFace[fpI]];
+
+                                const label nbrMpI =
+                                    nbrMeshPoints[nbrFace[fpI]];
+
+                                if
+                                (
+                                    curMarkedPoints[patchMpI] > 1
+                                 && nbrMarkedPoints[nbrMpI] <= 1
+                                )
+                                {
+                                    nbrMarkedPoints[nbrMpI] =
+                                        curMarkedPoints[patchMpI];
+                                         
+                                    nSynced++;
+                                }
+
+                                if
+                                (
+                                    curMarkedPoints[patchMpI] <= 1
+                                 && nbrMarkedPoints[nbrMpI] > 1
+                                )
+                                {
+                                    curMarkedPoints[patchMpI] =
+                                        nbrMarkedPoints[nbrMpI];
+
+                                    nSynced++;
+                                }
                             }
                         }
-                    }
-                }
-
-                // Count number of shared points per processor
-                forAll (curMarkedPoints, cpI)
-                {
-                    if (curMarkedPoints[cpI] > 1)
-                    {
-                        nGlobalPointsPerProc[meshI]++;
                     }
                 }
             }
         }
 
-        newNTotalPoints = sum(nGlobalPointsPerProc);
+        Info<< "Proc merge pass.  nSynced = " << nSynced << endl;
+    } while (nSynced > 0);
 
-        Info<< "Proc merge pass: " << oldNTotalPoints << " "
-            << newNTotalPoints << endl;
-    } while (oldNTotalPoints != newNTotalPoints);
-
-    Info<< "Number of shared points per processor: " << nGlobalPointsPerProc
-        << endl;
-
-    // Collect points for every processor, in order to re-use the markedPoints
-    // list.  Note: the list of global labels of shared points
-    // will be collected later
+    // Grab marked points
     forAll (meshes_, meshI)
     {
         if (meshes_.set(meshI))
         {
-            labelList& curSharedPoints = sharedPointLabels_[meshI];
-
-            curSharedPoints.setSize(nGlobalPointsPerProc[meshI]);
-
-            // Count inserted points
+            // Count the points and then collect
             label nShared = 0;
 
-            // Get point marking
             const labelList& curMarkedPoints = markedPoints[meshI];
 
             forAll (curMarkedPoints, pointI)
             {
                 if (curMarkedPoints[pointI] > 1)
                 {
-                    curSharedPoints[nShared] = pointI;
                     nShared++;
                 }
+            }
+
+            labelList& curShared = sharedPointLabels_[meshI];
+            curShared.setSize(nShared);
+
+            // Re-use the counter for insertion
+            nShared = 0;
+
+            forAll (curMarkedPoints, pointI)
+            {
+                if (curMarkedPoints[pointI] > 1)
+                {
+                    curShared[nShared] = pointI;
+                    nShared++;
+                }
+            }
+
+            const pointField& P = meshes_[meshI].points();
+            OFstream ppp("points" + name(meshI) + ".vtk");
+            ppp << "# vtk DataFile Version 2.0" << nl
+                << "points" + name(meshI) << ".vtk" << nl
+                << "ASCII" << nl
+                << "DATASET POLYDATA" << nl
+                << "POINTS " << curShared.size() << " float" << nl;
+
+            forAll (curShared, i)
+            {
+                ppp << float(P[curShared[i]].x()) << ' '
+                    << float(P[curShared[i]].y()) << ' '
+                    << float(P[curShared[i]].z())
+                    << nl;
             }
         }
     }
@@ -324,6 +376,7 @@ void Foam::sharedPoints::calcSharedPoints()
 
             labelList& curMarkedPoints = markedPoints[meshI];
 
+            // Collect shared point addressing
             forAll (curSharedPoints, spI)
             {
                 if (curMarkedPoints[curSharedPoints[spI]] == -1)
@@ -356,31 +409,60 @@ void Foam::sharedPoints::calcSharedPoints()
 
                 if (isA<processorPolyPatch>(pp))
                 {
-                    // Found processor patch
-
                     // My processor patch
                     const processorPolyPatch& myProcPatch =
                         refCast<const processorPolyPatch>(pp);
 
-                    const labelList& patchMeshPoints = pp.meshPoints();
-
-                    // Get neighbour processor ID
-                    const int nbrProcID = myProcPatch.neighbProcNo();
-
-                    // Neighbour patch
-                    const polyPatch& nbrPatch =
-                        meshes_[nbrProcID].boundaryMesh()
-                        [patchPairs[meshI][patchI]];
-
-                    const labelList& nbrMeshPoints = nbrPatch.meshPoints();
-
-                    forAll (patchMeshPoints, mpI)
+                    if (myProcPatch.master())
                     {
-                        if (curMarkedPoints[patchMeshPoints[mpI]] > -1)
+                        // Get local mesh points
+                        const labelList& patchMeshPoints = pp.meshPoints();
+
+                        // Get my local faces
+                        const faceList& patchLocalFaces = pp.localFaces();
+
+
+                        // Get neighbour processor ID
+                        const int nbrProcID = myProcPatch.neighbProcNo();
+
+                        // Neighbour patch
+                        const polyPatch& nbrPatch =
+                            meshes_[nbrProcID].boundaryMesh()
+                            [patchPairs[meshI][patchI]];
+
+                        // Get neighbour mesh points
+                        const labelList& nbrMeshPoints = nbrPatch.meshPoints();
+
+                        // Get neighbour local faces
+                        const faceList& nbrLocalFaces = nbrPatch.localFaces();
+                        
+                        // Note:
+                        // Cannot loop over mesh points because they are sorted
+                        // Use face loops as they are synchronised
+                        // HJ, 21/May/2018
+                        forAll (patchLocalFaces, faceI)
                         {
-                            // Mark opposite side
-                            markedPoints[nbrProcID][nbrMeshPoints[mpI]] =
-                                curMarkedPoints[patchMeshPoints[mpI]];
+                            const face& curFace = patchLocalFaces[faceI];
+
+                            // Reverse neighbour face (copy)
+                            const face nbrFace =
+                                nbrLocalFaces[faceI].reverseFace();
+
+                            forAll (curFace, fpI)
+                            {
+                                const label patchMpI =
+                                    patchMeshPoints[curFace[fpI]];
+
+                                const label nbrMpI =
+                                    nbrMeshPoints[nbrFace[fpI]];
+
+                                if (curMarkedPoints[patchMpI] > -1)
+                                {
+                                    // Mark opposite side
+                                    markedPoints[nbrProcID][nbrMpI] =
+                                        curMarkedPoints[patchMpI];
+                                }
+                            }
                         }
                     }
                 }
