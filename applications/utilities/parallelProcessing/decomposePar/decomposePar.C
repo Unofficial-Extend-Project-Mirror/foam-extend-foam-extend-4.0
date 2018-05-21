@@ -641,7 +641,7 @@ int main(int argc, char *argv[])
             rm(timeDir/"nut.gz");
         }
 
-        // read the mesh
+        // Read the mesh
         fvMesh procMesh
         (
             IOobject
@@ -651,7 +651,6 @@ int main(int argc, char *argv[])
                 processorDb
             )
         );
-        procMesh.syncUpdateMesh();
 
         labelIOList pointProcAddressing
         (
