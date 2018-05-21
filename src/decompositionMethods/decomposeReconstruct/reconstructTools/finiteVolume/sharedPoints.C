@@ -333,22 +333,6 @@ void Foam::sharedPoints::calcSharedPoints()
                     nShared++;
                 }
             }
-
-            const pointField& P = meshes_[meshI].points();
-            OFstream ppp("points" + name(meshI) + ".vtk");
-            ppp << "# vtk DataFile Version 2.0" << nl
-                << "points" + name(meshI) << ".vtk" << nl
-                << "ASCII" << nl
-                << "DATASET POLYDATA" << nl
-                << "POINTS " << curShared.size() << " float" << nl;
-
-            forAll (curShared, i)
-            {
-                ppp << float(P[curShared[i]].x()) << ' '
-                    << float(P[curShared[i]].y()) << ' '
-                    << float(P[curShared[i]].z())
-                    << nl;
-            }
         }
     }
 
