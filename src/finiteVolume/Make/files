@@ -188,6 +188,8 @@ $(derivedFvPatchFields)/waveTransmissiveInlet/waveTransmissiveInletFvPatchFields
 $(derivedFvPatchFields)/noSlipWall/noSlipWallFvPatchVectorField.C
 $(derivedFvPatchFields)/noSlipMovingWall/noSlipMovingWallFvPatchVectorField.C
 
+$(derivedFvPatchFields)/blockSymmPlane/blockSymmPlaneFvPatchVectorField.C
+
 fvsPatchFields = fields/fvsPatchFields
 $(fvsPatchFields)/fvsPatchField/fvsPatchFields.C
 
