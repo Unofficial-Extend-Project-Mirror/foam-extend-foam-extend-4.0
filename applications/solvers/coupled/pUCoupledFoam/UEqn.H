@@ -12,4 +12,6 @@
     UEqn.relax();
 
     UpEqn.insertEquation(0, UEqn);
+
+#   include "addBlockCoupledBC.H"
 }
