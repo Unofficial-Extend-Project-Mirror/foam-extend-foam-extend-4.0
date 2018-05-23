@@ -106,6 +106,14 @@ class sharedPoints
         //  For each processor patch, find equivalent patch on other mesh
         labelListList procPatchPairs() const;
 
+        //- Sync mark using processor patches
+        void syncMark
+        (
+            labelListList& markedPoints,
+            const labelListList& patchPairs,
+            const label fromMesh
+        ) const;
+    
         //- Calculate shared points
         void calcSharedPoints();
 
