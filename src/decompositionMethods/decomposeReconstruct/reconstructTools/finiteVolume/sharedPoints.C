@@ -242,10 +242,10 @@ void Foam::sharedPoints::calcSharedPoints()
 
                         // Get neighbour mesh points
                         const labelList& nbrMeshPoints = nbrPatch.meshPoints();
-                        
+
                         // Get neighbour local faces
                         const faceList& nbrLocalFaces = nbrPatch.localFaces();
-                        
+
                         labelList& nbrMarkedPoints = markedPoints[nbrProcID];
 
                         // Note:
@@ -259,7 +259,7 @@ void Foam::sharedPoints::calcSharedPoints()
                             // Reverse neighbour face (copy)
                             const face nbrFace =
                                 nbrLocalFaces[faceI].reverseFace();
-                            
+
                             forAll (curFace, fpI)
                             {
                                 const label patchMpI =
@@ -270,24 +270,19 @@ void Foam::sharedPoints::calcSharedPoints()
 
                                 if
                                 (
-                                    curMarkedPoints[patchMpI] > 1
-                                 && nbrMarkedPoints[nbrMpI] <= 1
+                                    curMarkedPoints[patchMpI]
+                                 != nbrMarkedPoints[nbrMpI]
                                 )
                                 {
-                                    nbrMarkedPoints[nbrMpI] =
-                                        curMarkedPoints[patchMpI];
-                                         
-                                    nSynced++;
-                                }
-
-                                if
-                                (
-                                    curMarkedPoints[patchMpI] <= 1
-                                 && nbrMarkedPoints[nbrMpI] > 1
-                                )
-                                {
-                                    curMarkedPoints[patchMpI] =
-                                        nbrMarkedPoints[nbrMpI];
+                                    const label maxMark =
+                                        Foam::max
+                                        (
+                                            curMarkedPoints[patchMpI],
+                                            nbrMarkedPoints[nbrMpI]
+                                        );
+                                    
+                                    nbrMarkedPoints[nbrMpI] = maxMark;
+                                    curMarkedPoints[patchMpI] = maxMark;
 
                                     nSynced++;
                                 }
@@ -313,7 +308,7 @@ void Foam::sharedPoints::calcSharedPoints()
 
             forAll (curMarkedPoints, pointI)
             {
-                if (curMarkedPoints[pointI] > 1)
+                if (curMarkedPoints[pointI] > 2)
                 {
                     nShared++;
                 }
@@ -327,7 +322,7 @@ void Foam::sharedPoints::calcSharedPoints()
 
             forAll (curMarkedPoints, pointI)
             {
-                if (curMarkedPoints[pointI] > 1)
+                if (curMarkedPoints[pointI] > 2)
                 {
                     curShared[nShared] = pointI;
                     nShared++;
@@ -419,7 +414,7 @@ void Foam::sharedPoints::calcSharedPoints()
 
                         // Get neighbour local faces
                         const faceList& nbrLocalFaces = nbrPatch.localFaces();
-                        
+
                         // Note:
                         // Cannot loop over mesh points because they are sorted
                         // Use face loops as they are synchronised
@@ -451,6 +446,67 @@ void Foam::sharedPoints::calcSharedPoints()
                     }
                 }
             }
+        }
+    }
+
+    // debug
+    {
+        Info<< "nGlobalPoints_: " << nGlobalPoints_ << endl;
+        pointField gp(nGlobalPoints_);
+        boolList gpSet(nGlobalPoints_, false);
+
+        forAll (meshes_, meshI)
+        {
+            if (meshes_.set(meshI))
+            {
+                // Get points
+                const pointField& P = meshes_[meshI].points();
+
+                // Get list of local point labels that are globally shared
+                const labelList& curShared = sharedPointLabels_[meshI];
+
+                // Get index in global point list
+                const labelList& curAddr = sharedPointAddr_[meshI];
+
+                // Loop through all local points
+                forAll (curShared, i)
+                {
+                    if (!gpSet[curAddr[i]])
+                    {
+                        // Point not set: set it
+                        gp[curAddr[i]] = P[curShared[i]];
+                        gpSet[curAddr[i]] = true;
+                    }
+                    else
+                    {
+                        // Point already set: check location
+                        if (mag(gp[curAddr[i]] - P[curShared[i]]) > SMALL)
+                        {
+                            Info<< "MERGE MISMATCH: mesh" << meshI
+                                << " point: " << curShared[i]
+                                << " dist: " << gp[curAddr[i]] << " "
+                                << P[curShared[i]]
+                                << endl;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Grab marked points
+        OFstream ppp("points.vtk");
+        ppp << "# vtk DataFile Version 2.0" << nl
+            << "points.vtk" << nl
+            << "ASCII" << nl
+            << "DATASET POLYDATA" << nl
+            << "POINTS " << nGlobalPoints_ << " float" << nl;
+
+        forAll (gp, i)
+        {
+            ppp << float(gp[i].x()) << ' '
+                << float(gp[i].y()) << ' '
+                << float(gp[i].z())
+                << nl;
         }
     }
 }
