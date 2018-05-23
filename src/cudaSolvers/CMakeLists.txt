@@ -43,4 +43,4 @@ list(APPEND SOURCES
 
 add_foam_library(cudaSolvers SHARED ${SOURCES})
 
-target_link_libraries(cudaSolvers finiteVolume)
+target_link_libraries(cudaSolvers PUBLIC finiteVolume)

@@ -30,7 +30,5 @@
 #
 # --------------------------------------------------------------------------
 
-add_subdirectory(immersedBoundaryForce)
 add_subdirectory(immersedBoundary)
-add_subdirectory(immersedBoundaryTurbulence)
 add_subdirectory(immersedBoundaryDynamicMesh)

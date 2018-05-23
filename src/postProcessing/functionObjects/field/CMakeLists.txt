@@ -35,21 +35,30 @@ list(APPEND SOURCES
   fieldAverage/fieldAverageItem/fieldAverageItem.C
   fieldAverage/fieldAverageItem/fieldAverageItemIO.C
   fieldAverage/fieldAverageFunctionObject/fieldAverageFunctionObject.C
+  fieldCoordinateSystemTransform/fieldCoordinateSystemTransform.C
+  fieldCoordinateSystemTransform/fieldCoordinateSystemTransformFunctionObject.C
   fieldMinMax/fieldMinMax.C
   fieldMinMax/fieldMinMaxFunctionObject.C
   minMaxField/minMaxField.C
   maxFieldCell/maxFieldCell.C
   fieldValues/fieldValue/fieldValue.C
+  fieldValues/fieldValue/fieldValueNew.C
+  fieldValues/fieldValueDelta/fieldValueDelta.C
+  fieldValues/fieldValueDelta/fieldValueDeltaFunctionObject.C
   fieldValues/faceSource/faceSource.C
   fieldValues/faceSource/faceSourceFunctionObject.C
   fieldValues/cellSource/cellSource.C
   fieldValues/cellSource/cellSourceFunctionObject.C
+  processorField/processorField.C
+  processorField/processorFieldFunctionObject.C
   readFields/readFields.C
   readFields/readFieldsFunctionObject.C
-  surfaceInterpolateFields/surfaceInterpolateFieldsFunctionObject.C
   surfaceInterpolateFields/surfaceInterpolateFields.C
+  surfaceInterpolateFields/surfaceInterpolateFieldsFunctionObject.C
+  regionSizeDistribution/regionSizeDistribution.C
+  regionSizeDistribution/regionSizeDistributionFunctionObject.C
 )
 
 add_foam_library(fieldFunctionObjects SHARED ${SOURCES})
 
-target_link_libraries(fieldFunctionObjects PUBLIC finiteVolume)
+target_link_libraries(fieldFunctionObjects PUBLIC finiteVolume sampling)

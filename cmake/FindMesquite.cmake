@@ -20,8 +20,12 @@ find_library(MESQUITE_LIBRARY
   ${MESQUITE_PKGCONF_LIBRARY_DIRS}
 )
 
+message(STATUS ${MESQUITE_INCLUDE_DIR})
+message(STATUS ${MESQUITE_LIBRARY})
+
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
-set(MESQUITE_PROCESS_INCLUDES MESQUITE_INCLUDE_DIR)
-set(MESQUITE_PROCESS_LIBS MESQUITE_LIBRARY)
+
+set(MESQUITE_PROCESS_INCLUDE MESQUITE_INCLUDE_DIR)
+set(MESQUITE_PROCESS_LIB MESQUITE_LIBRARY)
 libfind_process(MESQUITE)

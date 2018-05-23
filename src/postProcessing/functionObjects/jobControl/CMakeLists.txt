@@ -30,4 +30,11 @@
 #
 # --------------------------------------------------------------------------
 
-add_subdirectory(vtkPV3Foam)
+list(APPEND SOURCES
+  abortCalculation/abortCalculation.C
+  abortCalculation/abortCalculationFunctionObject.C
+)
+
+add_foam_library(jobControl SHARED ${SOURCES})
+
+target_link_libraries(jobControl PUBLIC foam)

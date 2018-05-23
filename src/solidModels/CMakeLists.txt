@@ -122,16 +122,8 @@ list(APPEND SOURCES
   ${rheologyLaws}/multiMaterial/multiMaterial.C
   ${rheologyLaws}/orthotropicLinearElastic/orthotropicLinearElastic.C
   ${rheologyLaws}/PronyViscoelastic/PronyViscoelastic.C
-  thermalModel/thermalModel.C
-)
-set(thermalLaws thermalModel/thermalLaws)
-list(APPEND SOURCES
-  ${thermalLaws}/thermalLaw/thermalLaw.C
-  ${thermalLaws}/thermalLaw/newThermalLaw.C
-  ${thermalLaws}/constantThermal/constantThermal.C
-  ${thermalLaws}/multiMaterialThermal/multiMaterialThermal.C
 )
 
 add_foam_library(solidModels SHARED ${SOURCES})
 
-target_link_libraries(solidModels PUBLIC topoChangerFvMesh finiteArea)
+target_link_libraries(solidModels PUBLIC topoChangerFvMesh finiteArea conjugateHeatTransfer)

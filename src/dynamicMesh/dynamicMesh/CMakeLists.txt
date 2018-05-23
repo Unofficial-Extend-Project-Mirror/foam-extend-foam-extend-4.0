@@ -75,6 +75,11 @@ list(APPEND SOURCES
 set(repatchCoverage ${polyMeshModifiers}/repatchCoverage)
 list(APPEND SOURCES
   ${repatchCoverage}/repatchCoverage.C
+)
+
+set(polyhedralRefinement ${polyMeshModifiers}/polyhedralRefinement)
+list(APPEND SOURCES
+  ${polyhedralRefinement}/polyhedralRefinement.C
   polyTopoChange/polyTopoChange/polyTopoChange.C
   polyTopoChange/polyTopoChange/actions/topoAction/topoActions.C
   polyTopoChange/polyTopoChanger/polyTopoChanger.C

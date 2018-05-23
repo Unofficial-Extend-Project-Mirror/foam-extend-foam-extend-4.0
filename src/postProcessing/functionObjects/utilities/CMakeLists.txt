@@ -31,14 +31,38 @@
 # --------------------------------------------------------------------------
 
 list(APPEND SOURCES
+  codedFunctionObject/codedFunctionObject.C
+  CourantNo/CourantNo.C
+  CourantNo/CourantNoFunctionObject.C
+  Lambda2/Lambda2.C
+  Lambda2/Lambda2FunctionObject.C
+  Peclet/Peclet.C
+  Peclet/PecletFunctionObject.C
+  Q/Q.C
+  Q/QFunctionObject.C
   staticPressure/staticPressure.C
   staticPressure/staticPressureFunctionObject.C
   dsmcFields/dsmcFields.C
   dsmcFields/dsmcFieldsFunctionObject.C
   MachNumber/MachNumber.C
   divFlux/divFlux.C
+  pressureTools/pressureTools.C
+  pressureTools/pressureToolsFunctionObject.C
+  residuals/residuals.C
+  residuals/residualsFunctionObject.C
+  scalarTransport/scalarTransport.C
+  scalarTransport/scalarTransportFunctionObject.C
+  timeActivatedFileUpdate/timeActivatedFileUpdate.C
+  timeActivatedFileUpdate/timeActivatedFileUpdateFunctionObject.C
+  turbulenceFields/turbulenceFields.C
+  turbulenceFields/turbulenceFieldsFunctionObject.C
+  vorticity/vorticity.C
+  vorticity/vorticityFunctionObject.C
+  wallShearStress/wallShearStress.C
+  wallShearStress/wallShearStressFunctionObject.C
+  setTimeStep/setTimeStepFunctionObject.C
 )
 
 add_foam_library(utilityFunctionObjects SHARED ${SOURCES})
 
-target_link_libraries(utilityFunctionObjects PUBLIC basicThermophysicalModels sampling dsmc)
+target_link_libraries(utilityFunctionObjects PUBLIC basicThermophysicalModels sampling dsmc incompressibleTurbulenceModel compressibleTurbulenceModel)

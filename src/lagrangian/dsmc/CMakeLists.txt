@@ -50,4 +50,4 @@ list(APPEND SOURCES
 
 add_foam_library(dsmc SHARED ${SOURCES})
 
-target_link_libraries(dsmc finiteVolume lagrangianBasic)
+target_link_libraries(dsmc PUBLIC finiteVolume lagrangianBasic)

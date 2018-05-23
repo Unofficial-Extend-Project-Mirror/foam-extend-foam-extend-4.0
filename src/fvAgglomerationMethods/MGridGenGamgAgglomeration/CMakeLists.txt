@@ -37,4 +37,4 @@ list(APPEND SOURCES
 
 add_foam_library(MGridGenGAMGAgglomeration SHARED ${SOURCES})
 
-target_link_libraries(MGridGenGAMGAgglomeration finiteVolume parmgridgen)
+target_link_libraries(MGridGenGAMGAgglomeration PUBLIC finiteVolume parmgridgen)

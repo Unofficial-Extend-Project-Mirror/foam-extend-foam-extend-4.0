@@ -31,16 +31,14 @@
 # --------------------------------------------------------------------------
 
 list(APPEND SOURCES
-  potentialIbFoam.C
+  calcFvcDiv/calcFvcDiv.C
+  calcFvcDiv/calcFvcDivFunctionObject.C
+  calcFvcGrad/calcFvcGrad.C
+  calcFvcGrad/calcFvcGradFunctionObject.C
+  calcMag/calcMag.C
+  calcMag/calcMagFunctionObject.C
 )
 
-# Set minimal environment for external compilation
-if(NOT FOAM_FOUND)
-  cmake_minimum_required(VERSION 2.8)
-  find_package(FOAM REQUIRED)
-endif()
+add_foam_library(FVFunctionObjects SHARED ${SOURCES})
 
-add_foam_executable(potentialIbFoam
-  DEPENDS immersedBoundary
-  SOURCES ${SOURCES}
-)
+target_link_libraries(FVFunctionObjects PUBLIC finiteVolume)

@@ -30,25 +30,5 @@
 #
 # --------------------------------------------------------------------------
 
-include(${PARAVIEW_USE_FILE})
-
-list(APPEND SOURCES
-  vtkPV4Foam.C
-  vtkPV4FoamFields.C
-  vtkPV4FoamMesh.C
-  vtkPV4FoamMeshLagrangian.C
-  vtkPV4FoamMeshPatch.C
-  vtkPV4FoamMeshSet.C
-  vtkPV4FoamMeshVolume.C
-  vtkPV4FoamMeshZone.C
-  vtkPV4FoamUpdateInfo.C
-  vtkPV4FoamUtilities.C
-)
-
-add_foam_library(vtkPV4Foam SHARED ${SOURCES})
-
-target_link_libraries(vtkPV4Foam finiteVolume)
-target_include_directories(vtkPV4Foam PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../PV4FoamReader>
-#  $<INSTALL_INTERFACE:include/mylib>
-)
+add_subdirectory(PVFoamReader)
+add_subdirectory(vtkPVFoam)

@@ -82,4 +82,4 @@ list(APPEND SOURCES
 
 add_foam_library(surfMesh SHARED ${SOURCES})
 
-target_link_libraries(surfMesh foam)
+target_link_libraries(surfMesh PUBLIC foam)

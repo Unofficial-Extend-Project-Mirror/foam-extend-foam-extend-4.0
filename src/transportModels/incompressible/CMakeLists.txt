@@ -46,7 +46,7 @@ list(APPEND SOURCES
 
 add_foam_library(incompressibleTransportModels SHARED ${SOURCES})
 
-target_link_libraries(incompressibleTransportModels finiteVolume)
+target_link_libraries(incompressibleTransportModels PUBLIC finiteVolume)
 
 target_include_directories(incompressibleTransportModels PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>

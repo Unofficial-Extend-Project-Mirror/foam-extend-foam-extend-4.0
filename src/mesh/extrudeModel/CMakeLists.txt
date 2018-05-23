@@ -34,6 +34,7 @@ list(APPEND SOURCES
   extrudeModel/extrudeModel.C
   extrudeModel/newExtrudeModel.C
   linearNormal/linearNormal.C
+  gradedNormal/gradedNormal.C
   linearRadial/linearRadial.C
   sigmaRadial/sigmaRadial.C
   wedge/wedge.C
@@ -41,4 +42,4 @@ list(APPEND SOURCES
 
 add_foam_library(extrudeModel SHARED ${SOURCES})
 
-target_link_libraries(extrudeModel PUBLIC dynamicMesh)
+target_link_libraries(extrudeModel PUBLIC dynamicMesh ODE)

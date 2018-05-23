@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    $RCSfile: vtkPV4FoamReader.cxx,v $
+  Module:    $RCSfile: vtkPVFoamReader.cxx,v $
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -13,10 +13,10 @@
 
 =========================================================================*/
 
-#include "vtkPV4FoamReader.h"
+#include "vtkPVFoamReader.h"
 
 // Foam includes
-#include "vtkPV4Foam.H"
+#include "vtkPVFoam.H"
 
 #include "pqApplicationCore.h"
 #include "pqRenderView.h"
@@ -33,11 +33,11 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 
-vtkStandardNewMacro(vtkPV4FoamReader);
+vtkStandardNewMacro(vtkPVFoamReader);
 
 #undef EXPERIMENTAL_TIME_CACHING
 
-vtkPV4FoamReader::vtkPV4FoamReader()
+vtkPVFoamReader::vtkPVFoamReader()
 {
     Debug = 0;
     vtkDebugMacro(<<"Constructor");
@@ -49,7 +49,7 @@ vtkPV4FoamReader::vtkPV4FoamReader()
 
     output0_  = NULL;
 
-#ifdef VTKPV4FOAM_DUALPORT
+#ifdef VTKPVFOAM_DUALPORT
     // Add second output for the Lagrangian
     this->SetNumberOfOutputPorts(2);
     vtkMultiBlockDataSet *lagrangian = vtkMultiBlockDataSet::New();
@@ -65,6 +65,7 @@ vtkPV4FoamReader::vtkPV4FoamReader()
     CacheMesh = 1;
 
     ExtrapolatePatches = 0;
+    UseVTKPolyhedron = 0;
     IncludeSets = 0;
     IncludeZones = 0;
     ShowPatchNames = 0;
@@ -81,7 +82,7 @@ vtkPV4FoamReader::vtkPV4FoamReader()
     SelectionObserver = vtkCallbackCommand::New();
     SelectionObserver->SetCallback
     (
-        &vtkPV4FoamReader::SelectionModifiedCallback
+        &vtkPVFoamReader::SelectionModifiedCallback
     );
     SelectionObserver->SetClientData(this);
 
@@ -108,7 +109,7 @@ vtkPV4FoamReader::vtkPV4FoamReader()
 }
 
 
-vtkPV4FoamReader::~vtkPV4FoamReader()
+vtkPVFoamReader::~vtkPVFoamReader()
 {
     vtkDebugMacro(<<"Deconstructor");
 
@@ -140,7 +141,7 @@ vtkPV4FoamReader::~vtkPV4FoamReader()
 
 
 // Do everything except set the output info
-int vtkPV4FoamReader::RequestInformation
+int vtkPVFoamReader::RequestInformation
 (
     vtkInformation* vtkNotUsed(request),
     vtkInformationVector** vtkNotUsed(inputVector),
@@ -149,7 +150,7 @@ int vtkPV4FoamReader::RequestInformation
 {
     vtkDebugMacro(<<"RequestInformation");
 
-    if (Foam::vtkPV4Foam::debug)
+    if (Foam::vtkPVFoam::debug)
     {
         cout<<"REQUEST_INFORMATION\n";
     }
@@ -162,7 +163,7 @@ int vtkPV4FoamReader::RequestInformation
 
     int nInfo = outputVector->GetNumberOfInformationObjects();
 
-    if (Foam::vtkPV4Foam::debug)
+    if (Foam::vtkPVFoam::debug)
     {
         cout<<"RequestInformation with " << nInfo << " item(s)\n";
         for (int infoI = 0; infoI < nInfo; ++infoI)
@@ -173,7 +174,7 @@ int vtkPV4FoamReader::RequestInformation
 
     if (!foamData_)
     {
-        foamData_ = new Foam::vtkPV4Foam(FileName, this);
+        foamData_ = new Foam::vtkPVFoam(FileName, this);
     }
     else
     {
@@ -210,7 +211,7 @@ int vtkPV4FoamReader::RequestInformation
         timeRange[0] = timeSteps[0];
         timeRange[1] = timeSteps[nTimeSteps-1];
 
-        if (Foam::vtkPV4Foam::debug > 1)
+        if (Foam::vtkPVFoam::debug > 1)
         {
             cout<<"nTimeSteps " << nTimeSteps << "\n"
                 <<"timeRange " << timeRange[0] << " to " << timeRange[1]
@@ -240,7 +241,7 @@ int vtkPV4FoamReader::RequestInformation
 
 
 // Set the output info
-int vtkPV4FoamReader::RequestData
+int vtkPVFoamReader::RequestData
 (
     vtkInformation* vtkNotUsed(request),
     vtkInformationVector** vtkNotUsed(inputVector),
@@ -264,7 +265,7 @@ int vtkPV4FoamReader::RequestData
 
     int nInfo = outputVector->GetNumberOfInformationObjects();
 
-    if (Foam::vtkPV4Foam::debug)
+    if (Foam::vtkPVFoam::debug)
     {
         cout<<"RequestData with " << nInfo << " item(s)\n";
         for (int infoI = 0; infoI < nInfo; ++infoI)
@@ -282,7 +283,7 @@ int vtkPV4FoamReader::RequestData
     // taking port0 as the lead for other outputs would be nice, but fails when
     // a filter is added - we need to check everything
     // but since PREVIOUS_UPDATE_TIME_STEPS() is protected, relay the logic
-    // to the vtkPV4Foam::setTime() method
+    // to the vtkPVFoam::setTime() method
     for (int infoI = 0; infoI < nInfo; ++infoI)
     {
         vtkInformation *outInfo = outputVector->GetInformationObject(infoI);
@@ -314,7 +315,7 @@ int vtkPV4FoamReader::RequestData
         )
     );
 
-    if (Foam::vtkPV4Foam::debug)
+    if (Foam::vtkPVFoam::debug)
     {
         cout<< "update output with "
             << output->GetNumberOfBlocks() << " blocks\n";
@@ -342,7 +343,7 @@ int vtkPV4FoamReader::RequestData
         output->ShallowCopy(output0_);
     }
 
-    if (Foam::vtkPV4Foam::debug)
+    if (Foam::vtkPVFoam::debug)
     {
         if (needsUpdate)
         {
@@ -362,7 +363,7 @@ int vtkPV4FoamReader::RequestData
 
 #else
 
-#ifdef VTKPV4FOAM_DUALPORT
+#ifdef VTKPVFOAM_DUALPORT
     foamData_->Update
     (
         output,
@@ -396,7 +397,7 @@ int vtkPV4FoamReader::RequestData
 }
 
 
-void vtkPV4FoamReader::addPatchNamesToView()
+void vtkPVFoamReader::addPatchNamesToView()
 {
     pqApplicationCore* appCore = pqApplicationCore::instance();
 
@@ -416,7 +417,7 @@ void vtkPV4FoamReader::addPatchNamesToView()
 }
 
 
-void vtkPV4FoamReader::removePatchNamesFromView()
+void vtkPVFoamReader::removePatchNamesFromView()
 {
     pqApplicationCore* appCore = pqApplicationCore::instance();
 
@@ -436,7 +437,7 @@ void vtkPV4FoamReader::removePatchNamesFromView()
 }
 
 
-void vtkPV4FoamReader::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVFoamReader::PrintSelf(ostream& os, vtkIndent indent)
 {
     vtkDebugMacro(<<"PrintSelf");
 
@@ -453,7 +454,7 @@ void vtkPV4FoamReader::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 
-int vtkPV4FoamReader::GetTimeStep()
+int vtkPVFoamReader::GetTimeStep()
 {
     return foamData_ ? foamData_->timeIndex() : -1;
 }
@@ -462,35 +463,35 @@ int vtkPV4FoamReader::GetTimeStep()
 // ----------------------------------------------------------------------
 // Parts selection list control
 
-vtkDataArraySelection* vtkPV4FoamReader::GetPartSelection()
+vtkDataArraySelection* vtkPVFoamReader::GetPartSelection()
 {
     vtkDebugMacro(<<"GetPartSelection");
     return PartSelection;
 }
 
 
-int vtkPV4FoamReader::GetNumberOfPartArrays()
+int vtkPVFoamReader::GetNumberOfPartArrays()
 {
     vtkDebugMacro(<<"GetNumberOfPartArrays");
     return PartSelection->GetNumberOfArrays();
 }
 
 
-const char* vtkPV4FoamReader::GetPartArrayName(int index)
+const char* vtkPVFoamReader::GetPartArrayName(int index)
 {
     vtkDebugMacro(<<"GetPartArrayName");
     return PartSelection->GetArrayName(index);
 }
 
 
-int vtkPV4FoamReader::GetPartArrayStatus(const char* name)
+int vtkPVFoamReader::GetPartArrayStatus(const char* name)
 {
     vtkDebugMacro(<<"GetPartArrayStatus");
     return PartSelection->ArrayIsEnabled(name);
 }
 
 
-void vtkPV4FoamReader::SetPartArrayStatus(const char* name, int status)
+void vtkPVFoamReader::SetPartArrayStatus(const char* name, int status)
 {
     vtkDebugMacro(<<"SetPartArrayStatus");
     if (status)
@@ -507,35 +508,35 @@ void vtkPV4FoamReader::SetPartArrayStatus(const char* name, int status)
 // ----------------------------------------------------------------------
 // volField selection list control
 
-vtkDataArraySelection* vtkPV4FoamReader::GetVolFieldSelection()
+vtkDataArraySelection* vtkPVFoamReader::GetVolFieldSelection()
 {
     vtkDebugMacro(<<"GetVolFieldSelection");
     return VolFieldSelection;
 }
 
 
-int vtkPV4FoamReader::GetNumberOfVolFieldArrays()
+int vtkPVFoamReader::GetNumberOfVolFieldArrays()
 {
     vtkDebugMacro(<<"GetNumberOfVolFieldArrays");
     return VolFieldSelection->GetNumberOfArrays();
 }
 
 
-const char* vtkPV4FoamReader::GetVolFieldArrayName(int index)
+const char* vtkPVFoamReader::GetVolFieldArrayName(int index)
 {
     vtkDebugMacro(<<"GetVolFieldArrayName");
     return VolFieldSelection->GetArrayName(index);
 }
 
 
-int vtkPV4FoamReader::GetVolFieldArrayStatus(const char* name)
+int vtkPVFoamReader::GetVolFieldArrayStatus(const char* name)
 {
     vtkDebugMacro(<<"GetVolFieldArrayStatus");
     return VolFieldSelection->ArrayIsEnabled(name);
 }
 
 
-void vtkPV4FoamReader::SetVolFieldArrayStatus(const char* name, int status)
+void vtkPVFoamReader::SetVolFieldArrayStatus(const char* name, int status)
 {
     vtkDebugMacro(<<"SetVolFieldArrayStatus");
     if (status)
@@ -552,35 +553,35 @@ void vtkPV4FoamReader::SetVolFieldArrayStatus(const char* name, int status)
 // ----------------------------------------------------------------------
 // pointField selection list control
 
-vtkDataArraySelection* vtkPV4FoamReader::GetPointFieldSelection()
+vtkDataArraySelection* vtkPVFoamReader::GetPointFieldSelection()
 {
     vtkDebugMacro(<<"GetPointFieldSelection");
     return PointFieldSelection;
 }
 
 
-int vtkPV4FoamReader::GetNumberOfPointFieldArrays()
+int vtkPVFoamReader::GetNumberOfPointFieldArrays()
 {
     vtkDebugMacro(<<"GetNumberOfPointFieldArrays");
     return PointFieldSelection->GetNumberOfArrays();
 }
 
 
-const char* vtkPV4FoamReader::GetPointFieldArrayName(int index)
+const char* vtkPVFoamReader::GetPointFieldArrayName(int index)
 {
     vtkDebugMacro(<<"GetPointFieldArrayName");
     return PointFieldSelection->GetArrayName(index);
 }
 
 
-int vtkPV4FoamReader::GetPointFieldArrayStatus(const char* name)
+int vtkPVFoamReader::GetPointFieldArrayStatus(const char* name)
 {
     vtkDebugMacro(<<"GetPointFieldArrayStatus");
     return PointFieldSelection->ArrayIsEnabled(name);
 }
 
 
-void vtkPV4FoamReader::SetPointFieldArrayStatus(const char* name, int status)
+void vtkPVFoamReader::SetPointFieldArrayStatus(const char* name, int status)
 {
     vtkDebugMacro(<<"SetPointFieldArrayStatus");
     if (status)
@@ -597,35 +598,35 @@ void vtkPV4FoamReader::SetPointFieldArrayStatus(const char* name, int status)
 // ----------------------------------------------------------------------
 // lagrangianField selection list control
 
-vtkDataArraySelection* vtkPV4FoamReader::GetLagrangianFieldSelection()
+vtkDataArraySelection* vtkPVFoamReader::GetLagrangianFieldSelection()
 {
     vtkDebugMacro(<<"GetLagrangianFieldSelection");
     return LagrangianFieldSelection;
 }
 
 
-int vtkPV4FoamReader::GetNumberOfLagrangianFieldArrays()
+int vtkPVFoamReader::GetNumberOfLagrangianFieldArrays()
 {
     vtkDebugMacro(<<"GetNumberOfLagrangianFieldArrays");
     return LagrangianFieldSelection->GetNumberOfArrays();
 }
 
 
-const char* vtkPV4FoamReader::GetLagrangianFieldArrayName(int index)
+const char* vtkPVFoamReader::GetLagrangianFieldArrayName(int index)
 {
     vtkDebugMacro(<<"GetLagrangianFieldArrayName");
     return LagrangianFieldSelection->GetArrayName(index);
 }
 
 
-int vtkPV4FoamReader::GetLagrangianFieldArrayStatus(const char* name)
+int vtkPVFoamReader::GetLagrangianFieldArrayStatus(const char* name)
 {
     vtkDebugMacro(<<"GetLagrangianFieldArrayStatus");
     return LagrangianFieldSelection->ArrayIsEnabled(name);
 }
 
 
-void vtkPV4FoamReader::SetLagrangianFieldArrayStatus
+void vtkPVFoamReader::SetLagrangianFieldArrayStatus
 (
     const char* name,
     int status
@@ -645,7 +646,7 @@ void vtkPV4FoamReader::SetLagrangianFieldArrayStatus
 
 // ----------------------------------------------------------------------
 
-void vtkPV4FoamReader::SelectionModifiedCallback
+void vtkPVFoamReader::SelectionModifiedCallback
 (
     vtkObject*,
     unsigned long,
@@ -653,18 +654,18 @@ void vtkPV4FoamReader::SelectionModifiedCallback
     void*
 )
 {
-    static_cast<vtkPV4FoamReader*>(clientdata)->SelectionModified();
+    static_cast<vtkPVFoamReader*>(clientdata)->SelectionModified();
 }
 
 
-void vtkPV4FoamReader::SelectionModified()
+void vtkPVFoamReader::SelectionModified()
 {
     vtkDebugMacro(<<"SelectionModified");
     Modified();
 }
 
 
-int vtkPV4FoamReader::FillOutputPortInformation
+int vtkPVFoamReader::FillOutputPortInformation
 (
     int port,
     vtkInformation* info

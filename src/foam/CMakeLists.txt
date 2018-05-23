@@ -57,11 +57,16 @@ list(APPEND SOURCES
 
 set(ints primitives/ints)
 list(APPEND SOURCES
-  ${ints}/int/intIO.C
+  ${ints}/uint32/uint32.C
+  ${ints}/uint32/uint32IO.C
+  ${ints}/uint64/uint64.C
+  ${ints}/uint64/uint64IO.C
   ${ints}/uint/uintIO.C
-  ${ints}/long/longIO.C
-  ${ints}/longLong/longLongIO.C
-  ${ints}/ulong/ulongIO.C
+  ${ints}/int32/int32.C
+  ${ints}/int32/int32IO.C
+  ${ints}/int64/int64.C
+  ${ints}/int64/int64IO.C
+  ${ints}/int/intIO.C
   ${ints}/label/label.C
   ${ints}/uLabel/uLabel.C
   primitives/Scalar/doubleScalar/doubleScalar.C
@@ -88,6 +93,9 @@ list(APPEND SOURCES
   primitives/complex/complex.C
   primitives/quaternion/quaternion.C
   primitives/septernion/septernion.C
+# functions, data entries
+  primitives/functions/Function1/makeDataEntries.C
+  primitives/functions/Polynomial/polynomialFunction.C
 )
 
 set(strings primitives/strings)
@@ -98,8 +106,9 @@ list(APPEND SOURCES
   ${strings}/word/wordIO.C
   ${strings}/fileName/fileName.C
   ${strings}/fileName/fileNameIO.C
-  ${strings}/keyType/keyTypeIO.C
-  ${strings}/wordRe/wordReIO.C
+  ${strings}/keyType/keyType.C
+  ${strings}/wordRe/wordRe.C
+  ${strings}/stringOps/stringOps.C
   primitives/hashes/Hasher/Hasher.C
 )
 
@@ -122,8 +131,8 @@ list(APPEND SOURCES
   primitives/random/Random.C
   containers/HashTables/HashTable/HashTableCore.C
   containers/HashTables/StaticHashTable/StaticHashTableCore.C
-  containers/Lists/SortableList/ParSortableListName.C
-  containers/Lists/PackedList/PackedListName.C
+#  containers/Lists/SortableList/ParSortableListName.C
+#  containers/Lists/PackedList/PackedListName.C
   containers/Lists/ListOps/ListOps.C
   containers/LinkedLists/linkTypes/SLListBase/SLListBase.C
   containers/LinkedLists/linkTypes/DLListBase/DLListBase.C
@@ -143,6 +152,8 @@ list(APPEND SOURCES
   ${primitiveLists}/tensorList.C
   ${primitiveLists}/VectorNLists.C
   ${primitiveLists}/wordIOList.C
+  ${primitiveLists}/hashedWordList.C
+  ${primitiveLists}/PackedBoolList.C
 )
 
 set(Streams db/IOstreams)
@@ -190,13 +201,13 @@ list(APPEND SOURCES
 set(Pstreams ${Streams}/Pstreams)
 list(APPEND SOURCES
   ${Pstreams}/Pstream.C
+  ${Pstreams}/PstreamReduceOps.C
   ${Pstreams}/PstreamCommsStruct.C
   ${Pstreams}/PstreamGlobals.C
   ${Pstreams}/IPstream.C
   ${Pstreams}/OPstream.C
   ${Pstreams}/IPread.C
   ${Pstreams}/OPwrite.C
-  ${Pstreams}/PstreamsPrint.C
 )
 
 set(dictionary db/dictionary)
@@ -225,8 +236,11 @@ list(APPEND SOURCES
 
 set(functionEntries ${dictionary}/functionEntries)
 list(APPEND SOURCES
+  ${functionEntries}/calcEntry/calcEntry.C
+  ${functionEntries}/codeStream/codeStream.C
   ${functionEntries}/functionEntry/functionEntry.C
   ${functionEntries}/includeEntry/includeEntry.C
+  ${functionEntries}/includeEtcEntry/includeEtcEntry.C
   ${functionEntries}/includeIfPresentEntry/includeIfPresentEntry.C
   ${functionEntries}/inputModeEntry/inputModeEntry.C
   ${functionEntries}/removeEntry/removeEntry.C
@@ -256,10 +270,18 @@ list(APPEND SOURCES
   db/objectRegistry/objectRegistry.C
   db/postfixedSubRegistry/postfixedSubRegistry.C
   db/CallbackRegistry/CallbackRegistryName.C
-  db/dlLibraryTable/dlLibraryTable.C
   db/functionObjects/functionObject/functionObject.C
   db/functionObjects/functionObjectList/functionObjectList.C
+  db/functionObjects/functionObjectFile/functionObjectFile.C
   db/functionObjects/outputFilterOutputControl/outputFilterOutputControl.C
+)
+
+set(dll db/dynamicLibrary)
+list(APPEND SOURCES
+  ${dll}/dlLibraryTable/dlLibraryTable.C
+  ${dll}/dynamicCode/dynamicCode.C
+  ${dll}/dynamicCode/dynamicCodeContext.C
+  ${dll}/codedBase/codedBase.C
 )
 
 set(Time db/Time)
@@ -301,6 +323,12 @@ list(APPEND SOURCES
   ${LUscalarMatrix}/LUscalarMatrix.C
   ${LUscalarMatrix}/procLduMatrix.C
   ${LUscalarMatrix}/procLduInterface.C
+)
+
+set(crMatrix matrices/crMatrix)
+list(APPEND SOURCES
+  ${crMatrix}/crAddressing.C
+  ${crMatrix}/crMatrix.C
 )
 
 set(lduMatrix matrices/lduMatrix)
@@ -368,7 +396,7 @@ list(APPEND SOURCES
   ${AMG}/GAMGSolverSolve.C
 )
 
-set(AMGInterfaces ${AMG}/interfaces)
+set(AMGInterfaces ${AMG}/interfaces/AMGInterfaces)
 list(APPEND SOURCES
   ${AMGInterfaces}/AMGInterface/AMGInterface.C
   ${AMGInterfaces}/AMGInterface/newAMGInterface.C
@@ -380,7 +408,15 @@ list(APPEND SOURCES
   ${AMGInterfaces}/mixingPlaneAMGInterface/mixingPlaneAMGInterface.C
 )
 
-set(AMGInterfaceFields ${AMG}/interfaceFields)
+set(SAMGInterfaces ${AMG}/interfaces/SAMGInterfaces)
+list(APPEND SOURCES
+  ${SAMGInterfaces}/SAMGInterface/SAMGInterface.C
+  ${SAMGInterfaces}/SAMGInterface/newSAMGInterface.C
+  ${SAMGInterfaces}/processorSAMGInterface/processorSAMGInterface.C
+  ${SAMGInterfaces}/ggiSAMGInterface/ggiSAMGInterface.C
+)
+
+set(AMGInterfaceFields ${AMG}/interfaceFields/AMGInterfaceFields)
 list(APPEND SOURCES
   ${AMGInterfaceFields}/AMGInterfaceField/AMGInterfaceField.C
   ${AMGInterfaceFields}/AMGInterfaceField/newAMGInterfaceField.C
@@ -390,6 +426,14 @@ list(APPEND SOURCES
   ${AMGInterfaceFields}/cyclicGgiAMGInterfaceField/cyclicGgiAMGInterfaceField.C
   ${AMGInterfaceFields}/regionCoupleAMGInterfaceField/regionCoupleAMGInterfaceField.C
   ${AMGInterfaceFields}/mixingPlaneAMGInterfaceField/mixingPlaneAMGInterfaceField.C
+)
+
+set(SAMGInterfaceFields ${AMG}/interfaceFields/SAMGInterfaceFields)
+list(APPEND SOURCES
+  ${SAMGInterfaceFields}/SAMGInterfaceField/SAMGInterfaceField.C
+  ${SAMGInterfaceFields}/SAMGInterfaceField/newSAMGInterfaceField.C
+  ${SAMGInterfaceFields}/processorSAMGInterfaceField/processorSAMGInterfaceField.C
+  ${SAMGInterfaceFields}/ggiSAMGInterfaceField/ggiSAMGInterfaceField.C
 )
 
 set(AMGAgglomerations ${AMG}/AMGAgglomerations)
@@ -517,6 +561,7 @@ list(APPEND SOURCES
   ${globalMeshData}/globalMeshData.C
   ${globalMeshData}/globalPoints.C
   ${globalMeshData}/globalIndex.C
+  ${globalMeshData}/globalProcFaceIndex.C
   ${polyMesh}/syncTools/syncTools.C
 )
 
@@ -748,6 +793,19 @@ list(APPEND SOURCES
   ${interpolations}/RBFInterpolation/RBFFunctions/Gauss/Gauss.C
   ${interpolations}/RBFInterpolation/RBFFunctions/TPS/TPS.C
   ${interpolations}/RBFInterpolation/RBFFunctions/IMQB/IMQB.C
+  ${interpolations}/interpolationTable/tableReaders/tableReaders.C
+  ${interpolations}/interpolationTable/tableReaders/openFoam/openFoamTableReaders.C
+  ${interpolations}/interpolationTable/tableReaders/csv/csvTableReaders.C
+)
+
+set(interpolationWeights ${interpolations}/interpolationWeights)
+list(APPEND SOURCES
+  ${interpolationWeights}/interpolationWeights/interpolationWeights.C
+  ${interpolationWeights}/linearInterpolationWeights/linearInterpolationWeights.C
+  ${interpolationWeights}/splineInterpolationWeights/splineInterpolationWeights.C
+)
+
+list(APPEND SOURCES
   algorithms/MeshWave/MeshWaveName.C
   algorithms/MeshWave/FaceCellWaveName.C
   algorithms/polygon/clipping/SutherlandHodgman.C
@@ -849,10 +907,19 @@ list(APPEND SOURCES
   ${BlockAMGInterfaceFields}/GGIBlockAMGInterfaceField/GGIBlockAMGInterfaceFields.C
 )
 
+set(BlockSAMGInterfaceFields ${BlockAMG}/BlockSAMGInterfaceFields)
+list(APPEND SOURCES
+  ${BlockSAMGInterfaceFields}/BlockSAMGInterfaceField/blockSAMGInterfaceFields.C
+  ${BlockSAMGInterfaceFields}/BlockSAMGInterfaceField/blockVectorNSAMGInterfaceFields.C
+  ${BlockSAMGInterfaceFields}/ProcessorBlockSAMGInterfaceField/ProcessorBlockSAMGInterfaceFields.C
+  ${BlockSAMGInterfaceFields}/GGIBlockSAMGInterfaceField/GGIBlockSAMGInterfaceFields.C
+)
+
 set(BlockMatrixCoarsening ${BlockAMG}/BlockMatrixCoarsening)
 list(APPEND SOURCES
   ${BlockMatrixCoarsening}/BlockMatrixCoarsening/blockMatrixCoarsenings.C
-  ${BlockMatrixCoarsening}/BlockMatrixAgglomeration/blockMatrixAgglomerations.C
+  ${BlockMatrixCoarsening}/BlockMatrixClustering/blockMatrixClusterings.C
+  ${BlockMatrixCoarsening}/BlockMatrixSelection/blockMatrixSelections.C
 )
 
 set(BlockLduPrecons matrices/blockLduMatrix/BlockLduPrecons)
@@ -869,6 +936,9 @@ list(APPEND SOURCES
   ${BlockLduPrecons}/BlockCholeskyPrecon/tensorBlockCholeskyPrecon.C
   ${BlockLduPrecons}/BlockCholeskyPrecon/blockCholeskyPrecons.C
   ${BlockLduPrecons}/BlockAMGPrecon/blockAMGPrecons.C
+  ${BlockLduPrecons}/BlockILUC0Precon/scalarBlockILUC0Precon.C
+  ${BlockLduPrecons}/BlockILUC0Precon/tensorBlockILUC0Precon.C
+  ${BlockLduPrecons}/BlockILUC0Precon/blockILUC0Precons.C
   ${BlockLduPrecons}/BlockILUCpPrecon/scalarBlockILUCpPrecon.C
   ${BlockLduPrecons}/BlockILUCpPrecon/tensorBlockILUCpPrecon.C
   ${BlockLduPrecons}/BlockILUCpPrecon/blockILUCpPrecons.C
@@ -879,6 +949,7 @@ list(APPEND SOURCES
   ${BlockLduSmoothers}/BlockLduSmoother/blockLduSmoothers.C
   ${BlockLduSmoothers}/BlockGaussSeidelSmoother/blockGaussSeidelSmoothers.C
   ${BlockLduSmoothers}/BlockILUSmoother/blockILUSmoothers.C
+  ${BlockLduSmoothers}/BlockILUC0Smoother/blockILUC0Smoothers.C
   ${BlockLduSmoothers}/BlockILUCpSmoother/blockILUCpSmoothers.C
 )
 
@@ -888,6 +959,7 @@ list(APPEND SOURCES
   ${BlockLduSolvers}/BlockLduSolver/blockLduSolvers.C
   ${BlockLduSolvers}/BlockDiagonal/blockDiagonalSolvers.C
   ${BlockLduSolvers}/BlockGaussSeidel/blockGaussSeidelSolvers.C
+  ${BlockLduSolvers}/BlockILU/blockILUSolvers.C
   ${BlockLduSolvers}/BlockCG/blockCGSolvers.C
   ${BlockLduSolvers}/BlockBiCGStab/blockBiCGStabSolvers.C
   ${BlockLduSolvers}/BlockGMRES/blockGMRESSolvers.C
@@ -897,5 +969,5 @@ list(APPEND SOURCES
 
 add_foam_library(foam SHARED ${SOURCES})
 
-target_link_libraries(foam OSspecific mpi ZLIB::ZLIB)
+target_link_libraries(foam PUBLIC OSspecific mpi ZLIB::ZLIB)
 add_dependencies(foam getGitVersion)

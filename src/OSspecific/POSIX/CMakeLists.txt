@@ -44,7 +44,12 @@ list(APPEND SOURCES
   POSIX.C
   cpuTime/cpuTime.C
   clockTime/clockTime.C
+  memInfo/memInfo.C
   multiThreader/multiThreader.C
+
+# Note: fileMonitor assumes inotify by default. Compile with -DFOAM_USE_STAT
+# to use stat (=timestamps) instead of inotify
+ fileMonitor.C
 )
 
 #ifdef SunOS64
@@ -59,5 +64,4 @@ list(APPEND SOURCES
 
 add_foam_library(OSspecific SHARED ${SOURCES})
 
-target_link_libraries(OSspecific)
 add_dependencies(OSspecific foam_lnInclude)

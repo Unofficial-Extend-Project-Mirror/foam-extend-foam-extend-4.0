@@ -30,11 +30,6 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND SOURCES
-  crMatrix/crAddressing.C
-  crMatrix/crMatrix.C
-)
-
 set(lduPrecon lduPrecon)
 list(APPEND SOURCES
   ${lduPrecon}/CholeskyPrecon/CholeskyPrecon.C
@@ -49,6 +44,7 @@ set(lduSmoother lduSmoother)
 list(APPEND SOURCES
   ${lduSmoother}/symGaussSeidelSmoother/symGaussSeidelSmoother.C
   ${lduSmoother}/iluSmoother/iluSmoother.C
+  ${lduSmoother}/iluC0Smoother/iluC0Smoother.C
 )
 
 set(lduSolver lduSolver)
@@ -75,6 +71,8 @@ set(amgPolicy ${amg}/amgPolicy)
 list(APPEND SOURCES
   ${amgPolicy}/amgPolicy.C
   ${amgPolicy}/pamgPolicy.C
+  ${amgPolicy}/clusterAmgPolicy.C
+  ${amgPolicy}/selectionAmgPolicy.C
 )
 
 add_foam_library(lduSolvers SHARED ${SOURCES})

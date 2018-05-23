@@ -65,21 +65,27 @@ list(APPEND SOURCES
   ${nutWallFunctions}/nutSpalartAllmarasStandardWallFunction/nutSpalartAllmarasStandardWallFunctionFvPatchScalarField.C
   ${nutWallFunctions}/nutSpalartAllmarasStandardRoughWallFunction/nutSpalartAllmarasStandardRoughWallFunctionFvPatchScalarField.C
   ${nutWallFunctions}/nutLowReWallFunction/nutLowReWallFunctionFvPatchScalarField.C
+  ${nutWallFunctions}/nutCWTWallFunction/nutCWTWallFunctionFvPatchScalarField.C
+  ${nutWallFunctions}/nutMEWTWallFunction/nutMEWTWallFunctionFvPatchScalarField.C
 )
 
 set(epsilonWallFunctions ${wallFunctions}/epsilonWallFunctions)
 list(APPEND SOURCES
   ${epsilonWallFunctions}/epsilonWallFunction/epsilonWallFunctionFvPatchScalarField.C
+  ${epsilonWallFunctions}/epsilonNonEqWallFunction/epsilonNonEqWallFunctionFvPatchScalarField.C
 )
 
 set(omegaWallFunctions ${wallFunctions}/omegaWallFunctions)
 list(APPEND SOURCES
   ${omegaWallFunctions}/omegaWallFunction/omegaWallFunctionFvPatchScalarField.C
+  ${omegaWallFunctions}/omegaCWTWallFunction/omegaCWTWallFunctionFvPatchScalarField.C
+  ${omegaWallFunctions}/omegaMEWTWallFunction/omegaMEWTWallFunctionFvPatchScalarField.C
 )
 
 set(kqRWallFunctions ${wallFunctions}/kqRWallFunctions)
 list(APPEND SOURCES
   ${kqRWallFunctions}/kqRWallFunction/kqRWallFunctionFvPatchFields.C
+  ${kqRWallFunctions}/kNonEqWallFunction/kNonEqWallFunctionFvPatchScalarField.C
 )
 
 set(RWallFunctions ${wallFunctions}/RWallFunctions)
@@ -87,12 +93,19 @@ list(APPEND SOURCES
   ${RWallFunctions}/RWallFunction/RWallFunctionFvPatchSymmTensorField.C
 )
 
+set(wallFunctionFunctionObjects ${wallFunctions}/functionObjects)
+list(APPEND SOURCES
+  ${wallFunctionFunctionObjects}/pressureGradient/pressureGradientFunctionObject.C
+  ${wallFunctionFunctionObjects}/velocityConvection/velocityConvectionFunctionObject.C
+)
 
 #  Patch fields 
 list(APPEND SOURCES
   derivedFvPatchFields/turbulentHeatFluxTemperature/turbulentHeatFluxTemperatureFvPatchScalarField.C
   derivedFvPatchFields/turbulentMixingLengthDissipationRateInlet/turbulentMixingLengthDissipationRateInletFvPatchScalarField.C
   derivedFvPatchFields/turbulentMixingLengthFrequencyInlet/turbulentMixingLengthFrequencyInletFvPatchScalarField.C
+  derivedFvPatchFields/nuRatioEpsilon/nuRatioEpsilonFvPatchScalarField.C
+  derivedFvPatchFields/nuRatioOmega/nuRatioOmegaFvPatchScalarField.C
   backwardsCompatibility/wallFunctions/backwardsCompatibilityWallFunctions.C
 )
 

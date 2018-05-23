@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(interFoam
-  DEPENDS interfaceProperties incompressibleTurbulenceModel
+  DEPENDS interfaceProperties incompressibleRASModels incompressibleLESModels
   SOURCES ${SOURCES}
 )

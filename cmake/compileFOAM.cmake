@@ -118,6 +118,11 @@ if(CCMIO_FOUND)
   set_property(TARGET ccmio PROPERTY INTERFACE_LINK_LIBRARIES ${CCMIO_LIBRARIES})
 endif()
 
+#SET(CMAKE_INSTALL_RPATH FALSE)
+#SET(CMAKE_SKIP_BUILD_RPATH TRUE)
+#SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+#SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 #
 # Recurse into the source
 #
@@ -155,8 +160,16 @@ else()
   target_compile_definitions(OSspecific PUBLIC WM_DP)
 endif()
 
+# Label size
+set(FOAM_LABEL_SIZE "32" CACHE STRING "Label size")
+set_property(CACHE FOAM_LABEL_SIZE PROPERTY STRINGS 32 64)
+target_compile_definitions(OSspecific PUBLIC WM_LABEL_SIZE=${FOAM_LABEL_SIZE})
+  
 # No Repository
 target_compile_definitions(OSspecific PUBLIC NoRepository)
+
+# No Repository
+target_compile_definitions(OSspecific PUBLIC linux64)
 
 # FOAM's full debug mode
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
@@ -164,8 +177,10 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
   target_compile_options(OSspecific PUBLIC -fdefault-inline -ggdb3)
 endif()
 
-#option(FOAM_PRECISION "help string describing option" -WM_DP)
-
+#target_compile_options(
+#  OSspecific PUBLIC
+#  -Wall -Wextra -Wno-unused-parameter -Wold-style-cast -Wnon-virtual-dtor
+#)
 
 #
 # Exports and install

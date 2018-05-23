@@ -32,12 +32,6 @@
 
 list(APPEND SOURCES
   processorMeshes.C
-  processorFaMeshes.C
-  fvFieldReconstructor.C
-  faFieldReconstructor.C
-  pointFieldReconstructor.C
-  tetPointFieldReconstructor.C
-  reconstructLagrangianPositions.C
   reconstructPar.C
 )
 
@@ -48,6 +42,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(reconstructPar
-  DEPENDS finiteVolume finiteArea tetFiniteElement
+  DEPENDS decomposeReconstruct
   SOURCES ${SOURCES}
 )

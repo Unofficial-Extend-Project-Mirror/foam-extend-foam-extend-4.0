@@ -31,16 +31,7 @@
 # --------------------------------------------------------------------------
 
 list(APPEND SOURCES
-  decomposeMesh.C
   decomposePar.C
-  domainDecomposition.C
-  distributeCells.C
-  faMeshDecomposition.C
-  fvFieldDecomposer.C
-  faFieldDecomposer.C
-  pointFieldDecomposer.C
-  tetPointFieldDecomposer.C
-  lagrangianFieldDecomposer.C
 )
 
 # Set minimal environment for external compilation
@@ -50,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(decomposePar
-  DEPENDS finiteVolume finiteArea tetFiniteElement
+  DEPENDS decomposeReconstruct
   SOURCES ${SOURCES}
 )

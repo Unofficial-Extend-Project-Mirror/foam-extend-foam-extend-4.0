@@ -54,4 +54,4 @@ list(APPEND SOURCES
 
 add_foam_library(coupledLduMatrix SHARED ${SOURCES})
 
-target_link_libraries(coupledLduMatrix finiteVolume)
+target_link_libraries(coupledLduMatrix PUBLIC finiteVolume)

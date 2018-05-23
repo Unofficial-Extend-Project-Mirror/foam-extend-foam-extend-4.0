@@ -30,9 +30,4 @@
 #
 # --------------------------------------------------------------------------
 
-add_subdirectory(potentialIbFoam)
-add_subdirectory(porousSimpleIbFoam)
-add_subdirectory(simpleIbFoam)
-add_subdirectory(icoDyMIbFoam)
-add_subdirectory(interIbFoam)
-add_subdirectory(icoIbFoam)
+add_subdirectory(pimpleDyMIbFoam)

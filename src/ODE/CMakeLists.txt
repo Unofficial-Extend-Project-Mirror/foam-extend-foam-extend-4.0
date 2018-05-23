@@ -51,7 +51,23 @@ set(sixDOF sixDOF)
 list(APPEND SOURCES
   ${sixDOF}/finiteRotation/finiteRotation.C
   ${sixDOF}/sixDOFqODE/sixDOFqODE.C
-  ${sixDOF}/sixDOFbodies/sixDOFbodies.C
+  ${sixDOF}/sixDOFODE/constraints/rotationalConstraints/rotationalConstraint/rotationalConstraint.C
+  ${sixDOF}/sixDOFODE/constraints/rotationalConstraints/constantAngularAcceleration/constantAngularAcceleration.C
+  ${sixDOF}/sixDOFODE/constraints/translationalConstraints/translationalConstraint/translationalConstraint.C
+  ${sixDOF}/sixDOFODE/constraints/translationalConstraints/constantTranslationalAcceleration/constantTranslationalAcceleration.C
+  ${sixDOF}/sixDOFODE/constraints/translationalConstraints/periodicOscillation/periodicOscillation.C
+
+  ${sixDOF}/sixDOFODE/restraints/translationalRestraints/translationalRestraint/translationalRestraint.C
+  ${sixDOF}/sixDOFODE/restraints/translationalRestraints/linearSpringDamper/linearSpringDamper.C
+  ${sixDOF}/sixDOFODE/restraints/rotationalRestraints/rotationalRestraint/rotationalRestraint.C
+  ${sixDOF}/sixDOFODE/restraints/rotationalRestraints/angularDamper/angularDamper.C
+
+  ${sixDOF}/sixDOFODE/sixDOFODE.C
+  ${sixDOF}/sixDOFODE/newSixDOFODE.C
+  ${sixDOF}/quaternionSixDOF/quaternionSixDOF.C
+  ${sixDOF}/geometricSixDOF/geometricSixDOF.C
+
+  ${sixDOF}/sixDOFBodies/sixDOFBodies.C
 )
 
 add_foam_library(ODE SHARED ${SOURCES})

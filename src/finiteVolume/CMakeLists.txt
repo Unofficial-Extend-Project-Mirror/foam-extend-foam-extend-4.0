@@ -142,7 +142,7 @@ list(APPEND SOURCES
 
 set(basicFvPatchFields ${fvPatchFields}/basic)
 list(APPEND SOURCES
-  ${basicFvPatchFields}/basicSymmetry/basicSymmetryFvPatchFields.C
+#  ${basicFvPatchFields}/basicSymmetry/basicSymmetryFvPatchFields.C
   ${basicFvPatchFields}/basicSymmetry/basicSymmetryFvPatchScalarField.C
   ${basicFvPatchFields}/calculated/calculatedFvPatchFields.C
   ${basicFvPatchFields}/calculated/calculatedFvPatchVectorNFields.C
@@ -178,11 +178,13 @@ list(APPEND SOURCES
   ${constraintFvPatchFields}/wedge/wedgeFvPatchFields.C
   ${constraintFvPatchFields}/wedge/wedgeFvPatchScalarField.C
   ${constraintFvPatchFields}/wedge/wedgeFvPatchVectorNFields.C
+  ${constraintFvPatchFields}/ggi/ggiFvPatchScalarField.C
   ${constraintFvPatchFields}/ggi/ggiFvPatchFields.C
   ${constraintFvPatchFields}/ggi/ggiFvPatchVectorNFields.C
   ${constraintFvPatchFields}/jumpGgi/jumpGgiFvPatchFields.C
   ${constraintFvPatchFields}/cyclicGgi/cyclicGgiFvPatchFields.C
   ${constraintFvPatchFields}/overlapGgi/overlapGgiFvPatchFields.C
+  ${constraintFvPatchFields}/jumpOverlapGgi/jumpOverlapGgiFvPatchFields.C
   ${constraintFvPatchFields}/mixingPlane/mixingPlaneFvPatchFields.C
   ${constraintFvPatchFields}/jumpMixingPlane/jumpMixingPlaneFvPatchFields.C
   ${constraintFvPatchFields}/regionCoupling/regionCouplingFvPatchFields.C
@@ -245,6 +247,9 @@ list(APPEND SOURCES
   ${derivedFvPatchFields}/uniformDensityHydrostaticPressure/uniformDensityHydrostaticPressureFvPatchScalarField.C
   ${derivedFvPatchFields}/pulseFixedValue/pulseFixedValueFvPatchFields.C
   ${derivedFvPatchFields}/waveTransmissiveInlet/waveTransmissiveInletFvPatchFields.C
+  ${derivedFvPatchFields}/noSlipWall/noSlipWallFvPatchVectorField.C
+  ${derivedFvPatchFields}/noSlipMovingWall/noSlipMovingWallFvPatchVectorField.C
+  ${derivedFvPatchFields}/blockSymmPlane/blockSymmPlaneFvPatchVectorField.C
 )
 
 set(fvsPatchFields fields/fvsPatchFields)

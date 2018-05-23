@@ -32,6 +32,7 @@
 
 list(APPEND SOURCES
   topoChangerFvMesh/topoChangerFvMesh.C
+  topoChangerFvMesh/topoChangerFvMeshLoadBalance.C
   attachDetachFvMesh/attachDetachFvMesh.C
   linearValveFvMesh/linearValveFvMesh.C
   linearValveLayersFvMesh/linearValveLayersFvMesh.C
@@ -41,8 +42,16 @@ list(APPEND SOURCES
   mixerFvMesh/mixerFvMesh.C
   multiMixerFvMesh/mixerRotor.C
   multiMixerFvMesh/multiMixerFvMesh.C
+  dynamicPolyRefinementFvMesh/dynamicPolyRefinementFvMesh.C
+  dynamicPolyRefinementFvMesh/refinementSelection/refinementSelection/refinementSelection.C
+  dynamicPolyRefinementFvMesh/refinementSelection/fieldBoundsRefinement/fieldBoundsRefinement.C
+  dynamicPolyRefinementFvMesh/refinementSelection/minCellVolumeRefinement/minCellVolumeRefinement.C
+  dynamicPolyRefinementFvMesh/refinementSelection/minCellSizeRefinement/minCellSizeRefinement.C
+  dynamicPolyRefinementFvMesh/refinementSelection/minPatchDistanceRefinement/minPatchDistanceRefinement.C
+  dynamicPolyRefinementFvMesh/refinementSelection/compositeRefinementSelection/compositeRefinementSelection.C
 )
 
 add_foam_library(topoChangerFvMesh SHARED ${SOURCES})
 
-target_link_libraries(topoChangerFvMesh PUBLIC dynamicFvMesh)
+target_link_libraries(topoChangerFvMesh PUBLIC dynamicFvMesh decomposeReconstruct)
+ 

@@ -31,10 +31,16 @@
 # --------------------------------------------------------------------------
 
 list(APPEND SOURCES
-  immersedBoundaryForces.C
-  immersedBoundaryForcesFunctionObject.C
+  spatialMeanValueRichardsonFoam.C
 )
 
-add_foam_library(immersedBoundaryForceFunctionObject SHARED ${SOURCES})
+# Set minimal environment for external compilation
+if(NOT FOAM_FOUND)
+  cmake_minimum_required(VERSION 2.8)
+  find_package(FOAM REQUIRED)
+endif()
 
-target_link_libraries(immersedBoundaryForceFunctionObject immersedBoundaryTurbulence forces)
+add_foam_executable(spatialMeanValueRichardsonFoam
+  DEPENDS finiteVolume
+  SOURCES ${SOURCES}
+)

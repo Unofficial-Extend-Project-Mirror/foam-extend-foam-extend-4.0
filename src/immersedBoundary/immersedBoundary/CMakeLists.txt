@@ -31,17 +31,14 @@
 # --------------------------------------------------------------------------
 
 list(APPEND SOURCES
+  immersedPoly/immersedPoly.C
+  immersedPoly/distanceFunctions/triSurfaceDistance/triSurfaceDistance.C
   immersedBoundaryPolyPatch/immersedBoundaryPolyPatch.C
   immersedBoundaryPointPatch/immersedBoundaryPointPatch.C
   immersedBoundaryFvPatch/immersedBoundaryFvPatch.C
-  immersedBoundaryFvPatch/immersedBoundaryFvPatchLeastSquaresFit.C
-  immersedBoundaryFvPatch/immersedBoundaryFvPatchSamplingWeights.C
-  immersedBoundaryFvPatch/immersedBoundaryFvPatchTriAddressing.C
   immersedBoundaryFvPatchField/immersedBoundaryFvPatchFields.C
-  immersedBoundaryFvsPatchField/immersedBoundaryFvsPatchFields.C
-  immersedBoundaryAdjustPhi/immersedBoundaryAdjustPhi.C
-  refineImmersedBoundaryMesh/refineImmersedBoundaryMesh.C
-  ibSwirlFlowRateInletVelocity/ibSwirlFlowRateInletVelocityFvPatchVectorField.C
+  mixedIbFvPatchField/mixedIbFvPatchFields.C
+  movingImmersedBoundaryVelocity/movingImmersedBoundaryVelocityFvPatchVectorField.C
 )
 
 add_foam_library(immersedBoundary SHARED ${SOURCES})

@@ -32,6 +32,7 @@
 
 add_subdirectory(foam)
 add_subdirectory(immersedBoundary)
+add_subdirectory(overset)
 add_subdirectory(lagrangian)
 add_subdirectory(edgeMesh)
 add_subdirectory(coupledMatrix)
@@ -62,3 +63,4 @@ add_subdirectory(meshTools)
 add_subdirectory(dynamicMesh)
 add_subdirectory(thermophysicalModels)
 add_subdirectory(dbns)
+add_subdirectory(conjugateHeatTransfer)

@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(writeIbMasks
-  DEPENDS immersedBoundary
+  DEPENDS postCalc immersedBoundary
   SOURCES ${SOURCES}
 )

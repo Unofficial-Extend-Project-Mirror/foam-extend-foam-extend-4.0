@@ -41,7 +41,7 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(buoyantBoussinesqPisoFoam
-  DEPENDS incompressibleTurbulenceModel
+  DEPENDS incompressibleRASModels incompressibleLESModels
   SOURCES ${SOURCES}
 )
 

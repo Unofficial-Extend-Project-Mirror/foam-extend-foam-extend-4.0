@@ -32,7 +32,8 @@
 
 list(APPEND SOURCES
   probes/probes.C
-  probes/probesFunctionObject.C
+  probes/probesGrouping.C
+  probes/probesFunctionObject/probesFunctionObject.C
   sampledSet/coordSet/coordSet.C
   sampledSet/sampledSet/sampledSet.C
   sampledSet/cloud/cloudSet.C
@@ -41,7 +42,9 @@ list(APPEND SOURCES
   sampledSet/uniform/uniformSet.C
   sampledSet/midPoint/midPointSet.C
   sampledSet/midPointAndFace/midPointAndFaceSet.C
+  sampledSet/sampledSet/sampledSet.C
   sampledSet/sampledSets/sampledSets.C
+  sampledSet/sampledSets/sampledSetsGrouping.C
   sampledSet/sampledSetsFunctionObject/sampledSetsFunctionObject.C
 )
 
@@ -64,6 +67,7 @@ list(APPEND SOURCES
   sampledSurface/sampledCuttingPlane/sampledCuttingPlane.C
   sampledSurface/sampledSurface/sampledSurface.C
   sampledSurface/sampledSurfaces/sampledSurfaces.C
+  sampledSurface/sampledSurfaces/sampledSurfacesGrouping.C
   sampledSurface/sampledSurfacesFunctionObject/sampledSurfacesFunctionObject.C
   sampledSurface/sampledTriSurfaceMesh/sampledTriSurfaceMesh.C
   sampledSurface/thresholdCellFaces/thresholdCellFaces.C
@@ -73,13 +77,14 @@ list(APPEND SOURCES
 set(surfWriters sampledSurface/writers)
 
 list(APPEND SOURCES
-  ${surfWriters}/surfaceWriters.C
-  ${surfWriters}/dx/dxSurfaceWriterRunTime.C
-  ${surfWriters}/foamFile/foamFileSurfaceWriterRunTime.C
-  ${surfWriters}/null/nullSurfaceWriterRunTime.C
-  ${surfWriters}/proxy/proxySurfaceWriterRunTime.C
-  ${surfWriters}/raw/rawSurfaceWriterRunTime.C
-  ${surfWriters}/vtk/vtkSurfaceWriterRunTime.C
+  ${surfWriters}/surfaceWriter.C
+  ${surfWriters}/dx/dxSurfaceWriter.C
+  ${surfWriters}/foamFile/foamFileSurfaceWriter.C
+  ${surfWriters}/nastran/nastranSurfaceWriter.C
+  ${surfWriters}/proxy/proxySurfaceWriter.C
+  ${surfWriters}/raw/rawSurfaceWriter.C
+  ${surfWriters}/starcd/starcdSurfaceWriter.C
+  ${surfWriters}/vtk/vtkSurfaceWriter.C
   graphField/writePatchGraph.C
   graphField/writeCellGraph.C
   graphField/makeGraph.C

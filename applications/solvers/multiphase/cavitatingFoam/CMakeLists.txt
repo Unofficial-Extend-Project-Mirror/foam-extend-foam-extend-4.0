@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(cavitatingFoam
-  DEPENDS incompressibleTurbulenceModel barotropicCompressibilityModel
+  DEPENDS barotropicCompressibilityModel incompressibleRASModels incompressibleLESModels
   SOURCES ${SOURCES}
 )

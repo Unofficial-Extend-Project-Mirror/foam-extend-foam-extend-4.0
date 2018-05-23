@@ -32,7 +32,7 @@
 
 list(APPEND SOURCES
   bunnylod/progmesh.C
-  bunnylod/vector.C
+  bunnylod/vectorb.C
   surfaceCoarsen.C
 )
 

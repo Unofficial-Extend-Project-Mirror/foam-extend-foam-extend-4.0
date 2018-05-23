@@ -42,6 +42,7 @@ list(APPEND SOURCES
   field/div/div.C
   field/randomise/randomise.C
   field/interpolate/interpolate.C
+  field/helicity/helicity.C
   basic/addSubtract/addSubtract.C
   basic/scalarMult/scalarMult.C
 )

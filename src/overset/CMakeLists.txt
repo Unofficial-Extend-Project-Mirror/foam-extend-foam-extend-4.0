@@ -30,13 +30,5 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND SOURCES
-  wallFunctions/immersedBoundaryWallFunctions/immersedBoundaryWallFunctionFvPatchFields.C
-  wallFunctions/immersedBoundaryEpsilonWallFunctions/immersedBoundaryEpsilonWallFunctionFvPatchScalarField.C
-  wallFunctions/immersedBoundaryOmegaWallFunctions/immersedBoundaryOmegaWallFunctionFvPatchScalarField.C
-  wallFunctions/immersedBoundaryVelocityWallFunctions/immersedBoundaryVelocityWallFunctionFvPatchVectorField.C
-)
-
-add_foam_library(immersedBoundaryTurbulence SHARED ${SOURCES})
-
-target_link_libraries(immersedBoundaryTurbulence immersedBoundary incompressibleRASModels incompressibleLESModels)
+add_subdirectory(oversetMesh)
+add_subdirectory(oversetDynamicFvMesh)

@@ -40,4 +40,4 @@ list(APPEND SOURCES
 
 add_foam_library(barotropicCompressibilityModel SHARED ${SOURCES})
 
-target_link_libraries(barotropicCompressibilityModel finiteVolume)
+target_link_libraries(barotropicCompressibilityModel PUBLIC finiteVolume)

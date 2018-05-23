@@ -30,5 +30,11 @@
 #
 # --------------------------------------------------------------------------
 
-add_subdirectory(vtkPV4Foam)
-add_subdirectory(PV4FoamReader)
+list(APPEND SOURCES
+  movingOversetRegion/movingOversetRegion.C
+  oversetSolidBodyMotionFvMesh/oversetSolidBodyMotionFvMesh.C
+)
+
+add_foam_library(oversetDynamicFvMesh SHARED ${SOURCES})
+
+target_link_libraries(oversetDynamicFvMesh PUBLIC oversetMesh dynamicFvMesh solidBodyMotion)

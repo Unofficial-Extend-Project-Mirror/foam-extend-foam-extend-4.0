@@ -31,10 +31,16 @@
 # --------------------------------------------------------------------------
 
 list(APPEND SOURCES
+  partialWrite/partialWrite.C
+  partialWrite/partialWriteFunctionObject.C
+  removeRegisteredObject/removeRegisteredObject.C
+  removeRegisteredObject/removeRegisteredObjectFunctionObject.C
+  writeDictionary/writeDictionary.C
+  writeDictionary/writeDictionaryFunctionObject.C
   writeRegisteredObject/writeRegisteredObject.C
   writeRegisteredObject/writeRegisteredObjectFunctionObject.C
 )
 
 add_foam_library(IOFunctionObjects SHARED ${SOURCES})
 
-target_link_libraries(IOFunctionObjects PUBLIC foam)
+target_link_libraries(IOFunctionObjects PUBLIC finiteVolume)

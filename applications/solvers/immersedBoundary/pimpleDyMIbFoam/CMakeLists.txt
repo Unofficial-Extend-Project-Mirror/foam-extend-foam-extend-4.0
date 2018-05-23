@@ -31,7 +31,7 @@
 # --------------------------------------------------------------------------
 
 list(APPEND SOURCES
-  simpleIbFoam.C
+  pimpleDyMIbFoam.C
 )
 
 # Set minimal environment for external compilation
@@ -40,7 +40,7 @@ if(NOT FOAM_FOUND)
   find_package(FOAM REQUIRED)
 endif()
 
-add_foam_executable(simpleIbFoam
-  DEPENDS immersedBoundaryTurbulence
+add_foam_executable(pimpleDyMIbFoam
+  DEPENDS immersedBoundary dynamicFvMesh incompressibleRASModels incompressibleLESModels
   SOURCES ${SOURCES}
 )

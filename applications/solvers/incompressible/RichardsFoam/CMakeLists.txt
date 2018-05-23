@@ -30,8 +30,10 @@
 #
 # --------------------------------------------------------------------------
 
+add_subdirectory(spatialMeanValueRichardsonFoam)
+
 list(APPEND SOURCES
-  porousSimpleIbFoam.C
+  RichardsFoam.C
 )
 
 # Set minimal environment for external compilation
@@ -40,7 +42,7 @@ if(NOT FOAM_FOUND)
   find_package(FOAM REQUIRED)
 endif()
 
-add_foam_executable(porousSimpleIbFoam
-  DEPENDS immersedBoundaryTurbulence
+add_foam_executable(RichardsFoam
+  DEPENDS finiteVolume
   SOURCES ${SOURCES}
 )

@@ -30,17 +30,25 @@
 #
 # --------------------------------------------------------------------------
 
+include(${PARAVIEW_USE_FILE})
+
 list(APPEND SOURCES
-  interIbFoam.C
+  vtkPVFoam.C
+  vtkPVFoamFields.C
+  vtkPVFoamMesh.C
+  vtkPVFoamMeshLagrangian.C
+  vtkPVFoamMeshPatch.C
+  vtkPVFoamMeshSet.C
+  vtkPVFoamMeshVolume.C
+  vtkPVFoamMeshZone.C
+  vtkPVFoamUpdateInfo.C
+  vtkPVFoamUtilities.C
 )
 
-# Set minimal environment for external compilation
-if(NOT FOAM_FOUND)
-  cmake_minimum_required(VERSION 2.8)
-  find_package(FOAM REQUIRED)
-endif()
+add_foam_library(vtkPVFoam SHARED ${SOURCES})
 
-add_foam_executable(interIbFoam
-  DEPENDS immersedBoundary interfaceProperties incompressibleTurbulenceModel
-  SOURCES ${SOURCES}
+target_link_libraries(vtkPVFoam finiteVolume)
+target_include_directories(vtkPVFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../PVFoamReader>
+#  $<INSTALL_INTERFACE:include/mylib>
 )

@@ -31,16 +31,9 @@
 # --------------------------------------------------------------------------
 
 list(APPEND SOURCES
-  icoDyMIbFoam.C
+  pairPatchAgglomeration.C
 )
 
-# Set minimal environment for external compilation
-if(NOT FOAM_FOUND)
-  cmake_minimum_required(VERSION 2.8)
-  find_package(FOAM REQUIRED)
-endif()
+add_foam_library(pairPatchAgglomeration SHARED ${SOURCES})
 
-add_foam_executable(icoDyMIbFoam
-  DEPENDS immersedBoundary dynamicFvMesh
-  SOURCES ${SOURCES}
-)
+target_link_libraries(pairPatchAgglomeration PUBLIC foam)

@@ -321,7 +321,7 @@ message("Site name: ${SITE}")
 
 # Compile FOAM, libs and apps
 add_custom_target (foam-extend-$ENV{WM_PROJECT_VERSION} ALL
-  ${FOAM_ROOT}/Allwmake
+  #${FOAM_ROOT}/Allwmake
 )
 
 set_property(

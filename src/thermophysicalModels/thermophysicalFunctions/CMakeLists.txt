@@ -68,4 +68,4 @@ list(APPEND SOURCES
 
 add_foam_library(thermophysicalFunctions SHARED ${SOURCES})
 
-target_link_libraries(thermophysicalFunctions foam)
+target_link_libraries(thermophysicalFunctions PUBLIC foam)

@@ -31,16 +31,9 @@
 # --------------------------------------------------------------------------
 
 list(APPEND SOURCES
-  icoIbFoam.C
+  loadBalanceFvMesh/loadBalanceFvMesh.C
 )
 
-# Set minimal environment for external compilation
-if(NOT FOAM_FOUND)
-  cmake_minimum_required(VERSION 2.8)
-  find_package(FOAM REQUIRED)
-endif()
+add_foam_library(loadBalanceFvMesh SHARED ${SOURCES})
 
-add_foam_executable(icoIbFoam
-  DEPENDS immersedBoundary
-  SOURCES ${SOURCES}
-)
+target_link_libraries(loadBalanceFvMesh PUBLIC decomposeReconstruct topoChangerFvMesh)

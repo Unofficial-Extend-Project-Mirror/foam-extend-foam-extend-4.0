@@ -61,30 +61,40 @@ list(APPEND SOURCES
 set(faPatchFields fields/faPatchFields)
 list(APPEND SOURCES
   ${faPatchFields}/faPatchField/faPatchFields.C
+  ${faPatchFields}/faPatchField/faPatchVectorNFields.C
 )
 
 set(basicFaPatchFields ${faPatchFields}/basic)
 list(APPEND SOURCES
-  ${basicFaPatchFields}/basicSymmetry/basicSymmetryFaPatchFields.C
   ${basicFaPatchFields}/basicSymmetry/basicSymmetryFaPatchScalarField.C
   ${basicFaPatchFields}/calculated/calculatedFaPatchFields.C
+  ${basicFaPatchFields}/calculated/calculatedFaPatchVectorNFields.C
   ${basicFaPatchFields}/coupled/coupledFaPatchFields.C
+  ${basicFaPatchFields}/coupled/coupledFaPatchVectorNFields.C
   ${basicFaPatchFields}/zeroGradient/zeroGradientFaPatchFields.C
+  ${basicFaPatchFields}/zeroGradient/zeroGradientFaPatchVectorNFields.C
   ${basicFaPatchFields}/fixedValue/fixedValueFaPatchFields.C
+  ${basicFaPatchFields}/fixedValue/fixedValueFaPatchVectorNFields.C
   ${basicFaPatchFields}/fixedGradient/fixedGradientFaPatchFields.C
+  ${basicFaPatchFields}/fixedGradient/fixedGradientFaPatchVectorNFields.C
   ${basicFaPatchFields}/mixed/mixedFaPatchFields.C
   ${basicFaPatchFields}/transform/transformFaPatchFields.C
   ${basicFaPatchFields}/transform/transformFaPatchScalarField.C
+  ${basicFaPatchFields}/transform/transformFaPatchVectorNFields.C
 )
 
 set(constraintFaPatchFields ${faPatchFields}/constraint)
 list(APPEND SOURCES
   ${constraintFaPatchFields}/empty/emptyFaPatchFields.C
+  ${constraintFaPatchFields}/empty/emptyFaPatchVectorNFields.C
   ${constraintFaPatchFields}/processor/processorFaPatchFields.C
   ${constraintFaPatchFields}/processor/processorFaPatchScalarField.C
+  ${constraintFaPatchFields}/processor/processorFaPatchVectorNFields.C
   ${constraintFaPatchFields}/wedge/wedgeFaPatchFields.C
   ${constraintFaPatchFields}/wedge/wedgeFaPatchScalarField.C
+  ${constraintFaPatchFields}/wedge/wedgeFaPatchVectorNFields.C
   ${constraintFaPatchFields}/cyclic/cyclicFaPatchFields.C
+  ${constraintFaPatchFields}/cyclic/cyclicFaPatchVectorNFields.C
   ${constraintFaPatchFields}/symmetry/symmetryFaPatchFields.C
 )
 
@@ -93,6 +103,8 @@ list(APPEND SOURCES
   ${derivedFaPatchFields}/fixedValueOutflow/fixedValueOutflowFaPatchFields.C
   ${derivedFaPatchFields}/inletOutlet/inletOutletFaPatchFields.C
   ${derivedFaPatchFields}/slip/slipFaPatchFields.C
+  ${derivedFaPatchFields}/edgeNormalFixedValue/edgeNormalFixedValueFaPatchVectorField.C
+  ${derivedFaPatchFields}/timeVaryingUniformFixedValue/timeVaryingUniformFixedValueFaPatchFields.C
 )
 
 set(faePatchFields fields/faePatchFields)
@@ -114,8 +126,21 @@ list(APPEND SOURCES
   ${constraintFaePatchFields}/wedge/wedgeFaePatchFields.C
   ${constraintFaePatchFields}/cyclic/cyclicFaePatchFields.C
   ${constraintFaePatchFields}/symmetry/symmetryFaePatchFields.C
+)
+
+set(faePatchVectorNFields ${faePatchFields}/faePatchVectorNFields)
+list(APPEND SOURCES
+  ${faePatchVectorNFields}/faePatchVectorNFields.C
+  ${faePatchVectorNFields}/calculatedFaePatchVectorNFields.C
+  ${faePatchVectorNFields}/emptyFaePatchVectorNFields.C
+  ${faePatchVectorNFields}/wedgeFaePatchVectorNFields.C
+  ${faePatchVectorNFields}/coupledFaePatchVectorNFields.C
+  ${faePatchVectorNFields}/processorFaePatchVectorNFields.C
+
   fields/areaFields/areaFields.C
+  fields/areaFields/areaVectorNFields.C
   fields/edgeFields/edgeFields.C
+  fields/edgeFields/edgeVectorNFields.C
   faMatrices/faMatrices.C
   faMatrices/faScalarMatrix/faScalarMatrix.C
 )
@@ -148,6 +173,7 @@ list(APPEND SOURCES
 
 set(divSchemes finiteArea/divSchemes)
 list(APPEND SOURCES
+  finiteArea/fam/vectorFamDiv.C
   ${divSchemes}/faDivScheme/faDivSchemes.C
   ${divSchemes}/gaussFaDivScheme/gaussFaDivSchemes.C
 )
@@ -184,6 +210,16 @@ set(convectionSchemes finiteArea/convectionSchemes)
 list(APPEND SOURCES
   ${convectionSchemes}/faConvectionScheme/faConvectionSchemes.C
   ${convectionSchemes}/gaussFaConvectionScheme/gaussFaConvectionSchemes.C
+)
+
+set(general cfdTools/general)
+
+set(solutionFaControl ${general}/solutionFaControl)
+list(APPEND SOURCES
+  ${solutionFaControl}/solutionFaControl/solutionFaControl.C
+  ${solutionFaControl}/simpleFaControl/simpleFaControl.C
+  ${solutionFaControl}/pimpleFaControl/pimpleFaControl.C
+  ${solutionFaControl}/pisoFaControl/pisoFaControl.C
 )
 
 add_foam_library(finiteArea SHARED ${SOURCES})

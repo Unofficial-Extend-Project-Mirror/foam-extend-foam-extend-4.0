@@ -53,7 +53,7 @@ list(APPEND SOURCES
 if(PARMGRIDGEN_FOUND)
   add_foam_library(dbns SHARED ${SOURCES})
 
-  target_link_libraries(dbns compressibleTurbulenceModel parmgridgen)
+  target_link_libraries(dbns PUBLIC compressibleTurbulenceModel parmgridgen)
 else()
   message(WARNING dbns will not be build)
 endif()

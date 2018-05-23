@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(refineImmersedBoundaryMesh
-  DEPENDS immersedBoundary
+  DEPENDS finiteVolume immersedBoundaryDynamicMesh
   SOURCES ${SOURCES}
 )

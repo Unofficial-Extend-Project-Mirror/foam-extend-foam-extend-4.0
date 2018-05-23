@@ -32,9 +32,12 @@
 
 list(APPEND SOURCES
   movingImmersedBoundary/movingImmersedBoundary.C
+  refineImmersedBoundaryMesh/refineImmersedBoundaryMesh.C
   immersedBoundarySolidBodyMotionFvMesh/immersedBoundarySolidBodyMotionFvMesh.C
+  immersedBoundaryRefinement/immersedBoundaryRefinement.C
+  immersedBoundaryDynamicRefineSolidBodyMotionFvMesh/immersedBoundaryDynamicRefineSolidBodyMotionFvMesh.C
 )
 
-add_foam_library(immersedBoundaryDynamicFvMesh SHARED ${SOURCES})
+add_foam_library(immersedBoundaryDynamicMesh SHARED ${SOURCES})
 
-target_link_libraries(immersedBoundaryDynamicFvMesh PUBLIC immersedBoundary dynamicFvMesh solidBodyMotion)
+target_link_libraries(immersedBoundaryDynamicMesh PUBLIC immersedBoundary topoChangerFvMesh solidBodyMotion)

@@ -37,4 +37,4 @@ list(APPEND SOURCES
 
 add_foam_library(scotchDecomp SHARED ${SOURCES})
 
-target_link_libraries(scotchDecomp finiteVolume scotch)
+target_link_libraries(scotchDecomp PUBLIC decompositionMethods scotch)

@@ -39,4 +39,4 @@ list(APPEND SOURCES
 
 add_foam_library(liquidMixture SHARED ${SOURCES})
 
-target_link_libraries(liquidMixture liquids specie)
+target_link_libraries(liquidMixture PUBLIC liquids specie)
