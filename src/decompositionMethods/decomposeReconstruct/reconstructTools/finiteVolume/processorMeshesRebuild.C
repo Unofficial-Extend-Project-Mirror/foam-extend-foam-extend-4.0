@@ -839,13 +839,50 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
             nReconFaces++;
         }
 
-        // Go through all patches.  For regular patches
-        // dump the faces into patch lists and for processor make internal faces
+        // Go through all patches.
+        // For processor make internal faces
+        // For regular patches dump the faces into patch lists
+        // Note: processor patches need to be visited in the increasing
+        // neighbour processor index.  HJ, 24/May/2018
 
         const polyBoundaryMesh& procPatches = curMesh.boundaryMesh();
 
+        // Sort processor patches for insertion
+        labelList nrbProcIndex(procPatches.size(), -1);
+
         forAll (procPatches, patchI)
         {
+            if (isA<processorPolyPatch>(procPatches[patchI]))
+            {
+                // Processor patch: faces become internal faces
+                const processorPolyPatch& curPatch =
+                    refCast<const processorPolyPatch>(procPatches[patchI]);
+
+                nrbProcIndex[patchI] = curPatch.neighbProcNo();
+            }
+            else if (isA<passiveProcessorPolyPatch>(procPatches[patchI]))
+            {
+                // For passive processor patch, faces need to be inserted in
+                // the increasing global face index
+                const passiveProcessorPolyPatch& curPatch =
+                    refCast<const passiveProcessorPolyPatch>
+                    (
+                        procPatches[patchI]
+                    );
+
+                nrbProcIndex[patchI] = curPatch.neighbProcNo();
+            }
+        }
+
+        // Get sorting order.  Note make a copy of indices because
+        // sortable list will be deleted
+        labelList procVisitOrder =
+            SortableList<label>(nrbProcIndex).indices();
+
+        forAll (procVisitOrder, pvoI)
+        {
+            const label patchI = procVisitOrder[pvoI];
+
             if (isA<processorPolyPatch>(procPatches[patchI]))
             {
                 // Processor patch: faces become internal faces
@@ -1115,7 +1152,10 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                                             "autoPtr<fvMesh> "
                                             "processorMeshesReconstructor::"
                                             "reconstructMesh(const Time& db)"
-                                        )   << "Loss of proc sync: "
+                                        )   << "Loss of proc sync: proc pair: ("
+                                            << procPatch.myProcNo()
+                                            << " " << procPatch.neighbProcNo()
+                                            << ") point addr: "
                                             << ppAddr[curRF[pointI]] << " and "
                                             << masterPpAddr[curMF[pointI]]
                                             << " for point "
@@ -1200,10 +1240,47 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                 nReconFaces++;
             }
 
-            // Go through all patches.  For regular patches
-            // dump the faces into patch lists
+            // Go through all patches.
+            // For processor make internal faces
+            // Note: processor patches need to be visited in the increasing
+            // neighbour processor index.  HJ, 24/May/2018
+
+            // Sort processor patches for insertion
+            labelList nrbProcIndex(procPatches.size(), -1);
+
             forAll (procPatches, patchI)
             {
+                if (isA<processorPolyPatch>(procPatches[patchI]))
+                {
+                    // Processor patch: faces become internal faces
+                    const processorPolyPatch& curPatch =
+                        refCast<const processorPolyPatch>(procPatches[patchI]);
+
+                    nrbProcIndex[patchI] = curPatch.neighbProcNo();
+                }
+                else if (isA<passiveProcessorPolyPatch>(procPatches[patchI]))
+                {
+                    // For passive processor patch, faces need to be inserted in
+                    // the increasing global face index
+                    const passiveProcessorPolyPatch& curPatch =
+                        refCast<const passiveProcessorPolyPatch>
+                        (
+                            procPatches[patchI]
+                        );
+
+                    nrbProcIndex[patchI] = curPatch.neighbProcNo();
+                }
+            }
+
+            // Get sorting order.  Note make a copy of indices because
+            // sortable list will be deleted
+            labelList procVisitOrder =
+                SortableList<label>(nrbProcIndex).indices();
+
+            forAll (procVisitOrder, pvoI)
+            {
+                const label patchI = procVisitOrder[pvoI];
+
                 if (isA<processorPolyPatch>(procPatches[patchI]))
                 {
                     // Processor patch: faces become internal faces
