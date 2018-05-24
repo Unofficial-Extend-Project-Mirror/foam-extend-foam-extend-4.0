@@ -232,6 +232,10 @@ void Foam::coarseBlockAMGLevel<Type>::solve
 
     if (blockLduMatrix::debug >= 4)
     {
+        blockLduMatrix::debug = 2;
+    }
+    else if (blockLduMatrix::debug == 3)
+    {
         blockLduMatrix::debug = 1;
     }
     else
