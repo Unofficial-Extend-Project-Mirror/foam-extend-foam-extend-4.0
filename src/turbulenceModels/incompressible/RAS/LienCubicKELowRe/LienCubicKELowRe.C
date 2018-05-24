@@ -24,7 +24,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "LienCubicKELowRe.H"
-#include "wallFvPatch.H"
 #include "addToRunTimeSelectionTable.H"
 
 #include "backwardsCompatibilityWallFunctions.H"

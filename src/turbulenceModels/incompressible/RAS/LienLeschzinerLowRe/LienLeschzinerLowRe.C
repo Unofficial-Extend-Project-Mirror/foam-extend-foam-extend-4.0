@@ -24,7 +24,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "LienLeschzinerLowRe.H"
-#include "wallFvPatch.H"
 #include "addToRunTimeSelectionTable.H"
 
 #include "backwardsCompatibilityWallFunctions.H"

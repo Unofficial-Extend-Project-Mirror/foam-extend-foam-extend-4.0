@@ -25,10 +25,9 @@ License
 
 #include "kNonEqWallFunctionFvPatchScalarField.H"
 #include "fvPatchFieldMapper.H"
-#include "addToRunTimeSelectionTable.H"
-#include "wallFvPatch.H"
 #include "RASModel.H"
 #include "volFields.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

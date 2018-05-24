@@ -25,7 +25,6 @@ License
 
 #include "NonlinearKEShih.H"
 #include "addToRunTimeSelectionTable.H"
-#include "wallFvPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
