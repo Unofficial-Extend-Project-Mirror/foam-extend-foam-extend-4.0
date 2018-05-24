@@ -53,7 +53,6 @@ SourceFiles
 #include "fvc.H"
 #include "fvMatrices.H"
 #include "incompressible/transportModel/transportModel.H"
-#include "wallFvPatch.H"
 #include "bound.H"
 #include "autoPtr.H"
 #include "runTimeSelectionTables.H"
