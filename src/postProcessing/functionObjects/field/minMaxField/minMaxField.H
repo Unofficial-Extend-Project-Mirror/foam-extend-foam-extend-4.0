@@ -96,6 +96,11 @@ public:
         );
 
 
+    //- Destructor
+    virtual ~minMaxField()
+    {}
+
+
     // Member Functions
 
         //- start is called at the start of the time-loop
