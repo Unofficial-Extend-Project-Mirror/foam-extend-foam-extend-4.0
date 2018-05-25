@@ -26,7 +26,7 @@ License
 #ifndef mixedIbFvPatchFieldsFwd_H
 #define mixedIbFvPatchFieldsFwd_H
 
-#include "fvPatchField.H"
+#include "fvPatchFieldsFwd.H"
 #include "fieldTypes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

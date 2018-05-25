@@ -44,7 +44,7 @@ SourceFiles
 #ifndef immersedBoundaryFvPatchField_H
 #define immersedBoundaryFvPatchField_H
 
-#include "fvPatchField.H"
+#include "fvPatchFields.H"
 #include "immersedBoundaryFvPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
