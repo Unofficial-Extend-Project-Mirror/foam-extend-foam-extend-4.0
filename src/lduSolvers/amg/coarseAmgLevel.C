@@ -193,11 +193,9 @@ void Foam::coarseAmgLevel::solve
 {
     lduSolverPerformance coarseSolverPerf;
 
-    label maxIter = Foam::min(2*policyPtr_->minCoarseEqns(), 1000);
-
     dictionary topLevelDict;
     topLevelDict.add("minIter", 1);
-    topLevelDict.add("maxIter", maxIter);
+    topLevelDict.add("maxIter", 500);
     topLevelDict.add("tolerance", tolerance);
     topLevelDict.add("relTol", relTol);
 
@@ -220,7 +218,6 @@ void Foam::coarseAmgLevel::solve
     if (matrixPtr_->matrix().symmetric())
     {
         // Note: must change preconditioner to C0.  HJ. 10/Oct/2017
-        // topLevelDict.add("preconditioner", "Cholesky");
         topLevelDict.add("preconditioner", "ILUC0");
 
         coarseSolverPerf = cgSolver
@@ -246,6 +243,21 @@ void Foam::coarseAmgLevel::solve
             matrixPtr_->interfaceFields(),
             topLevelDict
         ).solve(x, b, cmpt);
+    }
+
+    // Check for convergence
+    const scalar magInitialRes = mag(coarseSolverPerf.initialResidual());
+    const scalar magFinalRes = mag(coarseSolverPerf.finalResidual());
+
+    if (magFinalRes > magInitialRes && magInitialRes > SMALL)
+    {
+        if (blockLduMatrix::debug)
+        {
+            Info<< "Divergence in top AMG level" << endl;
+            coarseSolverPerf.print();
+        }
+
+        x = 0;
     }
 
     // Restore debug
