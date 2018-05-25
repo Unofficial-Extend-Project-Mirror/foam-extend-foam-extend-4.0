@@ -212,13 +212,11 @@ void Foam::coarseBlockAMGLevel<Type>::solve
         "topLevelCorr"
     );
 
-    label maxIter = Foam::min(2*coarseningPtr_->minCoarseEqns(), 100);
-
     // Create artificial dictionary for top-level solution
     dictionary topLevelDict;
     topLevelDict.add("nDirections", "5");
     topLevelDict.add("minIter", 1);
-    topLevelDict.add("maxIter", maxIter);
+    topLevelDict.add("maxIter", 500);
     topLevelDict.add("tolerance", tolerance);
     topLevelDict.add("relTol", relTol);
 
@@ -245,8 +243,8 @@ void Foam::coarseBlockAMGLevel<Type>::solve
 
     if (matrixPtr_->symmetric())
     {
-        // Note: top-level preconditioner is incorrect: FIX.  HJ, 3/Oct/2017
-        topLevelDict.add("preconditioner", "Cholesky");
+        // Note: must change preconditioner to C0.  HJ. 10/Oct/2017
+        topLevelDict.add("preconditioner", "ILUC0");
 
         coarseSolverPerf = BlockCGSolver<Type>
         (
@@ -268,10 +266,25 @@ void Foam::coarseBlockAMGLevel<Type>::solve
         ).solve(x, b);
     }
 
+    // Check for convergence
+    const scalar magInitialRes = mag(coarseSolverPerf.initialResidual());
+    const scalar magFinalRes = mag(coarseSolverPerf.finalResidual());
+
+    if (magFinalRes > magInitialRes && magInitialRes > SMALL)
+    {
+        if (blockLduMatrix::debug)
+        {
+            Info<< "Divergence in top AMG level" << endl;
+            coarseSolverPerf.print();
+        }
+
+        x = pTraits<Type>::zero;
+    }
+
     // Restore debug
     blockLduMatrix::debug = oldDebug;
 
-    if (blockLduMatrix::debug >= 3)
+    if (blockLduMatrix::debug >= 2)
     {
         coarseSolverPerf.print();
     }
