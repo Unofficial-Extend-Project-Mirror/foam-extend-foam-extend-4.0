@@ -39,6 +39,7 @@ Author
 #include "BlockSolverPerformance.H"
 #include "BlockCGSolver.H"
 #include "BlockBiCGStabSolver.H"
+#include "BlockGMRESSolver.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -56,8 +57,8 @@ Foam::coarseBlockAMGLevel<Type>::coarseBlockAMGLevel
 :
     addrPtr_(addrPtr),
     matrixPtr_(matrixPtr),
-    x_(matrixPtr_->diag().size(),pTraits<Type>::zero),
-    b_(matrixPtr_->diag().size(),pTraits<Type>::zero),
+    x_(matrixPtr_->diag().size(), pTraits<Type>::zero),
+    b_(matrixPtr_->diag().size(), pTraits<Type>::zero),
     dict_(dict),
     coarseningPtr_
     (
@@ -215,15 +216,15 @@ void Foam::coarseBlockAMGLevel<Type>::solve
     // Create artificial dictionary for top-level solution
     dictionary topLevelDict;
     topLevelDict.add("nDirections", "5");
-    topLevelDict.add("minIter", 1);
+    topLevelDict.add("preconditioner", "ILUC0");
+    topLevelDict.add("minIter", 0);
     topLevelDict.add("maxIter", 500);
     topLevelDict.add("tolerance", tolerance);
     topLevelDict.add("relTol", relTol);
 
     // Avoid issues with round-off on strict tolerance setup
     // HJ, 27/Jun/2013
-    // Create multiplication function object
-    typename BlockCoeff<Type>::multiply mult;
+    x = pTraits<Type>::zero;
 
     // Switch of debug in top-level direct solve
     label oldDebug = blockLduMatrix::debug();
@@ -243,9 +244,6 @@ void Foam::coarseBlockAMGLevel<Type>::solve
 
     if (matrixPtr_->symmetric())
     {
-        // Note: must change preconditioner to C0.  HJ. 10/Oct/2017
-        topLevelDict.add("preconditioner", "ILUC0");
-
         coarseSolverPerf = BlockCGSolver<Type>
         (
             "topLevelCorr",
@@ -255,8 +253,6 @@ void Foam::coarseBlockAMGLevel<Type>::solve
     }
     else
     {
-        topLevelDict.add("preconditioner", "ILUC0");
-
         coarseSolverPerf =
         BlockBiCGStabSolver<Type>
         (
@@ -267,10 +263,15 @@ void Foam::coarseBlockAMGLevel<Type>::solve
     }
 
     // Check for convergence
+
+//    blockLduMatrix::debug = 1;
+//    coarseSolverPerf.print();
+//    Info<< "b: " << gSum(b) << " corr (min, max): (" << gMin(x) << ", " << gMax(x) << endl;
+
     const scalar magInitialRes = mag(coarseSolverPerf.initialResidual());
     const scalar magFinalRes = mag(coarseSolverPerf.finalResidual());
 
-    if (magFinalRes > magInitialRes && magInitialRes > SMALL)
+    if (magFinalRes > magInitialRes && magInitialRes > 1e-12)
     {
         if (blockLduMatrix::debug)
         {
@@ -284,7 +285,7 @@ void Foam::coarseBlockAMGLevel<Type>::solve
     // Restore debug
     blockLduMatrix::debug = oldDebug;
 
-    if (blockLduMatrix::debug >= 2)
+    if (blockLduMatrix::debug >= 3)
     {
         coarseSolverPerf.print();
     }

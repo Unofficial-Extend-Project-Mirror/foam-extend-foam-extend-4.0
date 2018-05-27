@@ -194,10 +194,14 @@ void Foam::coarseAmgLevel::solve
     lduSolverPerformance coarseSolverPerf;
 
     dictionary topLevelDict;
-    topLevelDict.add("minIter", 1);
+    topLevelDict.add("preconditioner", "ILUC0");
+    topLevelDict.add("minIter", 0);
     topLevelDict.add("maxIter", 500);
     topLevelDict.add("tolerance", tolerance);
     topLevelDict.add("relTol", relTol);
+
+    // Top-level round-off error control.  HJ, 28/May/2018
+    x = 0;
 
     // Switch off debug in top-level direct solve
     label oldDebug = blockLduMatrix::debug();
@@ -217,9 +221,6 @@ void Foam::coarseAmgLevel::solve
 
     if (matrixPtr_->matrix().symmetric())
     {
-        // Note: must change preconditioner to C0.  HJ. 10/Oct/2017
-        topLevelDict.add("preconditioner", "ILUC0");
-
         coarseSolverPerf = cgSolver
         (
             "topLevelCorr",
@@ -232,8 +233,6 @@ void Foam::coarseAmgLevel::solve
     }
     else
     {
-        topLevelDict.add("preconditioner", "ILUC0");
-
         coarseSolverPerf = bicgStabSolver
         (
             "topLevelCorr",
@@ -249,7 +248,7 @@ void Foam::coarseAmgLevel::solve
     const scalar magInitialRes = mag(coarseSolverPerf.initialResidual());
     const scalar magFinalRes = mag(coarseSolverPerf.finalResidual());
 
-    if (magFinalRes > magInitialRes && magInitialRes > SMALL)
+    if (magFinalRes > magInitialRes && magInitialRes > 1e-12)
     {
         if (blockLduMatrix::debug)
         {
