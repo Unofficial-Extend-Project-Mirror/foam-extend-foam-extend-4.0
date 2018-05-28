@@ -163,6 +163,7 @@ void fluxFvPatchField<Type>::write(Ostream& os) const
     fixedGradientFvPatchField<Type>::write(os);
     flux_.writeEntry("flux", os);
     reactivity_.writeEntry("reactivity", os);
+    os.writeKeyword("gamma") << gammaName_ << token::END_STATEMENT << nl;
     this->writeEntry("value", os);
 }
 
