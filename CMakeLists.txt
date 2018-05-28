@@ -44,5 +44,5 @@ if(BUILD_WITH_CMAKE)
 endif(BUILD_WITH_CMAKE)
 
 if(RUN_TESTS)
-    include(tests)
+    include(testFOAM)
 endif(RUN_TESTS)
