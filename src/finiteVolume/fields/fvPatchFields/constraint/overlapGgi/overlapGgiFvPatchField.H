@@ -125,6 +125,7 @@ public:
 
 
     // Member functions
+
         //- Access
 
             // Return overlapGgiFvPatch
