@@ -73,21 +73,21 @@ Foam::tmp<Foam::fvVectorMatrix> Foam::UCM::divTau(volVectorField& U) const
     {
         dimensionedScalar etaPEff = etaP_;
 
-    	return
-    	(
-    	    fvc::div(tau_/rho_, "div(tau)")
-    	  - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
-    	  + fvm::laplacian( (etaPEff)/rho_, U, "laplacian(etaPEff+etaS,U)")
-    	);
+        return
+        (
+            fvc::div(tau_/rho_, "div(tau)")
+          - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
+          + fvm::laplacian( (etaPEff)/rho_, U, "laplacian(etaPEff+etaS,U)")
+        );
     }
     else
     {
-    	return
-    	(
-    	    fvc::div(tau_/rho_, "div(tau)")
-    	  - fvc::div((etaStab_/rho_)*fvc::grad(U), "div(tau)")
-    	  + fvm::laplacian( (etaStab_)/rho_, U, "laplacian(etaPEff+etaS,U)")
-    	);
+        return
+        (
+            fvc::div(tau_/rho_, "div(tau)")
+          - fvc::div((etaStab_/rho_)*fvc::grad(U), "div(tau)")
+          + fvm::laplacian( (etaStab_)/rho_, U, "laplacian(etaPEff+etaS,U)")
+        );
     }
 }
 

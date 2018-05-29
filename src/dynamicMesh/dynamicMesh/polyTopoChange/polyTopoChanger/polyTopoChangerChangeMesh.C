@@ -2499,7 +2499,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh()
 
         // Mark the mesh as changing
         mesh_.changing(true);
-        
+
         return topoChangeMap;
     }
     else

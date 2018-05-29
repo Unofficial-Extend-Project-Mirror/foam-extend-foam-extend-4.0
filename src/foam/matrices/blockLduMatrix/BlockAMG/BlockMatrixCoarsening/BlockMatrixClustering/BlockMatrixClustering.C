@@ -633,7 +633,7 @@ void Foam::BlockMatrixClustering<Type>::agglomerateCoeffs
 
     // Reset coefficients to zero.  Cannot touch the diagonal
     activeCoarseUpper = pTraits<ULType>::zero;
-    
+
     forAll(coeffRestrictAddr_, fineCoeffI)
     {
         label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffI]];
@@ -686,7 +686,7 @@ void Foam::BlockMatrixClustering<Type>::agglomerateCoeffs
     // Reset coefficients to zero.  Cannot touch the diagonal
     activeCoarseUpper = pTraits<ULType>::zero;
     activeCoarseLower = pTraits<ULType>::zero;
-    
+
     forAll(coeffRestrictAddr_, fineCoeffI)
     {
         label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffI]];
@@ -1165,7 +1165,7 @@ void Foam::BlockMatrixClustering<Type>::updateMatrix
 
     // Get interfaces from coarse matrix
     lduInterfacePtrsList coarseInterfaces = coarseMatrix.mesh().interfaces();
-    
+
     // Get interfaces fields from coarse matrix
     typename BlockLduInterfaceFieldPtrsList<Type>::Type&
         coarseInterfaceFieldsTransfer = coarseMatrix.interfaces();

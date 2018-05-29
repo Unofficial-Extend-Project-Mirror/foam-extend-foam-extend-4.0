@@ -82,7 +82,7 @@ oversetEulerDdtScheme<Type>::fvcDdt
     }
 
     // Correct for overset "mesh motion" due to change in acceptor/live cells
-    
+
     // Get overset mesh
     const oversetMesh& om = oversetMesh::New(mesh);
 

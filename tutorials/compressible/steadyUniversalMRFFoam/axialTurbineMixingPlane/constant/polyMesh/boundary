@@ -30,7 +30,7 @@ FoamFile
         startFace       11840;
         shadowPatch     RUINLET;
         zone            GVOUTLETZone;
-        coordinateSystem         
+        coordinateSystem
         {
             type            cylindrical;
             name            mixingCS;
@@ -39,7 +39,7 @@ FoamFile
             e3              (0 0 1);
             inDegrees       true;
         }
-        ribbonPatch     
+        ribbonPatch
         {
             sweepAxis       Theta;
             stackAxis       R;
@@ -91,7 +91,7 @@ FoamFile
         startFace       12920;
         shadowPatch     DTINLET;
         zone            RUOUTLETZone;
-        coordinateSystem         
+        coordinateSystem
         {
             type            cylindrical;
             name            mixingCS;
@@ -100,7 +100,7 @@ FoamFile
             e3              (0 0 1);
             inDegrees       true;
         }
-        ribbonPatch     
+        ribbonPatch
         {
             sweepAxis       Theta;
             stackAxis       R;

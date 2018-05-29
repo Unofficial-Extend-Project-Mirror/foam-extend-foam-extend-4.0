@@ -308,7 +308,7 @@ void omegaMEWTWallFunctionFvPatchScalarField::updateCoeffs()
         const scalar yPlus = sqrt(tauw)*y[faceI]/nuw[faceI];
 
         // Velocity gradient for viscous sublayer
-		const scalar dudyVis= magGradUw[faceI];
+        const scalar dudyVis= magGradUw[faceI];
 
         // Velocity gradient for log layer
         const scalar dudyLog =

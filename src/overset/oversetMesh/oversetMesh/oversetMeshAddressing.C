@@ -938,9 +938,9 @@ void Foam::oversetMesh::calcInterpolationMap() const
     /*
        Procs sending to me | Number of items being sent
       --------------------------------------------------
-              P0           |             1              
-              P1           |             7              
-              P5           |             2              
+              P0           |             1
+              P1           |             7
+              P5           |             2
               .            |             .
               .            |             .
               .            |             .

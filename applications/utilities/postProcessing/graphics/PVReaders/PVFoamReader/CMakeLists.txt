@@ -8,7 +8,7 @@
 # file extensions and descriptions.
 
 #
-# We a little hack here to support cmake and wmake-compiled FOAM 
+# We a little hack here to support cmake and wmake-compiled FOAM
 # libraries simultaneously. This uses the same trigger as externally
 # compiled applications (FOAM_FOUND)
 #

@@ -30,17 +30,17 @@
 #
 # --------------------------------------------------------------------------
 
-#  Parcels 
+#  Parcels
 list(APPEND SOURCES
   parcels/derived/dsmcParcel/dsmcParcel.C
 )
 
-#  Cloud base classes 
+#  Cloud base classes
 list(APPEND SOURCES
   clouds/baseClasses/DsmcBaseCloud/DsmcBaseCloud.C
 )
 
-#  submodels 
+#  submodels
 list(APPEND SOURCES
   parcels/derived/dsmcParcel/defineDsmcParcel.C
   parcels/derived/dsmcParcel/makeDsmcParcelBinaryCollisionModels.C

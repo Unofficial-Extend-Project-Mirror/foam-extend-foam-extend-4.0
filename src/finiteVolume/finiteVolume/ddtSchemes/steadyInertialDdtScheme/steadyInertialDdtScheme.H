@@ -72,7 +72,7 @@ class steadyInertialDdtScheme
 
         //- Name of the flux field used to calculate the local
         //  convective time-step
-        word phiName_; 
+        word phiName_;
 
         //- Name of the diffusivity field used to calculate the local
         //  diffusive time-step

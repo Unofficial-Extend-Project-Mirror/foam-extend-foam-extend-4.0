@@ -164,7 +164,7 @@ endif()
 set(FOAM_LABEL_SIZE "32" CACHE STRING "Label size")
 set_property(CACHE FOAM_LABEL_SIZE PROPERTY STRINGS 32 64)
 target_compile_definitions(OSspecific PUBLIC WM_LABEL_SIZE=${FOAM_LABEL_SIZE})
-  
+
 # No Repository
 target_compile_definitions(OSspecific PUBLIC NoRepository)
 

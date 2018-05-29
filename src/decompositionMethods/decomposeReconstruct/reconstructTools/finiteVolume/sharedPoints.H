@@ -113,7 +113,7 @@ class sharedPoints
             const labelListList& patchPairs,
             const label fromMesh
         ) const;
-    
+
         //- Calculate shared points
         void calcSharedPoints();
 

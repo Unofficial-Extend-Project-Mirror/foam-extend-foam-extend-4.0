@@ -230,7 +230,7 @@ class freeSurface
             const vector& axis
         ) const;
 
-    
+
 public:
 
     // Declare name of the class and it's debug switch

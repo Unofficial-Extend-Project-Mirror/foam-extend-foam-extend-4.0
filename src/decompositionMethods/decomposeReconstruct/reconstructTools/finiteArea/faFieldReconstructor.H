@@ -113,7 +113,7 @@ public:
             //- Destructor
             virtual ~faPatchFieldReconstructor()
             {}
-            
+
 
             // Member functions
 

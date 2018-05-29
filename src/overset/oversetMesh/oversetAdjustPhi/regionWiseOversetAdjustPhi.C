@@ -219,33 +219,33 @@ void Foam::regionWiseOversetAdjustPhi
 
                     if (curFlip)
                     {
-	                if (curPhi > 0.0)
-	                {
-	                    // Flux going into the region (out of the fringe).
-	                    // Note that positive sign is kept.
-	                    regionFringeIn[curRegion] += curPhi;
-	                }
-	                else
-	                {
-	                    // Flux coming out of the region (into the fringe).
-	                    // Note reverted sign.
-	                    regionFringeOut[curRegion] -= curPhi;
-	                }
-	            }
-	            else
-	            {
-	                if (curPhi > 0.0)
-	                {
-	                    // Flux going out of the region (into the fringe).
-	                    // Note that positive sign is kept.
-	                    regionFringeOut[curRegion] += curPhi;
-	                }
-	                else
-	                {
-	                    // Flux going into the region (out of the fringe).
-	                    // Note reverted sign.
-	                    regionFringeIn[curRegion] -= curPhi;
-	                }
+                        if (curPhi > 0.0)
+                        {
+                            // Flux going into the region (out of the fringe).
+                            // Note that positive sign is kept.
+                            regionFringeIn[curRegion] += curPhi;
+                        }
+                        else
+                        {
+                            // Flux coming out of the region (into the fringe).
+                            // Note reverted sign.
+                            regionFringeOut[curRegion] -= curPhi;
+                        }
+                    }
+                    else
+                    {
+                        if (curPhi > 0.0)
+                        {
+                            // Flux going out of the region (into the fringe).
+                            // Note that positive sign is kept.
+                            regionFringeOut[curRegion] += curPhi;
+                        }
+                        else
+                        {
+                            // Flux going into the region (out of the fringe).
+                            // Note reverted sign.
+                            regionFringeIn[curRegion] -= curPhi;
+                        }
                     }
                 }
             }

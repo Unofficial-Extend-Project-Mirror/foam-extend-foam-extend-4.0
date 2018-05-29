@@ -176,7 +176,7 @@ void Foam::immersedBoundaryFvPatch::updatePhi
 
     // Calculate IB flux from new and old volumes
     scalarField ibFlux(fc.size());
-    
+
     forAll (fc, faceI)
     {
         ibFlux[faceI] =
@@ -185,7 +185,7 @@ void Foam::immersedBoundaryFvPatch::updatePhi
         // Add the flux to divPhi for the cell for later use
         divPhi[fc[faceI]] += ibFlux[faceI];
     }
-    
+
     phi.boundaryField()[index()] = ibFlux;
 
     // Check and adjust the immersed boundary space conservation law

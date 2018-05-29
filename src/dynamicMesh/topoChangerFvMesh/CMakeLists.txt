@@ -54,4 +54,4 @@ list(APPEND SOURCES
 add_foam_library(topoChangerFvMesh SHARED ${SOURCES})
 
 target_link_libraries(topoChangerFvMesh PUBLIC dynamicFvMesh decomposeReconstruct)
- 
+

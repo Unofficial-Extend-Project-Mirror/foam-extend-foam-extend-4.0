@@ -909,7 +909,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcPartiallyCoveredFaces
             InfoIn("GGIInterpolation::calcPartiallyCoveredFaces")
                 << "   : Found " << partiallyUncoveredMasterAddrPtr_->size()
                 << " partially overlapping faces for master GGI patch" << endl;
-            
+
             if (partiallyUncoveredMasterAddrPtr_->size())
             {
                 Info<< "Max uncoverage: "

@@ -72,7 +72,7 @@ class triSurfaceDistance
         //- Return immersed boundary cell span
         vector cellSpan(const label cellID) const;
 
-    
+
 public:
 
     // Constructors

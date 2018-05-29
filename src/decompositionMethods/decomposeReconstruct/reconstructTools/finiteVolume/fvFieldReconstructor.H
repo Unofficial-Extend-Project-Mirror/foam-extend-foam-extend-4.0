@@ -109,7 +109,7 @@ public:
             //- Destructor
             virtual ~fvPatchFieldReconstructor()
             {}
-            
+
 
             // Member functions
 
@@ -154,7 +154,7 @@ public:
     // Member Functions
 
         // Single field reconstruction
-    
+
             //- Reconstruct volume field data into a given field
             //  If a PtrList slot is empty, it is skipped
             template<class Type>
@@ -177,7 +177,7 @@ public:
 
 
         // Reconstruct and return a single field
-    
+
             //- Reconstruct volume field
             template<class Type>
             tmp<GeometricField<Type, fvPatchField, volMesh> >
@@ -196,7 +196,7 @@ public:
 
 
         // Reconstruct and write all/selected fields
-    
+
             //- Reconstruct and write all/selected volume fields
             template<class Type>
             void reconstructFvVolumeFields

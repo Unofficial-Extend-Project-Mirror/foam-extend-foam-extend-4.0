@@ -177,9 +177,9 @@ void Foam::isentropicTotalPressureFvPatchScalarField::updateCoeffs()
     const surfaceScalarField& phi =
         db().lookupObject<surfaceScalarField>(phiName_);
 
-    const scalarField& phip = 
+    const scalarField& phip =
         patch().patchField<surfaceScalarField, scalar>(phi);
-    
+
     // Get velocity
     // const fvPatchVectorField& U =
     //     patch().lookupPatchField<volVectorField, scalar>(UName_);

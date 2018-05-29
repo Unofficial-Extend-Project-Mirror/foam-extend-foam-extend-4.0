@@ -30,12 +30,12 @@
 #
 # --------------------------------------------------------------------------
 
-#  Radiation constants 
+#  Radiation constants
 list(APPEND SOURCES
   radiationConstants/radiationConstants.C
 )
 
-#  Radiation model 
+#  Radiation model
 list(APPEND SOURCES
   radiationModel/radiationModel/radiationModel.C
   radiationModel/radiationModel/newRadiationModel.C
@@ -48,7 +48,7 @@ list(APPEND SOURCES
   radiationModel/viewFactor/viewFactor.C
 )
 
-#  Scatter model 
+#  Scatter model
 list(APPEND SOURCES
   submodels/scatterModel/scatterModel/scatterModel.C
   submodels/scatterModel/scatterModel/newScatterModel.C
@@ -56,7 +56,7 @@ list(APPEND SOURCES
 )
 
 
-#  Absorption/Emission model 
+#  Absorption/Emission model
 list(APPEND SOURCES
   submodels/absorptionEmissionModel/absorptionEmissionModel/absorptionEmissionModel.C
   submodels/absorptionEmissionModel/absorptionEmissionModel/newAbsorptionEmissionModel.C
@@ -68,7 +68,7 @@ list(APPEND SOURCES
 )
 
 
-#  Boundary conditions 
+#  Boundary conditions
 list(APPEND SOURCES
   derivedFvPatchFields/MarshakRadiation/MarshakRadiationMixedFvPatchScalarField.C
   derivedFvPatchFields/MarshakRadiationFixedT/MarshakRadiationFixedTMixedFvPatchScalarField.C

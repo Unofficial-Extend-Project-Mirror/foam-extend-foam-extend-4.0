@@ -131,7 +131,7 @@ public:
 
         //- Is this the first update in the current time-step?
         bool firstUpdate() const;
-    
+
         //- Update the mesh for topology change
         virtual bool update();
 };

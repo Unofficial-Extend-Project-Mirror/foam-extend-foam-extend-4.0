@@ -57,7 +57,7 @@ void Foam::cyclicGgiFvPatch::makeC(slicedSurfaceVectorField& C) const
     );
 }
 
-    
+
 // Make patch weighting factors
 void Foam::cyclicGgiFvPatch::makeWeights(fvsPatchScalarField& w) const
 {

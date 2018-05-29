@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 #   include "createTime.H"
 #   include "createNamedMesh.H"
 
-    word agglomDictName("faceAgglomerateDict"); 
+    word agglomDictName("faceAgglomerateDict");
     args.optionReadIfPresent("dict", agglomDictName);
 
     const polyBoundaryMesh& patches = mesh.boundaryMesh();

@@ -71,7 +71,7 @@ class domainDecomposition
 
         //- Global face index
         globalProcFaceIndex gfIndex_;
-    
+
         //- Processor label for each cell
         labelList cellToProc_;
 

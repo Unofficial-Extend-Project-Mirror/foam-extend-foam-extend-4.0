@@ -106,7 +106,7 @@ void Foam::refineImmersedBoundaryMesh::addIbCellCells
 
             // Get mesh cellCells
             const labelListList& cellCells = mesh_.cellCells();
-            
+
             const labelList& c = ibPatch.ibCells();
 
             forAll (c, cellI)

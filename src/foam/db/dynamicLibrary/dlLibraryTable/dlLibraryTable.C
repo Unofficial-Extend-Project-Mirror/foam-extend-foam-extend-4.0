@@ -26,7 +26,7 @@ License
 #include "dlLibraryTable.H"
 #include "OSspecific.H"
 #include "int.H"
-#include <dlfcn.h> 
+#include <dlfcn.h>
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 

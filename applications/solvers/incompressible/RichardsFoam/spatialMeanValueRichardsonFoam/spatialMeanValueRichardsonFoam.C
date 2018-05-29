@@ -77,12 +77,12 @@ int main(int argc, char *argv[])
                 volScalarField field(fieldHeader, mesh);
 
                 int nbMesh;
-	            nbMesh = 0;
+                nbMesh = 0;
 
-	            forAll(field, cellI)
-	            {
-	                nbMesh++;
-	            }
+                forAll(field, cellI)
+                {
+                    nbMesh++;
+                }
 
                 Info<< runTime.timeName()<< " "
                     << sum(field).value()/nbMesh<< " "

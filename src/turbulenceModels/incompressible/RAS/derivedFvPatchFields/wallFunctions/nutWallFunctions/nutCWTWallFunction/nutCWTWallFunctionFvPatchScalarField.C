@@ -181,7 +181,7 @@ tmp<scalarField> nutCWTWallFunctionFvPatchScalarField::calcNut() const
         const label faceCellI = fc[faceI];
         const scalar uStar = Cmu25*sqrt(k[faceCellI]);
 
-	    // Note: here yPlus is actually yStar
+        // Note: here yPlus is actually yStar
         const scalar yPlus = uStar*y[faceI]/nuw[faceI];
 
         // Relative tangential velocity

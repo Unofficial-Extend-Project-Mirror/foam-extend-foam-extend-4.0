@@ -354,7 +354,7 @@ list(APPEND SOURCES
   ${schemes}/quadraticUpwindFit/quadraticUpwindFit.C
   ${schemes}/cubicUpwindFit/cubicUpwindFit.C
 )
-# 
+#
 # $(schemes)/quadraticLinearPureUpwindFit/quadraticLinearPureUpwindFit.C
 list(APPEND SOURCES
   ${schemes}/linearPureUpwindFit/linearPureUpwindFit.C
@@ -464,7 +464,7 @@ list(APPEND SOURCES
   ${snGradSchemes}/skewCorrectedSnGrad/skewCorrectedSnGrads.C
   ${snGradSchemes}/fourthSnGrad/fourthSnGrads.C
 )
-# 
+#
 # $(snGradSchemes)/quadraticFitSnGrad/quadraticFitSnGradData.C
 # $(snGradSchemes)/quadraticFitSnGrad/quadraticFitSnGrads.C
 

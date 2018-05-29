@@ -220,7 +220,7 @@ void Foam::sharedPoints::syncMark
                                             curMarkedPoints[patchMpI],
                                             nbrMarkedPoints[nbrMpI]
                                         );
-                                    
+
                                     nbrMarkedPoints[nbrMpI] = maxMark;
                                     curMarkedPoints[patchMpI] = maxMark;
 

@@ -82,7 +82,7 @@ tetMetric::New
         )   << "tetMetric table is empty"
             << exit(FatalError);
     }
-    
+
     metricPointMemberFunctionTable::iterator mfIter =
         metricPointMemberFunctionTablePtr_->find(metricName);
 

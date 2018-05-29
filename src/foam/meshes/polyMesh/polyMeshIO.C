@@ -192,7 +192,7 @@ Foam::polyMesh::polyMesh
 }
 
 
-    
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void Foam::polyMesh::setInstance(const fileName& inst)

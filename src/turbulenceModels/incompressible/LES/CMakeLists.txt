@@ -59,7 +59,7 @@ list(APPEND SOURCES
   kOmegaSSTSAS/kOmegaSSTSAS.C
 )
 
-#  Wall functions 
+#  Wall functions
 set(wallFunctions derivedFvPatchFields/wallFunctions)
 
 list(APPEND SOURCES

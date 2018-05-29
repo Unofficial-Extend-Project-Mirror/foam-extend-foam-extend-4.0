@@ -351,7 +351,7 @@ public:
 
 
         // Corrected immersed patch geometry
-    
+
             //- Corrected ib patch face areas
             const vectorField& correctedIbPatchFaceAreas() const;
 

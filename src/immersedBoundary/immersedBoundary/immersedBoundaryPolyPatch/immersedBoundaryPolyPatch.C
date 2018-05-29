@@ -514,7 +514,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                 {
                     const processorPolyPatch& curProcPatch =
                         refCast<const processorPolyPatch>(bMesh[patchI]);
-            
+
                     // Send internal cut
                     coupledPatchOwnCut[patchI] = labelList
                     (
@@ -580,7 +580,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
             const labelList& curNbrCut = coupledPatchNbrCut[patchI];
 
             const labelList& fc = bMesh[patchI].faceCells();
-            
+
             forAll (curOwnCut, patchFaceI)
             {
                 if
@@ -631,7 +631,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
             }
         }
     }
-        
+
     // Reset the cell lists
     Info<< "nIbCells: " << nIbCells << endl;
     unmergedFaces.setSize(nIbCells);
@@ -870,7 +870,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
         {
             // Regular patch: one-sided check
             const labelList& fc = bMesh[patchI].faceCells();
-            
+
             forAll (fc, patchFaceI)
             {
                 if

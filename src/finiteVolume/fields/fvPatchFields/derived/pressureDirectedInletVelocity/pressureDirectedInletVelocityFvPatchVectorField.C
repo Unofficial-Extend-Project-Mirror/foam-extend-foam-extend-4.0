@@ -99,7 +99,7 @@ pressureDirectedInletVelocityFvPatchVectorField
                  << " and patch " << this->patch().name()
                  << abort(FatalError);
         }
-    }       
+    }
 
     // Normalise to obtain the flow direction
     inletDir_ /= (mag(inletDir_) + SMALL);

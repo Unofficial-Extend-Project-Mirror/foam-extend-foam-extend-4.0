@@ -623,7 +623,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         oldPatchNMeshPoints         // oldPatchNMeshPoints
     );
 
-    
+
     // Reset fvMesh and patches
     resetFvPrimitives
     (

@@ -52,7 +52,7 @@ void cyclicFvPatch::makeC(slicedSurfaceVectorField& C) const
     );
 }
 
-    
+
 // Make patch weighting factors
 void cyclicFvPatch::makeWeights(fvsPatchScalarField& w) const
 {

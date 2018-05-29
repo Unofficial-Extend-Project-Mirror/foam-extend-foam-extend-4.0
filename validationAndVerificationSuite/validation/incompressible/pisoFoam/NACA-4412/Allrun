@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
 application=pisoFoam

@@ -285,8 +285,8 @@ int main(int argc, char *argv[])
             << endl;
 
         return 0;
-    }        
-    
+    }
+
     if (Pstream::master())
     {
         Info << "\nTotal number of coarse faces: "<< totalNCoarseFaces << endl;

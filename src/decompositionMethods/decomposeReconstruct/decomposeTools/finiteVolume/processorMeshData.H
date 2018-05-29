@@ -56,7 +56,7 @@ class processorMeshData
     // Private data
 
         // Internal mesh data
-    
+
             //- Points
             pointField procPoints_;
 
@@ -71,7 +71,7 @@ class processorMeshData
 
 
         // Boundary data, separated into existing and new patches
-    
+
             //- Boundary addressing
             labelList boundaryAddressing_;
 
@@ -80,19 +80,19 @@ class processorMeshData
 
             //- Regular patch starts
             labelList patchStarts_;
-    
+
             //- Processor patch sizes
             labelList procPatchSizes_;
-    
+
             //- Processor patch starts
             labelList procPatchSizes_;
 
-    
+
         // Zones
 
             //- Point zones
             labelListList pointZones_;
-    
+
             //- Face zones
             labelListList faceZones_;
 
@@ -102,7 +102,7 @@ class processorMeshData
             //- Cell zones
             labelListList cellZones_;
 
-    
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct

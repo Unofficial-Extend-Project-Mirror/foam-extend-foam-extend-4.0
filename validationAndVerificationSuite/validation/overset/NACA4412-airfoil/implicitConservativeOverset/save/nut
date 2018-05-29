@@ -32,7 +32,7 @@ boundaryField
         setHoleCellValue  yes;
         holeCellValue     0;
     }
-    
+
     Inflow
     {
         type    calculated;
@@ -74,7 +74,7 @@ boundaryField
         type    emptyOverset;
         value   uniform 0;
     }
-    OversetFront 
+    OversetFront
     {
         type    emptyOverset;
         value   uniform 0;

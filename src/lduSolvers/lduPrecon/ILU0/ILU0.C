@@ -189,7 +189,7 @@ void Foam::ILU0::precondition
 
     // Note: coupled boundary updated is not needed because x is zero
     // HJ and VV, 19/Jun/2017
-    
+
     // Diagonal block
     {
         scalar* __restrict__ xPtr = x.begin();
@@ -295,7 +295,7 @@ void Foam::ILU0::preconditionT
 
     // Note: coupled boundary updated is not needed because x is zero
     // HJ and VV, 19/Jun/2017
-    
+
     // Diagonal block
     {
         scalar* __restrict__ xPtr = x.begin();

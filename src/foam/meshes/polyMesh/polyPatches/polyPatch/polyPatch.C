@@ -587,10 +587,10 @@ void Foam::polyPatch::resetPatch
 {
     // Clear all data
     clearAddressing();
-    
+
     // Reset start and primitive patch
     start_ = newStart;
-    
+
     primitivePatch::operator=
     (
         primitivePatch

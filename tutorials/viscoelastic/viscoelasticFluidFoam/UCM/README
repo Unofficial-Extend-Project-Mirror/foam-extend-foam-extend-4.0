@@ -10,14 +10,14 @@
 #+AUTHORS: Fernandes, C., De Araujo, M.S.B., Ferrás, L.L., Nóbrega, J.M.
 
 
-This tutorial was prepared to illustrate the new stabilization approach for viscoelastic constitutive models proposed in: 
+This tutorial was prepared to illustrate the new stabilization approach for viscoelastic constitutive models proposed in:
 
 Fernandes, C., De Araujo, M.S.B., Ferras, L.L., Nobrega, J.M.,
-Improvements in the OpenFOAM numerical code for simulation of 
+Improvements in the OpenFOAM numerical code for simulation of
 steady-state differential viscoelastic flows, 11th OpenFOAM Workshop
 Guimarães, Portugal, June 26 - 30, 2016
 
-and 
+and
 
 De Araujo, M.S.B., Ferras, L.L.,Fernandes, C.,Nobrega, J.M.,
 Improvements ans assessment of the integral viscoelastic solver in OpenFOAM, 11th OpenFOAM Workshop
@@ -26,7 +26,7 @@ Guimarães, Portugal, June 26 - 30, 2016
 
 It comprises 2 case studies for the flow in a 4:1 abrupt contraction of an UCM viscoelastic fluid, for De=1
 
-- UCM_Orig - employs the original formulation that diverges before reaching the endtime 
+- UCM_Orig - employs the original formulation that diverges before reaching the endtime
 
 - UCM_Stab - employs the new stabilized formulation that allows to achieve convergence for all time steps
 

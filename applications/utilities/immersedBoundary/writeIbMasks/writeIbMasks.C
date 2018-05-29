@@ -59,7 +59,7 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
     scalar minLiveGamma = GREAT;
     label minLiveCell = -1;
     const scalarField& gammaIn = gamma.internalField();
-    
+
     forAll (mesh.boundary(), patchI)
     {
         if (isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))

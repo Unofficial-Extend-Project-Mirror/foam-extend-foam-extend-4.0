@@ -106,7 +106,7 @@ class ImmersedCell
         //- Depth to immersed surface for cell points and intersections
         //  Note: positive depth is dry
         scalarField depth_;
-    
+
 
     // Private member functions
 

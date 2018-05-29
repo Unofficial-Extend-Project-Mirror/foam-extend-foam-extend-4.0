@@ -43,7 +43,7 @@ list(APPEND SOURCES
   vanDriestDelta/vanDriestDelta.C
 )
 
-#  Wall functions 
+#  Wall functions
 set(wallFunctions derivedFvPatchFields/wallFunctions)
 
 set(muSgsWallFunctions ${wallFunctions}/muSgsWallFunctions)

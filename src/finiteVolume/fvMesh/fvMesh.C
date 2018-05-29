@@ -426,7 +426,7 @@ void Foam::fvMesh::resetFvPrimitives
 
     // Clear all mesh data
     clearOut();
-}        
+}
 
 
 Foam::polyMesh::readUpdateState Foam::fvMesh::readUpdate()

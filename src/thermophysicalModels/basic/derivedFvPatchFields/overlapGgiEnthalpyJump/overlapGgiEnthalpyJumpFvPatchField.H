@@ -142,7 +142,7 @@ public:
             }
 
             //- Return the "jump" across the patch as a "half" field
-            virtual tmp<Field<Type> > jump() const 
+            virtual tmp<Field<Type> > jump() const
             {
                 return jump_;
             }

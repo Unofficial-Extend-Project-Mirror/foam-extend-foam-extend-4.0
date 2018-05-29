@@ -77,7 +77,7 @@ void processorFvPatchField<scalar>::updateInterfaceMatrix
 
     // Transform according to the transformation tensor
     // No transform for scalar.  HJ, 29/Nov/2016
-    
+
     // Multiply the field by coefficients and add into the result
 
     const unallocLabelList& faceCells = this->patch().faceCells();

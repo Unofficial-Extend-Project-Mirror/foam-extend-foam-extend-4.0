@@ -166,7 +166,7 @@ bool Foam::primitiveMesh::checkClosedCells
     }
 
     reduce(nErrorClosed, sumOp<label>());
-    
+
     if (nErrorClosed > 0)
     {
         if (debug || report)

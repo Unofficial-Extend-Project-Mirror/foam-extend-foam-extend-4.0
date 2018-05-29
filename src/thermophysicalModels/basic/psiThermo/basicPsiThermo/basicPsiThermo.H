@@ -93,7 +93,7 @@ public:
         return New(mesh, mesh);
     }
 
-    
+
     //- Destructor
     virtual ~basicPsiThermo();
 

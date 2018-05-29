@@ -38,7 +38,7 @@ solvers
 
         minGroupSize    4;
         maxGroupSize    6;
-        
+
         nPreSweeps      2;
         nPostSweeps     2;
         groupSize       2;

@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
                     {
                         phi -= pEqn.flux();
                     }
-                    
+
                     p.relax();
                 }
 

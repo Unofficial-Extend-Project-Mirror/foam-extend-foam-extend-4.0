@@ -32,7 +32,7 @@ boundaryField
         setHoleCellValue  yes;
         holeCellValue     0.42797;
     }
-    
+
     Inflow
     {
         type    fixedValue;
@@ -79,7 +79,7 @@ boundaryField
         type    emptyOverset;
         value   uniform 0.42797;
     }
-    OversetFront 
+    OversetFront
     {
         type    emptyOverset;
         value   uniform 0.42797;

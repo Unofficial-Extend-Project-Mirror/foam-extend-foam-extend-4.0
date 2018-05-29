@@ -82,7 +82,7 @@ class globalProcFaceIndex
         //  Sized to number of live faces in the mesh
         labelList globalLabel_;
 
-    
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct

@@ -111,7 +111,7 @@ void Foam::nastranSurfaceWriter::writeCoord
             os.unsetf(ios_base::left);
             os.setf(ios_base::right);
             os  << setw(8) << pointI + 1
-                << "        " 
+                << "        "
                 << setw(8) << p.x()
                 << setw(8) << p.y()
                 << setw(8) << p.z()

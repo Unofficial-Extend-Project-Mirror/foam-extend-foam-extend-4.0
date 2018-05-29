@@ -34,7 +34,7 @@
 
         // Add implicit MRF source as a Hodge dual of the rotational velocity
         TU += *mrfZones.omega();
-        
+
         // Add implicit resistance
         pZones.addResistance(UEqn, TU);
 

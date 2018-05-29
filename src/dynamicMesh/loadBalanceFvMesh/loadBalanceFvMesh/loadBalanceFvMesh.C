@@ -131,7 +131,7 @@ bool Foam::loadBalanceFvMesh::update()
     if (Pstream::parRun())
     {
         // Decide when to balance here
-        
+
         return loadBalance(dict_);
     }
     else

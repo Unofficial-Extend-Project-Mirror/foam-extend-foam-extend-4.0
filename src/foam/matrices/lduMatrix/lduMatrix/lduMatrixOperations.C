@@ -148,7 +148,7 @@ void Foam::lduMatrix::operator+=(const lduMatrix& A)
     {
         return;
     }
-    
+
     if (A.diagPtr_)
     {
         diag() += A.diag();
@@ -222,7 +222,7 @@ void Foam::lduMatrix::operator-=(const lduMatrix& A)
     {
         return;
     }
-    
+
     if (A.diagPtr_)
     {
         diag() -= A.diag();

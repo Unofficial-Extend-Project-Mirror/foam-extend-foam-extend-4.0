@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-#  Coal parcel and sub-models 
+#  Coal parcel and sub-models
 list(APPEND SOURCES
   CoalParcel/defineCoalParcel.C
   CoalParcel/makeCoalParcelSubmodels.C

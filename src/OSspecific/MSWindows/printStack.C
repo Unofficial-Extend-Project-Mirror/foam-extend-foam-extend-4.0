@@ -266,7 +266,7 @@ void getSymbolForRaw
     const word& address
 )
 {
-    if 
+    if
     (
         filename.size() && (filename[0] == '/' || filename[1] == ':')
     )
@@ -319,7 +319,7 @@ void error::printStack(Ostream& os)
             string::size_type space = line.rfind(' ') + 1;
             fileName libPath = line.substr(space, line.size()-space);
 
-            if 
+            if
             (
                 libPath.size() && (libPath[0] == '/' || libPath[1] == ':')
             )

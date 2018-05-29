@@ -83,7 +83,7 @@ Foam::immersedBoundaryRefinement::refinementCellCandidates() const
     scalarField cellDistance(mesh().nCells(), -GREAT);
 
     const polyBoundaryMesh& bMesh = mesh().boundaryMesh();
-    
+
     const vector span(GREAT, GREAT, GREAT);
 
     forAll (bMesh, patchI)
@@ -116,7 +116,7 @@ Foam::immersedBoundaryRefinement::refinementCellCandidates() const
 
     Info<< "Cell distance (min, max): (" << min(cellDistance)
         << ", " << max(cellDistance) << ")" << endl;
-        
+
     // Create storage for collection of cells. Assume that almost all of the
     // cells will be marked to prevent excessive resizing.
     dynamicLabelList refinementCandidates(mesh().nCells());
@@ -158,7 +158,7 @@ Foam::immersedBoundaryRefinement::unrefinementPointCandidates() const
     scalarField pointDistance(mesh().nPoints(), -GREAT);
 
     const polyBoundaryMesh& bMesh = mesh().boundaryMesh();
-    
+
     const vector span(GREAT, GREAT, GREAT);
 
     forAll (bMesh, patchI)

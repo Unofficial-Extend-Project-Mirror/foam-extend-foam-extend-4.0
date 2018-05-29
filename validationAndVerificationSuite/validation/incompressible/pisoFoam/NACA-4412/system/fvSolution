@@ -77,16 +77,16 @@ solvers
     k
     {
         solver           BiCGStab;
-        preconditioner   DILU; 
+        preconditioner   DILU;
         tolerance        1e-08;
         relTol           0.1;
         minIter          1;
     }
 
-	omega
+    omega
     {
         solver           BiCGStab;
-        preconditioner   DILU; 
+        preconditioner   DILU;
         tolerance        1e-08;
         relTol           0.1;
         minIter          1;

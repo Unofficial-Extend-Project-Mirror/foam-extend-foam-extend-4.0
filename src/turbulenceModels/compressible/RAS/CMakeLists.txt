@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-#  RAS turbulence models 
+#  RAS turbulence models
 list(APPEND SOURCES
   RASModel/RASModel.C
   laminar/laminar.C
@@ -44,7 +44,7 @@ list(APPEND SOURCES
   kOmegaSST/kOmegaSST.C
 )
 
-#  Wall functions 
+#  Wall functions
 set(wallFunctions derivedFvPatchFields/wallFunctions)
 
 set(alphatWallFunctions ${wallFunctions}/alphatWallFunctions)
@@ -78,7 +78,7 @@ list(APPEND SOURCES
   ${kqRWallFunctions}/kqRWallFunction/kqRWallFunctionFvPatchFields.C
 )
 
-#  Patch fields 
+#  Patch fields
 list(APPEND SOURCES
   derivedFvPatchFields/turbulentHeatFluxTemperature/turbulentHeatFluxTemperatureFvPatchScalarField.C
   derivedFvPatchFields/turbulentMixingLengthDissipationRateInlet/turbulentMixingLengthDissipationRateInletFvPatchScalarField.C

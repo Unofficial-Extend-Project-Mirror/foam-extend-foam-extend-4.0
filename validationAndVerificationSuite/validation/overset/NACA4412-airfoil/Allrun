@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 # Run cases
 (cd explicitOverset ; ./Allrun)
@@ -11,7 +11,7 @@ gnuplot -persist  << 'EOF'
 
 set term pngcairo dashed size 1024,768 font "Arial,12"
 set output "Cp.png"
-set yrange [* : *] reverse; 
+set yrange [* : *] reverse;
 plot \
 './validationData/cp.dat' \
 using ($1/0.901):2 title 'Experimetal results', \

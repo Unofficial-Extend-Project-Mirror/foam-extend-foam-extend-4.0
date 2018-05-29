@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 
             // Solving potential flow equation and correcting velocities
             phi = (fvc::interpolate(U) & mesh.Sf());
-            
+
             solve
             (
                 tpEqn()
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
                 + tpEqn().flux()
                 + tpresSource;
         }
-        
+
         // Make flux relative in rotating zones
         mrfZones.relativeFlux(phi);
 

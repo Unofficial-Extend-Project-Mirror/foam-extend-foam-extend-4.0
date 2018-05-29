@@ -77,7 +77,7 @@ tmp<volScalarField> steadyInertialDdtScheme<Type>::CorDeltaT() const
                 << endl;
         }
     }
-    
+
     if (cofrDeltaTPtr.empty())
     {
         FatalErrorIn

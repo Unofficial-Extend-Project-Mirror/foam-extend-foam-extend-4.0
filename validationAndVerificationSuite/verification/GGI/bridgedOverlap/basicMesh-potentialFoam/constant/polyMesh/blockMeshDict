@@ -26,7 +26,7 @@ vertices
     (1 0 5)
     (1 1 5)
     (0 1 5)
-    
+
     (0 0 5)
     (1 0 5)
     (1 0.56 5)
@@ -40,21 +40,21 @@ vertices
 blocks
 (
     hex (0 1 2 3 4 5 6 7) stationary (1 1 2) simpleGrading (1 1 1)
-    hex (8 9 10 11 12 13 14 15) moving (1 3 2) simpleGrading (1 1 1)   
+    hex (8 9 10 11 12 13 14 15) moving (1 3 2) simpleGrading (1 1 1)
 );
 
 edges
 (
-    
+
 );
 
 boundary
 (
-    walls 
+    walls
     {
         type wall;
         faces
-        (            
+        (
             (0 1 5 4)
             (1 2 6 5)
             (2 3 7 6)
@@ -65,22 +65,22 @@ boundary
             (8 9 13 12)
         );
     }
-    
+
     inlet
     {
         type patch;
         faces
         (
-            (0 3 2 1)            
+            (0 3 2 1)
         );
     }
-    
+
     outlet
     {
         type patch;
         faces
         (
-            (12 13 14 15)            
+            (12 13 14 15)
         );
     }
 

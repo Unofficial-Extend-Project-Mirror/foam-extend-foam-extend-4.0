@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(applyWallFunctionBoundaryConditions
-  DEPENDS incompressibleRASModels compressibleRASModels 
+  DEPENDS incompressibleRASModels compressibleRASModels
   SOURCES ${SOURCES}
 )

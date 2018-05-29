@@ -147,7 +147,7 @@ namespace Foam
         os  << endl;
     }
 
-    
+
     template<>
     void Foam::rawSurfaceWriter::writeHeader
     (

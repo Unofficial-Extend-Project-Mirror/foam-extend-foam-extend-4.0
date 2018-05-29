@@ -28,7 +28,7 @@ Description
     UCM non linear viscoelastic fluid model (BIRD et al., 1987).
 
 Author
-    Miguel Nóbrega, Silvino Araújo, Célio Fernandes, Luís Ferrás. 
+    Miguel Nóbrega, Silvino Araújo, Célio Fernandes, Luís Ferrás.
     All rights reserved
 
 SourceFiles

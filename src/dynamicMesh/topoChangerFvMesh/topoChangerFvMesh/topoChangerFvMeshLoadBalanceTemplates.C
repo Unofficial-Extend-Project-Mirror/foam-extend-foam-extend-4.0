@@ -39,7 +39,7 @@ void Foam::topoChangerFvMesh::sendFields
     toProc<< geoFields.size() << nl;
 
     label fI = 0;
-    
+
     forAllConstIter
     (
         typename HashTable<const GeoField*>,
@@ -88,7 +88,7 @@ void Foam::topoChangerFvMesh::insertFields
         iter
     )
     {
-        
+
         localFields[fI].set
         (
             Pstream::myProcNo(),
@@ -164,7 +164,7 @@ void Foam::topoChangerFvMesh::rebuildFields
 
     // Make an fvMesh mapper
     const fvMeshMapper mapper(*this, meshMap);
-    
+
     forAllConstIter
     (
         typename HashTable<const GeoField*>,

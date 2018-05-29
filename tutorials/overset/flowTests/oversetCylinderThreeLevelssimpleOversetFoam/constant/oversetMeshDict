@@ -27,7 +27,7 @@ holePatches  ( cylinder );
 
 regions
 (
-    background 
+    background
     {
         // Donor regions
         donorRegions ( refine );
@@ -66,7 +66,7 @@ regions
         }
     }
 
-    front 
+    front
     {
         donorRegions ( refine );
 

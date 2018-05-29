@@ -1201,7 +1201,7 @@ CrankNicolsonDdtScheme<Type>::fvcDdtConsistentPhiCorr
           - offCentre_(faceUDdt0())
         );
     }
-    
+
     // Calculate old time flux
     fluxFieldType oldTimeFlux =
         rAUf*rDtCoef_(faceUDdt0)*(mesh().Sf() & faceU.oldTime());

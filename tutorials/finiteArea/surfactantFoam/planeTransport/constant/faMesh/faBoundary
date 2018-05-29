@@ -20,7 +20,7 @@ FoamFile
     inlet
     {
         type            patch;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 20
 (
 2321
@@ -50,7 +50,7 @@ FoamFile
     outlet
     {
         type            patch;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 20
 (
 2459
@@ -80,7 +80,7 @@ FoamFile
     bound
     {
         type            symmetryPlane;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 120
 (
 2320

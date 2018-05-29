@@ -38,12 +38,12 @@ if(GIT_FOUND)
   # Try to get version from from git
   execute_process(
     COMMAND ${GIT_EXECUTABLE} describe --tags --dirty=-dirty
-	OUTPUT_VARIABLE GIT_VERSION
-	ERROR_VARIABLE dummy
-	RESULT_VARIABLE res
+    OUTPUT_VARIABLE GIT_VERSION
+    ERROR_VARIABLE dummy
+    RESULT_VARIABLE res
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
-  
+
   if(res EQUAL 0)
     string(REPLACE "g" "" GIT_VERSION "${GIT_VERSION}")
     string(REGEX REPLACE "^v([0-9]+\\.?[0-9]*\\.?([0-9]*)).*" "\\1" FOAM_VERSION "${GIT_VERSION}")

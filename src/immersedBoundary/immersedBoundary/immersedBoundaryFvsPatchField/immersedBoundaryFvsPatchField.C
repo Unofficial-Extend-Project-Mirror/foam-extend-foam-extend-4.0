@@ -43,7 +43,7 @@ void immersedBoundaryFvsPatchField<Type>::updateSize()
     }
 }
 
-    
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>

@@ -39,13 +39,13 @@ set(BASECLOUDS ${CLOUDS}/baseClasses)
 set(DERIVEDCLOUDS ${CLOUDS}/derived)
 
 
-#  Parcels 
+#  Parcels
 list(APPEND SOURCES
   ${BASEPARCELS}/reactingParcel/reactingParcel.C
 )
 
 
-#  Cloud base classes 
+#  Cloud base classes
 list(APPEND SOURCES
   ${BASECLOUDS}/kinematicCloud/kinematicCloud.C
   ${BASECLOUDS}/thermoCloud/thermoCloud.C
@@ -54,7 +54,7 @@ list(APPEND SOURCES
 )
 
 
-#  kinematic parcel sub-models 
+#  kinematic parcel sub-models
 set(KINEMATICPARCEL ${DERIVEDPARCELS}/basicKinematicParcel)
 list(APPEND SOURCES
   ${KINEMATICPARCEL}/basicKinematicParcel.C
@@ -63,7 +63,7 @@ list(APPEND SOURCES
 )
 
 
-#  thermo parcel sub-models 
+#  thermo parcel sub-models
 set(THERMOPARCEL ${DERIVEDPARCELS}/basicThermoParcel)
 list(APPEND SOURCES
   ${THERMOPARCEL}/basicThermoParcel.C
@@ -72,7 +72,7 @@ list(APPEND SOURCES
 )
 
 
-#  reacting parcel sub-models 
+#  reacting parcel sub-models
 set(REACTINGPARCEL ${DERIVEDPARCELS}/BasicReactingParcel)
 list(APPEND SOURCES
   ${REACTINGPARCEL}/defineBasicReactingParcel.C
@@ -80,7 +80,7 @@ list(APPEND SOURCES
 )
 
 
-#  reacting multiphase parcel sub-models 
+#  reacting multiphase parcel sub-models
 set(REACTINGMPPARCEL ${DERIVEDPARCELS}/BasicReactingMultiphaseParcel)
 list(APPEND SOURCES
   ${REACTINGMPPARCEL}/defineBasicReactingMultiphaseParcel.C
@@ -88,7 +88,7 @@ list(APPEND SOURCES
 )
 
 
-#  bolt-on models 
+#  bolt-on models
 set(RADIATION submodels/addOns/radiation)
 list(APPEND SOURCES
   ${RADIATION}/absorptionEmission/cloudAbsorptionEmission/cloudAbsorptionEmission.C
@@ -125,7 +125,7 @@ list(APPEND SOURCES
 )
 
 
-#  data entries 
+#  data entries
 list(APPEND SOURCES
   submodels/IO/DataEntry/makeDataEntries.C
   submodels/IO/DataEntry/polynomial/polynomial.C
@@ -133,19 +133,19 @@ list(APPEND SOURCES
 )
 
 
-#  integration schemes 
+#  integration schemes
 list(APPEND SOURCES
   IntegrationScheme/makeIntegrationSchemes.C
 )
 
 
-#  particle forces 
+#  particle forces
 list(APPEND SOURCES
   particleForces/particleForces.C
 )
 
 
-#  phase properties 
+#  phase properties
 list(APPEND SOURCES
   phaseProperties/phaseProperties/phaseProperties.C
   phaseProperties/phaseProperties/phasePropertiesIO.C

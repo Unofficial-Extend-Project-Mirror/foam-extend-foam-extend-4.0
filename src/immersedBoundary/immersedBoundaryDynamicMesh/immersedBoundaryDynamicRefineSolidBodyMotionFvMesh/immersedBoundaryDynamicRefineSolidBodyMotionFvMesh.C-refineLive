@@ -245,7 +245,7 @@ selectRefineCells
     }
 
     Info<< "Cell distance: " << min(cellDistance) << " " << max(cellDistance) << endl;
-        
+
     // Create a sorting criterion
     forAll (cellDistance, cellI)
     {
@@ -344,7 +344,7 @@ Foam::immersedBoundaryDynamicRefineSolidBodyMotionFvMesh::selectUnrefinePoints
 
     // Get split points from all points
     pointField splitPoints(points(), splitPointLabels);
-    
+
     // Calculate distance to immersed boundary
     // Note: minimum distance is inside (WET) and implies a live cell
     scalarField splitPointDistance(splitPoints.size(), -GREAT);
@@ -380,7 +380,7 @@ Foam::immersedBoundaryDynamicRefineSolidBodyMotionFvMesh::selectUnrefinePoints
     }
 
     Info<< "Split point distance: " << min(splitPointDistance) << " " << max(splitPointDistance) << endl;
-        
+
     dynamicLabelList newSplitPoints(splitPointLabels.size());
 
     const labelListList& pc = pointCells();
@@ -462,7 +462,7 @@ void Foam::immersedBoundaryDynamicRefineSolidBodyMotionFvMesh::extendMarkedCells
 
     const labelList& own = faceOwner();
     const labelList& nei = faceNeighbour();
-    
+
     // Update cells using any markedFace
     for (label faceI = 0; faceI < nInternalFaces(); faceI++)
     {
@@ -643,7 +643,7 @@ bool immersedBoundaryDynamicRefineSolidBodyMotionFvMesh::update()
         // Negative cell distance implies live cell
         // For negative distance greater than -refinementDistance, refine
         // For neegative distance smaller than -coarseningDistance, coarsen
-        
+
         // Cells marked for refinement or otherwise protected from unrefinement.
         PackedBoolList refineCell(nCells());
 
