@@ -231,7 +231,7 @@ export(PACKAGE FOAM)
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Henrik Rusche")
 set(CPACK_PACKAGE_CONTACT "h.rusche@wikki-gmbh.de")
 set(CPACK_GENERATOR "DEB")
-set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/foam-extend-4.0")
+set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/foam-extend-4.1")
 set(CPACK_SOURCE_STRIP_FILES "1")
 include(CPack)
 
