@@ -78,24 +78,22 @@ void Foam::wallDist::correct()
         }
     }
 
-    // Get patchids of walls
-    // labelHashSet wallPatchIDs(getPatchIDs<wallPolyPatch>());
-
     // Calculate distance starting from wallPatch faces.
     patchWave wave(cellDistFuncs::mesh(), wallPatchIDs, correctWalls_);
 
     // Transfer cell values from wave into *this
     transfer(wave.distance());
 
-    // Transfer values on patches into boundaryField of *this
-    forAll (boundaryField(), patchI)
-    {
-        if (!isA<emptyFvPatchScalarField>(boundaryField()[patchI]))
-        {
-            scalarField& waveFld = wave.patchDistance()[patchI];
+    // Make near-wall distance consistent with wall distance
+    // This is needed by immersed boundary walls
+    // HJ, 29/May/2018
+    const fvPatchList& patches = volScalarField::mesh().boundary();
 
-            boundaryField()[patchI].transfer(waveFld);
-        }
+    forAll (patches, patchI)
+    {
+        fvPatchScalarField& yPatch = boundaryField()[patchI];
+
+        boundaryField()[patchI] = 1/patches[patchI].deltaCoeffs();
     }
 
     // Transfer number of unset values
