@@ -62,5 +62,10 @@ runTimeModifiable yes;
 // Output format for graphs
 graphFormat     raw;
 
+libs
+(
+    "liblduSolvers.so"
+);
+
 
 // ************************************************************************* //

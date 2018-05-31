@@ -41,6 +41,7 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(gen6DoF
-#   DEPENDS finiteVolume
+  DEPENDS finiteVolume
   SOURCES ${SOURCES}
+  USERSPACE # Hack: User, Site support not implemented
 )

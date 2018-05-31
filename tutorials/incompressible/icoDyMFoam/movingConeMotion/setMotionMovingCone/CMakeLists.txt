@@ -41,6 +41,7 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(setMotionMovingCone
-#   DEPENDS finiteVolume
+  DEPENDS tetFiniteElement
   SOURCES ${SOURCES}
+  USERSPACE # Hack: User, Site support not implemented
 )

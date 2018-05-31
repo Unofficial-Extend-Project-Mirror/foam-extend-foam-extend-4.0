@@ -41,6 +41,7 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(setInitialDroplet
-#   DEPENDS finiteVolume
+  DEPENDS finiteVolume finiteArea
   SOURCES ${SOURCES}
+  USERSPACE # Hack: User, Site support not implemented
 )

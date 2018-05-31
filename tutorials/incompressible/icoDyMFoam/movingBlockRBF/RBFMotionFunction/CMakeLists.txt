@@ -34,6 +34,12 @@ list(APPEND SOURCES
   RBFMotionFunctionObject.C
 )
 
+# Set minimal environment for external compilation
+if(NOT FOAM_FOUND)
+  cmake_minimum_required(VERSION 2.8)
+  find_package(FOAM REQUIRED)
+endif()
+
 add_foam_library(RBFMotionFunction SHARED ${SOURCES})
 
-#target_link_libraries(RBFMotionFunction finiteVolume)
+target_link_libraries(RBFMotionFunction PUBLIC RBFMotionSolver)

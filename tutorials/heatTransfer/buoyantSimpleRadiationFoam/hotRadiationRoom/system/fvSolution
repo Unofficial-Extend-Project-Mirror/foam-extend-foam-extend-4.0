@@ -51,7 +51,7 @@ solvers
         tolerance        1e-05;
         relTol           0.1;
     }
-    G PCG
+    G
     {
         solver           CG;
         preconditioner   Cholesky;

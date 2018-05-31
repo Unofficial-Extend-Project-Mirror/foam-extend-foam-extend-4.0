@@ -41,6 +41,7 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(rhoPisoTwinParcelFoam
-#   DEPENDS finiteVolume
+  DEPENDS lagrangianIntermediate
   SOURCES ${SOURCES}
+  USERSPACE # Hack: User, Site support not implemented
 )

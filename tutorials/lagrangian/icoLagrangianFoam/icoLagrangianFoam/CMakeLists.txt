@@ -41,6 +41,8 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(icoLagrangianFoam
-#   DEPENDS finiteVolume
+  DEPENDS lagrangianIntermediate
   SOURCES ${SOURCES}
+  USERSPACE # Hack: User, Site support not implemented
 )
+

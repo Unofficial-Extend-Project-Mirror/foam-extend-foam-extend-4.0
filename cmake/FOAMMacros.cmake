@@ -82,11 +82,17 @@ function(add_foam_library lib)
 endfunction()
 
 function(add_foam_executable exe)
-  set(options "")
+  set(options USERSPACE)
   set(oneValueArgs "")
   set(multiValueArgs DEPENDS SOURCES)
   cmake_parse_arguments(AFE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
-  
+
+  if(${AFE_USERSPACE})
+    message(STATUS Got here)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY $ENV{FOAM_USER_LIBBIN})
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY $ENV{FOAM_USER_APPBIN})
+  endif()
+
   add_executable(${exe} ${AFE_SOURCES})
   target_link_libraries(${exe} ${AFE_DEPENDS})
   install (TARGETS ${exe} DESTINATION bin)
