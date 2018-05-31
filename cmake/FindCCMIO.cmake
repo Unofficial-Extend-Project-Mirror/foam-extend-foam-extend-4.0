@@ -34,9 +34,6 @@ find_library(CCMIO_LIBRARY2
   ${CCMIO_PKGCONF_LIBRARY_DIRS}
 )
 
-message(STATUS ${CCMIO_INCLUDE_DIR})
-message(STATUS ${CCMIO_LIBRARY})
-
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
 

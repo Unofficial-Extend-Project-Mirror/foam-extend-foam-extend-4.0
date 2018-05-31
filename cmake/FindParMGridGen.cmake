@@ -30,9 +30,6 @@ find_library(PARMGRIDGEN_LIBRARY
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
 
-message(STATUS ${PARMGRIDGEN_INCLUDE_DIR})
-message(STATUS ${PARMGRIDGEN_LIBRARY})
-
 set(PARMGRIDGEN_PROCESS_INCLUDE PARMGRIDGEN_INCLUDE_DIR)
 set(PARMGRIDGEN_PROCESS_INCLUDES PARMGRIDGEN_INCLUDE_DIR2)
 set(PARMGRIDGEN_PROCESS_LIB PARMGRIDGEN_LIBRARY)

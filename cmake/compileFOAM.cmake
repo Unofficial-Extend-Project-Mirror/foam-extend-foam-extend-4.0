@@ -63,7 +63,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 find_package(MPI REQUIRED)
 add_library(mpi SHARED IMPORTED)
 set_property(TARGET mpi PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${MPI_C_INCLUDE_PATH})
-set_property(TARGET mpi PROPERTY IMPORTED_LOCATION ${MPI_LIBRARY})
+set_property(TARGET mpi PROPERTY IMPORTED_LOCATION ${MPI_C_LIBRARIES})
+set_property(TARGET mpi PROPERTY INTERFACE_COMPILE_DEFINITIONS OMPI_SKIP_MPICXX)
 
 find_package(ZLIB REQUIRED)
 
@@ -87,6 +88,7 @@ if(SCOTCH_FOUND)
   add_library(scotch SHARED IMPORTED)
   set_property(TARGET scotch PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${SCOTCH_INCLUDE_DIRS})
   set_property(TARGET scotch PROPERTY IMPORTED_LOCATION ${SCOTCH_LIBRARY})
+  set_property(TARGET scotch PROPERTY IMPORTED_NO_SONAME TRUE)
 endif()
 
 find_package(Metis REQUIRED)
@@ -108,6 +110,7 @@ if(PARMGRIDGEN_FOUND)
   add_library(parmgridgen SHARED IMPORTED)
   set_property(TARGET parmgridgen PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${PARMGRIDGEN_INCLUDE_DIRS})
   set_property(TARGET parmgridgen PROPERTY IMPORTED_LOCATION ${PARMGRIDGEN_LIBRARY})
+  set_property(TARGET parmgridgen PROPERTY IMPORTED_NO_SONAME TRUE)
 endif()
 
 find_package(CCMIO REQUIRED)
@@ -135,6 +138,7 @@ file(WRITE ${CMAKE_BINARY_DIR}/cmake/FOAMTargets.cmake "#" )
 
 add_subdirectory(src)
 add_subdirectory(applications)
+#add_subdirectory(tutorials)
 
 
 #
@@ -146,6 +150,7 @@ if(NOT CMAKE_BUILD_TYPE)
     "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
     FORCE)
 endif()
+
 
 #
 # Definitions inherited by all targets
@@ -168,7 +173,7 @@ target_compile_definitions(OSspecific PUBLIC WM_LABEL_SIZE=${FOAM_LABEL_SIZE})
 # No Repository
 target_compile_definitions(OSspecific PUBLIC NoRepository)
 
-# No Repository
+# linux64 - hardcoded for the moment
 target_compile_definitions(OSspecific PUBLIC linux64)
 
 # FOAM's full debug mode

@@ -23,9 +23,6 @@ find_library(METIS_LIBRARY
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
 
-message(STATUS ${METIS_INCLUDE_DIR})
-message(STATUS ${METIS_LIBRARY})
-
 set(METIS_PROCESS_INCLUDES METIS_INCLUDE_DIR)
 set(METIS_PROCESS_LIBS METIS_LIBRARY)
 libfind_process(METIS)

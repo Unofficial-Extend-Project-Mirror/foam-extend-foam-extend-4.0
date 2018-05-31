@@ -23,9 +23,6 @@ find_library(SCOTCH_LIBRARY
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
 
-message(STATUS ${SCOTCH_INCLUDE_DIR})
-message(STATUS ${SCOTCH_LIBRARY})
-
 set(SCOTCH_PROCESS_INCLUDE SCOTCH_INCLUDE_DIR)
 set(SCOTCH_PROCESS_LIB SCOTCH_LIBRARY)
 libfind_process(SCOTCH)
