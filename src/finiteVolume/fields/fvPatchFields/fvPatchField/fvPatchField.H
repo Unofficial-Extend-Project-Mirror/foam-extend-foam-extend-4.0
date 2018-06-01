@@ -107,6 +107,16 @@ class fvPatchField
         word patchType_;
 
 
+protected:
+
+    // Protected member functions
+
+        //- Read patch type
+        //  Use for derived types which over-ride dictionary constructor
+        //  in order to read the patch type
+        void readPatchType(const dictionary& dict);
+
+
 public:
 
     typedef fvPatch Patch;
@@ -120,7 +130,6 @@ public:
 
     // Declare run-time constructor selection tables
 
-#ifndef SWIG
         declareRunTimeSelectionTable
         (
             tmp,
@@ -159,7 +168,7 @@ public:
             ),
             (p, iF, dict)
         );
-#endif
+
 
     // Constructors
 
@@ -262,10 +271,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~fvPatchField<Type>()
-        {}
+    //- Destructor
+    virtual ~fvPatchField<Type>()
+    {}
 
 
     // Member functions
@@ -614,9 +622,7 @@ public:
 
     // Ostream operator
 
-#ifndef SWIG
         friend Ostream& operator<< <Type>(Ostream&, const fvPatchField<Type>&);
-#endif
 };
 
 
