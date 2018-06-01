@@ -422,5 +422,10 @@ list(APPEND SOURCES
 )
 
 add_foam_library(cfMesh SHARED ${SOURCES})
-
 target_link_libraries(cfMesh PUBLIC meshTools edgeMesh)
+
+if(OPENMP_FOUND)
+  target_compile_definitions(cfMesh PUBLIC USE_OMP)
+  target_compile_options(cfMesh PUBLIC ${OpenMP_CXX_FLAGS})
+  target_link_libraries(cfMesh PUBLIC ${OpenMP_CXX_FLAGS})
+endif()

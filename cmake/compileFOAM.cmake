@@ -72,6 +72,8 @@ find_package(FLEX REQUIRED)
 
 find_package(Git REQUIRED)
 
+find_package(OpenMP)
+
 # Path to ParaViewConfig.cmake
 set(ParaView_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/packages/ParaView-4.4.0/platforms/linux64GccDPOpt/lib/cmake/paraview-4.4)
 find_package(ParaView REQUIRED)
