@@ -37,6 +37,6 @@ list(APPEND SOURCES
   rho/fixedRhoFvPatchScalarField.C
 )
 
-add_foam_library(rhoCentralFoam SHARED ${SOURCES})
+add_foam_library(rhoCentralFoamLib SHARED ${SOURCES})
 
-target_link_libraries(rhoCentralFoam finiteVolume)
+target_link_libraries(rhoCentralFoamLib PUBLIC finiteVolume)

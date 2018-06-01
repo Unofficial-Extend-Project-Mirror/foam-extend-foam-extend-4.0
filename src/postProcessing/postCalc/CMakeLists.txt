@@ -34,6 +34,6 @@ list(APPEND SOURCES
   postCalc.C
 )
 
-add_foam_library(postCalc SHARED ${SOURCES})
+add_foam_library(postCalc STATIC ${SOURCES})
 
 target_link_libraries(postCalc PUBLIC finiteVolume)

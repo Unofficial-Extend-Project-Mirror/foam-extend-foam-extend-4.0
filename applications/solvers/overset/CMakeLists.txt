@@ -30,17 +30,13 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND SOURCES
-  XiFoam.C
-)
-
-# Set minimal environment for external compilation
-if(NOT FOAM_FOUND)
-  cmake_minimum_required(VERSION 2.8)
-  find_package(FOAM REQUIRED)
-endif()
-
-add_foam_executable(XiFoam
-  DEPENDS engine compressibleRASModels compressibleLESModels laminarFlameSpeedModels
-  SOURCES ${SOURCES}
-)
+add_subdirectory(icoDyMOversetFoam)
+add_subdirectory(icoOversetFoam)
+add_subdirectory(interOversetFoam)
+add_subdirectory(laplacianOversetFoam)
+add_subdirectory(pimpleDyMOversetFoam)
+add_subdirectory(potentialDyMOversetFoam)
+add_subdirectory(potentialOversetFoam)
+add_subdirectory(scalarTransportOversetFoam)
+add_subdirectory(simpleMRFOversetFoam)
+add_subdirectory(simpleOversetFoam)

@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(rhoReactingFoam
-  DEPENDS chemistryModel compressibleTurbulenceModel
+  DEPENDS chemistryModel compressibleRASModels compressibleLESModels
   SOURCES ${SOURCES}
 )

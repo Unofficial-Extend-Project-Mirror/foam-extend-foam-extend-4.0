@@ -61,7 +61,7 @@ list(APPEND SOURCES
 
 add_foam_library(kineticTheoryModel SHARED ${SOURCES})
 
-target_link_libraries(kineticTheoryModel PUBLIC phaseModel)
+target_link_libraries(kineticTheoryModel PUBLIC EulerianInterfacialModels)
 
 target_include_directories(kineticTheoryModel PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../interfacialModels/dragModels/dragModel>

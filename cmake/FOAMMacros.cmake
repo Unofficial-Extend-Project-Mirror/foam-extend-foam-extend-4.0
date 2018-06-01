@@ -36,6 +36,11 @@ add_custom_target(ImportMessage
 )
 
 function(add_foam_library lib)
+  set(options USERSPACE)
+  set(oneValueArgs "")
+  set(multiValueArgs "")
+  cmake_parse_arguments(AFL "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
   # Create target for lnInclude and use it
   include_directories(lnInclude)
   add_custom_command(
@@ -47,8 +52,13 @@ function(add_foam_library lib)
   )
   add_custom_target(${lib}_lnInclude DEPENDS lnInclude/uptodate)
 
+  if(${AFL_USERSPACE})
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY $ENV{FOAM_USER_LIBBIN})
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY $ENV{FOAM_USER_APPBIN})
+  endif()
+
   # Add the library to the targets and set include paths
-  add_library(${lib} ${ARGN})
+  add_library(${lib} ${AFL_UNPARSED_ARGUMENTS})
   add_dependencies(${lib} ${lib}_lnInclude)
   target_include_directories(${lib} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lnInclude>
@@ -88,12 +98,14 @@ function(add_foam_executable exe)
   cmake_parse_arguments(AFE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
   if(${AFE_USERSPACE})
-    message(STATUS Got here)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY $ENV{FOAM_USER_LIBBIN})
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY $ENV{FOAM_USER_APPBIN})
   endif()
 
   add_executable(${exe} ${AFE_SOURCES})
+  target_link_libraries(${exe}
+    "-Xlinker --add-needed -Xlinker --no-as-needed"
+  )
   target_link_libraries(${exe} ${AFE_DEPENDS})
   install (TARGETS ${exe} DESTINATION bin)
 

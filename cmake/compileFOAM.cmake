@@ -93,14 +93,14 @@ endif()
 
 find_package(Metis REQUIRED)
 if(METIS_FOUND)
-  add_library(metis SHARED IMPORTED)
+  add_library(metis STATIC IMPORTED)
   set_property(TARGET metis PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${METIS_INCLUDE_DIRS})
   set_property(TARGET metis PROPERTY IMPORTED_LOCATION ${METIS_LIBRARY})
 endif()
 
 find_package(ParMetis REQUIRED)
 if(PARMETIS_FOUND)
-  add_library(parmetis SHARED IMPORTED)
+  add_library(parmetis STATIC IMPORTED)
   set_property(TARGET parmetis PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${PARMETIS_INCLUDE_DIRS})
   set_property(TARGET parmetis PROPERTY IMPORTED_LOCATION ${PARMETIS_LIBRARY})
 endif()
@@ -121,10 +121,6 @@ if(CCMIO_FOUND)
   set_property(TARGET ccmio PROPERTY INTERFACE_LINK_LIBRARIES ${CCMIO_LIBRARIES})
 endif()
 
-#SET(CMAKE_INSTALL_RPATH FALSE)
-#SET(CMAKE_SKIP_BUILD_RPATH TRUE)
-#SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-#SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 #
 # Recurse into the source
@@ -138,7 +134,6 @@ file(WRITE ${CMAKE_BINARY_DIR}/cmake/FOAMTargets.cmake "#" )
 
 add_subdirectory(src)
 add_subdirectory(applications)
-#add_subdirectory(tutorials)
 
 
 #
@@ -181,6 +176,11 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
   target_compile_definitions(OSspecific PUBLIC FULLDEBUG)
   target_compile_options(OSspecific PUBLIC -fdefault-inline -ggdb3)
 endif()
+
+#target_link_libraries(
+#  OSspecific INTERFACE
+#  "-Xlinker --add-needed -Xlinker --no-as-needed"
+#)
 
 #target_compile_options(
 #  OSspecific PUBLIC

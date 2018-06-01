@@ -39,6 +39,6 @@ list(APPEND SOURCES
   p/inviscidWallPFvPatchScalarField.C
 )
 
-add_foam_library(rhopSonicFoam SHARED ${SOURCES})
+add_foam_library(rhopSonicFoamLib SHARED ${SOURCES})
 
-target_link_libraries(rhopSonicFoam PUBLIC finiteVolume)
+target_link_libraries(rhopSonicFoamLib PUBLIC finiteVolume)

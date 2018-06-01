@@ -43,6 +43,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(fireFoam
-  DEPENDS compressibleTurbulenceModel radiation combustionModels
+  DEPENDS radiation combustionModels
   SOURCES ${SOURCES}
 )

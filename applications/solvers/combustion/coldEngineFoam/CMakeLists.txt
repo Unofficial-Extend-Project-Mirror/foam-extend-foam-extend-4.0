@@ -41,7 +41,7 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(coldEngineFoam
-  DEPENDS engine compressibleTurbulenceModel
+  DEPENDS engine compressibleRASModels compressibleLESModels
   SOURCES ${SOURCES}
 )
 

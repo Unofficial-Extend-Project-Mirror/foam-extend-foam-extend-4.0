@@ -46,7 +46,7 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(chtMultiRegionFoam
-  DEPENDS compressibleTurbulenceModel
+  DEPENDS compressibleRASModels compressibleLESModels
   SOURCES ${SOURCES}
 )
 

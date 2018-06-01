@@ -58,6 +58,7 @@ libs
     "libdynamicFvMesh.so"
     "liboversetMesh.so"
     "liboversetDynamicFvMesh.so"
+    "liblduSolvers.so"
 );
 
 functions

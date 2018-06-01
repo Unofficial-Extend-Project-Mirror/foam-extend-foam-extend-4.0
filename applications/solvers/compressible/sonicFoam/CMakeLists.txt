@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(sonicFoam
-  DEPENDS compressibleTurbulenceModel
+  DEPENDS compressibleRASModels compressibleLESModels
   SOURCES ${SOURCES}
 )

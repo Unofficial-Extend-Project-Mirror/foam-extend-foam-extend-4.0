@@ -41,7 +41,7 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(rhoPorousMRFPimpleFoam
-  DEPENDS compressibleTurbulenceModel
+  DEPENDS compressibleRASModels compressibleLESModels
   SOURCES ${SOURCES}
 )
 

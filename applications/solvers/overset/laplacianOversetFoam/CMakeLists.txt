@@ -31,7 +31,7 @@
 # --------------------------------------------------------------------------
 
 list(APPEND SOURCES
-  XiFoam.C
+  laplacianOversetFoam.C
 )
 
 # Set minimal environment for external compilation
@@ -40,7 +40,7 @@ if(NOT FOAM_FOUND)
   find_package(FOAM REQUIRED)
 endif()
 
-add_foam_executable(XiFoam
-  DEPENDS engine compressibleRASModels compressibleLESModels laminarFlameSpeedModels
+add_foam_executable(laplacianOversetFoam
+  DEPENDS oversetMesh
   SOURCES ${SOURCES}
 )

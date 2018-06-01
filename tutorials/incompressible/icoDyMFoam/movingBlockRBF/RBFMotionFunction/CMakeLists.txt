@@ -40,6 +40,6 @@ if(NOT FOAM_FOUND)
   find_package(FOAM REQUIRED)
 endif()
 
-add_foam_library(RBFMotionFunction SHARED ${SOURCES})
+add_foam_library(RBFMotionFunction USERSPACE SHARED ${SOURCES})
 
 target_link_libraries(RBFMotionFunction PUBLIC RBFMotionSolver)

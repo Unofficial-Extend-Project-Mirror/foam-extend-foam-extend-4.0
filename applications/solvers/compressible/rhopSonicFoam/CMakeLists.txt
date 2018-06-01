@@ -31,3 +31,18 @@
 # --------------------------------------------------------------------------
 
 add_subdirectory(BCs)
+
+list(APPEND SOURCES
+  rhopSonicFoam.C
+)
+
+# Set minimal environment for external compilation
+if(NOT FOAM_FOUND)
+  cmake_minimum_required(VERSION 2.8)
+  find_package(FOAM REQUIRED)
+endif()
+
+add_foam_executable(rhopSonicFoam
+  DEPENDS rhopSonicFoamLib compressibleRASModels compressibleLESModels
+  SOURCES ${SOURCES}
+)

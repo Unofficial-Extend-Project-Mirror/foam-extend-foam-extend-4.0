@@ -33,3 +33,22 @@
 add_subdirectory(interfacialModels)
 add_subdirectory(phaseModel)
 add_subdirectory(kineticTheoryModels)
+
+list(APPEND SOURCES
+  twoPhaseEulerFoam.C
+)
+
+# Set minimal environment for external compilation
+if(NOT FOAM_FOUND)
+  cmake_minimum_required(VERSION 2.8)
+  find_package(FOAM REQUIRED)
+endif()
+
+add_foam_executable(twoPhaseEulerFoam
+  DEPENDS kineticTheoryModel
+  SOURCES ${SOURCES}
+)
+
+target_include_directories(twoPhaseEulerFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/turbulenceModel>
+)

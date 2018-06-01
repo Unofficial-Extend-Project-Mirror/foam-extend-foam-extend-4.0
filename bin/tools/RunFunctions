@@ -128,17 +128,21 @@ compileApplication ()
             wmake $1
         fi
         rm -rf $lockFilename
+        echo DONE
     fi
 }
 
 compileLibrary ()
 {
     echo "Compiling $1 library"
+    echo $WM_USE_CMAKE
     if [ "$WM_USE_CMAKE" = "1" ];
-        (cd $1; cmake .; make)
     then
+        (cd $1; cmake .; make)
+    else
         wmake libso $1
     fi
+    echo DONE
 }
 
 cloneCase ()

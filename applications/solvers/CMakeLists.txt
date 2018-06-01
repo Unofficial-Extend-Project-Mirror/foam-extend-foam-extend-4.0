@@ -50,3 +50,5 @@ add_subdirectory(basic)
 add_subdirectory(immersedBoundary)
 add_subdirectory(surfaceTracking)
 add_subdirectory(viscoelastic)
+add_subdirectory(overset)
+
