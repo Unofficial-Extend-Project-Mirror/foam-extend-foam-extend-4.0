@@ -44,6 +44,12 @@ timePrecision   6;
 
 runTimeModifiable yes;
 
+libs
+(
+    "liblduSolvers.so"
+);
+
+
 functions
 (
     forces

@@ -31,7 +31,7 @@ Description
 #include "mathematicalConstants.H"
 #include "EulerCoordinateRotation.H"
 #include "coordinateSystem.H"
-#include "curvedEdges/rotEllipse2D.H"
+#include "rotEllipse2D.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

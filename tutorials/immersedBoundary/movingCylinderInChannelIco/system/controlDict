@@ -58,6 +58,7 @@ libs
 (
     "libimmersedBoundary.so"
     "libimmersedBoundaryDynamicMesh.so"
+    "liblduSolvers.so"
 );
 
 functions

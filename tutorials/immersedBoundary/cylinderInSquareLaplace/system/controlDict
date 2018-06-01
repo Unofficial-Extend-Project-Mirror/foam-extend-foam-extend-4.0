@@ -46,6 +46,7 @@ runTimeModifiable yes;
 
 libs
 (
+    "liblduSolvers.so"
     "libimmersedBoundary.so"
 );
 

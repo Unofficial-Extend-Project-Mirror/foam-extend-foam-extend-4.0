@@ -17,6 +17,7 @@ FoamFile
 libs
 (
     "libimmersedBoundary.so"
+    "liblduSolvers.so"
 )
 
 application     simpleFoam;

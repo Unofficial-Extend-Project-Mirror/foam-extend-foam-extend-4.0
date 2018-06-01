@@ -55,6 +55,8 @@ libs
     "libsampling.so"
     "libdynamicMesh.so"
     "liboversetMesh.so"
+    "liboversetMesh.so"
+    "liblduSolvers.so"
 );
 
 

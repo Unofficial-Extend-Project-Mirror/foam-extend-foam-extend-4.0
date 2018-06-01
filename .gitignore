@@ -127,4 +127,17 @@ src/lduSolvers/amg/amgPolicy/aamgPolicy.H
 # vagrant stuff
 vagrantSandbox/.vagrant/
 
+# Various intermediate files and directories generated CMAKE
+CMakeFiles/
+build/
+Makefile
+CMakeCache.txt
+cmake_install.cmake
+install_manifest.txt
+timestamp
+
+# new target folders - just for the moment
+bin
+lib
+
 # end-of-file
