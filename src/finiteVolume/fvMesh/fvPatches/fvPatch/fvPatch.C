@@ -53,7 +53,8 @@ void fvPatch::makeWeights(fvsPatchScalarField& w) const
 
 void fvPatch::makeDeltaCoeffs(fvsPatchScalarField& dc) const
 {
-    dc = 1.0/(nf() & delta());
+    const vectorField d = delta();
+    dc = 1.0/max((nf() & d), 0.05*mag(d));
 }
 
 
