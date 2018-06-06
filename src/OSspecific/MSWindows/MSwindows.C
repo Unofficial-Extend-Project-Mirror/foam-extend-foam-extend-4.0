@@ -1277,11 +1277,9 @@ void* dlOpen(const fileName& libName, const bool check)
             << " : LoadLibrary of " << libName << endl;
     }
 
-    const char* dllExt = ".dll";
+    // Replace extension with .dll
+    string winLibName(libName.lessExt() + ".dll");
 
-    // Assume libName is of the form, lib<name>.so
-    string winLibName(libName);
-    winLibName.replace(".so", dllExt);
     void* handle = ::LoadLibrary(winLibName.c_str());
 
     if (NULL == handle)

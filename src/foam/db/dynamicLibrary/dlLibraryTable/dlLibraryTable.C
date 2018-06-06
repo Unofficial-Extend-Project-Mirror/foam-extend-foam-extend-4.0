@@ -26,7 +26,6 @@ License
 #include "dlLibraryTable.H"
 #include "OSspecific.H"
 #include "int.H"
-#include <dlfcn.h>
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -34,8 +33,6 @@ namespace Foam
 {
     defineTypeNameAndDebug(dlLibraryTable, 0);
 }
-
-Foam::dlLibraryTable Foam::dlLibraryTable::loadedLibraries;
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -62,6 +59,12 @@ Foam::dlLibraryTable::~dlLibraryTable()
     {
         if (libPtrs_[i])
         {
+            if (debug)
+            {
+                InfoInFunction
+                    << "Closing " << libNames_[i]
+                    << " with handle " << uintptr_t(libPtrs_[i]) << endl;
+            }
             dlClose(libPtrs_[i]);
         }
     }
@@ -78,75 +81,31 @@ bool Foam::dlLibraryTable::open
 {
     if (functionLibName.size())
     {
-        void* functionLibPtr =
-            dlopen(functionLibName.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+        void* functionLibPtr = dlOpen(functionLibName, verbose);
 
-#ifdef darwin
-        // If failing to load under OS X, let's try some obvious variations
-        // before giving up completely
-        fileName osxFileName(functionLibName);
-
-        if(!functionLibPtr && functionLibName.ext()=="so")
+        if (debug)
         {
-            osxFileName=functionLibName.lessExt()+".dylib";
-
-            functionLibPtr =
-                dlopen(osxFileName.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+            InfoInFunction
+                << "Opened " << functionLibName
+                << " resulting in handle " << uintptr_t(functionLibPtr) << endl;
         }
 
-        // If unsuccessful, which might be the case under Mac OSX 10.11 (El
-        // Capitan) with System Integrity Protection (SIP) enabled, let's try
-        // building a full path using well-known environment variables. This is
-        // the last resort, unless you provide the full pathname yourself.
         if (!functionLibPtr)
         {
-            fileName l_LIBBIN_Name =
-                getEnv("FOAM_LIBBIN")/osxFileName;
-            functionLibPtr =
-                dlopen(l_LIBBIN_Name.c_str(), RTLD_LAZY|RTLD_GLOBAL);
-        }
-        if (!functionLibPtr)
-        {
-            fileName l_SITE_LIBBIN_Name =
-                getEnv("FOAM_SITE_LIBBIN")/osxFileName;
-            functionLibPtr =
-                dlopen(l_SITE_LIBBIN_Name.c_str(), RTLD_LAZY|RTLD_GLOBAL);
-        }
-        if (!functionLibPtr)
-        {
-            fileName l_USER_LIBBIN_Name =
-                getEnv("FOAM_USER_LIBBIN")/osxFileName;
-            functionLibPtr =
-                dlopen(l_USER_LIBBIN_Name.c_str(), RTLD_LAZY|RTLD_GLOBAL);
-        }
-#elif defined mingw
-        if(!functionLibPtr && functionLibName.ext()=="so") {
-            fileName lName=functionLibName.lessExt()+".dll";
-            functionLibPtr =
-                dlopen(lName.c_str(), RTLD_LAZY|RTLD_GLOBAL);
-        }
-#endif
-        if (!functionLibPtr)
-        {
-            WarningIn
-            (
-                "dlLibraryTable::open(const fileName& functionLibName)"
-            )   << "could not load " << dlerror()
-                << endl;
+            if (verbose)
+            {
+                WarningInFunction
+                    << "could not load " << functionLibName
+                    << endl;
+            }
 
             return false;
         }
         else
         {
-            if (!loadedLibraries.found(functionLibPtr))
-            {
-                loadedLibraries.insert(functionLibPtr, functionLibName);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            libPtrs_.append(functionLibPtr);
+            libNames_.append(functionLibName);
+            return true;
         }
     }
     else
@@ -174,6 +133,13 @@ bool Foam::dlLibraryTable::close
 
     if (index != -1)
     {
+        if (debug)
+        {
+            InfoInFunction
+                << "Closing " << functionLibName
+                << " with handle " << uintptr_t(libPtrs_[index]) << endl;
+        }
+
         bool ok = dlClose(libPtrs_[index]);
 
         libPtrs_[index] = NULL;

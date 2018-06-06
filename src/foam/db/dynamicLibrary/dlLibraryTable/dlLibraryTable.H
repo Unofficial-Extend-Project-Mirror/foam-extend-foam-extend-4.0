@@ -37,8 +37,6 @@ SourceFiles
 
 #include "label.H"
 #include "DynamicList.H"
-#include "Hash.H"
-#include "HashTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,8 +48,6 @@ namespace Foam
 \*---------------------------------------------------------------------------*/
 
 class dlLibraryTable
-:
-    public HashTable<fileName, void*, Hash<void*> >
 {
     // Private Member Functions
 
@@ -71,12 +67,6 @@ public:
 
     // Declare name of the class and its debug switch
     ClassName("dlLibraryTable");
-
-    // Static data members
-
-        //- Static data someStaticData
-        static dlLibraryTable loadedLibraries;
-
 
     // Constructors
 
