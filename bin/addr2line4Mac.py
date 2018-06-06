@@ -11,6 +11,8 @@ if path.exists(filename):
     fullFile=filename
 
 for v in ["PATH","LD_LIBRARY_PATH"]:
+    if not v in environ:
+        continue
     if not fullFile:
         for d in environ[v].split(':'):
             if path.exists(path.join(d,filename)):

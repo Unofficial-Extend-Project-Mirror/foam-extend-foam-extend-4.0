@@ -77,7 +77,7 @@ setenv WM_THIRD_PARTY_DIR $WM_PROJECT_DIR/ThirdParty
 # This can be overriden in prefs.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # For AllMake.stage1
-setenv WM_THIRD_PARTY_USE_BISON_27 1
+#setenv WM_THIRD_PARTY_USE_BISON_27 1
 #setenv WM_THIRD_PARTY_USE_CMAKE_322 1
 
 #
