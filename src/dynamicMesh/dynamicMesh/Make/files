@@ -37,8 +37,8 @@ $(slidingInterface)/decoupleSlidingInterface.C
 repatchCoverage = $(polyMeshModifiers)/repatchCoverage
 $(repatchCoverage)/repatchCoverage.C
 
-polyhedralRefinement = $(polyMeshModifiers)/polyhedralRefinement
-$(polyhedralRefinement)/polyhedralRefinement.C
+$(polyMeshModifiers)/polyhedralRefinement/polyhedralRefinement.C
+$(polyMeshModifiers)/prismatic2DRefinement/prismatic2DRefinement.C
 
 polyTopoChange/polyTopoChange/polyTopoChange.C
 polyTopoChange/polyTopoChange/actions/topoAction/topoActions.C
