@@ -1236,6 +1236,8 @@ Foam::tmp<Foam::scalarField> Foam::polyMesh::movePoints
     // Moved from fvMesh.C in 1.6.x merge.  HJ, 29/Aug/2010
     meshObjectBase::allMovePoints<polyMesh>(*this);
 
+    const_cast<Time&>(time()).functionObjects().movePoints(allPoints_);
+
     return sweptVols;
 }
 
