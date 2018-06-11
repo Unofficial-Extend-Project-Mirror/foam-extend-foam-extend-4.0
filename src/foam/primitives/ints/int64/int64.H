@@ -74,6 +74,11 @@ Ostream& operator<<(Ostream&, const int64_t);
     Ostream& operator<<(Ostream&, const long);
 #endif
 
+#if defined(mingw)
+    Istream& operator>>(Istream&, off_t&);
+    Ostream& operator<<(Ostream&, const off_t);
+#endif
+
 //- Template specialization for pTraits<int64_t>
 template<>
 class pTraits<int64_t>

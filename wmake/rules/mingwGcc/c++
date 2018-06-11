@@ -9,14 +9,14 @@ include $(RULES)/c++$(WM_COMPILE_OPTION)
 ptFLAGS     = -DNoRepository -ftemplate-depth-200
 
 GFLAGS     = -DWM_$(WM_PRECISION_OPTION) -DWM_LABEL_SIZE=$(WM_LABEL_SIZE)
-c++FLAGS    = $(GFLAGS) $(c++WARN) $(c++OPT) $(c++DBUG) $(ptFLAGS) $(LIB_HEADER_DIRS) -I$(OPENMPI_DIR)/include -I$(WM_THIRD_PARTY_DIR)/packages/system/include -Dmingw -DBIG_ENDIAN=0 -DLITTLE_ENDIAN=1 -DBYTE_ORDER=BIG_ENDIAN
+c++FLAGS    = $(GFLAGS) $(c++WARN) $(c++OPT) $(c++DBUG) $(ptFLAGS) $(LIB_HEADER_DIRS) -I$(OPENMPI_DIR)/include -I$(WM_THIRD_PARTY_DIR)/packages/system/include -Dmingw -DBIG_ENDIAN=0 -DLITTLE_ENDIAN=1 -DBYTE_ORDER=BIG_ENDIAN -U__STRICT_ANSI__
 
 Ctoo        = $(WM_SCHEDULER) $(CC) $(c++FLAGS) -c $$SOURCE -o $@
 cxxtoo      = $(Ctoo)
 cctoo       = $(Ctoo)
 cpptoo      = $(Ctoo)
 
-LINK_LIBS   = $(c++DBUG) -L$(OPENMPI_DIR)/lib -lmpi -lpthread -lz -L$(WM_THIRD_PARTY_DIR)/packages/system/lib -ldl -lpsapi
+LINK_LIBS   = $(c++DBUG) -L$(OPENMPI_DIR)/lib -lmpi -lpthread -lz -L$(WM_THIRD_PARTY_DIR)/packages/system/lib -ldl -lpsapi -lws2_32
 
 LINKLIBSO   = $(CC) $(c++FLAGS) -shared -Xlinker --add-needed -Xlinker --no-as-needed
 LINKEXE     = $(CC) $(c++FLAGS) -Xlinker --add-needed -Xlinker --no-as-needed $(FOAM_LIBBIN)/libOSspecific.o

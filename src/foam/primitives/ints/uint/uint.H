@@ -67,7 +67,7 @@ MAXMIN(uint64_t, uint64_t, uint64_t)
 
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
-uint readUint(Istream&);
+unsigned int readUint(Istream&);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

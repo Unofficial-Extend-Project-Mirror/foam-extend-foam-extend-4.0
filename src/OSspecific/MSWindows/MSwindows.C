@@ -43,6 +43,8 @@ Description
 #include <map>
 
 // Windows system header files
+// DebugInfo macro defined in messageStream.H clashes with Windows headers
+#undef DebugInfo
 #include <io.h> // _close
 #include <windows.h>
 #include <signal.h>
@@ -372,7 +374,7 @@ string getEnv(const word& envName)
 bool setEnv
 (
     const word& envName,
-    const string& value,
+    const std::string& value,
     const bool overwrite
 )
 {
@@ -382,9 +384,8 @@ bool setEnv
 }
 
 
-word hostName()
+string hostName(bool full)
 {
-    const bool full = true;
     const DWORD bufferSize = MAX_COMPUTERNAME_LENGTH + 1;
     TCHAR buffer[bufferSize];
     DWORD actualBufferSize = bufferSize;
@@ -392,6 +393,17 @@ word hostName()
     const bool success =
       ::GetComputerName(buffer, &actualBufferSize);
     const string computerName = success ? buffer : string::null;
+
+    // implementation as per hostname from net-tools
+    if (full)
+    {
+        struct hostent *hp = gethostbyname(computerName.c_str());
+        if (hp)
+        {
+            return hp->h_name;
+        }
+    }
+
     return computerName;
 }
 
@@ -405,7 +417,7 @@ string domainName()
 }
 
 
-word userName()
+string userName()
 {
     std::string name = getEnv("USERNAME");
 
@@ -438,7 +450,7 @@ fileName home()
 }
 
 
-fileName home(const word& userName)
+fileName home(const string& userName)
 {
     return home();
 }
@@ -1287,7 +1299,7 @@ void* dlOpen(const fileName& libName, const bool check)
         // Assumes libName = name
         winLibName = "lib";
         winLibName += libName;
-        winLibName += dllExt;
+        winLibName += ".dll";
 
         handle = ::LoadLibrary(winLibName.c_str());
     }

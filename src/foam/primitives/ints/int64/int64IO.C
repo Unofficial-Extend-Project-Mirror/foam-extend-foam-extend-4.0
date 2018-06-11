@@ -114,4 +114,18 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const long i)
 }
 #endif
 
+#if defined(mingw)
+Foam::Istream& Foam::operator>>(Istream& is, off_t& i)
+{
+    return operator>>(is, i);
+}
+
+Foam::Ostream& Foam::operator<<(Ostream& os, const off_t i)
+{
+    os << i;
+    return os;
+}
+#endif
+
+
 // ************************************************************************* //
