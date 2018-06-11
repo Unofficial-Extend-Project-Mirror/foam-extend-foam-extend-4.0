@@ -29,16 +29,15 @@ Description
     Fixed temperature flux boundary condition. Assumes incompressible turbulent
     flow. The normal temperature gradient is calculated as:
 
-    snGrad(T) = q/kappaEff
+    snGrad(T) = q/(kappaEff*rhoRef*c)
 
     where:
         - q is the prescribed heat flux [W/m^2],
         - kappaEff is the effective diffusivity field: nu/Pr + nu_t/Pr_t,
         - Pr and Prt are laminar and turbulent Prandtl number read from
           transportProperties dictionary
-
-    Designed to be used alongside solvers with Boussinesq buoyancy
-    approximation (e.g. buoyantBoussinesqSimpleFoam).
+        - rhoRef is the reference density
+        - c is the specific heat capacity
 
 Author
     Vuko Vukcevic, Wikki Ltd.  All rights reserved
@@ -76,6 +75,12 @@ class fixedHeatFluxTemperatureFvPatchScalarField
 
         //- Turbulent Prandtl number
         scalar Prt_;
+
+        //- Reference density
+        scalar rhoRef_;
+
+        //- Specific heat capacity of the fluid
+        scalar c_;
 
 
 public:

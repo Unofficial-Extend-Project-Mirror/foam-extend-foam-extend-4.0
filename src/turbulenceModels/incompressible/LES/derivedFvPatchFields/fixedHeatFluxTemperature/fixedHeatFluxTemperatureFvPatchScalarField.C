@@ -45,7 +45,9 @@ fixedHeatFluxTemperatureFvPatchScalarField
     fixedGradientFvPatchScalarField(p, iF),
     heatFlux_(p.size(), 0.0),
     Pr_(0.0),
-    Prt_(0.0)
+    Prt_(0.0),
+    rhoRef_(0.0),
+    c_(0.0)
 {
     this->gradient() = 0.0;
 }
@@ -61,8 +63,10 @@ fixedHeatFluxTemperatureFvPatchScalarField
 :
     fixedGradientFvPatchScalarField(p, iF),
     heatFlux_("heatFlux", dict, p.size()),
-    Pr_(0.0), // Initialized in constructor body
-    Prt_(0.0) // Initialized in constructor body
+    Pr_(0.0),     // Initialized in constructor body
+    Prt_(0.0),    // Initialized in constructor body
+    rhoRef_(0.0), // Initialized in constructor body
+    c_(0.0)       // Initialized in constructor body
 {
     // Set dummy gradient
     this->gradient() = 0.0;
@@ -109,9 +113,101 @@ fixedHeatFluxTemperatureFvPatchScalarField
         )
     );
 
-    // Read in Prandtl numbers
-    Pr_ = dimensionedScalar(transportProperties.lookup("Pr")).value();
-    Prt_ = dimensionedScalar(transportProperties.lookup("Prt")).value();
+    // Read in all the necessary data as dimensioned scalars
+    const dimensionedScalar PrDim =
+        dimensionedScalar(transportProperties.lookup("Pr"));
+
+    const dimensionedScalar PrtDim =
+        dimensionedScalar(transportProperties.lookup("Prt"));
+
+    const dimensionedScalar rhoRefDim =
+        dimensionedScalar(transportProperties.lookup("rhoRef"));
+
+    const dimensionedScalar cDim =
+        dimensionedScalar(transportProperties.lookup("c"));
+
+    // Perform sanity checks for dimensions
+    if (PrDim.dimensions() != dimless)
+    {
+        FatalIOErrorIn
+        (
+            "fixedHeatFluxTemperatureFvPatchScalarField::"
+            "fixedHeatFluxTemperatureFvPatchScalarField"
+            "\n("
+            "\n    const fvPatch& p,"
+            "\n    const DimensionedField<scalar, volMesh>& iF,"
+            "\n    const dictionary& dict"
+            "\n)",
+            dict
+        ) << "Wrong dimensions for Prandtl number (Pr) detected: "
+          << PrDim.dimensions()
+          << nl
+          << "They should be: " << dimless
+          << abort(FatalIOError);
+    }
+
+    if (PrtDim.dimensions() != dimless)
+    {
+        FatalIOErrorIn
+        (
+            "fixedHeatFluxTemperatureFvPatchScalarField::"
+            "fixedHeatFluxTemperatureFvPatchScalarField"
+            "\n("
+            "\n    const fvPatch& p,"
+            "\n    const DimensionedField<scalar, volMesh>& iF,"
+            "\n    const dictionary& dict"
+            "\n)",
+            dict
+        ) << "Wrong dimensions for turbulent Prandtl number (Prt) detected: "
+          << PrtDim.dimensions()
+          << nl
+          << "They should be: " << dimless
+          << abort(FatalIOError);
+    }
+
+    if (rhoRefDim.dimensions() != dimDensity)
+    {
+        FatalIOErrorIn
+        (
+            "fixedHeatFluxTemperatureFvPatchScalarField::"
+            "fixedHeatFluxTemperatureFvPatchScalarField"
+            "\n("
+            "\n    const fvPatch& p,"
+            "\n    const DimensionedField<scalar, volMesh>& iF,"
+            "\n    const dictionary& dict"
+            "\n)",
+            dict
+        ) << "Wrong dimensions for reference density (rhoRef) detected: "
+          << rhoRefDim.dimensions()
+          << nl
+          << "They should be: " << dimDensity
+          << abort(FatalIOError);
+    }
+
+    if (cDim.dimensions() != dimSpecificHeatCapacity)
+    {
+        FatalIOErrorIn
+        (
+            "fixedHeatFluxTemperatureFvPatchScalarField::"
+            "fixedHeatFluxTemperatureFvPatchScalarField"
+            "\n("
+            "\n    const fvPatch& p,"
+            "\n    const DimensionedField<scalar, volMesh>& iF,"
+            "\n    const dictionary& dict"
+            "\n)",
+            dict
+        ) << "Wrong dimensions for specific heat capacity (c) detected: "
+          << cDim.dimensions()
+          << nl
+          << "They should be: " << dimSpecificHeatCapacity
+          << abort(FatalIOError);
+    }
+
+    // Store values in data members
+    Pr_ = PrDim.value();
+    Prt_ = PrtDim.value();
+    rhoRef_ = rhoRefDim.value();
+    c_ = cDim.value();
 }
 
 
@@ -127,7 +223,9 @@ fixedHeatFluxTemperatureFvPatchScalarField
     fixedGradientFvPatchScalarField(ptf, p, iF, mapper),
     heatFlux_(ptf.heatFlux_),
     Pr_(ptf.Pr_),
-    Prt_(ptf.Prt_)
+    Prt_(ptf.Prt_),
+    rhoRef_(ptf.rhoRef_),
+    c_(ptf.c_)
 {}
 
 
@@ -140,7 +238,9 @@ fixedHeatFluxTemperatureFvPatchScalarField
     fixedGradientFvPatchScalarField(ptf),
     heatFlux_(ptf.heatFlux_),
     Pr_(ptf.Pr_),
-    Prt_(ptf.Prt_)
+    Prt_(ptf.Prt_),
+    rhoRef_(ptf.rhoRef_),
+    c_(ptf.c_)
 {}
 
 
@@ -154,7 +254,9 @@ fixedHeatFluxTemperatureFvPatchScalarField
     fixedGradientFvPatchScalarField(ptf, iF),
     heatFlux_(ptf.heatFlux_),
     Pr_(ptf.Pr_),
-    Prt_(ptf.Prt_)
+    Prt_(ptf.Prt_),
+    rhoRef_(ptf.rhoRef_),
+    c_(ptf.c_)
 {}
 
 
@@ -183,7 +285,7 @@ void fixedHeatFluxTemperatureFvPatchScalarField::updateCoeffs()
             ras.nu().boundaryField()[patchID]/Pr_
           + ras.nut()().boundaryField()[patchID]/Prt_;
 
-        this->gradient() = heatFlux_/kappaEffp;
+        this->gradient() = heatFlux_/(kappaEffp*rhoRef_*c_);
     }
     else if (mesh.foundObject<incompressible::LESModel>("LESProperties"))
     {
@@ -195,7 +297,7 @@ void fixedHeatFluxTemperatureFvPatchScalarField::updateCoeffs()
             les.nu().boundaryField()[patchID]/Pr_
           + les.nut()().boundaryField()[patchID]/Prt_;
 
-        this->gradient() = heatFlux_/kappaEffp;
+        this->gradient() = heatFlux_/(kappaEffp*rhoRef_*c_);
     }
     else
     {
