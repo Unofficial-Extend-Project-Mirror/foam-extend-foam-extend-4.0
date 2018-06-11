@@ -55,7 +55,7 @@ class constantThermal
 {
     // Private data
 
-        //- Specific heat capacity
+        //- Density
         dimensionedScalar rho_;
 
         //- Specific heat capacity
