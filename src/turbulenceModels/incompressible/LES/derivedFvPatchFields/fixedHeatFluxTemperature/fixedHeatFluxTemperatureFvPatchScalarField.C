@@ -48,9 +48,7 @@ fixedHeatFluxTemperatureFvPatchScalarField
     Prt_(0.0),
     rhoRef_(0.0),
     c_(0.0)
-{
-    this->gradient() = 0.0;
-}
+{}
 
 
 fixedHeatFluxTemperatureFvPatchScalarField::
@@ -68,8 +66,11 @@ fixedHeatFluxTemperatureFvPatchScalarField
     rhoRef_(0.0), // Initialized in constructor body
     c_(0.0)       // Initialized in constructor body
 {
-    // Set dummy gradient
-    this->gradient() = 0.0;
+    // Read the gradient entry from the dictionary
+    if (dict.found("gradient"))
+    {
+        this->gradient() = scalarField("gradient", dict, p.size());
+    }
 
     // Read the value entry from the dictionary
     if (dict.found("value"))
@@ -275,28 +276,20 @@ void fixedHeatFluxTemperatureFvPatchScalarField::updateCoeffs()
     // Get this patch index
     const label patchID = this->patch().index();
 
-    if (mesh.foundObject<incompressible::RASModel>("RASProperties"))
+    if (mesh.foundObject<incompressible::turbulenceModel>("turbulenceModel"))
     {
-        const incompressible::RASModel& ras =
-            mesh.lookupObject<incompressible::RASModel>("RASProperties");
+        const incompressible::turbulenceModel& turb =
+            mesh.lookupObject
+            <
+                incompressible::turbulenceModel
+            >("turbulenceModel");
 
         // Calculate effective kappa at the patch
         const scalarField kappaEffp =
-            ras.nu().boundaryField()[patchID]/Pr_
-          + ras.nut()().boundaryField()[patchID]/Prt_;
+            turb.nu().boundaryField()[patchID]/Pr_
+          + turb.nut()().boundaryField()[patchID]/Prt_;
 
-        this->gradient() = heatFlux_/(kappaEffp*rhoRef_*c_);
-    }
-    else if (mesh.foundObject<incompressible::LESModel>("LESProperties"))
-    {
-        const incompressible::LESModel& les =
-            mesh.lookupObject<incompressible::LESModel>("LESProperties");
-
-        // Calculate effective kappa at the patch
-        const scalarField kappaEffp =
-            les.nu().boundaryField()[patchID]/Pr_
-          + les.nut()().boundaryField()[patchID]/Prt_;
-
+        // Calculate gradient at the boundary
         this->gradient() = heatFlux_/(kappaEffp*rhoRef_*c_);
     }
     else
