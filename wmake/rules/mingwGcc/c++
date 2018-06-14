@@ -9,7 +9,7 @@ include $(RULES)/c++$(WM_COMPILE_OPTION)
 ptFLAGS     = -DNoRepository -ftemplate-depth-200
 
 GFLAGS     = -DWM_$(WM_PRECISION_OPTION) -DWM_LABEL_SIZE=$(WM_LABEL_SIZE)
-c++FLAGS    = $(GFLAGS) $(c++WARN) $(c++OPT) $(c++DBUG) $(ptFLAGS) $(LIB_HEADER_DIRS) -I$(OPENMPI_DIR)/include -I$(WM_THIRD_PARTY_DIR)/packages/system/include -Dmingw -DBIG_ENDIAN=0 -DLITTLE_ENDIAN=1 -DBYTE_ORDER=BIG_ENDIAN -U__STRICT_ANSI__
+c++FLAGS    = $(GFLAGS) $(c++WARN) $(c++OPT) $(c++DBUG) $(ptFLAGS) $(LIB_HEADER_DIRS) -I$(OPENMPI_DIR)/include -I$(WM_THIRD_PARTY_DIR)/packages/system/include -Dmingw -DBIG_ENDIAN=0 -DLITTLE_ENDIAN=1 -DBYTE_ORDER=BIG_ENDIAN
 
 Ctoo        = $(WM_SCHEDULER) $(CC) $(c++FLAGS) -c $$SOURCE -o $@
 cxxtoo      = $(Ctoo)

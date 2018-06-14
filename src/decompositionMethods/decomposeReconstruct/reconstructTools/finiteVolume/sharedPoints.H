@@ -96,10 +96,10 @@ class sharedPoints
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        sharedPoints(const sharedPoints&) = delete;
+        sharedPoints(const sharedPoints&);
 
         //- Disallow default bitwise assignment
-        void operator=(const sharedPoints&) = delete;
+        void operator=(const sharedPoints&);
 
 
         //- Calculate processor patch pairs
@@ -127,7 +127,8 @@ public:
 
 
     //- Destructor
-    ~sharedPoints() = default;
+    ~sharedPoints()
+    {}
 
 
     // Member Functions
