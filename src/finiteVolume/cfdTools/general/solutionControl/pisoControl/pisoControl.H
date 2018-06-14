@@ -72,8 +72,20 @@ public:
 
     //- Destructor
     virtual ~pisoControl();
+
+
+    // Member Functions
+
+        // Solution control
+
+            //- Return true if in the final inner (PISO) iteration
+            inline bool finalInnerIter() const;
 };
 
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "pisoControlI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
