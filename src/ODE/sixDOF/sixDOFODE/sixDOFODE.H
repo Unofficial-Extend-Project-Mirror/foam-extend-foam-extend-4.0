@@ -384,6 +384,15 @@ public:
                 virtual const dimensionedVector& omegaAverage() const = 0;
 
 
+            // Accelerations in the current time-step
+
+                //- Translational acceleration in absolute coordinate system
+                virtual dimensionedVector translationalAcceleration() const = 0;
+
+                //- Rotational acceleration in relative coordinate system
+                virtual dimensionedVector rotationalAcceleration() const = 0;
+
+
             // Rotations
 
                 //- Return rotation tensor to relative coordinate system

@@ -376,6 +376,23 @@ const Foam::dimensionedVector& Foam::quaternionSixDOF::omegaAverage() const
 }
 
 
+Foam::dimensionedVector
+Foam::quaternionSixDOF::translationalAcceleration() const
+{
+    // Calculate and return translational acceleration in global c. s.
+    return A(Xrel(), Uaverage(), rotation_.eCurrent(), dict().time().value());
+}
+
+
+Foam::dimensionedVector
+Foam::quaternionSixDOF::rotationalAcceleration() const
+{
+    // Calculate and return rotational acceleration in relative c. s.
+    return
+        OmegaDot(rotation_.eCurrent(), omegaAverage(), dict().time().value());
+}
+
+
 Foam::tensor Foam::quaternionSixDOF::toRelative() const
 {
     return rotation_.eCurrent().R();
