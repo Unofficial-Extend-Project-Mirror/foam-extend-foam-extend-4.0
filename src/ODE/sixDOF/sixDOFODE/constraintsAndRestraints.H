@@ -6,5 +6,6 @@
 
 #include "translationalRestraint.H"
 #include "rotationalRestraint.H"
+#include "combinedRestraint.H"
 
 #endif

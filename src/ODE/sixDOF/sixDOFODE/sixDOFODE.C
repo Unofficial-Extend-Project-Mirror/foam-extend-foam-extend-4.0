@@ -244,6 +244,17 @@ void Foam::sixDOFODE::setState(const sixDOFODE& sd)
             sd.rotationalRestraints_[rrI].clone()
         );
     }
+
+    // Combined restraints
+    combinedRestraints_.setSize(sd.combinedRestraints_.size());
+    forAll(sd.combinedRestraints_, rrI)
+    {
+        combinedRestraints_.set
+        (
+            rrI,
+            sd.combinedRestraints_[rrI].clone()
+        );
+    }
 }
 
 
@@ -264,6 +275,17 @@ Foam::dimensionedVector Foam::sixDOFODE::force
     forAll(translationalRestraints_, trI)
     {
         rForce.value() += translationalRestraints_[trI].restrainingForce
+        (
+            t, // Time
+            toRelative, // Transformation tensor
+            x, // Position in the global c.s.
+            u // Velocity in the global c.s.
+        );
+    }
+
+    forAll(combinedRestraints_, trI)
+    {
+        rForce.value() += combinedRestraints_[trI].restrainingForce
         (
             t, // Time
             toRelative, // Transformation tensor
@@ -293,6 +315,16 @@ Foam::dimensionedVector Foam::sixDOFODE::moment
     forAll(rotationalRestraints_, rrI)
     {
         rMoment.value() += rotationalRestraints_[rrI].restrainingMoment
+        (
+            t, // Time
+            toRelative, // Transformation tensor
+            omega // Angular velocity in local c.s.
+        );
+    }
+
+    forAll(combinedRestraints_, rrI)
+    {
+        rMoment.value() += combinedRestraints_[rrI].restrainingMoment
         (
             t, // Time
             toRelative, // Transformation tensor
@@ -344,7 +376,8 @@ Foam::sixDOFODE::sixDOFODE(const IOobject& io)
     rotationalConstraints_(),
 
     translationalRestraints_(),
-    rotationalRestraints_()
+    rotationalRestraints_(),
+    combinedRestraints_()
 {
     // Sanity checks
     if (mass_.value() < SMALL)
@@ -431,6 +464,17 @@ Foam::sixDOFODE::sixDOFODE(const IOobject& io)
         );
         rotationalRestraints_.transfer(rcList);
     }
+
+    // Read rotation restraints if they are present
+    if (dict().found("combinedRestraints"))
+    {
+        PtrList<combinedRestraint> rcList
+        (
+            dict().lookup("combinedRestraints"),
+            combinedRestraint::iNew(*this)
+        );
+        combinedRestraints_.transfer(rcList);
+    }
 }
 
 
@@ -468,7 +512,8 @@ Foam::sixDOFODE::sixDOFODE(const word& name, const sixDOFODE& sd)
     rotationalConstraints_(sd.rotationalConstraints_),
 
     translationalRestraints_(sd.translationalRestraints_),
-    rotationalRestraints_(sd.rotationalRestraints_)
+    rotationalRestraints_(sd.rotationalRestraints_),
+    combinedRestraints_(sd.combinedRestraints_)
 {}
 
 
@@ -533,6 +578,13 @@ bool Foam::sixDOFODE::writeData(Ostream& os) const
     {
         os.writeKeyword("rotationalRestraints")
             << rotationalRestraints_
+            << token::END_STATEMENT << endl;
+    }
+
+    if (!combinedRestraints_.empty())
+    {
+        os.writeKeyword("combinedRestraints")
+            << combinedRestraints_
             << token::END_STATEMENT << endl;
     }
 

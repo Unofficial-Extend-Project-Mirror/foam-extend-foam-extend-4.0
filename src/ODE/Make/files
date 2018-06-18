@@ -26,6 +26,7 @@ $(sixDOF)/sixDOFODE/restraints/translationalRestraints/translationalRestraint/tr
 $(sixDOF)/sixDOFODE/restraints/translationalRestraints/linearSpringDamper/linearSpringDamper.C
 $(sixDOF)/sixDOFODE/restraints/rotationalRestraints/rotationalRestraint/rotationalRestraint.C
 $(sixDOF)/sixDOFODE/restraints/rotationalRestraints/angularDamper/angularDamper.C
+$(sixDOF)/sixDOFODE/restraints/combinedRestraints/combinedRestraint/combinedRestraint.C
 
 $(sixDOF)/sixDOFODE/sixDOFODE.C
 $(sixDOF)/sixDOFODE/newSixDOFODE.C
