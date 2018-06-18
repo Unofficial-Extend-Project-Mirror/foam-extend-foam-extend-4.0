@@ -1,0 +1,3 @@
+buoyantWallHeatFlux.C
+
+EXE = $(FOAM_APPBIN)/buoyantWallHeatFlux
