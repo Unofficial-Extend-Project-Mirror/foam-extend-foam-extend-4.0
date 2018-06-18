@@ -166,6 +166,9 @@ class sixDOFODE
             //- List of rotational restraints
             PtrList<rotationalRestraint> rotationalRestraints_;
 
+            //- List of combined trans and rot restraints
+            PtrList<combinedRestraint> combinedRestraints_;
+
 
     // Private Member Functions
 
@@ -344,6 +347,10 @@ public:
             //- Return const reference to rotational restraints
             inline const PtrList<rotationalRestraint>&
             rotationalRestraints() const;
+
+            //- Return const reference to combined restraints
+            inline const PtrList<combinedRestraint>&
+            combinedRestraints() const;
 
 
         // Virtual interface for 6DOF motion state
