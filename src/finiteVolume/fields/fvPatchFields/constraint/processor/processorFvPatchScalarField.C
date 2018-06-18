@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -77,7 +77,7 @@ void processorFvPatchField<scalar>::updateInterfaceMatrix
 
     // Transform according to the transformation tensor
     // No transform for scalar.  HJ, 29/Nov/2016
-    
+
     // Multiply the field by coefficients and add into the result
 
     const unallocLabelList& faceCells = this->patch().faceCells();

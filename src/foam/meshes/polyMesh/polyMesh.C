@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -1235,6 +1235,8 @@ Foam::tmp<Foam::scalarField> Foam::polyMesh::movePoints
     // Update all function objects
     // Moved from fvMesh.C in 1.6.x merge.  HJ, 29/Aug/2010
     meshObjectBase::allMovePoints<polyMesh>(*this);
+
+    const_cast<Time&>(time()).functionObjects().movePoints(allPoints_);
 
     return sweptVols;
 }

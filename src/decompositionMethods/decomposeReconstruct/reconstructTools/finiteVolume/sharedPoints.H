@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -96,10 +96,10 @@ class sharedPoints
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        sharedPoints(const sharedPoints&) = delete;
+        sharedPoints(const sharedPoints&);
 
         //- Disallow default bitwise assignment
-        void operator=(const sharedPoints&) = delete;
+        void operator=(const sharedPoints&);
 
 
         //- Calculate processor patch pairs
@@ -113,7 +113,7 @@ class sharedPoints
             const labelListList& patchPairs,
             const label fromMesh
         ) const;
-    
+
         //- Calculate shared points
         void calcSharedPoints();
 
@@ -127,7 +127,8 @@ public:
 
 
     //- Destructor
-    ~sharedPoints() = default;
+    ~sharedPoints()
+    {}
 
 
     // Member Functions

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -909,7 +909,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcPartiallyCoveredFaces
             InfoIn("GGIInterpolation::calcPartiallyCoveredFaces")
                 << "   : Found " << partiallyUncoveredMasterAddrPtr_->size()
                 << " partially overlapping faces for master GGI patch" << endl;
-            
+
             if (partiallyUncoveredMasterAddrPtr_->size())
             {
                 Info<< "Max uncoverage: "

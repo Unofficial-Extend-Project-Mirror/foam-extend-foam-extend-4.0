@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -111,7 +111,7 @@ void Foam::nastranSurfaceWriter::writeCoord
             os.unsetf(ios_base::left);
             os.setf(ios_base::right);
             os  << setw(8) << pointI + 1
-                << "        " 
+                << "        "
                 << setw(8) << p.x()
                 << setw(8) << p.y()
                 << setw(8) << p.z()

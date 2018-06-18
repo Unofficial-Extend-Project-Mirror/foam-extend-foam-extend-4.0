@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -181,7 +181,7 @@ tmp<scalarField> nutCWTWallFunctionFvPatchScalarField::calcNut() const
         const label faceCellI = fc[faceI];
         const scalar uStar = Cmu25*sqrt(k[faceCellI]);
 
-	    // Note: here yPlus is actually yStar
+        // Note: here yPlus is actually yStar
         const scalar yPlus = uStar*y[faceI]/nuw[faceI];
 
         // Relative tangential velocity

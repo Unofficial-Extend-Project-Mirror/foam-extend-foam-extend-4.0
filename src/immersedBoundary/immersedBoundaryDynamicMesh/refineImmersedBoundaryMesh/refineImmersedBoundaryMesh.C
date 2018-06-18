@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ void Foam::refineImmersedBoundaryMesh::addIbCellCells
 
             // Get mesh cellCells
             const labelListList& cellCells = mesh_.cellCells();
-            
+
             const labelList& c = ibPatch.ibCells();
 
             forAll (c, cellI)

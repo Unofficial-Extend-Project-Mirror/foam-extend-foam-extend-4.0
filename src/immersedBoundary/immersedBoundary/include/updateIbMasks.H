@@ -66,7 +66,7 @@
 
                     if (!isA<emptyFvPatch>(mesh.boundary()[pI]))
                     {
-                        const label fI = 
+                        const label fI =
                             mesh.boundaryMesh()[pI].whichFace(deadFaces[dfI]);
 
                         sGamma.boundaryField()[pI][fI] = 0;

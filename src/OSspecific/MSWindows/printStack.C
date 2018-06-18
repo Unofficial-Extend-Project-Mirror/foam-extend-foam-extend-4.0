@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -266,7 +266,7 @@ void getSymbolForRaw
     const word& address
 )
 {
-    if 
+    if
     (
         filename.size() && (filename[0] == '/' || filename[1] == ':')
     )
@@ -319,7 +319,7 @@ void error::printStack(Ostream& os)
             string::size_type space = line.rfind(' ') + 1;
             fileName libPath = line.substr(space, line.size()-space);
 
-            if 
+            if
             (
                 libPath.size() && (libPath[0] == '/' || libPath[1] == ':')
             )

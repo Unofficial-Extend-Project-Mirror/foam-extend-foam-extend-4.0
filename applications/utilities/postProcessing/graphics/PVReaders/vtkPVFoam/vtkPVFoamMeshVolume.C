@@ -300,7 +300,7 @@ vtkUnstructuredGrid* Foam::vtkPVFoam::volumeVTKMesh
             // but avoids crashes when there is no vtkPolyhedron support
 
             // establish unique node ids used
-            HashSet<vtkIdType, Hash<label>> hashUniqId(2*256);
+            HashSet<vtkIdType, Hash<label> > hashUniqId(2*256);
 
             forAll(cFaces, cFacei)
             {

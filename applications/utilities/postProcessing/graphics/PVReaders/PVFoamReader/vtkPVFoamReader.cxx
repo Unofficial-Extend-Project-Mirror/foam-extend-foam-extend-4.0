@@ -15,6 +15,9 @@
 
 #include "vtkPVFoamReader.h"
 
+// Foam includes
+#include "vtkPVFoam.H"
+
 #include "pqApplicationCore.h"
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
@@ -29,9 +32,6 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
-
-// Foam includes
-#include "vtkPVFoam.H"
 
 vtkStandardNewMacro(vtkPVFoamReader);
 

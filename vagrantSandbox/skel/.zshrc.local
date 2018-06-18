@@ -84,7 +84,7 @@ fi
 # just type '...' to get '../..'
 #rationalise-dot() {
 #local MATCH
-#if [[ $LBUFFER =~ '(^|/| |	|'$'\n''|\||;|&)\.\.$' ]]; then
+#if [[ $LBUFFER =~ '(^|/| |    |'$'\n''|\||;|&)\.\.$' ]]; then
 #  LBUFFER+=/
 #  zle self-insert
 #  zle self-insert

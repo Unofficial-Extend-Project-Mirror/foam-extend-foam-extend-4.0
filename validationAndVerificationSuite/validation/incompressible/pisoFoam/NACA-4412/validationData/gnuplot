@@ -1,10 +1,10 @@
-#!/bin/bash 
+#!/bin/bash
 
 gnuplot -persist  << 'EOF'
 
 set term pngcairo dashed size 1024,768 font "Arial,12"
 set output "Cp.png"
-set yrange [* : *] reverse; 
+set yrange [* : *] reverse;
 plot './validationData/cp.dat' using 1:2 title'C_p Experimetal data', \
 './validationData/p_solidWall.raw' using 1:($4/368.018) title 'C_p CFD' ;
 

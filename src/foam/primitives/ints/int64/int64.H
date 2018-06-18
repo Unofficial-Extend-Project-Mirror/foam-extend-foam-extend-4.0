@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -72,6 +72,11 @@ Ostream& operator<<(Ostream&, const int64_t);
 #if WM_ARCH_OPTION == 64 && darwin && __clang__
     Istream& operator>>(Istream&, long&);
     Ostream& operator<<(Ostream&, const long);
+#endif
+
+#if defined(mingw)
+    Istream& operator>>(Istream&, off_t&);
+    Ostream& operator<<(Ostream&, const off_t);
 #endif
 
 //- Template specialization for pTraits<int64_t>

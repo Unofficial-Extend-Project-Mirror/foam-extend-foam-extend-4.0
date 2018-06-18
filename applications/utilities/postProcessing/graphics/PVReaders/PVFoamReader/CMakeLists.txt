@@ -7,51 +7,78 @@
 # the pqReader.xml file contains xml defining readers with their
 # file extensions and descriptions.
 
-cmake_minimum_required(VERSION 2.4)
+#
+# We a little hack here to support cmake and wmake-compiled FOAM
+# libraries simultaneously. This uses the same trigger as externally
+# compiled applications (FOAM_FOUND)
+#
 
-if(COMMAND cmake_policy)
+if(NOT FOAM_FOUND)
+  # Config when compiling FOAM library with wmake
+
+  cmake_minimum_required(VERSION 2.4)
+
+  if(COMMAND cmake_policy)
     cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
+  endif(COMMAND cmake_policy)
 
-FIND_PACKAGE(ParaView REQUIRED)
-INCLUDE(${PARAVIEW_USE_FILE})
+  FIND_PACKAGE(ParaView REQUIRED)
+  INCLUDE(${PARAVIEW_USE_FILE})
 
-LINK_DIRECTORIES(
+  LINK_DIRECTORIES(
     $ENV{FOAM_LIBBIN}
-)
+  )
 
-INCLUDE_DIRECTORIES(
+  INCLUDE_DIRECTORIES(
     $ENV{WM_PROJECT_DIR}/src/foam/lnInclude
     $ENV{WM_PROJECT_DIR}/src/OSspecific/$ENV{WM_OSTYPE}/lnInclude
     $ENV{WM_PROJECT_DIR}/src/finiteVolume/lnInclude
     ${PROJECT_SOURCE_DIR}/../vtkPVFoam
-)
+  )
 
-ADD_DEFINITIONS(
+  ADD_DEFINITIONS(
     -std=c++11
     -DWM_$ENV{WM_PRECISION_OPTION}
     -DWM_LABEL_SIZE=$ENV{WM_LABEL_SIZE}
-)
+  )
 
-# Set output library destination to plugin folder
-SET(
+  # Set output library destination to plugin folder
+  SET(
     LIBRARY_OUTPUT_PATH $ENV{PV_PLUGIN_PATH}
     CACHE INTERNAL
     "Single output directory for building all libraries."
-)
+  )
+else()
+  # Config when compiling FOAM library with cmake
+
+  INCLUDE(${PARAVIEW_USE_FILE})
+endif()
+
 
 # Build the server-side plugin
 ADD_PARAVIEW_PLUGIN(
-    PVFoamReader_SM "1.0"
-    SERVER_MANAGER_XML PVFoamReader_SM.xml
-    SERVER_MANAGER_SOURCES vtkPVFoamReader.cxx
+  PVFoamReader_SM "1.0"
+  SERVER_MANAGER_XML PVFoamReader_SM.xml
+  SERVER_MANAGER_SOURCES vtkPVFoamReader.cxx
 )
 
-TARGET_LINK_LIBRARIES(
+if(NOT FOAM_FOUND)
+  # Config when compiling FOAM library with wmake
+
+  TARGET_LINK_LIBRARIES(
     PVFoamReader_SM
     foam
     finiteVolume
     vtkPVFoam
     pqCore
-)
+  )
+else()
+  # Config when compiling FOAM library with cmake
+
+  TARGET_LINK_LIBRARIES(
+    PVFoamReader_SM
+    PUBLIC vtkPVFoam pqCore
+  )
+endif()
+
 #-----------------------------------------------------------------------------

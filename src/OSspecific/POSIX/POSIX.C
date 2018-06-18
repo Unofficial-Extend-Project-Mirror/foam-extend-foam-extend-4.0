@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -1166,6 +1166,38 @@ void* Foam::dlOpen(const fileName& lib, const bool check)
             << " : dlopen of " << lib << std::endl;
     }
     void* handle = ::dlopen(lib.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+
+#ifdef darwin
+    // If failing to load under OS X, let's try some obvious variations
+    // before giving up completely
+    fileName osxFileName(lib);
+
+    if (!handle && lib.ext() == "so")
+    {
+        osxFileName = lib.lessExt() + ".dylib";
+        handle = ::dlopen(osxFileName.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+    }
+
+    // If unsuccessful, which might be the case under Mac OSX 10.11 (El
+    // Capitan) with System Integrity Protection (SIP) enabled, let's try
+    // building a full path using well-known environment variables. This is
+    // the last resort, unless you provide the full pathname yourself.
+    if (!handle)
+    {
+        fileName l_LIBBIN_Name = getEnv("FOAM_LIBBIN")/osxFileName;
+        handle = ::dlopen(l_LIBBIN_Name.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+    }
+    if (!handle)
+    {
+        fileName l_SITE_LIBBIN_Name = getEnv("FOAM_SITE_LIBBIN")/osxFileName;
+        handle = ::dlopen(l_SITE_LIBBIN_Name.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+    }
+    if (!handle)
+    {
+        fileName l_USER_LIBBIN_Name = getEnv("FOAM_USER_LIBBIN")/osxFileName;
+        handle = ::dlopen(l_USER_LIBBIN_Name.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+    }
+#endif
 
     if (!handle && check)
     {

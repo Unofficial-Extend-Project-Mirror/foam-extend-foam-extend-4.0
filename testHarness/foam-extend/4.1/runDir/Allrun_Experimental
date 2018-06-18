@@ -81,9 +81,9 @@ fi
 # We need cmake version 2.8.0 at least
 if [ "$WM_ARCH_BASE" == "mingw" ]
 then
-    cmake $WM_PROJECT_DIR -G "MSYS Makefiles"
+    cmake $WM_PROJECT_DIR -G "MSYS Makefiles" -DRUN_TESTS=ON -DBUILD_WITH_CMAKE=OFF
 else
-    cmake $WM_PROJECT_DIR -G "Unix Makefiles"
+    cmake $WM_PROJECT_DIR -G "Unix Makefiles" -DRUN_TESTS=ON -DBUILD_WITH_CMAKE=OFF
 fi
 
 # All set. Now we can run the available test harness

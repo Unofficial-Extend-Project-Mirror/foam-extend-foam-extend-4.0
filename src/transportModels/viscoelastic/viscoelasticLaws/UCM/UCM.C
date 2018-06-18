@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -73,21 +73,21 @@ Foam::tmp<Foam::fvVectorMatrix> Foam::UCM::divTau(volVectorField& U) const
     {
         dimensionedScalar etaPEff = etaP_;
 
-    	return
-    	(
-    	    fvc::div(tau_/rho_, "div(tau)")
-    	  - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
-    	  + fvm::laplacian( (etaPEff)/rho_, U, "laplacian(etaPEff+etaS,U)")
-    	);
+        return
+        (
+            fvc::div(tau_/rho_, "div(tau)")
+          - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
+          + fvm::laplacian( (etaPEff)/rho_, U, "laplacian(etaPEff+etaS,U)")
+        );
     }
     else
     {
-    	return
-    	(
-    	    fvc::div(tau_/rho_, "div(tau)")
-    	  - fvc::div((etaStab_/rho_)*fvc::grad(U), "div(tau)")
-    	  + fvm::laplacian( (etaStab_)/rho_, U, "laplacian(etaPEff+etaS,U)")
-    	);
+        return
+        (
+            fvc::div(tau_/rho_, "div(tau)")
+          - fvc::div((etaStab_/rho_)*fvc::grad(U), "div(tau)")
+          + fvm::laplacian( (etaStab_)/rho_, U, "laplacian(etaPEff+etaS,U)")
+        );
     }
 }
 

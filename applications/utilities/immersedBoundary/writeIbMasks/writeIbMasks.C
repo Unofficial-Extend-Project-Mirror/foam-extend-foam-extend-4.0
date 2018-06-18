@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
     scalar minLiveGamma = GREAT;
     label minLiveCell = -1;
     const scalarField& gammaIn = gamma.internalField();
-    
+
     forAll (mesh.boundary(), patchI)
     {
         if (isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))

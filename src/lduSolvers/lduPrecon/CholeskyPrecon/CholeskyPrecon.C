@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -152,7 +152,7 @@ void Foam::CholeskyPrecon::precondition
 
     // Note: coupled boundary updated is not needed because x is zero
     // HJ and VV, 19/Jun/2017
-    
+
     // Diagonal block
     {
         scalar* __restrict__ xPtr = x.begin();

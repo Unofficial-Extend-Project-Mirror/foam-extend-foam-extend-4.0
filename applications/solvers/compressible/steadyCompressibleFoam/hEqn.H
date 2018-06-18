@@ -2,7 +2,7 @@
     // Solve the enthalpy equation in total enthalpy formulation (see K)
 
     T.storePrevIter();
-    
+
     K = 0.5*(magSqr(U));
 
     fvScalarMatrix hEqn

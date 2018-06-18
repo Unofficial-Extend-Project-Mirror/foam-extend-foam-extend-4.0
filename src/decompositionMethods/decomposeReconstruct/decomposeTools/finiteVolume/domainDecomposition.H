@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ class domainDecomposition
 
         //- Global face index
         globalProcFaceIndex gfIndex_;
-    
+
         //- Processor label for each cell
         labelList cellToProc_;
 

@@ -23,13 +23,6 @@ $(boundaryConditions)/timeVaryingFixedDisplacementZeroShear/timeVaryingFixedDisp
 $(boundaryConditions)/timeVaryingFixedRotation/timeVaryingFixedRotationFvPatchVectorField.C
 $(boundaryConditions)/transitionalParabolicVelocity/transitionalParabolicVelocityFvPatchVectorField.C
 
-cohesiveLaws = $(constitutiveModel)/cohesiveLaws
-$(cohesiveLaws)/cohesiveLaw/cohesiveLaw.C
-$(cohesiveLaws)/cohesiveLaw/newCohesiveLaw.C
-$(cohesiveLaws)/multiMaterialCohesiveLaw/multiMaterialCohesiveLaw.C
-$(cohesiveLaws)/dugdaleCohesiveLaw/dugdaleCohesiveLaw.C
-$(cohesiveLaws)/linearCohesiveLaw/linearCohesiveLaw.C
-
 contactModels = contactModels
 $(contactModels)/normalContactModels/normalContactModel/normalContactModel.C
 $(contactModels)/normalContactModels/normalContactModel/newNormalContactModel.C
@@ -49,7 +42,7 @@ $(contactModels)/frictionContactModels/frictionLaws/coulombFriction/coulombFrict
 constitutiveModel = constitutiveModel
 $(constitutiveModel)/constitutiveModel.C
 $(constitutiveModel)/plasticityStressReturnMethods/plasticityStressReturn/plasticityStressReturn.C
-$(constitutiveModel)/plasticityStressReturnMethods/plasticityStressReturn/newPlasticityStressReturn.Cr
+$(constitutiveModel)/plasticityStressReturnMethods/plasticityStressReturn/newPlasticityStressReturn.C
 $(constitutiveModel)/plasticityStressReturnMethods/aravasMises/aravasMises.C
 $(constitutiveModel)/plasticityStressReturnMethods/yamadaMises/yamadaMises.C
 $(constitutiveModel)/solidInterfaces/solidInterface/solidInterface.C
@@ -62,6 +55,14 @@ $(constitutiveModel)/solidInterfaces/largeStrainUL/largeStrainULSolidInterface.C
 $(constitutiveModel)/solidInterfaces/largeStrainULCorrected/largeStrainULCorrectedSolidInterface.C
 $(constitutiveModel)/solidInterfaces/none/noneSolidInterface.C
 $(constitutiveModel)/tractionBoundaryGradient/tractionBoundaryGradient.C
+
+cohesiveLaws = $(constitutiveModel)/cohesiveLaws
+$(cohesiveLaws)/cohesiveLaw/cohesiveLaw.C
+$(cohesiveLaws)/cohesiveLaw/newCohesiveLaw.C
+$(cohesiveLaws)/multiMaterialCohesiveLaw/multiMaterialCohesiveLaw.C
+$(cohesiveLaws)/dugdaleCohesiveLaw/dugdaleCohesiveLaw.C
+$(cohesiveLaws)/linearCohesiveLaw/linearCohesiveLaw.C
+
 
 finiteVolume = finiteVolume
 $(finiteVolume)/gradSchemes/leastSquaresSolidInterfaceGrad/leastSquaresSolidInterfaceGrads.C

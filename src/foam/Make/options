@@ -11,7 +11,8 @@ LIB_LIBS = $(PLIBS)\
     -L$(WM_THIRD_PARTY_DIR)/packages/system/lib \
     -ldl \
     -lpsapi \
-    -lpthread
+    -lpthread \
+    -lws2_32
 
 #else
 
