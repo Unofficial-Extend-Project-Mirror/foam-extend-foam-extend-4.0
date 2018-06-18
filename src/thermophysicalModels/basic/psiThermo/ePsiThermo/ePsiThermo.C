@@ -114,8 +114,8 @@ Foam::ePsiThermo<MixtureType>::ePsiThermo
             "e",
             mesh.time().timeName(),
             obj,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
         ),
         mesh,
         dimensionSet(0, 2, -2, 0, 0),

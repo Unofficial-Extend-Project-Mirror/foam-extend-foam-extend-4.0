@@ -112,8 +112,8 @@ Foam::hsPsiThermo<MixtureType>::hsPsiThermo
             "hs",
             mesh.time().timeName(),
             obj,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
         ),
         mesh,
         dimEnergy/dimMass,

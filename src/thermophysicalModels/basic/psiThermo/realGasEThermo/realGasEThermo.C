@@ -22,10 +22,10 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Author
-Christian Lucas
-Institut für Thermodynamik
-Technische Universität Braunschweig
-Germany
+    Christian Lucas
+    Institut für Thermodynamik
+    Technische Universität Braunschweig
+    Germany
 
 \*---------------------------------------------------------------------------*/
 

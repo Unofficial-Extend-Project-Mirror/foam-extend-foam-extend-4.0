@@ -22,10 +22,10 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Author
-Christian Lucas
-Institut für Thermodynamik
-Technische Universität Braunschweig
-Germany
+    Christian Lucas
+    Institut für Thermodynamik
+    Technische Universität Braunschweig
+    Germany
 
 \*---------------------------------------------------------------------------*/
 
@@ -121,8 +121,8 @@ Foam::realGasHThermo<MixtureType>::realGasHThermo
             "h",
             mesh.time().timeName(),
             obj,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
         ),
         mesh,
         dimensionSet(0, 2, -2, 0, 0),
