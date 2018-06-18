@@ -110,7 +110,6 @@ public:
 
     // Declare run-time constructor selection table
 
-#ifndef SWIG
         declareRunTimeNewSelectionTable
         (
             autoPtr,
@@ -125,7 +124,6 @@ public:
             ),
             (rho, U, phi, thermoPhysicalModel, turbulenceModelName)
         );
-#endif
 
 
     // Constructors
