@@ -344,13 +344,11 @@ public:
     // Ostream operator
 
         // Write UList to Ostream.
-#ifndef SWIG
         friend Ostream& operator<< <T>
         (
             Ostream&,
             const UList<T>&
         );
-#endif
 };
 
 

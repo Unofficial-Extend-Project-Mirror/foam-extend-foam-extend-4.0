@@ -77,7 +77,6 @@ public:
 
     //- Declare run-time constructor selection table
 
-#ifndef SWIG
     declareRunTimeSelectionTable
     (
         autoPtr,
@@ -91,7 +90,6 @@ public:
         ),
         (p, U, T, thermo)
     );
-#endif
 
 
     // Constructors

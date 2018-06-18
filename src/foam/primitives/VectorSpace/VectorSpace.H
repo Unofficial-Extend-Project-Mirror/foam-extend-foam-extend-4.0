@@ -136,7 +136,6 @@ public:
 
     // IOstream Operators
 
-#ifndef SWIG
         friend Istream& operator>> <Form, Cmpt, nCmpt>
         (
             Istream&,
@@ -148,7 +147,6 @@ public:
             Ostream&,
             const VectorSpace<Form, Cmpt, nCmpt>&
         );
-#endif
 };
 
 

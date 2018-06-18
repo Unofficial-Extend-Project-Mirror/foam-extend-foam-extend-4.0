@@ -241,10 +241,8 @@ public:
 
     // Istream operator
 
-#ifndef SWIG
         //- Read List from Istream, discarding contents of existing List.
         friend Istream& operator>> <T>(Istream&, List<T>&);
-#endif
 };
 
 

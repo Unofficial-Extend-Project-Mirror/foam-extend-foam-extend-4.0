@@ -470,7 +470,6 @@ public:
 
     // Friend operators
 
-#ifndef SWIG
         friend tmp<GeometricField<Type, fvPatchField, volMesh> >
         operator& <Type>
         (
@@ -507,7 +506,6 @@ public:
             Ostream&,
             const fvMatrix<Type>&
         );
-#endif
 };
 
 

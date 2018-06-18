@@ -192,13 +192,11 @@ public:
 
     // IOstream operators
 
-#ifndef SWIG
         friend Istream& operator>> <Type>
         (Istream&, dimensioned<Type>&);
 
         friend Ostream& operator<< <Type>
         (Ostream&, const dimensioned<Type>&);
-#endif
 };
 
 

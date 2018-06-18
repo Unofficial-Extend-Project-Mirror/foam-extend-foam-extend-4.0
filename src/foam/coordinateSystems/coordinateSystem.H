@@ -260,7 +260,6 @@ public:
 
     // Declare run-time constructor selection table
 
-#ifndef SWIG
         declareRunTimeSelectionTable
         (
             autoPtr,
@@ -285,7 +284,6 @@ public:
             ),
             (name, origin, cr)
         );
-#endif
 
 
     // Selectors
@@ -310,9 +308,8 @@ public:
         static autoPtr<coordinateSystem> New(Istream& is);
 
 
-    // Destructor
-
-        virtual ~coordinateSystem();
+    //- Destructor
+    virtual ~coordinateSystem();
 
 
     // Member Functions

@@ -352,13 +352,11 @@ public:
 
     // IOstream operators
 
-#ifndef SWIG
         friend Ostream& operator<< <Type>
         (Ostream&, const Field<Type>&);
 
         friend Ostream& operator<< <Type>
         (Ostream&, const tmp<Field<Type> >&);
-#endif
 };
 
 

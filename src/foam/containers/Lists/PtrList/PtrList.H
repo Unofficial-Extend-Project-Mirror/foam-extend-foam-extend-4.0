@@ -293,13 +293,11 @@ public:
 
     // IOstream operator
 
-#ifndef SWIG
         //- Read List from Istream, discarding contents of existing List.
         friend Istream& operator>> <T>(Istream&, PtrList<T>&);
 
         // Write List to Ostream.
         friend Ostream& operator<< <T>(Ostream&, const PtrList<T>&);
-#endif
 };
 
 

@@ -145,9 +145,9 @@ public:
             return autoPtr<coordinateRotation>(new coordinateRotation(*this));
         }
 
+
     // Declare run-time constructor selection table
 
-#ifndef SWIG
         declareRunTimeSelectionTable
         (
             autoPtr,
@@ -158,7 +158,6 @@ public:
             ),
             (dict)
         );
-#endif
 
 
     // Selectors
@@ -170,10 +169,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~coordinateRotation()
-        {}
+    //- Destructor
+    virtual ~coordinateRotation()
+    {}
 
 
     // Member Functions

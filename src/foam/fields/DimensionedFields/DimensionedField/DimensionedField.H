@@ -173,13 +173,10 @@ public:
         );
 
         //- Construct by transferring the DimensionedField
-
-#ifndef SWIG
         DimensionedField
         (
             const Xfer<DimensionedField<Type, GeoMesh> >&
         );
-#endif
 
         //- Construct as copy of tmp<DimensionedField> deleting argument
 #       ifdef ConstructFromTmp
@@ -212,13 +209,11 @@ public:
         );
 
         //- Construct by transferring the DimensionedField with a new name
-#ifndef SWIG
         DimensionedField
         (
             const word& newName,
             const Xfer<DimensionedField<Type, GeoMesh> >&
         );
-#endif
 
         //- Construct as copy resetting name
 #       ifdef ConstructFromTmp
@@ -325,7 +320,6 @@ public:
 
     // Ostream Operators
 
-#ifndef SWIG
         friend Ostream& operator<< <Type, GeoMesh>
         (
             Ostream&,
@@ -337,7 +331,6 @@ public:
             Ostream&,
             const tmp<DimensionedField<Type, GeoMesh> >&
         );
-#endif
 };
 
 
