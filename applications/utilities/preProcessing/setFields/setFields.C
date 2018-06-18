@@ -111,6 +111,7 @@ class setField
 
 public:
 
+    //- Null constructor
     setField()
     {}
 
@@ -226,7 +227,7 @@ int main(int argc, char *argv[])
         (
             mesh,
             "cellSet",
-            mesh.nCells()/10+1  // Reasonable size estimate.
+            Foam::max(100, mesh.nCells()/10)  // Reasonable size estimate.
         );
 
         cellSelector->applyToSet
