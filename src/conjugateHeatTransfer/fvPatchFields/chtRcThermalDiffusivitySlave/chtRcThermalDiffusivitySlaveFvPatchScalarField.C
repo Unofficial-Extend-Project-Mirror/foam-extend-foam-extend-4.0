@@ -27,9 +27,11 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "chtRcThermalDiffusivitySlaveFvPatchScalarField.H"
+#include "chtRcTemperatureFvPatchScalarField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "fvPatchFieldMapper.H"
 #include "volFields.H"
+#include "basicThermo.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -56,16 +58,6 @@ chtRcThermalDiffusivitySlaveFvPatchScalarField
 {}
 
 
-Foam::chtRcThermalDiffusivitySlaveFvPatchScalarField::
-chtRcThermalDiffusivitySlaveFvPatchScalarField
-(
-    const chtRcThermalDiffusivitySlaveFvPatchScalarField& ptf,
-    const DimensionedField<scalar, volMesh>& iF
-)
-:
-    chtRegionCoupleBase(ptf, iF)
-{}
-
 
 Foam::chtRcThermalDiffusivitySlaveFvPatchScalarField::
 chtRcThermalDiffusivitySlaveFvPatchScalarField
@@ -77,6 +69,17 @@ chtRcThermalDiffusivitySlaveFvPatchScalarField
 )
 :
     chtRegionCoupleBase(ptf, p, iF, mapper)
+{}
+
+
+Foam::chtRcThermalDiffusivitySlaveFvPatchScalarField::
+chtRcThermalDiffusivitySlaveFvPatchScalarField
+(
+    const chtRcThermalDiffusivitySlaveFvPatchScalarField& ptf,
+    const DimensionedField<scalar, volMesh>& iF
+)
+:
+    chtRegionCoupleBase(ptf, iF)
 {}
 
 
@@ -108,7 +111,43 @@ void Foam::chtRcThermalDiffusivitySlaveFvPatchScalarField::updateCoeffs()
         return;
     }
 
-    shadowPatchField().calcThermalDiffusivity(*this, shadowPatchField());
+    scalarField& k = *this;
+
+    if
+    (
+        dimensionedInternalField().dimensions()
+     == dimensionSet(1, -1, -1, 0, 0, 0, 0)
+    )
+    {
+        const label patchi = patch().index();
+
+        const basicThermo& thermo = db().lookupObject<basicThermo>
+        (
+            "thermophysicalProperties"
+        );
+
+        const chtRcTemperatureFvPatchScalarField& h =
+            refCast<const chtRcTemperatureFvPatchScalarField>
+            (
+                thermo.h().boundaryField()[patchi]
+            );
+
+        const scalarField Tw =
+            lookupPatchField<volScalarField, scalar>("T");
+
+        k = calcThermalDiffusivity(*this, shadowPatchField(), h)
+            /thermo.Cp(Tw, patchi);
+    }
+    else
+    {
+        const chtRcTemperatureFvPatchScalarField& Tw =
+            refCast<const chtRcTemperatureFvPatchScalarField>
+            (
+                lookupPatchField<volScalarField, scalar>("T")
+            );
+
+        k = calcThermalDiffusivity(*this, shadowPatchField(), Tw);
+    }
 }
 
 

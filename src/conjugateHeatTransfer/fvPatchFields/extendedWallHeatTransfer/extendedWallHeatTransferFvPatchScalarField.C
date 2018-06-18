@@ -175,16 +175,6 @@ void Foam::extendedWallHeatTransferFvPatchScalarField::updateCoeffs()
 
     scalarField term2 = Tb*hc_*alpha_ + hc_*Qrio + alpha_*Qrio;
 
-    //Info << "Tc = " << Tc << endl;
-    //Info << "Tb = "<< (scalarField) *this << endl;
-    //Info << "Two = "<< Two << endl;
-    //Info << "Qri = "<< Qri << endl;
-    //Info << "q = "<< q << endl;
-
-    //Info << "q1 = " << hc_*(*this - Two) << endl;
-    //Info << "q2 = " << Qro + alpha_*(Two - Tinf_) << endl;
-    //Info << "q3 = "<< term*(Tc - *this) + Qri << endl;
-
     valueFraction() = 1.0 / (1.0 + Tb*term*(hc_ + alpha_)/term2);
     refValue() =
         Tb*(hc_*alpha_*Tinf_ - hc_*Qro + (hc_ + alpha_)*(Qri + Qrio))/term2;

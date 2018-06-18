@@ -128,16 +128,17 @@ public:
             virtual void evaluate(const Pstream::commsTypes commsType);
 
             //- Calculate the thermal diffusivity
-            virtual void calcThermalDiffusivity
+            virtual tmp<scalarField> calcThermalDiffusivity
             (
-                chtRegionCoupleBase& owner,
-                const chtRegionCoupleBase& neighbour
+                const chtRegionCoupleBase& owner,
+                const chtRegionCoupleBase& neighbour,
+                const chtRcTemperatureFvPatchScalarField& TwOwn
             ) const;
 
             //- Calculate the temperature
-            virtual void calcTemperature
+            virtual tmp<scalarField> calcTemperature
             (
-                chtRcTemperatureFvPatchScalarField& owner,
+                const chtRcTemperatureFvPatchScalarField& TwOwn,
                 const chtRcTemperatureFvPatchScalarField& neighbour,
                 const chtRegionCoupleBase& ownerK
             ) const;

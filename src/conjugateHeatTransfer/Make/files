@@ -27,6 +27,7 @@ $(BCs)/controlledParabolicVelocity/controlledParabolicVelocityFvPatchVectorField
 $(BCs)/chtRegionCoupleBase/chtRegionCoupleBase.C
 $(BCs)/chtRcThermalDiffusivity/chtRcThermalDiffusivityFvPatchScalarField.C
 $(BCs)/chtRcTemperature/chtRcTemperatureFvPatchScalarField.C
+$(BCs)/chtRcSolidTemperature/chtRcSolidTemperatureFvPatchScalarField.C
 $(BCs)/chtRcThermalDiffusivityResistance/chtRcThermalDiffusivityResistanceFvPatchScalarField.C
 $(BCs)/chtRcThermalDiffusivitySlave/chtRcThermalDiffusivitySlaveFvPatchScalarField.C
 
