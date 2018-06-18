@@ -5,7 +5,8 @@
     // Momentum equation
     fvVectorMatrix UEqn
     (
-        fvm::div(phi, U)
+        fvm::ddt(U)
+      + fvm::div(phi, U)
       + turbulence->divDevReff()
     );
 

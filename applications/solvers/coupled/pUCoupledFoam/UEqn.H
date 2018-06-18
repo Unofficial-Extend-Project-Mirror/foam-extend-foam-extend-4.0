@@ -2,12 +2,20 @@
     // Momentum equation
     fvVectorMatrix UEqn
     (
-        fvm::div(phi, U)
+        fvm::ddt(U)
+      + fvm::div(phi, U)
       + turbulence->divDevReff()
     );
 
     rAU = 1.0/UEqn.A();
 
+    if (gMin(rAU) < 0)
+    {
+        WarningIn(args.executable())
+            << "Negative rAU detected.  Check mesh and discretisation"
+            << endl;
+    }
+    
     // Under-relax momentum. Note this will destroy the H and A
     UEqn.relax();
 
