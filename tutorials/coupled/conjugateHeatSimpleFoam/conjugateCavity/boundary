@@ -16,49 +16,45 @@ FoamFile
 
 5
 (
-movingWall
-{
-    type wall;
-    nFaces 10;
-    startFace 180;
-}
+    movingWall
+    {
+        type wall;
+        nFaces 10;
+        startFace 180;
+    }
+    left
+    {
+        type wall;
+        nFaces 10;
+        startFace 190;
+    }
+    right
+    {
+        type regionCouple;
+        nFaces 10;
+        startFace 200;
 
-left
-{
-    type wall;
-    nFaces 10;
-    startFace 190;
-}
+        shadowRegion    solid;
+        shadowPatch     left;
+        attached        off;
+        isWall          on;
 
-right
-{
-    type regionCouple;
-    nFaces 10;
-    startFace 200;
-
-    shadowRegion    solid;
-    shadowPatch     left;
-    attached        off;
-    isWall          on;
-
-    zone            rightZone;
-    master          on;
-    bridgeOverlap   off;
-}
-
-bottom
-{
-    type wall;
-    nFaces 10;
-    startFace 210;
-}
-
-frontAndBack
-{
-    type empty;
-    nFaces 200;
-    startFace 220;
-}
+        zone            rightZone;
+        master          on;
+        bridgeOverlap   off;
+    }
+    bottom
+    {
+        type wall;
+        nFaces 10;
+        startFace 210;
+    }
+    frontAndBack
+    {
+        type empty;
+        nFaces 200;
+        startFace 220;
+    }
 )
 
 
