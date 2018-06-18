@@ -11,33 +11,31 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0";
-    object      epsilon;
+    object      nut;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 2 -3 0 0 0 0];
+dimensions      [0 2 -1 0 0 0 0];
 
-internalField   uniform 14.855;
+internalField   uniform 0;
 
 boundaryField
 {
     lowerWall
     {
-        type            epsilonWallFunction;
-        refValue        uniform 0;
-        value           uniform 14.855;
+        type            nutWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
+        value           uniform 0;
     }
     upperWall
     {
-        type            epsilonWallFunction;
-        refValue        uniform 0;
-        value           uniform 14.855;
+        type            nutWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
+        value           uniform 0;
     }
     defaultFaces
     {
