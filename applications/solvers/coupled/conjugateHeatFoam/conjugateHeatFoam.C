@@ -47,10 +47,11 @@ int main(int argc, char *argv[])
 {
 #   include "setRootCase.H"
 #   include "createTime.H"
-#   include "createFluidMesh.H"
+#   include "createMesh.H"
 #   include "createSolidMesh.H"
 
     pisoControl piso(mesh);
+    simpleControl simpleSolid(solidMesh);
 
 #   include "readGravitationalAcceleration.H"
 #   include "createFields.H"
@@ -72,7 +73,7 @@ int main(int argc, char *argv[])
 #       include "CourantNo.H"
 #       include "setDeltaT.H"
 
-        // Detach patches
+        // Detach coupled CHT patches
 #       include "detachPatches.H"
 
 #       include "UEqn.H"
@@ -99,7 +100,7 @@ int main(int argc, char *argv[])
         rhoCpsolid.oldTime();
         rhoCpsolid = solidThermo.rho()*solidThermo.C();
 
-        // Coupled patches
+        // Attached coupled CHT patches
 #       include "attachPatches.H"
 
         kappaEff.correctBoundaryConditions();
