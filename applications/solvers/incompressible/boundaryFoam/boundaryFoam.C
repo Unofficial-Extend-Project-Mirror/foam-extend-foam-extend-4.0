@@ -80,22 +80,11 @@ int main(int argc, char *argv[])
         U += (Ubar - UbarStar);
         gradP += (Ubar - UbarStar)/(1.0/UEqn.A())().weightedAverage(mesh.V());
 
-        label id = y.size() - 1;
-
-        scalar wallShearStress =
-            flowDirection & turbulence->R()()[id] & wallNormal;
-
-        scalar yplusWall
-//            = Foam::sqrt(mag(wallShearStress))*y[id]/laminarTransport.nu()()[id];
-            = Foam::sqrt(mag(wallShearStress))*y[id]/turbulence->nuEff()()[id];
-
         Info<< "Uncorrected Ubar = " << (flowDirection & UbarStar.value())<< tab
-            << "pressure gradient = " << (flowDirection & gradP.value()) << tab
-            << "min y+ = " << yplusWall << endl;
-
+            << "pressure gradient = " << (flowDirection & gradP.value())
+            << endl;
 
         turbulence->correct();
-
 
         if (runTime.outputTime())
         {
@@ -113,26 +102,6 @@ int main(int argc, char *argv[])
             );
 
             runTime.write();
-
-            const word& gFormat = runTime.graphFormat();
-
-            makeGraph(y, flowDirection & U, "Uf", gFormat);
-
-            makeGraph(y, laminarTransport.nu(), gFormat);
-
-            makeGraph(y, turbulence->k(), gFormat);
-            makeGraph(y, turbulence->epsilon(), gFormat);
-
-            //makeGraph(y, flowDirection & R & flowDirection, "Rff", gFormat);
-            //makeGraph(y, wallNormal & R & wallNormal, "Rww", gFormat);
-            //makeGraph(y, flowDirection & R & wallNormal, "Rfw", gFormat);
-
-            //makeGraph(y, sqrt(R.component(tensor::XX)), "u", gFormat);
-            //makeGraph(y, sqrt(R.component(tensor::YY)), "v", gFormat);
-            //makeGraph(y, sqrt(R.component(tensor::ZZ)), "w", gFormat);
-            makeGraph(y, R.component(tensor::XY), "uv", gFormat);
-
-            makeGraph(y, mag(fvc::grad(U)), "gammaDot", gFormat);
         }
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
