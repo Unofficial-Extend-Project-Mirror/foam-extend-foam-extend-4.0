@@ -19,6 +19,8 @@ $(alphatWallFunctions)/alphatWallFunction/alphatWallFunctionFvPatchScalarField.C
 mutWallFunctions = $(wallFunctions)/mutWallFunctions
 $(mutWallFunctions)/mutWallFunction/mutWallFunctionFvPatchScalarField.C
 $(mutWallFunctions)/mutLowReWallFunction/mutLowReWallFunctionFvPatchScalarField.C
+$(mutWallFunctions)/mutkWallFunction/mutkWallFunctionFvPatchScalarField.C
+
 
 epsilonWallFunctions = $(wallFunctions)/epsilonWallFunctions
 $(epsilonWallFunctions)/epsilonWallFunction/epsilonWallFunctionFvPatchScalarField.C
