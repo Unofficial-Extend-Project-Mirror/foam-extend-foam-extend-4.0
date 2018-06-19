@@ -25,7 +25,7 @@ Class
     Foam::incompressible::RASModels::nutWallFunctionFvPatchScalarField
 
 Description
-    Abstract base class for oundary condition for turbulent (kinematic)
+    Abstract base class for boundary condition for turbulent (kinematic)
     viscosity when using wall functions
     - replicates OpenFOAM v1.5 (and earlier) behaviour
 

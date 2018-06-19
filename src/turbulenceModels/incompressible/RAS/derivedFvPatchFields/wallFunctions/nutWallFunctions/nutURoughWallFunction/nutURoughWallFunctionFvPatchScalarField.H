@@ -212,8 +212,6 @@ public:
             }
 
 
-    // I-O
-
         // Evaluation functions
 
             //- Calculate and return the yPlus at the boundary

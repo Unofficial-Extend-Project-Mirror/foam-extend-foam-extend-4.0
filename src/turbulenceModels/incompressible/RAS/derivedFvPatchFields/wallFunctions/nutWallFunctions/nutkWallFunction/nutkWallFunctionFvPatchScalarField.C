@@ -62,9 +62,9 @@ tmp<scalarField> nutkWallFunctionFvPatchScalarField::calcNut() const
 
     forAll(nutw, faceI)
     {
-        const label cellI = fc[faceI];
+        const label faceCellI = fc[faceI];
 
-        const scalar yPlus = Cmu25*y[faceI]*sqrt(k[cellI])/nuw[faceI];
+        const scalar yPlus = Cmu25*y[faceI]*sqrt(k[faceCellI])/nuw[faceI];
 
         if (yPlus > yPlusLam_)
         {

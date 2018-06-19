@@ -109,7 +109,7 @@ tmp<scalarField> nutkRoughWallFunctionFvPatchScalarField::calcNut() const
                     min
                     (
                         nuw[faceI]
-                       *(yPlus*kappa_/log(max(Edash*yPlus, 1+1e-4)) - 1),
+                       *(yPlus*kappa_/log(max(Edash*yPlus, 1 + 1e-4)) - 1.0),
                         2*limitingNutw
                     ), 0.5*limitingNutw
                 );

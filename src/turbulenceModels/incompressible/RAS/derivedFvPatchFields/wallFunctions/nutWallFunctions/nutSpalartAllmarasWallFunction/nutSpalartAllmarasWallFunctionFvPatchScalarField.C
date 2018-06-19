@@ -65,16 +65,18 @@ tmp<scalarField> nutSpalartAllmarasWallFunctionFvPatchScalarField::calcUTau
     const scalarField& magGradU
 ) const
 {
+    const label patchI = patch().index();
+
     const turbulenceModel& turbModel =
         db().lookupObject<turbulenceModel>("turbulenceModel");
 
-    const scalarField& y = turbModel.y()[patch().index()];
+    const scalarField& y = turbModel.y()[patchI];
 
     const fvPatchVectorField& Uw =
-        turbModel.U().boundaryField()[patch().index()];
+        turbModel.U().boundaryField()[patchI];
     const scalarField magUp = mag(Uw.patchInternalField() - Uw);
 
-    const scalarField& nuw = turbModel.nu().boundaryField()[patch().index()];
+    const scalarField& nuw = turbModel.nu().boundaryField()[patchI];
     const scalarField& nutw = *this;
 
     tmp<scalarField> tuTau(new scalarField(patch().size(), 0.0));
@@ -111,6 +113,7 @@ tmp<scalarField> nutSpalartAllmarasWallFunctionFvPatchScalarField::calcUTau
                 ut = uTauNew;
 
             } while (ut > VSMALL && err > 0.01 && ++iter < 10);
+
             uTau[faceI] = max(0.0, ut);
         }
     }
