@@ -33,7 +33,7 @@ boundaryField
     }
     upperWall
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -41,7 +41,7 @@ boundaryField
     }
     lowerWall
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -49,7 +49,7 @@ boundaryField
     }
     lowerWallInterface
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -57,7 +57,7 @@ boundaryField
     }
     lowerWallInlet
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;

@@ -23,17 +23,17 @@ boundaryField
 {
     leftWall
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         value           uniform 0;
     }
     rightWall
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         value           uniform 0;
     }
     lowerWall
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         value           uniform 0;
     }
     atmosphere

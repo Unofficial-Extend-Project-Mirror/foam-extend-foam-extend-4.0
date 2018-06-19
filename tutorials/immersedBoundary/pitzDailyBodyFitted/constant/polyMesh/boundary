@@ -9,42 +9,45 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      nut;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 2 -1 0 0 0 0];
-
-internalField   uniform 0;
-
-boundaryField
-{
-    ground
+5
+(
+    inlet
     {
-        type            nutkWallFunction;
-        value           uniform 0;
+        type            patch;
+        nFaces          30;
+        startFace       24170;
     }
-
-    igloo_region0
+    outlet
     {
-        type            nutkWallFunction;
-        value           uniform 0;
+        type            patch;
+        nFaces          57;
+        startFace       24200;
     }
-
-    twoFridgeFreezers_seal_0
+    upperWall
     {
-        type            nutkWallFunction;
-        value           uniform 0;
+        type            wall;
+        nFaces          223;
+        startFace       24257;
     }
-
-    twoFridgeFreezers_herring_1
+    lowerWall
     {
-        type            nutkWallFunction;
-        value           uniform 0;
+        type            wall;
+        nFaces          250;
+        startFace       24480;
     }
-}
+    frontAndBack
+    {
+        type            empty;
+        nFaces          24450;
+        startFace       24730;
+    }
+)
 
 
 // ************************************************************************* //
