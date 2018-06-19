@@ -141,12 +141,6 @@ public:
 
             //- Calculate and return the yPlus at the boundary
             virtual tmp<scalarField> yPlus() const;
-
-
-        // I-O
-
-            //- Write
-            virtual void write(Ostream& os) const;
 };
 
 

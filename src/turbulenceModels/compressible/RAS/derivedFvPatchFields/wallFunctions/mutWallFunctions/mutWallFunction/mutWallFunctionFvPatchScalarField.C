@@ -38,6 +38,8 @@ namespace compressible
 namespace RASModels
 {
 
+defineTypeNameAndDebug(mutWallFunctionFvPatchScalarField, 0);
+
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
 void mutWallFunctionFvPatchScalarField::checkType()

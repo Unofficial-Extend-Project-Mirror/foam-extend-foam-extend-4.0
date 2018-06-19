@@ -38,6 +38,8 @@ namespace incompressible
 namespace RASModels
 {
 
+defineTypeNameAndDebug(nutWallFunctionFvPatchScalarField, 0);
+
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
 void nutWallFunctionFvPatchScalarField::checkType()
