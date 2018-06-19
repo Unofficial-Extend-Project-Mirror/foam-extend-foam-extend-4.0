@@ -23,22 +23,22 @@ boundaryField
 {
     front
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         value           uniform 0;
     }
     back
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         value           uniform 0;
     }
     wall
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         value           uniform 0;
     }
     porosityWall
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         value           uniform 0;
     }
     inlet
