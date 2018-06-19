@@ -166,7 +166,7 @@ class sixDOFODE
             //- List of rotational restraints
             PtrList<rotationalRestraint> rotationalRestraints_;
 
-            //- List of combined trans and rot restraints
+            //- List of combined translational and rotational restraints
             PtrList<combinedRestraint> combinedRestraints_;
 
 

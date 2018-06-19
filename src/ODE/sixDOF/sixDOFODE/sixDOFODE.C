@@ -276,21 +276,21 @@ Foam::dimensionedVector Foam::sixDOFODE::force
     {
         rForce.value() += translationalRestraints_[trI].restrainingForce
         (
-            t, // Time
+            t,          // Time
             toRelative, // Transformation tensor
-            x, // Position in the global c.s.
-            u // Velocity in the global c.s.
+            x,          // Position in the global c.s.
+            u           // Velocity in the global c.s.
         );
     }
 
-    forAll(combinedRestraints_, trI)
+    forAll(combinedRestraints_, crI)
     {
-        rForce.value() += combinedRestraints_[trI].restrainingForce
+        rForce.value() += combinedRestraints_[crI].restrainingForce
         (
-            t, // Time
+            t,          // Time
             toRelative, // Transformation tensor
-            x, // Position in the global c.s.
-            u // Velocity in the global c.s.
+            x,          // Position in the global c.s.
+            u           // Velocity in the global c.s.
         );
     }
 
@@ -316,19 +316,19 @@ Foam::dimensionedVector Foam::sixDOFODE::moment
     {
         rMoment.value() += rotationalRestraints_[rrI].restrainingMoment
         (
-            t, // Time
+            t,          // Time
             toRelative, // Transformation tensor
-            omega // Angular velocity in local c.s.
+            omega       // Angular velocity in local c.s.
         );
     }
 
-    forAll(combinedRestraints_, rrI)
+    forAll(combinedRestraints_, crI)
     {
-        rMoment.value() += combinedRestraints_[rrI].restrainingMoment
+        rMoment.value() += combinedRestraints_[crI].restrainingMoment
         (
-            t, // Time
+            t,          // Time
             toRelative, // Transformation tensor
-            omega // Angular velocity in local c.s.
+            omega       // Angular velocity in local c.s.
         );
     }
 
