@@ -44,7 +44,7 @@ void nutWallFunctionFvPatchScalarField::checkType()
 {
     if (!patch().isWall())
     {
-        FatalErrorIn("nutWallFunctionFvPatchScalarField::checkType()")
+        FatalErrorIn(this->type() + "FvPatchScalarField::checkType()")
             << "Invalid wall function specification" << nl
             << "    Patch type for patch " << patch().name()
             << " must be wall" << nl
@@ -62,43 +62,12 @@ scalar nutWallFunctionFvPatchScalarField::calcYPlusLam
 {
     scalar ypl = 11.0;
 
-    for (int i=0; i<10; i++)
+    for (label i = 0; i < 10; ++i)
     {
         ypl = log(E*ypl)/kappa;
     }
 
     return ypl;
-}
-
-
-tmp<scalarField> nutWallFunctionFvPatchScalarField::calcNut() const
-{
-    const label patchI = patch().index();
-
-    const RASModel& rasModel = db().lookupObject<RASModel>("RASProperties");
-    const scalarField& y = rasModel.y()[patchI];
-    const tmp<volScalarField> tk = rasModel.k();
-    const volScalarField& k = tk();
-    const scalarField& nuw = rasModel.nu().boundaryField()[patchI];
-
-    const scalar Cmu25 = pow(Cmu_, 0.25);
-
-    tmp<scalarField> tnutw(new scalarField(patch().size(), 0.0));
-    scalarField& nutw = tnutw();
-
-    forAll(nutw, faceI)
-    {
-        label faceCellI = patch().faceCells()[faceI];
-
-        scalar yPlus = Cmu25*y[faceI]*sqrt(k[faceCellI])/nuw[faceI];
-
-        if (yPlus > yPlusLam_)
-        {
-            nutw[faceI] = nuw[faceI]*(yPlus*kappa_/log(E_*yPlus) - 1.0);
-        }
-    }
-
-    return tnutw;
 }
 
 
@@ -198,25 +167,14 @@ nutWallFunctionFvPatchScalarField::nutWallFunctionFvPatchScalarField
 
 void nutWallFunctionFvPatchScalarField::updateCoeffs()
 {
+    if (updated())
+    {
+        return;
+    }
+
     operator==(calcNut());
 
     fixedValueFvPatchScalarField::updateCoeffs();
-}
-
-
-tmp<scalarField> nutWallFunctionFvPatchScalarField::yPlus() const
-{
-    const label patchI = patch().index();
-
-    const RASModel& rasModel = db().lookupObject<RASModel>("RASProperties");
-    const scalarField& y = rasModel.y()[patchI];
-
-    const tmp<volScalarField> tk = rasModel.k();
-    const volScalarField& k = tk();
-    const scalarField kwc = k.boundaryField()[patchI].patchInternalField();
-    const scalarField& nuw = rasModel.nu().boundaryField()[patchI];
-
-    return pow(Cmu_, 0.25)*y*sqrt(kwc)/nuw;
 }
 
 
@@ -227,10 +185,6 @@ void nutWallFunctionFvPatchScalarField::write(Ostream& os) const
     writeEntry("value", os);
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-makePatchTypeField(fvPatchScalarField, nutWallFunctionFvPatchScalarField);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
