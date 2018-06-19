@@ -100,6 +100,25 @@ mutLowReWallFunctionFvPatchScalarField::mutLowReWallFunctionFvPatchScalarField
 {}
 
 
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+tmp<scalarField> mutLowReWallFunctionFvPatchScalarField::yPlus() const
+{
+    const label patchI = patch().index();
+    const turbulenceModel& turbModel =
+        db().lookupObject<turbulenceModel>("turbulenceModel");
+
+    const scalarField& y = turbModel.y()[patchI];
+    const fvPatchVectorField& Uw = turbModel.U().boundaryField()[patchI];
+    const scalarField& muw = turbModel.mu().boundaryField()[patchI];
+    const scalarField& rhow = turbModel.rho().boundaryField()[patchI];
+
+    const scalarField nuw = muw/rhow;
+
+    return y*sqrt(nuw*mag(Uw.snGrad()))/nuw;
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 makePatchTypeField
