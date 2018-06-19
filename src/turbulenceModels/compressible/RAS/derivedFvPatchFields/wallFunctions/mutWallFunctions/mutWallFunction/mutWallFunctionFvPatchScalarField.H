@@ -25,8 +25,8 @@ Class
     Foam::compressible::RASModels::mutWallFunctionFvPatchScalarField
 
 Description
-    Boundary condition for turbulent (kinematic) viscosity when using wall
-    functions
+    Abstract base class for boundary condition for turbulent (dynamic)
+    viscosity when using wall functions
     - replicates OpenFOAM v1.5 (and earlier) behaviour
 
 SourceFiles
@@ -73,7 +73,7 @@ protected:
         scalar yPlusLam_;
 
 
-    // Protected member functions
+    // Protected Member Functions
 
         //- Check the type of the patch
         virtual void checkType();
@@ -82,7 +82,7 @@ protected:
         virtual scalar calcYPlusLam(const scalar kappa, const scalar E) const;
 
         //- Calculate the turbulence viscosity
-        virtual tmp<scalarField> calcMut() const;
+        virtual tmp<scalarField> calcMut() const = 0;
 
         //- Write local wall function variables
         virtual void writeLocalEntries(Ostream&) const;
@@ -128,15 +128,6 @@ public:
             const mutWallFunctionFvPatchScalarField&
         );
 
-        //- Construct and return a clone
-        virtual tmp<fvPatchScalarField> clone() const
-        {
-            return tmp<fvPatchScalarField>
-            (
-                new mutWallFunctionFvPatchScalarField(*this)
-            );
-        }
-
         //- Construct as copy setting internal field reference
         mutWallFunctionFvPatchScalarField
         (
@@ -144,25 +135,13 @@ public:
             const DimensionedField<scalar, volMesh>&
         );
 
-        //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchScalarField> clone
-        (
-            const DimensionedField<scalar, volMesh>& iF
-        ) const
-        {
-            return tmp<fvPatchScalarField>
-            (
-                new mutWallFunctionFvPatchScalarField(*this, iF)
-            );
-        }
-
 
     // Member functions
 
         // Evaluation functions
 
             //- Calculate and return the yPlus at the boundary
-            virtual tmp<scalarField> yPlus() const;
+            virtual tmp<scalarField> yPlus() const = 0;
 
             //- Update the coefficients associated with the patch field
             virtual void updateCoeffs();
