@@ -26,7 +26,9 @@ Class
         mutSpalartAllmarasStandardRoughWallFunctionFvPatchScalarField
 
 Description
-    Wall function boundary condition for rough walls
+    This boundary condition is the same as mutURoughWallFunction. We will simply
+    derive from mutURoughWallFunctionFvPatchScalarField to enable backward
+    compatibility.
 
 SourceFiles
     mutSpalartAllamarasStandardWallFunctionFvPatchScalarField.C
@@ -36,7 +38,7 @@ SourceFiles
 #ifndef compressibleMutSpalartAllmarasStandardRoughWallFunctionFvPatchScalarField_H
 #define compressibleMutSpalartAllmarasStandardRoughWallFunctionFvPatchScalarField_H
 
-#include "mutWallFunctionFvPatchScalarField.H"
+#include "mutURoughWallFunctionFvPatchScalarField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -53,33 +55,8 @@ Class mutSpalartAllmarasStandardRoughWallFunctionFvPatchScalarField Declaration
 
 class mutSpalartAllmarasStandardRoughWallFunctionFvPatchScalarField
 :
-    public mutWallFunctionFvPatchScalarField
+    public mutURoughWallFunctionFvPatchScalarField
 {
-protected:
-
-    // Protected data
-
-        // Roughness parameters
-
-            //- Height
-            scalar roughnessHeight_;
-
-            //- Constant
-            scalar roughnessConstant_;
-
-            //- Scale factor
-            scalar roughnessFudgeFactor_;
-
-
-    // Protected member functions
-
-        //- Calculate yPLus
-        virtual tmp<scalarField> calcYPlus(const scalarField& magUp) const;
-
-        //- Calculate the turbulence viscosity
-        virtual tmp<scalarField> calcMut() const;
-
-
 public:
 
     //- Runtime type information
@@ -154,60 +131,6 @@ public:
                 )
             );
         }
-
-
-    // Member functions
-
-        // Access
-
-            //- Return the roughness height scale
-            const scalar& roughnessHeight() const
-            {
-                return roughnessHeight_;
-            }
-
-            //- Return reference to the roughness height to allow adjustment
-            scalar& roughnessHeight()
-            {
-                return roughnessHeight_;
-            }
-
-            //- Return the roughness constant scale
-            const scalar& roughnessConstant() const
-            {
-                return roughnessConstant_;
-            }
-
-            //- Return reference to the roughness constant to allow adjustment
-            scalar& roughnessConstant()
-            {
-                return roughnessConstant_;
-            }
-
-            //- Return the roughness scale factor
-            const scalar& roughnessFudgeFactor() const
-            {
-                return roughnessFudgeFactor_;
-            }
-
-            //- Return reference to the roughness scale factor to allow
-            //  adjustment
-            scalar& roughnessFudgeFactor()
-            {
-                return roughnessFudgeFactor_;
-            }
-
-
-        // Evaluation functions
-
-            //- Calculate and return the yPlus at the boundary
-            virtual tmp<scalarField> yPlus() const;
-
-
-        // I-O
-
-            //- Write
-            virtual void write(Ostream& os) const;
 };
 
 

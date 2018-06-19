@@ -26,7 +26,9 @@ Class
     mutSpalartAllmarasStandardWallFunctionFvPatchScalarField
 
 Description
-    Wall function boundary condition for walls
+    This boundary condition is the same as mutUWallFunction. We will simply
+    derive from nutUWallFunctionFvPatchScalarField to enable backward
+    compatibility.
 
 SourceFiles
     mutSpalartAllmarasStandardWallFunctionFvPatchScalarField.C
@@ -36,7 +38,7 @@ SourceFiles
 #ifndef compressibleMutSpalartAllmarasStandardWallFunctionFvPatchScalarField_H
 #define compressibleMutSpalartAllmarasStandardWallFunctionFvPatchScalarField_H
 
-#include "mutWallFunctionFvPatchScalarField.H"
+#include "mutUWallFunctionFvPatchScalarField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -53,19 +55,8 @@ namespace RASModels
 
 class mutSpalartAllmarasStandardWallFunctionFvPatchScalarField
 :
-    public mutWallFunctionFvPatchScalarField
+    public mutUWallFunctionFvPatchScalarField
 {
-protected:
-
-    // Protected member functions
-
-        //- Calculate yPLus
-        virtual tmp<scalarField> calcYPlus(const scalarField& magUp) const;
-
-        //- Calculate the turbulence viscosity
-        virtual tmp<scalarField> calcMut() const;
-
-
 public:
 
     //- Runtime type information
@@ -140,20 +131,6 @@ public:
                 )
             );
         }
-
-
-    // Member functions
-
-        // Evaluation functions
-
-            //- Calculate and return the yPlus at the boundary
-            virtual tmp<scalarField> yPlus() const;
-
-
-        // I-O
-
-            //- Write
-            virtual void write(Ostream& os) const;
 };
 
 
