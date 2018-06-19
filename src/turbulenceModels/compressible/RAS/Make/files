@@ -27,6 +27,7 @@ $(mutWallFunctions)/mutSpalartAllmarasStandardWallFunction/mutSpalartAllmarasSta
 $(mutWallFunctions)/mutSpalartAllmarasStandardRoughWallFunction/mutSpalartAllmarasStandardRoughWallFunctionFvPatchScalarField.C
 $(mutWallFunctions)/mutSpalartAllmarasWallFunction/mutSpalartAllmarasWallFunctionFvPatchScalarField.C
 
+backwardsCompatibility/wallFunctions/backwardsCompatibilityWallFunctions.C
 
 epsilonWallFunctions = $(wallFunctions)/epsilonWallFunctions
 $(epsilonWallFunctions)/epsilonWallFunction/epsilonWallFunctionFvPatchScalarField.C
