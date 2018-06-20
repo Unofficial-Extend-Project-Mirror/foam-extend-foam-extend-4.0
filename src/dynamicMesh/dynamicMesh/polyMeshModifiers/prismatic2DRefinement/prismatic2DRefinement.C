@@ -25,7 +25,7 @@ Author
     Vuko Vukcevic, Wikki Ltd.  All rights reserved.
 
 Notes
-    Specialisation of prismatic2DRefinement for 2D simulations on arbitrary
+    Specialisation of polyhedralRefinement for 2D simulations on arbitrary
     prismatic meshes (tet, hex, etc).
 
 \*---------------------------------------------------------------------------*/
@@ -2418,7 +2418,7 @@ void Foam::prismatic2DRefinement::setPrismatic2DUnrefinement
             << ", number of cells: " << mesh_.nCells()
             << nl
             << "Make sure to call setPrismatic2DRefinement(...) before"
-            << " calling setPrismatic2DRefinement(...)."
+            << " calling setPrismatic2DUnrefinement(...)."
             << abort(FatalError);
     }
 
@@ -2506,7 +2506,36 @@ void Foam::prismatic2DRefinement::setPrismatic2DUnrefinement
 
     // Memory management
     {
-        // Collect split faces in the hast set, guess size to prevent excessive
+        // Mark faces on empty patches to exclude them
+        boolList faceOnEmptyPatch(mesh_.nFaces(), false);
+
+        // Get boundary
+        const polyBoundaryMesh& boundaryMesh = mesh_.boundaryMesh();
+
+        // Loop through all patches
+        forAll (boundaryMesh, patchI)
+        {
+            // Get current patch
+            const polyPatch& curPatch = boundaryMesh[patchI];
+
+            // Check whether this patch is emptyPolyPatch
+            if (isA<emptyPolyPatch>(curPatch))
+            {
+                // Get start and end face labels
+                const label startFaceI = curPatch.start();
+                const label endFaceI = startFaceI + curPatch.size();
+
+                // Mark all the faces and edges on the patch
+                for (label faceI = startFaceI; faceI < endFaceI; ++faceI)
+                {
+                    // Mark face
+                    faceOnEmptyPatch[faceI] = true;
+                }
+            }
+        }
+
+
+        // Collect split faces in the hash set, guess size to prevent excessive
         // resizing
         labelHashSet splitFaces(12*splitPointsToUnrefine_.size());
 
@@ -2520,7 +2549,14 @@ void Foam::prismatic2DRefinement::setPrismatic2DUnrefinement
 
             forAll(pFaces, j)
             {
-                splitFaces.insert(pFaces[j]);
+                // Get face index
+                const label& faceI = pFaces[j];
+
+                if (!faceOnEmptyPatch[faceI])
+                {
+                    // Face is not on empty patch, insert it into hash set
+                    splitFaces.insert(faceI);
+                }
             }
         }
 
@@ -4858,18 +4894,18 @@ void Foam::prismatic2DRefinement::setSplitPointsToUnrefine
     // Algorithm: split point is uniquely defined as a point that:
     // 1. Has pointLevel_ > 0 (obviously),
     // 2. A point that has the same pointLevel_ as ALL of the points of its
-    //    faces. In other words, for each point, we will look through all the
-    //    faces of the point. For each face, we will visit points and check the
-    //    point level of all of these points. All point levels must be the same
-    //    for this point candidate to be split point. This is quite useful since
-    //    there is no need to store the refinement history
+    //    edges. In other words, for each point, we will look through all the
+    //    edges of the point. For each edges, we will visit both points and
+    //    check point levels. All point levels must be the same for this point
+    //    candidate to be a split point. This is quite useful since there is no
+    //    need to store the refinement history
 
     // Get necessary mesh data
-    const faceList& meshFaces = mesh_.faces();
-    const labelListList& meshPointFaces = mesh_.pointFaces();
+    const edgeList& meshEdges = mesh_.edges();
+    const labelListList& meshPointEdges = mesh_.pointEdges();
 
     // Loop through all points
-    forAll (meshPointFaces, pointI)
+    forAll (meshPointEdges, pointI)
     {
         // Get point level of this point
         const label& centralPointLevel = pointLevel_[pointI];
@@ -4884,21 +4920,21 @@ void Foam::prismatic2DRefinement::setSplitPointsToUnrefine
         // Flag to see whether this is a split point candidate
         bool splitPointCandidate = true;
 
-        // Get face labels for this point
-        const labelList& pFaces = meshPointFaces[pointI];
+        // Get all edge labels for this point
+        const labelList& pEdges = meshPointEdges[pointI];
 
-        // Loop through all point faces
-        forAll (pFaces, i)
+        // Loop through all point edges
+        forAll (pEdges, i)
         {
-            // Get face index and the face
-            const label& faceI = pFaces[i];
-            const face& curFace = meshFaces[faceI];
+            // Get edge index and the edge
+            const label& edgeI = pEdges[i];
+            const edge& curEdge = meshEdges[edgeI];
 
-            // Loop through points of the face
-            forAll (curFace, j)
+            // Loop through both points of the edge
+            forAll (curEdge, j)
             {
                 // Get point index
-                const label& pointJ = curFace[j];
+                const label& pointJ = curEdge[j];
 
                 if (pointLevel_[pointJ] != centralPointLevel)
                 {
@@ -4909,7 +4945,7 @@ void Foam::prismatic2DRefinement::setSplitPointsToUnrefine
                 }
                 // else: this is still potential split point candidate so
                 //       there's nothing to do
-            } // End for all points of this face
+            } // End for both points of this edge
 
             // Check whether this can't be a split point already and break out
             // immediately
@@ -4984,7 +5020,7 @@ void Foam::prismatic2DRefinement::setSplitPointsToUnrefine
 
     // Extend protected cells across points using a specified number of
     // unrefinement buffer layers
-    for (label i = 0; i < nUnrefinementBufferLayers_ + 2; ++i)
+    for (label i = 0; i < nUnrefinementBufferLayers_; ++i)
     {
         extendMarkedCellsAcrossPoints(protectedCell);
     }
@@ -5008,7 +5044,7 @@ void Foam::prismatic2DRefinement::setSplitPointsToUnrefine
     }
 
 
-    // PART 4: Ensure face consistent (2:1 constraint) and possibly point
+    // PART 4: Ensure face consistent (2:1 constraint) and possibly edge
     // consistent (4:1 constraint) unrefinement
 
     // Get necessary mesh data
