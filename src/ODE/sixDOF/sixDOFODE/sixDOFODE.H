@@ -166,7 +166,7 @@ class sixDOFODE
             //- List of rotational restraints
             PtrList<rotationalRestraint> rotationalRestraints_;
 
-            //- List of combined trans and rot restraints
+            //- List of combined translational and rotational restraints
             PtrList<combinedRestraint> combinedRestraints_;
 
 
@@ -382,6 +382,15 @@ public:
                 //- Return average rotational velocity in relative coordinate
                 //  system (evaluated at midstep)
                 virtual const dimensionedVector& omegaAverage() const = 0;
+
+
+            // Accelerations in the current time-step
+
+                //- Translational acceleration in absolute coordinate system
+                virtual dimensionedVector translationalAcceleration() const = 0;
+
+                //- Rotational acceleration in relative coordinate system
+                virtual dimensionedVector rotationalAcceleration() const = 0;
 
 
             // Rotations
