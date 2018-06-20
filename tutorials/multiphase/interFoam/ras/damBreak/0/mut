@@ -23,19 +23,19 @@ boundaryField
 {
     leftWall
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         value           uniform 0;
     }
 
     rightWall
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         value           uniform 0;
     }
 
     lowerWall
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         value           uniform 0;
     }
 

@@ -22,82 +22,80 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::incompressible::RASModels::nutRoughWallFunctionFvPatchScalarField
+    Foam::compressible::RASModels::mutkWallFunctionFvPatchScalarField
 
 Description
-    Boundary condition for turbulent (kinematic) viscosity when using wall
-    functions for rough walls.
+    Boundary condition for turbulent (dynamic) viscosity when using wall
+    functions, based on velocity.
+    - replicates OpenFOAM v1.5 (and earlier) behaviour
 
-    Manipulates the E parameter to account for roughness effects, based on
-    KsPlus.
+Usage
+    Example of the boundary condition specification:
+    \verbatim
+    <patchName>
+    {
+        type            mutUWallFunction;
+    }
+    \endverbatim
 
-    - roughness height = sand-grain roughness (0 for smooth walls)
-    - roughness constant = 0.5-1.0 (0.5 default)
+See also
+    Foam::mutWallFunctionFvPatchScalarField
 
 SourceFiles
-    nutRoughWallFunctionFvPatchScalarField.C
+    mutUWallFunctionFvPatchScalarField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef nutRoughWallFunctionFvPatchScalarField_H
-#define nutRoughWallFunctionFvPatchScalarField_H
+#ifndef mutUWallFunctionFvPatchScalarField_H
+#define mutUWallFunctionFvPatchScalarField_H
 
-#include "nutWallFunctionFvPatchScalarField.H"
+#include "mutWallFunctionFvPatchScalarField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-namespace incompressible
+namespace compressible
 {
 namespace RASModels
 {
 
 /*---------------------------------------------------------------------------*\
-           Class nutRoughWallFunctionFvPatchScalarField Declaration
+            Class mutUWallFunctionFvPatchScalarField Declaration
 \*---------------------------------------------------------------------------*/
 
-class nutRoughWallFunctionFvPatchScalarField
+class mutUWallFunctionFvPatchScalarField
 :
-    public nutWallFunctionFvPatchScalarField
+    public mutWallFunctionFvPatchScalarField
 {
 protected:
 
-    // Protected data
+    // Protected Member Functions
 
-        //- Roughness height
-        scalarField Ks_;
-
-        //- Roughness constant
-        scalarField Cs_;
-
-
-    // Protected member functions
-
-        //- Compute the roughness function
-        virtual scalar fnRough(const scalar KsPlus, const scalar Cs) const;
+        //- Calculate yPLus. Helper function
+        tmp<scalarField> calcYPlus(const scalarField& magUp) const;
 
         //- Calculate the turbulence viscosity
-        virtual tmp<scalarField> calcNut() const;
+        virtual tmp<scalarField> calcMut() const;
 
 
 public:
 
     //- Runtime type information
-    TypeName("nutRoughWallFunction");
+    TypeName("mutUWallFunction");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        nutRoughWallFunctionFvPatchScalarField
+        mutUWallFunctionFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        nutRoughWallFunctionFvPatchScalarField
+        mutUWallFunctionFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
@@ -105,20 +103,20 @@ public:
         );
 
         //- Construct by mapping given
-        //  nutRoughWallFunctionFvPatchScalarField
+        //  mutUWallFunctionFvPatchScalarField
         //  onto a new patch
-        nutRoughWallFunctionFvPatchScalarField
+        mutUWallFunctionFvPatchScalarField
         (
-            const nutRoughWallFunctionFvPatchScalarField&,
+            const mutUWallFunctionFvPatchScalarField&,
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        nutRoughWallFunctionFvPatchScalarField
+        mutUWallFunctionFvPatchScalarField
         (
-            const nutRoughWallFunctionFvPatchScalarField&
+            const mutUWallFunctionFvPatchScalarField&
         );
 
         //- Construct and return a clone
@@ -126,14 +124,14 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new nutRoughWallFunctionFvPatchScalarField(*this)
+                new mutUWallFunctionFvPatchScalarField(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        nutRoughWallFunctionFvPatchScalarField
+        mutUWallFunctionFvPatchScalarField
         (
-            const nutRoughWallFunctionFvPatchScalarField&,
+            const mutUWallFunctionFvPatchScalarField&,
             const DimensionedField<scalar, volMesh>&
         );
 
@@ -145,37 +143,22 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new nutRoughWallFunctionFvPatchScalarField(*this, iF)
+                new mutUWallFunctionFvPatchScalarField(*this, iF)
             );
         }
 
 
     // Member functions
 
-        // Mapping functions
-
-            //- Map (and resize as needed) from self given a mapping object
-            virtual void autoMap(const fvPatchFieldMapper&);
-
-            //- Reverse map the given fvPatchField onto this fvPatchField
-            virtual void rmap
-            (
-                const fvPatchScalarField&,
-                const labelList&
-            );
-
-
-        // I-O
-
-            //- Write
-            virtual void write(Ostream&) const;
+        //- Calculate and return the yPlus at the boundary
+        virtual tmp<scalarField> yPlus() const;
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace RASModels
-} // End namespace incompressible
+} // End namespace compressible
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

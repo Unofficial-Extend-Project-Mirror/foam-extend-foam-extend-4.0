@@ -23,17 +23,17 @@ boundaryField
 {
     top
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         value           uniform 0;
     }
     bottom
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         value           uniform 0;
     }
     walls
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         value           uniform 0;
     }
     symmetry

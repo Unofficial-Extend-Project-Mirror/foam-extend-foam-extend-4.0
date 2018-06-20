@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "mutRoughWallFunctionFvPatchScalarField.H"
+#include "mutkRoughWallFunctionFvPatchScalarField.H"
 #include "RASModel.H"
 #include "fvPatchFieldMapper.H"
 #include "volFields.H"
@@ -38,10 +38,9 @@ namespace compressible
 namespace RASModels
 {
 
-
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-scalar mutRoughWallFunctionFvPatchScalarField::fnRough
+scalar mutkRoughWallFunctionFvPatchScalarField::fnRough
 (
     const scalar KsPlus,
     const scalar Cs
@@ -64,38 +63,46 @@ scalar mutRoughWallFunctionFvPatchScalarField::fnRough
 }
 
 
-tmp<scalarField> mutRoughWallFunctionFvPatchScalarField::calcMut() const
+tmp<scalarField> mutkRoughWallFunctionFvPatchScalarField::calcMut() const
 {
     const label patchI = patch().index();
 
-    const RASModel& rasModel = db().lookupObject<RASModel>("RASProperties");
-    const scalarField& y = rasModel.y()[patchI];
-    const scalarField& rhow = rasModel.rho().boundaryField()[patchI];
-    const tmp<volScalarField> tk = rasModel.k();
-    const volScalarField& k = tk();
-    const scalarField& muw = rasModel.mu().boundaryField()[patchI];
+    const turbulenceModel& turbModel =
+        db().lookupObject<turbulenceModel>("turbulenceModel");
 
-    const scalar Cmu25 = pow(Cmu_, 0.25);
+    const scalarField& y = turbModel.y()[patchI];
+    const scalarField& rhow = turbModel.rho().boundaryField()[patchI];
+    const tmp<volScalarField> tk = turbModel.k();
+    const volScalarField& k = tk();
+    const scalarField& muw = turbModel.mu().boundaryField()[patchI];
+
+    const scalar Cmu25 = pow025(Cmu_);
 
     tmp<scalarField> tmutw(new scalarField(*this));
     scalarField& mutw = tmutw();
 
+    const unallocLabelList& fc = patch().faceCells();
+
     forAll(mutw, faceI)
     {
-        label faceCellI = patch().faceCells()[faceI];
+        const label faceCellI = fc[faceI];
 
-        scalar uStar = Cmu25*sqrt(k[faceCellI]);
-
-        scalar yPlus = uStar*y[faceI]/(muw[faceI]/rhow[faceI]);
-
-        scalar KsPlus = uStar*Ks_[faceI]/(muw[faceI]/rhow[faceI]);
+        const scalar uStar = Cmu25*sqrt(k[faceCellI]);
+        const scalar yPlus = uStar*y[faceI]/(muw[faceI]/rhow[faceI]);
+        const scalar KsPlus = uStar*Ks_[faceI]/(muw[faceI]/rhow[faceI]);
 
         scalar Edash = E_;
         scalar yPlusLamNew = yPlusLam_;
         if (KsPlus > 2.25)
         {
             Edash /= fnRough(KsPlus, Cs_[faceI]);
-            yPlusLamNew = rasModel.yPlusLam(kappa_, Edash);
+            yPlusLamNew = turbModel.yPlusLam(kappa_, Edash);
+        }
+
+        if (yPlus > yPlusLamNew)
+        {
+            mutw[faceI] =
+                muw[faceI]*(yPlus*kappa_/log(max(Edash*yPlus, 1 + 1e-4)) - 1);
         }
 
         if (debug)
@@ -104,13 +111,8 @@ tmp<scalarField> mutRoughWallFunctionFvPatchScalarField::calcMut() const
                 << ", KsPlus = " << KsPlus
                 << ", Edash = " << Edash
                 << ", yPlusLam = " << yPlusLam_
+                << ", mutw = " << mutw[faceI]
                 << endl;
-        }
-
-        if (yPlus > yPlusLamNew)
-        {
-            mutw[faceI] =
-                muw[faceI]*(yPlus*kappa_/log(max(Edash*yPlus, 1+1e-4)) - 1);
         }
     }
 
@@ -120,63 +122,63 @@ tmp<scalarField> mutRoughWallFunctionFvPatchScalarField::calcMut() const
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-mutRoughWallFunctionFvPatchScalarField::mutRoughWallFunctionFvPatchScalarField
+mutkRoughWallFunctionFvPatchScalarField::mutkRoughWallFunctionFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF
 )
 :
-    mutWallFunctionFvPatchScalarField(p, iF),
+    mutkWallFunctionFvPatchScalarField(p, iF),
     Ks_(p.size(), 0.0),
     Cs_(p.size(), 0.0)
 {}
 
 
-mutRoughWallFunctionFvPatchScalarField::mutRoughWallFunctionFvPatchScalarField
+mutkRoughWallFunctionFvPatchScalarField::mutkRoughWallFunctionFvPatchScalarField
 (
-    const mutRoughWallFunctionFvPatchScalarField& ptf,
+    const mutkRoughWallFunctionFvPatchScalarField& ptf,
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
     const fvPatchFieldMapper& mapper
 )
 :
-    mutWallFunctionFvPatchScalarField(ptf, p, iF, mapper),
+    mutkWallFunctionFvPatchScalarField(ptf, p, iF, mapper),
     Ks_(ptf.Ks_, mapper),
     Cs_(ptf.Cs_, mapper)
 {}
 
 
-mutRoughWallFunctionFvPatchScalarField::mutRoughWallFunctionFvPatchScalarField
+mutkRoughWallFunctionFvPatchScalarField::mutkRoughWallFunctionFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
     const dictionary& dict
 )
 :
-    mutWallFunctionFvPatchScalarField(p, iF, dict),
+    mutkWallFunctionFvPatchScalarField(p, iF, dict),
     Ks_("Ks", dict, p.size()),
     Cs_("Cs", dict, p.size())
 {}
 
 
-mutRoughWallFunctionFvPatchScalarField::mutRoughWallFunctionFvPatchScalarField
+mutkRoughWallFunctionFvPatchScalarField::mutkRoughWallFunctionFvPatchScalarField
 (
-    const mutRoughWallFunctionFvPatchScalarField& rwfpsf
+    const mutkRoughWallFunctionFvPatchScalarField& rwfpsf
 )
 :
-    mutWallFunctionFvPatchScalarField(rwfpsf),
+    mutkWallFunctionFvPatchScalarField(rwfpsf),
     Ks_(rwfpsf.Ks_),
     Cs_(rwfpsf.Cs_)
 {}
 
 
-mutRoughWallFunctionFvPatchScalarField::mutRoughWallFunctionFvPatchScalarField
+mutkRoughWallFunctionFvPatchScalarField::mutkRoughWallFunctionFvPatchScalarField
 (
-    const mutRoughWallFunctionFvPatchScalarField& rwfpsf,
+    const mutkRoughWallFunctionFvPatchScalarField& rwfpsf,
     const DimensionedField<scalar, volMesh>& iF
 )
 :
-    mutWallFunctionFvPatchScalarField(rwfpsf, iF),
+    mutkWallFunctionFvPatchScalarField(rwfpsf, iF),
     Ks_(rwfpsf.Ks_),
     Cs_(rwfpsf.Cs_)
 {}
@@ -184,34 +186,34 @@ mutRoughWallFunctionFvPatchScalarField::mutRoughWallFunctionFvPatchScalarField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void mutRoughWallFunctionFvPatchScalarField::autoMap
+void mutkRoughWallFunctionFvPatchScalarField::autoMap
 (
     const fvPatchFieldMapper& m
 )
 {
-    mutWallFunctionFvPatchScalarField::autoMap(m);
+    mutkWallFunctionFvPatchScalarField::autoMap(m);
     Ks_.autoMap(m);
     Cs_.autoMap(m);
 }
 
 
-void mutRoughWallFunctionFvPatchScalarField::rmap
+void mutkRoughWallFunctionFvPatchScalarField::rmap
 (
     const fvPatchScalarField& ptf,
     const labelList& addr
 )
 {
-    mutWallFunctionFvPatchScalarField::rmap(ptf, addr);
+    mutkWallFunctionFvPatchScalarField::rmap(ptf, addr);
 
-    const mutRoughWallFunctionFvPatchScalarField& nrwfpsf =
-        refCast<const mutRoughWallFunctionFvPatchScalarField>(ptf);
+    const mutkRoughWallFunctionFvPatchScalarField& nrwfpsf =
+        refCast<const mutkRoughWallFunctionFvPatchScalarField>(ptf);
 
-    Cs_.rmap(nrwfpsf.Cs_, addr);
     Ks_.rmap(nrwfpsf.Ks_, addr);
+    Cs_.rmap(nrwfpsf.Cs_, addr);
 }
 
 
-void mutRoughWallFunctionFvPatchScalarField::write(Ostream& os) const
+void mutkRoughWallFunctionFvPatchScalarField::write(Ostream& os) const
 {
     fvPatchField<scalar>::write(os);
     writeLocalEntries(os);
@@ -223,7 +225,7 @@ void mutRoughWallFunctionFvPatchScalarField::write(Ostream& os) const
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField(fvPatchScalarField, mutRoughWallFunctionFvPatchScalarField);
+makePatchTypeField(fvPatchScalarField, mutkRoughWallFunctionFvPatchScalarField);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

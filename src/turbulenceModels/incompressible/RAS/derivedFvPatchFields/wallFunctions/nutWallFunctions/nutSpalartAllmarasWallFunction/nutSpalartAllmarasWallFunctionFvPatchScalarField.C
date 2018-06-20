@@ -45,14 +45,16 @@ nutSpalartAllmarasWallFunctionFvPatchScalarField::calcNut() const
 {
     const label patchI = patch().index();
 
-    const RASModel& rasModel = db().lookupObject<RASModel>("RASProperties");
-    const fvPatchVectorField& Uw = rasModel.U().boundaryField()[patchI];
+    const turbulenceModel& turbModel =
+        db().lookupObject<turbulenceModel>("turbulenceModel");
+
+    const fvPatchVectorField& Uw = turbModel.U().boundaryField()[patchI];
     const scalarField magGradU = mag(Uw.snGrad());
-    const scalarField& nuw = rasModel.nu().boundaryField()[patchI];
+    const scalarField& nuw = turbModel.nu().boundaryField()[patchI];
 
     return max
     (
-        scalar(0),
+        0.0,
         sqr(calcUTau(magGradU))/(magGradU + ROOTVSMALL) - nuw
     );
 }
@@ -63,51 +65,56 @@ tmp<scalarField> nutSpalartAllmarasWallFunctionFvPatchScalarField::calcUTau
     const scalarField& magGradU
 ) const
 {
-    const RASModel& rasModel = db().lookupObject<RASModel>("RASProperties");
-    const scalarField& y = rasModel.y()[patch().index()];
+    const label patchI = patch().index();
+
+    const turbulenceModel& turbModel =
+        db().lookupObject<turbulenceModel>("turbulenceModel");
+
+    const scalarField& y = turbModel.y()[patchI];
 
     const fvPatchVectorField& Uw =
-        rasModel.U().boundaryField()[patch().index()];
+        turbModel.U().boundaryField()[patchI];
     const scalarField magUp = mag(Uw.patchInternalField() - Uw);
 
-    const scalarField& nuw = rasModel.nu().boundaryField()[patch().index()];
+    const scalarField& nuw = turbModel.nu().boundaryField()[patchI];
     const scalarField& nutw = *this;
 
     tmp<scalarField> tuTau(new scalarField(patch().size(), 0.0));
     scalarField& uTau = tuTau();
 
-    forAll(uTau, facei)
+    forAll(uTau, faceI)
     {
-        scalar magUpara = magUp[facei];
+        const scalar& magUpara = magUp[faceI];
 
-        scalar ut = sqrt((nutw[facei] + nuw[facei])*magGradU[facei]);
+        scalar ut = sqrt((nutw[faceI] + nuw[faceI])*magGradU[faceI]);
 
         if (ut > VSMALL)
         {
-            int iter = 0;
+            label iter = 0;
             scalar err = GREAT;
 
             do
             {
-                scalar kUu = min(kappa_*magUpara/ut, 50);
-                scalar fkUu = exp(kUu) - 1 - kUu*(1 + 0.5*kUu);
+                const scalar kUu = min(kappa_*magUpara/ut, 50);
+                const scalar fkUu = exp(kUu) - 1 - kUu*(1 + 0.5*kUu);
 
-                scalar f =
-                    - ut*y[facei]/nuw[facei]
+                const scalar f =
+                    - ut*y[faceI]/nuw[faceI]
                     + magUpara/ut
                     + 1/E_*(fkUu - 1.0/6.0*kUu*sqr(kUu));
 
-                scalar df =
-                    y[facei]/nuw[facei]
+                const scalar df =
+                    y[faceI]/nuw[faceI]
                   + magUpara/sqr(ut)
                   + 1/E_*kUu*fkUu/ut;
 
-                scalar uTauNew = ut + f/df;
+                const scalar uTauNew = ut + f/df;
                 err = mag((ut - uTauNew)/ut);
                 ut = uTauNew;
 
             } while (ut > VSMALL && err > 0.01 && ++iter < 10);
-            uTau[facei] = max(0.0, ut);
+
+            uTau[faceI] = max(0.0, ut);
         }
     }
 
@@ -131,6 +138,18 @@ nutSpalartAllmarasWallFunctionFvPatchScalarField
 nutSpalartAllmarasWallFunctionFvPatchScalarField::
 nutSpalartAllmarasWallFunctionFvPatchScalarField
 (
+    const fvPatch& p,
+    const DimensionedField<scalar, volMesh>& iF,
+    const dictionary& dict
+)
+:
+    nutWallFunctionFvPatchScalarField(p, iF, dict)
+{}
+
+
+nutSpalartAllmarasWallFunctionFvPatchScalarField::
+nutSpalartAllmarasWallFunctionFvPatchScalarField
+(
     const nutSpalartAllmarasWallFunctionFvPatchScalarField& ptf,
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
@@ -138,18 +157,6 @@ nutSpalartAllmarasWallFunctionFvPatchScalarField
 )
 :
     nutWallFunctionFvPatchScalarField(ptf, p, iF, mapper)
-{}
-
-
-nutSpalartAllmarasWallFunctionFvPatchScalarField::
-nutSpalartAllmarasWallFunctionFvPatchScalarField
-(
-    const fvPatch& p,
-    const DimensionedField<scalar, volMesh>& iF,
-    const dictionary& dict
-)
-:
-    nutWallFunctionFvPatchScalarField(p, iF, dict)
 {}
 
 
@@ -181,23 +188,14 @@ nutSpalartAllmarasWallFunctionFvPatchScalarField::yPlus() const
 {
     const label patchI = patch().index();
 
-    const RASModel& rasModel = db().lookupObject<RASModel>("RASProperties");
-    const scalarField& y = rasModel.y()[patchI];
-    const fvPatchVectorField& Uw = rasModel.U().boundaryField()[patchI];
-    const scalarField& nuw = rasModel.nu().boundaryField()[patchI];
+    const turbulenceModel& turbModel =
+        db().lookupObject<turbulenceModel>("turbulenceModel");
+
+    const scalarField& y = turbModel.y()[patchI];
+    const fvPatchVectorField& Uw = turbModel.U().boundaryField()[patchI];
+    const scalarField& nuw = turbModel.nu().boundaryField()[patchI];
 
     return y*calcUTau(mag(Uw.snGrad()))/nuw;
-}
-
-
-void nutSpalartAllmarasWallFunctionFvPatchScalarField::write
-(
-    Ostream& os
-) const
-{
-    fvPatchField<scalar>::write(os);
-    writeLocalEntries(os);
-    writeEntry("value", os);
 }
 
 

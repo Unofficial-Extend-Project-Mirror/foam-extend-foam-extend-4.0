@@ -38,7 +38,7 @@ boundaryField
     }
     GVBLADE
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -46,7 +46,7 @@ boundaryField
     }
     GVHUB
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -54,7 +54,7 @@ boundaryField
     }
     GVSHROUD
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -82,7 +82,7 @@ boundaryField
     }
     RUBLADE
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -90,7 +90,7 @@ boundaryField
     }
     RUHUB
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -98,7 +98,7 @@ boundaryField
     }
     RUSHROUD
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -126,7 +126,7 @@ boundaryField
     }
     DTHUB
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -134,7 +134,7 @@ boundaryField
     }
     DTSHROUD
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;

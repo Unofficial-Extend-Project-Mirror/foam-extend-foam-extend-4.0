@@ -30,6 +30,18 @@ Description
 
     Sets nut to zero, and provides an access function to calculate y+.
 
+Usage
+    Example of the boundary condition specification:
+    \verbatim
+    <patchName>
+    {
+        type            nutLowReWallFunction;
+    }
+    \endverbatim
+
+See also
+    Foam::nutWallFunctionFvPatchScalarField
+
 SourceFiles
     nutLowReWallFunctionFvPatchScalarField.C
 
@@ -59,7 +71,7 @@ class nutLowReWallFunctionFvPatchScalarField
 {
 protected:
 
-    // Protected member functions
+    // Protected Member Functions
 
         //- Calculate the turbulence viscosity
         virtual tmp<scalarField> calcNut() const;
@@ -132,6 +144,12 @@ public:
                 new nutLowReWallFunctionFvPatchScalarField(*this, iF)
             );
         }
+
+
+    // Member functions
+
+        //- Calculate and return the yPlus at the boundary
+        virtual tmp<scalarField> yPlus() const;
 };
 
 

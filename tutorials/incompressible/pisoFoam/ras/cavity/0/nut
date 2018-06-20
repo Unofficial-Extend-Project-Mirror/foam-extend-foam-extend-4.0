@@ -23,12 +23,12 @@ boundaryField
 {
     movingWall
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         value           uniform 0;
     }
     fixedWalls
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         value           uniform 0;
     }
     frontAndBack

@@ -23,7 +23,7 @@ boundaryField
 {
     walls
     {
-        type            mutWallFunction;
+        type            mutkWallFunction;
         value           uniform 0;
     }
     inlet

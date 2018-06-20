@@ -100,6 +100,22 @@ nutLowReWallFunctionFvPatchScalarField::nutLowReWallFunctionFvPatchScalarField
 {}
 
 
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+tmp<scalarField> nutLowReWallFunctionFvPatchScalarField::yPlus() const
+{
+    const label patchI = patch().index();
+    const turbulenceModel& turbModel =
+        db().lookupObject<turbulenceModel>("turbulenceModel");
+
+    const scalarField& y = turbModel.y()[patchI];
+    const scalarField& nuw = turbModel.nu().boundaryField()[patchI];
+    const fvPatchVectorField& Uw = turbModel.U().boundaryField()[patchI];
+
+    return y*sqrt(nuw*mag(Uw.snGrad()))/nuw;
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 makePatchTypeField(fvPatchScalarField, nutLowReWallFunctionFvPatchScalarField);
