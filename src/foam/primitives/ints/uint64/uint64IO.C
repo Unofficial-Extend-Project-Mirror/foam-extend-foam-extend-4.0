@@ -98,5 +98,13 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const uint64_t i)
     return os;
 }
 
+#if WM_ARCH_OPTION == 64 && darwin && __clang__
+Foam::Ostream& Foam::operator<<(Ostream& os, const uintptr_t i)
+{
+    os.write(label(i));
+    os.check("Ostream& operator<<(Ostream&, const uintptr_t)");
+    return os;
+}
+#endif
 
 // ************************************************************************* //
