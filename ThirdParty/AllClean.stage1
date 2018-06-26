@@ -98,6 +98,7 @@ uninstallPackage cmake-2.8.11 $1
 uninstallPackage cmake-2.8.12 $1
 uninstallPackage cmake-3.2.2  $1
 uninstallPackage cmake-3.3.2  $1
+uninstallPackage cmake-3.11.4  $1
 
 
 echo
@@ -107,5 +108,3 @@ echo ========================================
 echo
 
 # ----------------------------------------------------------------- end-of-file
-
-

@@ -31,10 +31,10 @@
 #     Communication libraries
 #
 #     Once this stage is built, you would normally re-initialize your
-#     foam-extend environment in order redirect foam-extend toward the 
-#     appropriate communication library 
+#     foam-extend environment in order redirect foam-extend toward the
+#     appropriate communication library
 #
-#     NOTE: This stage is optional. Use it only if you want to override 
+#     NOTE: This stage is optional. Use it only if you want to override
 #           your system communication libraries
 #
 # Requirements:
@@ -45,7 +45,7 @@
 #
 # Author:
 #     Martin Beaudoin, Hydro-Quebec, (2015)
-# 
+#
 #------------------------------------------------------------------------------
 # run from third-party directory only
 cd ${0%/*} || exit 1
@@ -104,6 +104,15 @@ then
 	( rpm_make -p openmpi-1.8.8 -s openmpi-1.8.8.spec  -u https://www.open-mpi.org/software/ompi/v1.8/downloads/openmpi-1.8.8.tar.gz \
           -f --define '_configureAdditionalArgs "$WM_THIRD_PARTY_USE_OPENMPI_188_ConfigureAdditionalArgs"')
     }
+
+    # openmpi 3.1.0
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_OPENMPI_310" ] && {
+	echo "Building openmpi 3.1.0"
+	( rpm_make -p openmpi-3.1.0 -s openmpi-3.1.0.spec  -u https://www.open-mpi.org/software/ompi/v3.1/downloads/openmpi-3.1.0.tar.gz \
+          -f --define '_configureAdditionalArgs "$WM_THIRD_PARTY_USE_OPENMPI_310_ConfigureAdditionalArgs"')
+    }
+
     # mvipich2-2.2
     #
     [ ! -z "$WM_THIRD_PARTY_USE_MVAPICH2_22" ] && {
@@ -121,5 +130,3 @@ echo ========================================
 echo
 
 # ----------------------------------------------------------------- end-of-file
-
-

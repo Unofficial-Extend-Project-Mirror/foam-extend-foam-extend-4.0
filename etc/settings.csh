@@ -167,7 +167,15 @@ set mpi_version=unknown
 
 switch ("$WM_MPLIB")
 case OPENMPI:
-    if ($?WM_THIRD_PARTY_USE_OPENMPI_188 != 0 && -d $WM_THIRD_PARTY_DIR/packages/openmpi-1.8.8/platforms/$WM_OPTIONS ) then
+    if ($?WM_THIRD_PARTY_USE_OPENMPI_310 != 0 && -d $WM_THIRD_PARTY_DIR/packages/openmpi-3.1.0/platforms/$WM_OPTIONS ) then
+        set mpi_version=openmpi-3.1.0
+
+        if ($?FOAM_VERBOSE && $?prompt) then
+            echo "Using openmpi-3.1.0 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
+        endif
+        _foamSource $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
+
+    else if ($?WM_THIRD_PARTY_USE_OPENMPI_188 != 0 && -d $WM_THIRD_PARTY_DIR/packages/openmpi-1.8.8/platforms/$WM_OPTIONS ) then
         set mpi_version=openmpi-1.8.8
 
         if ($?FOAM_VERBOSE && $?prompt) then
@@ -547,6 +555,9 @@ endif
 
 # cmake
 # ~~~~~
+if ( $?CMAKE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_CMAKE_3114 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-3.11.4/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-3.11.4/platforms/$WM_OPTIONS/etc/cmake-3.11.4.csh
+endif
 if ( $?CMAKE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_CMAKE_332 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-3.3.2/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-3.3.2/platforms/$WM_OPTIONS/etc/cmake-3.3.2.csh
 endif

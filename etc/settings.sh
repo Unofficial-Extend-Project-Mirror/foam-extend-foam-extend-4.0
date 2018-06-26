@@ -213,7 +213,16 @@ unset MPI_ARCH_PATH
 mpi_version=unknown
 case "$WM_MPLIB" in
 OPENMPI)
-    if [ ! -z $WM_THIRD_PARTY_USE_OPENMPI_188 ] && [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.8.8/platforms/$WM_OPTIONS ]
+    if [ ! -z $WM_THIRD_PARTY_USE_OPENMPI_310 ] && [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-3.1.0/platforms/$WM_OPTIONS ]
+        then
+        mpi_version=openmpi-3.1.0
+        if [ "$FOAM_VERBOSE" -a "$PS1" ]
+        then
+            echo "Using openmpi-3.1.0 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
+        fi
+        _foamSource $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.sh
+
+    elif [ ! -z $WM_THIRD_PARTY_USE_OPENMPI_188 ] && [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.8.8/platforms/$WM_OPTIONS ]
         then
         mpi_version=openmpi-1.8.8
         if [ "$FOAM_VERBOSE" -a "$PS1" ]
@@ -650,6 +659,9 @@ export MPI_BUFFER_SIZE
 
 # Load cmake
 # ~~~~~~~~~~
+[ -z "$CMAKE_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_CMAKE_3114 ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-3.11.4/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-3.11.4/platforms/$WM_OPTIONS/etc/cmake-3.11.4.sh
+}
 [ -z "$CMAKE_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_CMAKE_332 ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-3.3.2/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-3.3.2/platforms/$WM_OPTIONS/etc/cmake-3.3.2.sh
 }
