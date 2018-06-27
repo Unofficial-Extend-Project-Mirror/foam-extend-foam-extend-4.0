@@ -609,6 +609,9 @@ endif
 
 # hwloc
 # ~~~~~
+if ( $?HWLOC_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_HWLOC_201 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/hwloc-2.0.1/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-2.0.1/platforms/$WM_OPTIONS/etc/hwloc-2.0.1.csh
+endif
 if ( $?HWLOC_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_HWLOC_1101 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/hwloc-1.10.1/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-1.10.1/platforms/$WM_OPTIONS/etc/hwloc-1.10.1.csh
 endif

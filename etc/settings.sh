@@ -731,6 +731,9 @@ fi
 
 # Load hwloc
 # ~~~~~~~~~~~
+[ -z "$HWLOC_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_HWLOC_201 ] && [ -e $WM_THIRD_PARTY_DIR/packages/hwloc-2.0.1/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-2.0.1/platforms/$WM_OPTIONS/etc/hwloc-2.0.1.sh
+}
 [ -z "$HWLOC_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_HWLOC_1101 ] && [ -e $WM_THIRD_PARTY_DIR/packages/hwloc-1.10.1/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-1.10.1/platforms/$WM_OPTIONS/etc/hwloc-1.10.1.sh
 }
