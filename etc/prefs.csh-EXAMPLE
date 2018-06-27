@@ -53,6 +53,10 @@
 #setenv OPENMPI_COMPILE_FLAGS "`$OPENMPI_BIN_DIR/mpicc --showme:compile`"
 #setenv OPENMPI_LINK_FLAGS "`$OPENMPI_BIN_DIR/mpicc --showme:link`"
 
+# MPI runtime options
+#setenv MPI_BUFFER_SIZE 100000000
+#setenv MPIRUN_OPTIONS -oversubscribe  # OpenMPI version 3.1
+
 # Specify system installed ThirdParty packages/libraries
 # NB: The packages installed under $WM_THIRD_PARTY_DIR
 #     will always override these values.
