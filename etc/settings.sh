@@ -718,6 +718,12 @@ export MPI_BUFFER_SIZE
 [ -z "$PYFOAM_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_PYFOAM_064 ] && [ -e $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.4/platforms/noarch ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.4/platforms/noarch/etc/PyFoam-0.6.4.sh
 }
+[ -z "$PYFOAM_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_PYFOAM_066 ] && [ -e $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.6/platforms/noarch ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.6/platforms/noarch/etc/PyFoam-0.6.6.sh
+}
+[ -z "$PYFOAM_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_PYFOAM_069 ] && [ -e $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.9/platforms/noarch ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.9/platforms/noarch/etc/PyFoam-0.6.9.sh
+}
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PYFOAM_DIR is initialized to: $PYFOAM_DIR"
 
 # Make sure that there is a special directory for special PyFoam-scripts

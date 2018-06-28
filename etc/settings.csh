@@ -606,6 +606,12 @@ endif
 if ( $?PYFOAM_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_PYFOAM_064 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.6.4/platforms/noarch ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.4/platforms/noarch/etc/PyFoam-0.6.4.csh
 endif
+if ( $?PYFOAM_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_PYFOAM_066 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.6.6/platforms/noarch ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.6/platforms/noarch/etc/PyFoam-0.6.6.csh
+endif
+if ( $?PYFOAM_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_PYFOAM_069 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.6.9/platforms/noarch ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.9/platforms/noarch/etc/PyFoam-0.6.9.csh
+endif
 
 # hwloc
 # ~~~~~
