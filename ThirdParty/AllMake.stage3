@@ -108,6 +108,13 @@ then
 	echo "Building Mesquite 2.1.2"
 	( rpm_make -p mesquite-2.1.2 -s mesquite-2.1.2.spec -u http://downloads.sourceforge.net/project/foam-extend/ThirdParty/mesquite-2.1.2.tar.gz )
     }
+    # Mesquite 2.3.0
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_MESQUITE_230" ] && {
+	echo "Building Mesquite 2.3.0"
+	( rpm_make -p mesquite-2.3.0 -s mesquite-2.3.0.spec -u https://software.sandia.gov/mesquite/mesquite-2.3.0.tar.gz )
+	# ( rpm_make -p mesquite-2.3.0 -s mesquite-2.3.0.spec -u http://downloads.sourceforge.net/project/foam-extend/ThirdParty/mesquite-2.3.0.tar.gz )
+    }
 else
     echo "Using system installed Mesquite"
     echo ""

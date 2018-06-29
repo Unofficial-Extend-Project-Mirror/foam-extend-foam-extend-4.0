@@ -610,6 +610,10 @@ export MPI_BUFFER_SIZE
     _foamSource $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS/etc/mesquite-2.1.2.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    MESQUITE_DIR is initialized to: $MESQUITE_DIR"
+[ -z "$MESQUITE_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_MESQUITE_230 ] && [ -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.3.0/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/mesquite-2.3.0/platforms/$WM_OPTIONS/etc/mesquite-2.3.0.sh
+}
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    MESQUITE_DIR is initialized to: $MESQUITE_DIR"
 
 
 # Load Metis library

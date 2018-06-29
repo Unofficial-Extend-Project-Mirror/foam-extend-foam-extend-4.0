@@ -510,6 +510,9 @@ endif
 if ( $?MESQUITE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_MESQUITE_212 != 0 && -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS/etc/mesquite-2.1.2.csh
 endif
+if ( $?MESQUITE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_MESQUITE_230 != 0 && -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.3.0/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/mesquite-2.3.0/platforms/$WM_OPTIONS/etc/mesquite-2.3.0.csh
+endif
 
 # Metis library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
