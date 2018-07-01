@@ -71,6 +71,12 @@ then
     echo "Building Qt 5.8.0"
     ( rpm_make -p qt-everywhere-opensource-src-5.8.0 -s qt-everywhere-opensource-src-5.8.0.spec -u http://download.qt.io/archive/qt/5.8/5.8.0/single/qt-everywhere-opensource-src-5.8.0.tar.gz )
     }
+    # Qt 5.11.1
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_QT_5111" ] && {
+    echo "Building Qt 5.11.1"
+    ( rpm_make -p qt-everywhere-src-5.11.1 -s qt-everywhere-src-5.11.1.spec -u http://download.qt.io/archive/qt/5.11/5.11.1/single/qt-everywhere-src-5.11.1.tar.xz )
+    }
 else
     echo "Using system installed QT"
     echo ""
@@ -172,5 +178,3 @@ echo ========================================
 echo
 
 # ----------------------------------------------------------------- end-of-file
-
-

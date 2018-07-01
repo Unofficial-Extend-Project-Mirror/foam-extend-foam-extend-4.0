@@ -630,6 +630,9 @@ endif
 
 # QT
 # ~~~~~
+if ( $?QT_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_QT_5111 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/qt-everywhere-src-5.11.1/platforms/$WM_OPTIONS )then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-src-5.11.1/platforms/$WM_OPTIONS/etc/qt-everywhere-src-5.11.1.csh
+endif
 if ( $?QT_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_QT_580 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/qt-everywhere-opensource-src-5.8.0/platforms/$WM_OPTIONS )then
     _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-5.8.0/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-5.8.0.csh
 endif
