@@ -125,7 +125,7 @@ rpm_make()
 				#( cd SOURCES; wget --no-check-certificate $_PACKAGE_URL )
 
 				( cd SOURCES; curl --connect-timeout 60 \
-								   --max-time 10 \
+								   --max-time 3600 \
 								   --retry 6 \
 								   --retry-delay 10 \
 								   --retry-max-time 60 \
