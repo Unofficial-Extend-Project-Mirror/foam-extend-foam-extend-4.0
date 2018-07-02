@@ -78,7 +78,7 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://www.paraview.org/files/v5.4/
+URL:                    http://www.paraview.org/files/v5.5/
 Source: 		%url/%{name}-v%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
@@ -226,7 +226,7 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 export PARAVIEW_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 export PARAVIEW_BIN_DIR=\$PARAVIEW_DIR/bin
 export PARAVIEW_LIB_DIR=\$PARAVIEW_DIR/lib
-export PARAVIEW_INCLUDE_DIR=\$PARAVIEW_DIR/include/paraview-5.4
+export PARAVIEW_INCLUDE_DIR=\$PARAVIEW_DIR/include/paraview-5.5
 
 export PARAVIEW_VERSION=%{version}
 
@@ -235,9 +235,9 @@ export PARAVIEW_VERSION=%{version}
 #     specified directory to see if a given library is a paraview plugin.
 #     In the case of \$FOAM_LIBBIN, with over 80 libraries, this is a total waste of time that will slow down the
 #     startup of paraview or even make paraview crash on startup.
-export PV_PLUGIN_PATH=\$FOAM_LIBBIN/paraview-5.4_plugins
+export PV_PLUGIN_PATH=\$FOAM_LIBBIN/paraview-5.5_plugins
 
-[ -d \$PARAVIEW_LIB_DIR/paraview-5.4 ] && _foamAddLib \$PARAVIEW_LIB_DIR/paraview-5.4
+[ -d \$PARAVIEW_LIB_DIR/paraview-5.5 ] && _foamAddLib \$PARAVIEW_LIB_DIR/paraview-5.5
 
 # Enable access to the package applications if present
 [ -d \$PARAVIEW_BIN_DIR ] && _foamAddPath \$PARAVIEW_BIN_DIR
@@ -256,7 +256,7 @@ cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.cs
 setenv PARAVIEW_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 setenv PARAVIEW_BIN_DIR \$PARAVIEW_DIR/bin
 setenv PARAVIEW_LIB_DIR \$PARAVIEW_DIR/lib
-setenv PARAVIEW_INCLUDE_DIR \$PARAVIEW_DIR/include/paraview-5.4
+setenv PARAVIEW_INCLUDE_DIR \$PARAVIEW_DIR/include/paraview-5.5
 
 setenv PARAVIEW_VERSION %{version}
 
@@ -265,14 +265,14 @@ setenv PARAVIEW_VERSION %{version}
 #     specified directory to see if a given library is a paraview plugin.
 #     In the case of \$FOAM_LIBBIN, with over 80 libraries, this is a total waste of time that will slow down the
 #     startup of paraview or even make paraview crash on startup.
-setenv PV_PLUGIN_PATH \$FOAM_LIBBIN/paraview-5.4_plugins
+setenv PV_PLUGIN_PATH \$FOAM_LIBBIN/paraview-5.5_plugins
 
 if ( -e \$PARAVIEW_BIN_DIR ) then
     _foamAddPath \$PARAVIEW_BIN_DIR
 endif
 
-if ( -e \$PARAVIEW_LIB_DIR/paraview-5.4 ) then
-    _foamAddLib \$PARAVIEW_LIB_DIR/paraview-5.4
+if ( -e \$PARAVIEW_LIB_DIR/paraview-5.5 ) then
+    _foamAddLib \$PARAVIEW_LIB_DIR/paraview-5.5
 endif
 
 
