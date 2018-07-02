@@ -130,6 +130,14 @@ then
         -f --define='_qmakePath $QT_BIN_DIR/qmake'
             )
         }
+        # ParaView 5.5.2
+        #
+        [ ! -z "$WM_THIRD_PARTY_USE_PARAVIEW_552" ] && {
+            echo "Building ParaView 5.5.2"
+            ( rpm_make -p ParaView-5.5.2 -s ParaView-5.5.2.spec -u http://www.paraview.org/files/v5.5/ParaView-v5.5.2.tar.gz \
+        -f --define='_qmakePath $QT_BIN_DIR/qmake'
+            )
+        }
     else
         echo "WARNING: "
         echo "WARNING: Skipping the installation of ParaView-4.x.x."
