@@ -348,6 +348,12 @@ Foam::InjectionModel<CloudType>::~InjectionModel()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class CloudType>
+void Foam::InjectionModel<CloudType>::updateMesh()
+{
+    // do nothing
+}
+
+template<class CloudType>
 template<class TrackData>
 void Foam::InjectionModel<CloudType>::inject(TrackData& td)
 {
@@ -360,6 +366,11 @@ void Foam::InjectionModel<CloudType>::inject(TrackData& td)
     const scalar carrierDt = owner_.db().time().deltaTValue();
     const polyMesh& mesh = owner_.mesh();
 
+    // BUGFIX HR 23.06.18: Force recalculation of global data because
+    // constrainToMeshCentre is inside of an if-statement
+    mesh.geometricD();
+    mesh.bounds();
+    
     // Prepare for next time step
     label parcelsAdded = 0;
     scalar massAdded = 0.0;

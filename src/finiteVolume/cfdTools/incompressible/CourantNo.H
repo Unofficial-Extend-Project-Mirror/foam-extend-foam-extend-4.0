@@ -33,7 +33,12 @@ scalar CoNum = 0.0;
 scalar meanCoNum = 0.0;
 scalar velMag = 0.0;
 
-if (mesh.nInternalFaces())
+// HR 26.06.28: A parallel run has at least two cells and therefore at least
+// one internal face in the global mesh. It may be a processor boundary, but
+// this is captured by max(mag(phi)).
+// Old formulation hangs on parallel cases where one partition is degenerated
+// to a single cell.
+if (mesh.nInternalFaces() || Pstream::parRun())
 {
     surfaceScalarField magPhi = mag(phi);
 
@@ -47,6 +52,20 @@ if (mesh.nInternalFaces())
     meanCoNum = (sum(SfUfbyDelta)/sum(mesh.magSf())).value()*deltaT;
 
     velMag = max(magPhi/mesh.magSf()).value();
+}
+else
+{
+    // Single cell mesh: Co is still defined; use cell formulation
+
+    const scalar deltaT = runTime.deltaT().value();
+
+    const scalar deltaX = Foam::cbrt(mesh.V()[0]);
+
+    velMag = mag(U[0]);
+
+    CoNum = velMag*deltaT/deltaX;
+
+    meanCoNum = CoNum;
 }
 
 Info<< "Courant Number mean: " << meanCoNum

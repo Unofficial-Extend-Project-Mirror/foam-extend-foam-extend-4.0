@@ -155,6 +155,9 @@ fvFieldDecomposer::fvFieldDecomposer
         static_cast<processorSurfacePatchFieldDecomposer*>(NULL)
     )
 {
+    // HR 25.06.18: Weights may be required for some mappings and might hang in parallel.
+    completeMesh_.weights();
+
     forAll (boundaryAddressing_, patchi)
     {
         if (boundaryAddressing_[patchi] >= 0)

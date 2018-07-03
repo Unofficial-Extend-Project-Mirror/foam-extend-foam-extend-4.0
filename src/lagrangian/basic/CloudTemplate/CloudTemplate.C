@@ -340,6 +340,172 @@ void Foam::Cloud<ParticleType>::autoMap(const mapPolyMesh& mapper)
 
 
 template<class ParticleType>
+void Foam::Cloud<ParticleType>::split
+(
+    const labelList& cellToProc,
+    const labelListList& procCellAddressing,
+    const labelListList& procFaceAddressing,
+    List<IDLList<ParticleType> >& procParticles
+)
+{
+    // Create addressing old cell ID to new cell ID from procCellAddressing
+    labelList reverseCellMap(cellToProc.size());
+    forAll(procCellAddressing, procI)
+    {
+        const labelList& procCell = procCellAddressing[procI];
+
+        forAll(procCell, cellI)
+        {
+            reverseCellMap[procCell[cellI]] = cellI;
+        }
+    }
+
+    labelList reverseFaceMap(polyMesh_.nFaces());
+    forAll(procFaceAddressing, procI)
+    {
+        const labelList& procFace = procFaceAddressing[procI];
+
+        forAll(procFace, faceI)
+        {
+            reverseFaceMap[mag(procFace[faceI])-1] = faceI;
+        }
+    }
+
+    if (cloud::debug)
+    {
+        Pout << "printing cloud before splitting" << endl;
+
+        forAllConstIter(typename Cloud<ParticleType>, *this, pIter)
+        {
+            const ParticleType& p = pIter();
+
+            Pout << p.celli_ << " "
+                << p.facei_ << " "
+                << p.position() << " "
+                << p.inCell() << endl;
+        }
+    }
+
+    // Loop over all particles
+    forAllIter(typename Cloud<ParticleType>, *this, pIter)
+    {
+        ParticleType& p = pIter();
+
+        const label newProc = cellToProc[p.celli_];
+
+        // Map cellID and faceID of the particle to new mesh
+        p.celli_ = reverseCellMap[p.celli_];
+
+        if (p.facei_ >= 0)
+        {
+            // HR 29.06.17: face mapping not tested. Did not occur in test cases.
+            p.facei_ = reverseFaceMap[p.facei_];
+        }
+
+        if (newProc != Pstream::myProcNo())
+        {
+            // Add for transfer to new processor and delete from local cloud
+            procParticles[newProc].append(this->remove(&p));
+        }
+    }
+}
+
+
+template<class ParticleType>
+void Foam::Cloud<ParticleType>::rebuild
+(
+    List<IDLList<ParticleType> >& receivedClouds,
+    const PtrList<labelIOList>& cellProcAddressing,
+    const PtrList<labelIOList>& faceProcAddressing
+)
+{
+    {
+        const labelList& procCell = cellProcAddressing[Pstream::myProcNo()];
+        const labelList& procFace = faceProcAddressing[Pstream::myProcNo()];
+
+        // Particles in local cloud. Map cellID and faceID in-place
+        forAllIter
+        (
+            typename Cloud<ParticleType>,
+            *this,
+            pIter
+        )
+        {
+            ParticleType& p = pIter();
+
+            // Map cellID and faceID of the particle to new mesh
+            p.celli_ = procCell[p.celli_];
+
+            if (p.facei_ >= 0)
+            {
+                // HR 29.06.17: face mapping not tested. Did not occur in test cases.
+                p.facei_ = procFace[p.facei_];
+            }
+        }
+    }
+
+    forAll(cellProcAddressing, procI)
+    {
+        if (!cellProcAddressing.set(procI))
+        {
+            continue;
+        }
+
+        const labelList& procCell = cellProcAddressing[procI];
+        const labelList& procFace = faceProcAddressing[procI];
+
+        IDLList<ParticleType>& receivedCloud = receivedClouds[procI];
+
+        // Particles received from other processors. To be added to local cloud
+        forAllIter
+        (
+            typename Cloud<ParticleType>,
+            receivedCloud,
+            newpIter
+        )
+        {
+            ParticleType& newp = newpIter();
+
+            // Map cellID and faceID of the particle to new mesh
+            newp.celli_ = procCell[newp.celli_];
+
+            if (newp.facei_ >= 0)
+            {
+                // HR 29.06.17: face mapping not tested. Did not occur in test cases.
+                newp.facei_ = procFace[newp.facei_];
+            }
+
+            // Add to cloud and remove from transfer list
+            this->addParticle(receivedCloud.remove(&newp));
+        }
+    }
+
+
+    if (cloud::debug)
+    {
+        Pout << "printing cloud after rebuild" << endl;
+
+        forAllIter
+        (
+            typename Cloud<ParticleType>,
+            *this,
+            pIter
+        )
+        {
+            const ParticleType& p = pIter();
+
+            Pout << p.celli_ << " "
+                << p.facei_ << " "
+                << p.position() << " "
+                << p.inCell() << endl;
+        }
+    }
+
+    this->updateMesh();
+}
+
+
+template<class ParticleType>
 void Foam::Cloud<ParticleType>::writePositions() const
 {
     OFstream pObj
