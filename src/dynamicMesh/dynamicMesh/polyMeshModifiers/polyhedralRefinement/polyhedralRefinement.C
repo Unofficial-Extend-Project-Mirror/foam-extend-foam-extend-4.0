@@ -355,9 +355,22 @@ void Foam::polyhedralRefinement::extendMarkedCellsAcrossFaces
     {
         if (markedFace[faceI])
         {
-            // Face will be marked, mark both owner and neighbour
-            markedCell[owner[faceI]] = true;
-            markedCell[neighbour[faceI]] = true;
+            // Face is marked, mark both owner and neighbour if the maximum
+            // refinement level is not exceeded
+            const label& own = owner[faceI];
+            const label& nei = neighbour[faceI];
+
+            if (cellLevel_[own] < maxRefinementLevel_)
+            {
+                // Mark owner
+                markedCell[own] = true;
+            }
+
+            if (cellLevel_[nei] < maxRefinementLevel_)
+            {
+                // Mark neighbour
+                markedCell[nei] = true;
+            }
         }
     }
 
@@ -366,8 +379,15 @@ void Foam::polyhedralRefinement::extendMarkedCellsAcrossFaces
     {
         if (markedFace[faceI])
         {
-            // Face will be markedd, mark owner
-            markedCell[owner[faceI]] = true;
+            // Face is marked, mark owner if the maximum refinement level is not
+            // exceeded
+            const label& own = owner[faceI];
+
+            if (cellLevel_[own] < maxRefinementLevel_)
+            {
+                // Mark owner
+                markedCell[own] = true;
+            }
         }
     }
 }
@@ -3154,27 +3174,42 @@ Foam::label Foam::polyhedralRefinement::faceConsistentUnrefinement
             // unrefine owner
 
             // Check whether the cell has not been marked for unrefinement
+            // Note: this "redundancy" check should not be performed if we are
+            // running with dynamic load balancing. If an ordinary face with
+            // standard consistency (2:1) becomes a processor face with more
+            // stringent consistency (1:1), the refinement still remains valid,
+            // even though the 1:1 consistency is not achieved for this time
+            // step. Doing further refinement will make sure that this does not
+            // exceed at least 2:1 consistency and therefore 2:1 edge
+            // consistency as well. Instead of issuing a FatalError, issue a
+            // Warning and wrap it into debug
             if (!cellsToUnrefine[own])
             {
-                FatalErrorIn
-                (
-                    "label polyhedralRefinement::faceConsistentUnrefinement"
-                    "(boolList& cellsToUnrefine)"
-                )   << "Boundary cell not marked for unrefinement, indicating a"
-                    << " previous unnoticed problem with unrefinement."
-                    << nl
-                    << "Owner: " << own
-                    << nl
-                    << "Owner level: " << curOwnLevel
-                    << ", neighbour level: " << neiLevel[i] << nl
-                    << "This is probably because the refinement and "
-                    << "unrefinement regions are very close." << nl
-                    << "Try increasing nUnrefinementBufferLayers. "
-                    << abort(FatalError);
+                if (debug)
+                {
+                    WarningIn
+                    (
+                        "label polyhedralRefinement::faceConsistentUnrefinement"
+                        "(boolList& cellsToUnrefine)"
+                    )   << "Boundary cell not marked for unrefinement,"
+                        << " indicating a previous unnoticed problem with"
+                        << " unrefinement."
+                        << nl
+                        << "Owner: " << own
+                        << nl
+                        << "Owner level: " << curOwnLevel
+                        << ", neighbour level: " << neiLevel[i] << nl
+                        << "This is probably because the refinement and "
+                        << "unrefinement regions are very close." << nl
+                        << "Try increasing nUnrefinementBufferLayers. "
+                        << abort(FatalError);
+                }
             }
-
-            cellsToUnrefine[own] = false;
-            ++nRemCells;
+            else
+            {
+                cellsToUnrefine[own] = false;
+                ++nRemCells;
+            }
         }
 
         // Note: other possibility (that neighbour level is smaller than owner
@@ -3788,7 +3823,7 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
 
     // Extend protected cells across points using a specified number of
     // unrefinement buffer layers
-    for (label i = 0; i < nUnrefinementBufferLayers_ + 2; ++i)
+    for (label i = 0; i < nUnrefinementBufferLayers_; ++i)
     {
         extendMarkedCellsAcrossPoints(protectedCell);
     }
