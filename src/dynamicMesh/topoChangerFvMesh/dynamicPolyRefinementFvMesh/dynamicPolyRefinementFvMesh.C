@@ -165,7 +165,7 @@ Foam::dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh
                 "\n)"
             )   << "1D case detected. No valid refinement strategy is"
                 <<  " available for 1D cases."
-                << abort(FatalErrorIn);
+                << abort(FatalError);
             break;
 
         default:
@@ -180,7 +180,7 @@ Foam::dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh
                 << nGeometricDirs
                 << nl << "It appears that this mesh is neither 1D, 2D or 3D."
                 << nl << " the mesh."
-                << abort(FatalErrorIn);
+                << abort(FatalError);
 
     }
 
