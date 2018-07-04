@@ -27,17 +27,9 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "polyhedralRefinement.H"
-#include "polyTopoChanger.H"
-#include "polyMesh.H"
-#include "foamTime.H"
-#include "primitiveMesh.H"
-#include "polyTopoChange.H"
-#include "syncTools.H"
-#include "meshTools.H"
 #include "cellSet.H"
 #include "faceSet.H"
 #include "pointSet.H"
-#include "mapPolyMesh.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
