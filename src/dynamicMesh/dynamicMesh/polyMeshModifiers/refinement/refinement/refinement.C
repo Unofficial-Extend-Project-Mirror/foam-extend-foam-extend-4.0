@@ -1400,8 +1400,8 @@ Foam::refinement::refinement
             << " unrefinement buffer layers and " << nRefinementBufferLayers_
             << " refinement buffer layers."
             << nl
-            << "Make sure that the number of refinement buffer layers is "
-            << "at least nUnrefinementBufferLayers + 2" << nl
+            << "Make sure that the number of unrefinement buffer layers is "
+            << "at least nRefinementBufferLayers + 2" << nl
             << "in order to avoid problems with edge level inconsistency when "
             << "refinement and unrefinement are performed in same iteration."
             << endl;
