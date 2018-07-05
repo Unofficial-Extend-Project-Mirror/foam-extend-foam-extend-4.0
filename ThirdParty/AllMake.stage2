@@ -105,12 +105,12 @@ then
           -f --define '_configureAdditionalArgs "$WM_THIRD_PARTY_USE_OPENMPI_188_ConfigureAdditionalArgs"')
     }
 
-    # openmpi 3.1.0
+    # openmpi 3.1.1
     #
-    [ ! -z "$WM_THIRD_PARTY_USE_OPENMPI_310" ] && {
-	echo "Building openmpi 3.1.0"
-	( rpm_make -p openmpi-3.1.0 -s openmpi-3.1.0.spec  -u https://www.open-mpi.org/software/ompi/v3.1/downloads/openmpi-3.1.0.tar.gz \
-          -f --define '_configureAdditionalArgs "$WM_THIRD_PARTY_USE_OPENMPI_310_ConfigureAdditionalArgs"')
+    [ ! -z "$WM_THIRD_PARTY_USE_OPENMPI_311" ] && {
+	echo "Building openmpi 3.1.1"
+	( rpm_make -p openmpi-3.1.1 -s openmpi-3.1.1.spec  -u https://www.open-mpi.org/software/ompi/v3.1/downloads/openmpi-3.1.1.tar.gz \
+          -f --define '_configureAdditionalArgs "$WM_THIRD_PARTY_USE_OPENMPI_311_ConfigureAdditionalArgs"')
     }
 
     # mvipich2-2.2

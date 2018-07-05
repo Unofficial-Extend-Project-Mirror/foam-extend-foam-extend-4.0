@@ -167,11 +167,11 @@ set mpi_version=unknown
 
 switch ("$WM_MPLIB")
 case OPENMPI:
-    if ($?WM_THIRD_PARTY_USE_OPENMPI_310 != 0 && -d $WM_THIRD_PARTY_DIR/packages/openmpi-3.1.0/platforms/$WM_OPTIONS ) then
-        set mpi_version=openmpi-3.1.0
+    if ($?WM_THIRD_PARTY_USE_OPENMPI_311 != 0 && -d $WM_THIRD_PARTY_DIR/packages/openmpi-3.1.1/platforms/$WM_OPTIONS ) then
+        set mpi_version=openmpi-3.1.1
 
         if ($?FOAM_VERBOSE && $?prompt) then
-            echo "Using openmpi-3.1.0 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
+            echo "Using openmpi-3.1.1 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
         endif
         _foamSource $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
 
