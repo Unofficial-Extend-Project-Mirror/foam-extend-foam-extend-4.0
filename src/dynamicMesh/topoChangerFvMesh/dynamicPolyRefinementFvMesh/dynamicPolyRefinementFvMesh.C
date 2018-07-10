@@ -111,7 +111,11 @@ Foam::dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh
     ),
     curTimeIndex_(-1),
 
-    refinementSelectionPtr_(refinementSelection::New(*this, refinementDict_))
+    // Note: initialize refinement selection algorithm after the refinement
+    // polyMeshModifier has been set. It is possible that the selection
+    // algorithm needs cellLevel and pointLevel (see e.g.
+    // protectedInitialRefinement)
+    refinementSelectionPtr_()
 {
     // Only one topo changer engine
     topoChanger_.setSize(1);
@@ -188,6 +192,9 @@ Foam::dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh
     topoChanger_.writeOpt() = IOobject::AUTO_WRITE;
     topoChanger_.write();
     write();
+
+    // Initialize refinement selection algorithm after modifiers
+    refinementSelectionPtr_ = refinementSelection::New(*this, refinementDict_);
 }
 
 
