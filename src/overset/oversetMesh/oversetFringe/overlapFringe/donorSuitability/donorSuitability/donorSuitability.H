@@ -26,7 +26,7 @@ Class
 
 Description
     An abstract base class for donor suitability algorithms. This class is
-    used by overlapFringe algorithm to optimise overlap given donor suitability
+    used by oversetFringe algorithm to optimise overlap given donor suitability
     function.
 
     Donor suitability criteria is given in isDonorSuitable member function. The
@@ -42,6 +42,9 @@ SourceFiles
 
 Author
     Vuko Vukcevic, FMENA Zagreb.  All rights reserved.
+
+Contributor
+    Josip Katavic, FMENA Zagreb.  All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
@@ -61,7 +64,7 @@ namespace Foam
 {
 
 // Forward declaration of classes
-class overlapFringe;
+class oversetFringe;
 
 namespace donorSuitability
 {
@@ -74,8 +77,8 @@ class donorSuitability
 {
     // Private data
 
-        //- Reference to overlapFringe algorithm
-        const overlapFringe& overlapFringe_;
+        //- Reference to oversetFringe algorithm
+        const oversetFringe& oversetFringe_;
 
         //- Subdictionary for acceptor set specification
         const dictionary coeffDict_;
@@ -141,10 +144,10 @@ public:
             donorSuitability,
             dictionary,
             (
-                const overlapFringe& overlapFringeAlgorithm,
+                const oversetFringe& oversetFringeAlgorithm,
                 const dictionary& dict
             ),
-            (overlapFringeAlgorithm, dict)
+            (oversetFringeAlgorithm, dict)
         );
 
 
@@ -153,7 +156,7 @@ public:
         //- Construct from components
         donorSuitability
         (
-            const overlapFringe& overlapFringeAlgorithm,
+            const oversetFringe& oversetFringeAlgorithm,
             const dictionary& dict
         );
 
@@ -163,7 +166,7 @@ public:
         //- Return an autoPtr to the selected donorSuitability
         static autoPtr<donorSuitability> New
         (
-            const overlapFringe& overlapFringeAlgorithm,
+            const oversetFringe& oversetFringeAlgorithm,
             const dictionary& dict
         );
 
@@ -177,8 +180,8 @@ public:
 
         // Access
 
-            //- Return a const reference to overlapFringe algorithm
-            const overlapFringe& overlapFringeAlgorithm() const;
+            //- Return a const reference to oversetFringe algorithm
+            const oversetFringe& oversetFringeAlgorithm() const;
 
             //- Return coefficient dictionary
             const dictionary& coeffDict() const;
@@ -186,8 +189,12 @@ public:
 
         // Overlap minimisation via Donor Suitability Function
 
-            //- Is this donor/acceptor pair suitable
-            bool isDonorSuitable
+            //- Donor/acceptor pair suitability fraction.
+            //  Subtract smaller DSF from the greater. Divide difference with
+            //  greater DSF to get relative difference. Return relative
+            //  difference (a value which is always between 0 and 1. Higher
+            //  value means better suitability).
+            scalar suitabilityFraction 
             (
                 const donorAcceptor& daPair
             ) const
@@ -205,20 +212,23 @@ public:
                 // need to take the absolute value
                 if (dsfAcceptor > dsfDonor)
                 {
-                    return
-                        (
-                            (dsfAcceptor - dsfDonor)/
-                            (dsfAcceptor + SMALL)
-                        ) < threshold_;
+                    return (1 - (dsfAcceptor - dsfDonor)/(dsfAcceptor + SMALL));
                 }
                 else
                 {
-                    return
-                        (
-                            (dsfDonor - dsfAcceptor)/
-                            (dsfDonor + SMALL)
-                        ) < threshold_;
+                    return (1 - (dsfDonor - dsfAcceptor)/(dsfDonor + SMALL));
                 }
+            }
+
+
+            //- Is this donor/acceptor pair suitable?
+            //  if (1 - sutabilityFraction) < threshold
+            bool isDonorSuitable
+            (
+                const donorAcceptor& daPair
+            ) const
+            {
+                return (1 - suitabilityFraction(daPair)) < threshold_;
             }
 };
 
