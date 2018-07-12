@@ -5,6 +5,7 @@ oversetFringe/oversetFringe/newOversetFringe.C
 oversetFringe/manualFringe/manualFringe.C
 oversetFringe/faceCellsFringe/faceCellsFringe.C
 oversetFringe/overlapFringe/overlapFringe/overlapFringe.C
+oversetFringe/overlapFringe/adaptiveOverlapFringe/adaptiveOverlapFringe.C
 oversetFringe/compositeFringe/compositeFringe.C
 
 oversetFringe/overlapFringe/donorSuitability/donorSuitability/donorSuitability.C
