@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "donorSuitability.H"
-#include "overlapFringe.H"
+#include "oversetFringe.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -43,11 +43,11 @@ defineRunTimeSelectionTable(donorSuitability, dictionary);
 
 Foam::donorSuitability::donorSuitability::donorSuitability
 (
-    const overlapFringe& overlapFringeAlgorithm,
+    const oversetFringe& oversetFringeAlgorithm,
     const dictionary& dict
 )
 :
-    overlapFringe_(overlapFringeAlgorithm),
+    oversetFringe_(oversetFringeAlgorithm),
     coeffDict_
     (
         dict.subDict("donorSuitability")
@@ -102,10 +102,10 @@ void Foam::donorSuitability::donorSuitability::combineDonorSuitabilityFunction
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const Foam::overlapFringe&
-Foam::donorSuitability::donorSuitability::overlapFringeAlgorithm() const
+const Foam::oversetFringe&
+Foam::donorSuitability::donorSuitability::oversetFringeAlgorithm() const
 {
-    return overlapFringe_;
+    return oversetFringe_;
 }
 
 

@@ -67,7 +67,7 @@ public:
         //- Construct from components
         noSuitability
         (
-            const overlapFringe& overlapFringeAlgorithm,
+            const oversetFringe& oversetFringeAlgorithm,
             const dictionary& dict
         );
 

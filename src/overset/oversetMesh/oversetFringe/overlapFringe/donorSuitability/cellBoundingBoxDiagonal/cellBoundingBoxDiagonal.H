@@ -73,7 +73,7 @@ public:
         //- Construct from components
         cellBoundingBoxDiagonal
         (
-            const overlapFringe& overlapFringeAlgorithm,
+            const oversetFringe& oversetFringeAlgorithm,
             const dictionary& dict
         );
 

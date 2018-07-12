@@ -1358,15 +1358,18 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
             // This acceptor has been previously visited, meaning we have to
             // make a choice whether to update it or not. At this point, the
             // choice will be based on:
-            // a) If this donor is within bounding box and the original one is not, prefer the new donor
-            // b) Otherwise prefert on e with least distance from acceptor cell centre
-            // to donor cell centre.
-            // Run-time selectable Donor Suitability Function will be applied in oversetFringe
+            // a) If this donor is within bounding box and the original one is
+            //    not, prefer the new donor
+            // b) Otherwise prefert on e with least distance from acceptor cell
+            //    centre to donor cell centre.
+            // Run-time selectable Donor Suitability Function will be applied
+            // in oversetFringe
             if
             (
                 (curDA.donorWithinBB() && !curDACombined.donorWithinBB())
              || (curDA.distance() < curDACombined.distance())
             )
+            {
                 // This is a better candidate for the same acceptor, set donor
                 // accordingly
                 curDACombined.setDonor

@@ -41,6 +41,90 @@ namespace Foam
     addToRunTimeSelectionTable(oversetFringe, overlapFringe, dictionary);
 }
 
+
+// * * * * * * * * * * * * * Static Member Functions  * * * * * * * * * * * * //
+
+void Foam::overlapFringe::evaluateNonOversetBoundaries
+(
+    volScalarField::GeometricBoundaryField& psib
+) const
+{
+    // Code practically copy/pasted from GeometricBoundaryField::evaluateCoupled
+    // GeometricBoundaryField should be redesigned to accomodate for such needs
+    if
+    (
+        Pstream::defaultComms() == Pstream::blocking
+     || Pstream::defaultComms() == Pstream::nonBlocking
+    )
+    {
+        forAll(psib, patchI)
+        {
+            // Get fvPatchField
+            fvPatchScalarField& psip = psib[patchI];
+
+            if (psip.coupled() && !isA<oversetFvPatchScalarField>(psip))
+            {
+                psip.initEvaluate(Pstream::defaultComms());
+            }
+        }
+
+        // Block for any outstanding requests
+        if (Pstream::defaultComms() == Pstream::nonBlocking)
+        {
+            IPstream::waitRequests();
+            OPstream::waitRequests();
+        }
+
+        forAll(psib, patchI)
+        {
+            // Get fvPatchField
+            fvPatchScalarField& psip = psib[patchI];
+
+            if (psip.coupled() && !isA<oversetFvPatchScalarField>(psip))
+            {
+                psip.evaluate(Pstream::defaultComms());
+            }
+        }
+    }
+    else if (Pstream::defaultComms() == Pstream::scheduled)
+    {
+        const lduSchedule& patchSchedule =
+            region().mesh().globalData().patchSchedule();
+
+        forAll(patchSchedule, patchEvalI)
+        {
+            if (patchSchedule[patchEvalI].init)
+            {
+                // Get fvPatchField
+                fvPatchScalarField psip = psib[patchSchedule[patchEvalI].patch];
+
+                if (psip.coupled() && !isA<oversetFvPatchScalarField>(psip))
+                {
+                    psip.initEvaluate(Pstream::scheduled);
+                }
+            }
+            else
+            {
+                // Get fvPatchField
+                fvPatchScalarField psip = psib[patchSchedule[patchEvalI].patch];
+
+                if (psip.coupled() && !isA<oversetFvPatchScalarField>(psip))
+                {
+                    psip.evaluate(Pstream::scheduled);
+                }
+            }
+        }
+    }
+    else
+    {
+        FatalErrorIn("overlapFringe::evaluateNonOversetBoundaries()")
+            << "Unsuported communications type "
+            << Pstream::commsTypeNames[Pstream::defaultCommsType()]
+            << exit(FatalError);
+    }
+}
+
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 void Foam::overlapFringe::calcAddressing() const
@@ -258,87 +342,6 @@ void Foam::overlapFringe::clearAddressing() const
     deleteDemandDrivenData(acceptorsPtr_);
     deleteDemandDrivenData(finalDonorAcceptorsPtr_);
     deleteDemandDrivenData(cumulativeDonorAcceptorsPtr_);
-}
-
-
-void Foam::overlapFringe::evaluateNonOversetBoundaries
-(
-    volScalarField::GeometricBoundaryField& psib
-) const
-{
-    // Code practically copy/pasted from GeometricBoundaryField::evaluateCoupled
-    // GeometricBoundaryField should be redesigned to accomodate for such needs
-    if
-    (
-        Pstream::defaultComms() == Pstream::blocking
-     || Pstream::defaultComms() == Pstream::nonBlocking
-    )
-    {
-        forAll(psib, patchI)
-        {
-            // Get fvPatchField
-            fvPatchScalarField& psip = psib[patchI];
-
-            if (psip.coupled() && !isA<oversetFvPatchScalarField>(psip))
-            {
-                psip.initEvaluate(Pstream::defaultComms());
-            }
-        }
-
-        // Block for any outstanding requests
-        if (Pstream::defaultComms() == Pstream::nonBlocking)
-        {
-            IPstream::waitRequests();
-            OPstream::waitRequests();
-        }
-
-        forAll(psib, patchI)
-        {
-            // Get fvPatchField
-            fvPatchScalarField& psip = psib[patchI];
-
-            if (psip.coupled() && !isA<oversetFvPatchScalarField>(psip))
-            {
-                psip.evaluate(Pstream::defaultComms());
-            }
-        }
-    }
-    else if (Pstream::defaultComms() == Pstream::scheduled)
-    {
-        const lduSchedule& patchSchedule =
-            region().mesh().globalData().patchSchedule();
-
-        forAll(patchSchedule, patchEvalI)
-        {
-            if (patchSchedule[patchEvalI].init)
-            {
-                // Get fvPatchField
-                fvPatchScalarField psip = psib[patchSchedule[patchEvalI].patch];
-
-                if (psip.coupled() && !isA<oversetFvPatchScalarField>(psip))
-                {
-                    psip.initEvaluate(Pstream::scheduled);
-                }
-            }
-            else
-            {
-                // Get fvPatchField
-                fvPatchScalarField psip = psib[patchSchedule[patchEvalI].patch];
-
-                if (psip.coupled() && !isA<oversetFvPatchScalarField>(psip))
-                {
-                    psip.evaluate(Pstream::scheduled);
-                }
-            }
-        }
-    }
-    else
-    {
-        FatalErrorIn("overlapFringe::evaluateNonOversetBoundaries()")
-            << "Unsuported communications type "
-            << Pstream::commsTypeNames[Pstream::defaultCommsType()]
-            << exit(FatalError);
-    }
 }
 
 

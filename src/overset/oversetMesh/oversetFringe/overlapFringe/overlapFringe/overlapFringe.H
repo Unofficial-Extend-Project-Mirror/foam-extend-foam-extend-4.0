@@ -120,18 +120,31 @@ class overlapFringe
 
     // Private Member Functions
 
-        //- Disallow default bitwise copy construct
-        overlapFringe(const overlapFringe&);
+        // Copy control
 
-        //- Disallow default bitwise assignment
-        void operator=(const overlapFringe&);
+            //- Disallow default bitwise copy construct
+            overlapFringe(const overlapFringe&);
+
+            //- Disallow default bitwise assignment
+            void operator=(const overlapFringe&);
 
 
-        //- Calculate hole-acceptor addressing
-        void calcAddressing() const;
+        // Addressing calculation functions
 
-        //- Clear hole-acceptor addressing
-        void clearAddressing() const;
+            //- Calculate hole-acceptor addressing
+            void calcAddressing() const;
+
+            //- Clear hole-acceptor addressing
+            void clearAddressing() const;
+
+
+public:
+
+    //- Runtime type information
+    TypeName("overlap");
+
+
+    // Static Member Functions
 
         //- Helper function used to evaluate coupled boundaries, excluding
         //  overset patch
@@ -139,11 +152,6 @@ class overlapFringe
         (
             volScalarField::GeometricBoundaryField& psib
         ) const;
-
-public:
-
-    //- Runtime type information
-    TypeName("overlap");
 
 
     // Constructors
@@ -157,9 +165,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~overlapFringe();
+    //- Destructor
+    virtual ~overlapFringe();
 
 
     // Member Functions

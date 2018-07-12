@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "cellVolumes.H"
-#include "overlapFringe.H"
+#include "oversetFringe.H"
 #include "oversetRegion.H"
 #include "volFields.H"
 #include "addToRunTimeSelectionTable.H"
@@ -51,14 +51,14 @@ addToRunTimeSelectionTable
 
 Foam::donorSuitability::cellVolumes::cellVolumes
 (
-    const overlapFringe& overlapFringeAlgorithm,
+    const oversetFringe& oversetFringeAlgorithm,
     const dictionary& dict
 )
 :
-    donorSuitability(overlapFringeAlgorithm, dict)
+    donorSuitability(oversetFringeAlgorithm, dict)
 {
     // Get local donor suitability function using cell volumes
-    const scalarField& localDsf = overlapFringeAlgorithm.mesh().V().field();
+    const scalarField& localDsf = oversetFringeAlgorithm.mesh().V().field();
 
     // Combine donor suitability function data across processors for parallel
     // run
