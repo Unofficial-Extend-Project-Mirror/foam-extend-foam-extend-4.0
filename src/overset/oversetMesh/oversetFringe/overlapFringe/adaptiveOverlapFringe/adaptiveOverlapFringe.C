@@ -618,7 +618,7 @@ bool Foam::adaptiveOverlapFringe::updateIteration
             iterationDataHistory_.pop();
 
             // Increment relative counter
-            relativeCounter_ += 1;
+            ++relativeCounter_;
 
             // Print information
             Info << "1 additional iteration for region " << region().name()
