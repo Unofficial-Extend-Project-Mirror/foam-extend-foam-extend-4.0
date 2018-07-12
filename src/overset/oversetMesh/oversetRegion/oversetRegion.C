@@ -197,10 +197,11 @@ void Foam::oversetRegion::calcDonorAcceptorCells() const
             //  - cellSearch (depends on eligible donors).
             if (!regionFoundSuitableOverlap)
             {
-                deleteDemandDrivenData(curRegion.holeCellsPtr_);
-                deleteDemandDrivenData(curRegion.eligibleDonorCellsPtr_);
                 deleteDemandDrivenData(curRegion.cellSearchPtr_);
             }
+
+            deleteDemandDrivenData(curRegion.holeCellsPtr_);
+            deleteDemandDrivenData(curRegion.eligibleDonorCellsPtr_);
         }
     } while (!foundGlobalOverlap);
 
@@ -1164,14 +1165,17 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
                 // Get index obtained by octree
                 const label donorCandidateIndex = pih.index();
 
+                // Donor within BB flag 
+                const bool donorWithinBB =  mesh_.pointInCellBB
+                (
+                    curP,
+                    curDonors[donorCandidateIndex]
+                 );
+                
                 if
                 (
                    !daPair.donorFound()
-                 || mesh_.pointInCellBB
-                    (
-                        curP,
-                        curDonors[donorCandidateIndex]
-                    )
+                 || donorWithinBB
                  || (
                         mag(cc[curDonors[donorCandidateIndex]] - curP)
                       < mag(daPair.donorPoint() - curP)
@@ -1183,7 +1187,8 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
                     (
                         curDonors[donorCandidateIndex],
                         Pstream::myProcNo(),
-                        cc[curDonors[donorCandidateIndex]]
+                        cc[curDonors[donorCandidateIndex]], 
+                        donorWithinBB 
                     );
 
                     // Set extended donors
@@ -1352,18 +1357,24 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
         {
             // This acceptor has been previously visited, meaning we have to
             // make a choice whether to update it or not. At this point, the
-            // choice will be based on least distance from acceptor cell centre
-            // to donor cell centre. Run-time selectable Donor Suitability
-            // Functions will be applied in oversetFringe
-            if (curDA.distance() < curDACombined.distance())
-            {
+            // choice will be based on:
+            // a) If this donor is within bounding box and the original one is not, prefer the new donor
+            // b) Otherwise prefert on e with least distance from acceptor cell centre
+            // to donor cell centre.
+            // Run-time selectable Donor Suitability Function will be applied in oversetFringe
+            if
+            (
+                (curDA.donorWithinBB() && !curDACombined.donorWithinBB())
+             || (curDA.distance() < curDACombined.distance())
+            )
                 // This is a better candidate for the same acceptor, set donor
                 // accordingly
                 curDACombined.setDonor
                 (
                     curDA.donorCell(),
                     curDA.donorProcNo(),
-                    curDA.donorPoint()
+                    curDA.donorPoint(), 
+                    curDA.donorWithinBB()
                 );
             }
         }
