@@ -47,7 +47,7 @@ namespace Foam
 void Foam::overlapFringe::evaluateNonOversetBoundaries
 (
     volScalarField::GeometricBoundaryField& psib
-) const
+)
 {
     // Code practically copy/pasted from GeometricBoundaryField::evaluateCoupled
     // GeometricBoundaryField should be redesigned to accomodate for such needs
@@ -88,8 +88,10 @@ void Foam::overlapFringe::evaluateNonOversetBoundaries
     }
     else if (Pstream::defaultComms() == Pstream::scheduled)
     {
+        // Get the mesh by looking at first fvPatchField
         const lduSchedule& patchSchedule =
-            region().mesh().globalData().patchSchedule();
+            psib[0].dimensionedInternalField().mesh().globalData().
+            patchSchedule();
 
         forAll(patchSchedule, patchEvalI)
         {

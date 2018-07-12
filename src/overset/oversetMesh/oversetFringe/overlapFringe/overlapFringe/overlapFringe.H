@@ -148,10 +148,10 @@ public:
 
         //- Helper function used to evaluate coupled boundaries, excluding
         //  overset patch
-        void evaluateNonOversetBoundaries
+        static void evaluateNonOversetBoundaries
         (
             volScalarField::GeometricBoundaryField& psib
-        ) const;
+        );
 
 
     // Constructors
