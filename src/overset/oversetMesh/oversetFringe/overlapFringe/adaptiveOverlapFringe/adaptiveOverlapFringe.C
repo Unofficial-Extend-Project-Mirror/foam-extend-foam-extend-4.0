@@ -264,6 +264,10 @@ void Foam::adaptiveOverlapFringe::clearAddressing() const
     deleteDemandDrivenData(fringeHolesPtr_);
     deleteDemandDrivenData(acceptorsPtr_);
     deleteDemandDrivenData(finalDonorAcceptorsPtr_);
+
+    // Reset (clear) suitability of suitable pairs and suitableDAPairs list
+    suitablePairsSuit_ = 0;
+    suitableDAPairs_.clear();
 }
 
 
@@ -301,16 +305,16 @@ Foam::adaptiveOverlapFringe::adaptiveOverlapFringe
     ),
     orphanSuitability_
     (
-        dict.lookupOrDefault<scalar>("orphanSuitability", 100)
+        dict.lookupOrDefault<scalar>("orphanSuitability", 1)
     ),
     minLocalSuit_
     (
-        dict.lookupOrDefault<scalar>("minLocalSuit", 0)
+        dict.lookupOrDefault<scalar>("minLocalSuit", 1)
     ),
     suitablePairsSuit_(0)
 
 {
-    if (minLocalSuit_ <= 0)
+    if (minLocalSuit_ < 0)
     {
         WarningIn
         (
@@ -320,7 +324,7 @@ Foam::adaptiveOverlapFringe::adaptiveOverlapFringe
                "\n \t const oversetRegion& region, "
                "\n \t const dictionary& dict"
             "\n \t)"
-        )   << "Chosen minimal local suitability is less than or equal to 0%."
+        )   << "Chosen minimal local suitability is less than or equal to 0."
             << nl
             << "This means all donor/acceptor pairs, except the ones "
             << "whose donor is not within bounding box, will be "
@@ -328,7 +332,7 @@ Foam::adaptiveOverlapFringe::adaptiveOverlapFringe
             << nl << endl;
     }
 
-    if (minLocalSuit_ > 100)
+    if (minLocalSuit_ > 1)
     {
         WarningIn
         (
@@ -338,7 +342,7 @@ Foam::adaptiveOverlapFringe::adaptiveOverlapFringe
                "\n \t const oversetRegion& region, "
                "\n \t const dictionary& dict"
             "\n \t)"
-        )   << "Chosen minimal local suitability is greater than 100%."
+        )   << "Chosen minimal local suitability is greater than 1."
             << nl
             << "This means all donor/acceptor pairs will be considered"
             << " unsuitable. "
@@ -429,7 +433,7 @@ bool Foam::adaptiveOverlapFringe::updateIteration
             unsuitableDAPairs.append(curDA);
 
             // Add suitability of this pair to cumulative suitability.
-            unsuitableSuitCum -= orphanSuitability_/100.0;
+            unsuitableSuitCum -= orphanSuitability_;
 
            // Increment number of pairs
            ++notWithinBBCounter;
@@ -442,7 +446,7 @@ bool Foam::adaptiveOverlapFringe::updateIteration
             // Calculate donor acceptor suitability
             donorAcceptorSuit = donorSuitability_->suitabilityFraction(curDA);
 
-            if (donorAcceptorSuit < minLocalSuit_/100)
+            if (donorAcceptorSuit < minLocalSuit_)
             {
                 // Suitability of this pair is lower than minLocalSuit_.
                 // Append it to unsuitableDAPairs list.
