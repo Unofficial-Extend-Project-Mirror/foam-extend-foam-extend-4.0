@@ -420,7 +420,7 @@ bool Foam::adaptiveOverlapFringe::updateIteration
         // Get current donor/acceptor pair
         const donorAcceptor& curDA = donorAcceptorRegionData[daPairI];
 
-        if (!curDA.donorWithinBB())
+        if (!curDA.withinBB())
         {
             // Donor of this acceptor is not within bounding box.
             // Append this pair to unsuitableDAPairs list.

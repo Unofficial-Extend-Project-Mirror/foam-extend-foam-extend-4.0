@@ -1165,17 +1165,17 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
                 // Get index obtained by octree
                 const label donorCandidateIndex = pih.index();
 
-                // Donor within BB flag 
-                const bool donorWithinBB =  mesh_.pointInCellBB
+                // Whether acceptor is within donor's bounding box
+                const bool withinBB =  mesh_.pointInCellBB
                 (
                     curP,
                     curDonors[donorCandidateIndex]
-                 );
-                
+                );
+
                 if
                 (
                    !daPair.donorFound()
-                 || donorWithinBB
+                 || withinBB
                  || (
                         mag(cc[curDonors[donorCandidateIndex]] - curP)
                       < mag(daPair.donorPoint() - curP)
@@ -1187,8 +1187,8 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
                     (
                         curDonors[donorCandidateIndex],
                         Pstream::myProcNo(),
-                        cc[curDonors[donorCandidateIndex]], 
-                        donorWithinBB 
+                        cc[curDonors[donorCandidateIndex]],
+                        withinBB
                     );
 
                     // Set extended donors
@@ -1366,7 +1366,7 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
             // in oversetFringe
             if
             (
-                (curDA.donorWithinBB() && !curDACombined.donorWithinBB())
+                (curDA.withinBB() && !curDACombined.withinBB())
              || (curDA.distance() < curDACombined.distance())
             )
             {
@@ -1376,10 +1376,32 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
                 (
                     curDA.donorCell(),
                     curDA.donorProcNo(),
-                    curDA.donorPoint(), 
-                    curDA.donorWithinBB()
+                    curDA.donorPoint(),
+                    curDA.withinBB()
                 );
             }
+        }
+    }
+
+    // Update withinBB flag if the donor is within bounding box of acceptor
+    // (previously we checked whether the acceptor is within bounding box of
+    // donor)
+    forAll (combinedDonorAcceptorList, daI)
+    {
+        donorAcceptor& curDA = combinedDonorAcceptorList[daI];
+
+        // If the acceptor is not within bounding box of donor, set the flag
+        // other way around
+        if (!curDA.withinBB())
+        {
+            curDA.setWithinBB
+            (
+                mesh_.pointInCellBB
+                (
+                    curDA.donorPoint(),
+                    curDA.acceptorCell()
+                )
+            );
         }
     }
 
