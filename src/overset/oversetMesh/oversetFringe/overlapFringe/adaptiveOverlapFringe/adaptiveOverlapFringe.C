@@ -265,8 +265,7 @@ void Foam::adaptiveOverlapFringe::clearAddressing() const
     deleteDemandDrivenData(acceptorsPtr_);
     deleteDemandDrivenData(finalDonorAcceptorsPtr_);
 
-    // Reset (clear) suitability of suitable pairs and suitableDAPairs list
-    suitablePairsSuit_ = 0;
+    // Reset suitableDAPairs list
     suitableDAPairs_.clear();
 }
 
@@ -310,9 +309,7 @@ Foam::adaptiveOverlapFringe::adaptiveOverlapFringe
     minLocalSuit_
     (
         dict.lookupOrDefault<scalar>("minLocalSuit", 1)
-    ),
-    suitablePairsSuit_(0)
-
+    )
 {
     if (minLocalSuit_ < 0)
     {
@@ -389,7 +386,7 @@ bool Foam::adaptiveOverlapFringe::updateIteration
     ++fringeIter_;
 
     // Print info
-    Info<< "Region: " << region().name() << " fringeIter_: "
+    Info<< "Region: " << region().name() << ", iteration: "
         << fringeIter_ << endl;
 
     // Store donor/acceptor pairs whose donors are not within bounding box or
@@ -404,17 +401,15 @@ bool Foam::adaptiveOverlapFringe::updateIteration
 
     // Suitability fraction variables
 
-    // Suitability of each donor/acceptor pair individually
-    scalar donorAcceptorSuit = 0;
-
-    // Average suitability fraction from current iteration
-    scalar donorAcceptorSuitAverage = 0;
-
     // Not within bounding box pairs counter
     label notWithinBBCounter = 0;
 
     // Unsuitable pairs cumulative suitability
     scalar unsuitableSuitCum = 0;
+    
+    // Suitable pairs cumulative suitability
+    scalar suitableSuitCum = 0;
+
 
     // Loop through donor/acceptor pairs and divide received donor/acceptor
     // pairs into two lists:
@@ -444,7 +439,8 @@ bool Foam::adaptiveOverlapFringe::updateIteration
             // bounding box
 
             // Calculate donor acceptor suitability
-            donorAcceptorSuit = donorSuitability_->suitabilityFraction(curDA);
+            const scalar donorAcceptorSuit =
+                donorSuitability_->suitabilityFraction(curDA);
 
             if (donorAcceptorSuit < minLocalSuit_)
             {
@@ -452,15 +448,15 @@ bool Foam::adaptiveOverlapFringe::updateIteration
                 // Append it to unsuitableDAPairs list.
                 unsuitableDAPairs.append(curDA);
 
-               // Debug
-               unsuitableSuitCum += donorAcceptorSuit;
+                // For debug
+                unsuitableSuitCum += donorAcceptorSuit;
             }
             else
             {
                 // Suitability of this pair is greater than minLocalSuit_.
 
-                // Add suitability to suitablePairsSuit_
-                suitablePairsSuit_ += donorAcceptorSuit;
+                // Add suitability to suitableSuitCum
+                suitableSuitCum += donorAcceptorSuit;
 
                 // Append pair to suitableDAPairs_
                 suitableDAPairs_.append(curDA);
@@ -472,9 +468,18 @@ bool Foam::adaptiveOverlapFringe::updateIteration
     storageDAPairs.append(unsuitableDAPairs);
     storageDAPairs.append(suitableDAPairs_);
 
+    // Reduce all necessary information
+    reduce(notWithinBBCounter, sumOp<label>());
+    reduce(unsuitableSuitCum, sumOp<scalar>());
+    reduce(suitableSuitCum, sumOp<scalar>());
+    const label nGlobalDAPairs =
+        returnReduce(storageDAPairs.size(), sumOp<label>());
+    const label nGlobalUnsuitablePairs =
+        returnReduce(unsuitableDAPairs.size(), sumOp<label>());
+
     // Calculate donor/acceptor average suitability from current iteration
-    donorAcceptorSuitAverage =
-        (unsuitableSuitCum + suitablePairsSuit_)/storageDAPairs.size();
+    const scalar donorAcceptorSuitAverage =
+        (unsuitableSuitCum + suitableSuitCum)/nGlobalDAPairs;
 
     // Copy fringe holes list in order to store it into iterationDataObject
     labelList allFringeHoles(*fringeHolesPtr_);
@@ -496,22 +501,21 @@ bool Foam::adaptiveOverlapFringe::updateIteration
         )
     );
 
-    // Print information
-    Info<< "Found " << notWithinBBCounter << " pairs that are not within "
-        << "bounding box and " << unsuitableDAPairs.size() - notWithinBBCounter
-        << " pairs whose suitability " << nl
-        << "is lower than minLocalSuit. "
-        << endl;
-
-    Info<< "Adaptive verlap fringe iteration: " << fringeIter_
-        << " for region: " << region().name() << nl
-        << "Average donor/acceptor pair suitability: "
+    Info<< "Average donor/acceptor pair suitability: "
         << donorAcceptorSuitAverage*100 << " %."
         << endl;
 
-    // Debug: write stored acceptors and holes
+    // Debug: write stored acceptors and holes and some general information
     if (adaptiveOverlapFringe::debug)
     {
+        // Print information
+        Info<< "Found " << notWithinBBCounter << " pairs that are not within "
+            << "bounding box and "
+            << nGlobalUnsuitablePairs - notWithinBBCounter
+            << " pairs whose suitability " << nl
+            << "is lower than minLocalSuit. "
+            << endl;
+    
         // Iteration ordinal number from max object
         label iterNum = fringeIter_;
 
@@ -608,10 +612,13 @@ bool Foam::adaptiveOverlapFringe::updateIteration
         );
 
         // Print information
-        Info<< "Average donor suitability fraction depending on"
-            << " iteration number: " << nl
-            << "ADSF = " << alpha*100 << " + " << beta*100 << "*iter."
-            << nl << endl;
+        if (adaptiveOverlapFringe::debug)
+        {
+            Info<< "Average donor suitability fraction depending on"
+                << " iteration number: " << nl
+                << "ADSF = " << alpha*100 << " + " << beta*100 << "*iter."
+                << nl << endl;
+        }
 
 
         // If the donor/acceptor suitability gradient is positive,
@@ -625,8 +632,11 @@ bool Foam::adaptiveOverlapFringe::updateIteration
             ++relativeCounter_;
 
             // Print information
-            Info << "1 additional iteration for region " << region().name()
-                 << " will be performed." << endl;
+            if (adaptiveOverlapFringe::debug)
+            {
+                Info<< "1 additional iteration for region " << region().name()
+                    << " will be performed." << endl;
+            }
         }
      }
 
@@ -637,7 +647,11 @@ bool Foam::adaptiveOverlapFringe::updateIteration
     //    positive and
     // 2) There is a number of  unsuitable donor/acceptor pairs what
     //    indicates that suitable overlap is found.
-    if (fringeIter_ < relativeCounter_ && !unsuitableDAPairs.empty())
+    if
+    (
+        fringeIter_ < relativeCounter_
+     && (nGlobalUnsuitablePairs != 0)
+    )
     {
         // Get necessary mesh data
         const fvMesh& mesh = region().mesh();
@@ -787,13 +801,12 @@ bool Foam::adaptiveOverlapFringe::updateIteration
         // Set the flag to false (suitable overlap not found)
         updateSuitableOverlapFlag(false);
     }
-
     else
     {
         // Specified number of iterations is made or suitable overlap is found.
         // There is no possibility for memory leak because
-        // Foam::adaptiveOverlapFringe::updateIteration is not going to be called
-        // again, i.e. final overlap fringe assembly is found.
+        // Foam::adaptiveOverlapFringe::updateIteration is not going to be
+        // called again, i.e. final overlap fringe assembly is found.
 
         // Iterator to iterationDataHistory_ beginning
         FIFOStack<iterationData>::iterator begin =
@@ -979,9 +992,8 @@ bool Foam::adaptiveOverlapFringe::updateIteration
         }
 
         // Print how many acceptors have been converted to holes
-        Info<< "Converted " << nAccToHoles << " acceptors to holes."
-            << endl;
-
+        reduce(nAccToHoles, sumOp<label>());
+        Info<< "Converted " << nAccToHoles << " acceptors to holes." << endl;
 
         // Construct final donor/acceptor list
         finalDonorAcceptorsPtr_ = new donorAcceptorList
@@ -996,9 +1008,10 @@ bool Foam::adaptiveOverlapFringe::updateIteration
         );
 
         // Print information
-        Info<< "Finished assembling overlap fringe for region "
+        Info<< nl
+            << "Finished assembling overlap fringe for region "
             << region().name() << "." <<  nl
-            << " Chosen overlap is from " << maxObject().iteration() << "."
+            << "Chosen overlap is from " << maxObject().iteration() << "."
             << " iteration. " << nl
             << "Average donor/acceptor suitability is "
             << maxObject().suitability()*100 << "%."

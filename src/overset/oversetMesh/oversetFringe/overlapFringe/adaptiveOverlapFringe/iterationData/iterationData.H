@@ -93,8 +93,8 @@ public:
         (
             const Xfer<donorAcceptorList>& donorAcceptorPairs,
             const Xfer<labelList>& fringeHoles,
-            scalar& averageSuitability,
-            label& iteration
+            const scalar averageSuitability,
+            const scalar iteration
         )
         :
             donorAcceptorPairs_(donorAcceptorPairs),

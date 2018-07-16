@@ -135,9 +135,6 @@ class adaptiveOverlapFringe
             // Suitable donor/acceptor pairs
             mutable donorAcceptorDynamicList suitableDAPairs_;
 
-            //- Suitable pairs cumulative suitability
-            mutable scalar suitablePairsSuit_;
-
 
     // Private Member Functions
 
