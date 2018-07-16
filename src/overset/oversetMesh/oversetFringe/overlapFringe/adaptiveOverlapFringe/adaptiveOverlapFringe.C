@@ -265,8 +265,9 @@ void Foam::adaptiveOverlapFringe::clearAddressing() const
     deleteDemandDrivenData(acceptorsPtr_);
     deleteDemandDrivenData(finalDonorAcceptorsPtr_);
 
-    // Reset suitableDAPairs list
+    // Reset and clear out helper data
     suitableDAPairs_.clear();
+    suitablePairsSuit_ = 0;
 }
 
 
@@ -308,8 +309,10 @@ Foam::adaptiveOverlapFringe::adaptiveOverlapFringe
     ),
     minLocalSuit_
     (
-        dict.lookupOrDefault<scalar>("minLocalSuit", 1)
-    )
+        dict.lookupOrDefault<scalar>("minLocalSuit", 0)
+    ),
+    suitablePairsSuit_(0)
+
 {
     if (minLocalSuit_ < 0)
     {
@@ -406,16 +409,12 @@ bool Foam::adaptiveOverlapFringe::updateIteration
 
     // Unsuitable pairs cumulative suitability
     scalar unsuitableSuitCum = 0;
-    
-    // Suitable pairs cumulative suitability
-    scalar suitableSuitCum = 0;
-
 
     // Loop through donor/acceptor pairs and divide received donor/acceptor
     // pairs into two lists:
     //     1) unsuitableDAPairs,
     //     2) suitableDAPairs_ - those pairs are valid, keep them
-    //    through the whole iterative process.
+    //        through the whole iterative process.
     forAll (donorAcceptorRegionData, daPairI)
     {
         // Get current donor/acceptor pair
@@ -430,8 +429,8 @@ bool Foam::adaptiveOverlapFringe::updateIteration
             // Add suitability of this pair to cumulative suitability.
             unsuitableSuitCum -= orphanSuitability_;
 
-           // Increment number of pairs
-           ++notWithinBBCounter;
+            // Increment number of pairs
+            ++notWithinBBCounter;
         }
         else
         {
@@ -455,8 +454,8 @@ bool Foam::adaptiveOverlapFringe::updateIteration
             {
                 // Suitability of this pair is greater than minLocalSuit_.
 
-                // Add suitability to suitableSuitCum
-                suitableSuitCum += donorAcceptorSuit;
+                // Add suitability to suitablePairsSuit_
+                suitablePairsSuit_ += donorAcceptorSuit;
 
                 // Append pair to suitableDAPairs_
                 suitableDAPairs_.append(curDA);
@@ -471,7 +470,9 @@ bool Foam::adaptiveOverlapFringe::updateIteration
     // Reduce all necessary information
     reduce(notWithinBBCounter, sumOp<label>());
     reduce(unsuitableSuitCum, sumOp<scalar>());
-    reduce(suitableSuitCum, sumOp<scalar>());
+
+    const scalar globalSuitablePairsSuit =
+        returnReduce(suitablePairsSuit_, sumOp<scalar>());
     const label nGlobalDAPairs =
         returnReduce(storageDAPairs.size(), sumOp<label>());
     const label nGlobalUnsuitablePairs =
@@ -479,7 +480,7 @@ bool Foam::adaptiveOverlapFringe::updateIteration
 
     // Calculate donor/acceptor average suitability from current iteration
     const scalar donorAcceptorSuitAverage =
-        (unsuitableSuitCum + suitableSuitCum)/nGlobalDAPairs;
+        (unsuitableSuitCum + globalSuitablePairsSuit)/nGlobalDAPairs;
 
     // Copy fringe holes list in order to store it into iterationDataObject
     labelList allFringeHoles(*fringeHolesPtr_);
@@ -515,7 +516,7 @@ bool Foam::adaptiveOverlapFringe::updateIteration
             << " pairs whose suitability " << nl
             << "is lower than minLocalSuit. "
             << endl;
-    
+
         // Iteration ordinal number from max object
         label iterNum = fringeIter_;
 
@@ -649,7 +650,7 @@ bool Foam::adaptiveOverlapFringe::updateIteration
     //    indicates that suitable overlap is found.
     if
     (
-        fringeIter_ < relativeCounter_
+        (fringeIter_ < relativeCounter_)
      && (nGlobalUnsuitablePairs != 0)
     )
     {
