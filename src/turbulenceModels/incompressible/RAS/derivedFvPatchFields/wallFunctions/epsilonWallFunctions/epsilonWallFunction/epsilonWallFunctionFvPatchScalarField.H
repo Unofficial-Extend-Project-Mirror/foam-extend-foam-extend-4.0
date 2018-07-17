@@ -89,6 +89,20 @@ class epsilonWallFunctionFvPatchScalarField
         void checkType();
 
 
+protected:
+
+    // Protected Member Functions
+
+        //- Write local wall function variables
+        virtual void writeLocalEntries(Ostream&) const;
+
+        //- Return name of turbulence generation field
+        inline const word& GName() const
+        {
+            return GName_;
+        }
+
+
 public:
 
     //- Runtime type information

@@ -54,6 +54,21 @@ void epsilonNonEqWallFunctionFvPatchScalarField::checkType()
 }
 
 
+// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+
+void epsilonNonEqWallFunctionFvPatchScalarField::
+writeLocalEntries(Ostream& os) const
+{
+    writeEntryIfDifferent<word>(os, "U", "U", UName_);
+    writeEntryIfDifferent<word>(os, "k", "k", kName_);
+    writeEntryIfDifferent<word>(os, "G", "RASModel::G", GName_);
+    writeEntryIfDifferent<word>(os, "nu", "nu", nuName_);
+    writeEntryIfDifferent<word>(os, "nut", "nut", nutName_);
+    os.writeKeyword("Cmu") << Cmu_ << token::END_STATEMENT << nl;
+    os.writeKeyword("kappa") << kappa_ << token::END_STATEMENT << nl;
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 epsilonNonEqWallFunctionFvPatchScalarField::
@@ -218,13 +233,7 @@ void epsilonNonEqWallFunctionFvPatchScalarField::evaluate
 void epsilonNonEqWallFunctionFvPatchScalarField::write(Ostream& os) const
 {
     fixedInternalValueFvPatchScalarField::write(os);
-    writeEntryIfDifferent<word>(os, "U", "U", UName_);
-    writeEntryIfDifferent<word>(os, "k", "k", kName_);
-    writeEntryIfDifferent<word>(os, "G", "RASModel::G", GName_);
-    writeEntryIfDifferent<word>(os, "nu", "nu", nuName_);
-    writeEntryIfDifferent<word>(os, "nut", "nut", nutName_);
-    os.writeKeyword("Cmu") << Cmu_ << token::END_STATEMENT << nl;
-    os.writeKeyword("kappa") << kappa_ << token::END_STATEMENT << nl;
+    writeLocalEntries(os);
 }
 
 

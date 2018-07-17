@@ -104,6 +104,14 @@ class epsilonNonEqWallFunctionFvPatchScalarField
         void checkType();
 
 
+protected:
+
+    // Protected Member Functions
+
+        //- Write local wall function variables
+        virtual void writeLocalEntries(Ostream&) const;
+
+
 public:
 
     //- Runtime type information

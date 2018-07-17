@@ -126,16 +126,6 @@ kqRWallFunctionFvPatchField<Type>::kqRWallFunctionFvPatchField
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-void kqRWallFunctionFvPatchField<Type>::evaluate
-(
-    const Pstream::commsTypes commsType
-)
-{
-    zeroGradientFvPatchField<Type>::evaluate(commsType);
-}
-
-
-template<class Type>
 void kqRWallFunctionFvPatchField<Type>::write(Ostream& os) const
 {
     zeroGradientFvPatchField<Type>::write(os);
