@@ -306,6 +306,7 @@ list(APPEND SOURCES
   ${interpolation}/interpolationCellPointFace/makeInterpolationCellPointFace.C
   ${interpolation}/interpolationCellPointWallModified/cellPointWeightWallModified/cellPointWeightWallModified.C
   ${interpolation}/interpolationCellPointWallModified/makeInterpolationCellPointWallModified.C
+  ${interpolation}/interpolationPointMVC/interpolationPointMVC.C
 )
 
 set(volPointInterpolation interpolation/volPointInterpolation)
