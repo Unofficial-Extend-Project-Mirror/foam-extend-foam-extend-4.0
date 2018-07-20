@@ -419,6 +419,7 @@ void Foam::Cloud<ParticleType>::rebuild
     const PtrList<labelIOList>& faceProcAddressing
 )
 {
+    if (cellProcAddressing.set(Pstream::myProcNo()))
     {
         const labelList& procCell = cellProcAddressing[Pstream::myProcNo()];
         const labelList& procFace = faceProcAddressing[Pstream::myProcNo()];
