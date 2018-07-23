@@ -309,7 +309,7 @@ Foam::adaptiveOverlapFringe::adaptiveOverlapFringe
     ),
     minLocalSuit_
     (
-        dict.lookupOrDefault<scalar>("minLocalSuit", 0)
+        dict.lookupOrDefault<scalar>("minLocalSuit", 1)
     ),
     suitablePairsSuit_(0)
 
