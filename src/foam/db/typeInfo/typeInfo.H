@@ -109,7 +109,7 @@ inline To& refCast(From& r)
     {
         return dynamic_cast<To&>(r);
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast& e)
     {
         FatalErrorIn("refCast<To>(From&)")
             << "Attempt to cast type " << r.type()
