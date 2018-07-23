@@ -661,7 +661,7 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
             << endl;
     }
 
-    // First mark faces and edges on empty patches. This data is used in this
+    // First mark faces and edges on empty patches. This data is used in
     // PART 2 (collecting edges) and also PART 3 (collecting faces)
     boolList faceOnEmptyPatch(mesh_.nFaces(), false);
     boolList edgeOnEmptyPatch(mesh_.nEdges(), false);
@@ -1252,7 +1252,7 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
             if (cAdded.empty())
             {
                 // First face that hasn't been visited. Start adding cells
-                // point-by-poing and keep track of mapping necessary for
+                // point-by-point and keep track of mapping necessary for
                 // splitting other (not on empty patch) faces into two
 
                 // Set the total number of added cells to number of anchors
