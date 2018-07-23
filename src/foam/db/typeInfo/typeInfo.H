@@ -88,7 +88,7 @@ inline To& dynamicCast(From& r)
     {
         return dynamic_cast<To&>(r);
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast& e)
     {
         FatalErrorIn("dynamicCast<To>(From&)")
             << "Attempt to cast type " << typeid(r).name()
