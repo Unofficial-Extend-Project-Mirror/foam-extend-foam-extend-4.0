@@ -616,24 +616,6 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
             << abort(FatalError);
     }
 
-    if (debug)
-    {
-        // Write cells to refine into cell set
-        const cellSet cSet
-        (
-            mesh_,
-            "cellsToRefine",
-            labelHashSet(cellsToRefine_)
-        );
-
-        cSet.write();
-
-        Pout<< "prismatic2DRefinement::setRefinementInstruction(...)" << nl
-            << "Writing " << cSet.size() << " cells to refine into cell set: "
-            << cSet.objectPath()
-            << endl;
-    }
-
 
     // PART 1: Mark cells for refinement
 
