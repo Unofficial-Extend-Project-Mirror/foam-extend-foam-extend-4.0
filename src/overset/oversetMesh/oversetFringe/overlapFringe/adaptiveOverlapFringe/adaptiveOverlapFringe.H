@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
-     \\/     M anipulation  |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     adaptiveOverlapFringe
@@ -52,6 +51,7 @@ Description
 
 Authors
     Josip Katavic, FMENA Zagreb.  All rights reserved.
+    Vuko Vukcevic, FMENA Zagreb.  All rights reserved.
 
 SourceFiles
     adaptiveOverlapFringe.C
@@ -100,14 +100,23 @@ class adaptiveOverlapFringe
         mutable FIFOStack<iterationData> iterationDataHistory_;
 
 
+        // Optional initialization data
+
+            //- Name of the cell set defining initial holes (empty by default).
+            //  Useful when the resolution of the background mesh is much
+            //  coarser than the front mesh and no hole is found
+            const word holesSetName_;
+
+            //- Optional list of patches to start the iterative fringe assembly
+            //  process (empty list by default). Useful when we actually have
+            //  a hole as a patch in the background mesh
+            const wordList initPatchNames_;
+
+
         // Data for iteration control
 
             //- Run-time selectable donor/acceptor suitability handler
             autoPtr<donorSuitability::donorSuitability> donorSuitability_;
-
-            //- List of patches to start the iterative fringe assembly process
-            //  (empty list by default)
-            const wordList initPatchNames_;
 
             //- Iteration counter
             mutable label fringeIter_;
@@ -159,6 +168,16 @@ class adaptiveOverlapFringe
             void clearAddressing() const;
 
 
+    // Private Static Functions
+
+        //- Sort function - third parameter for max_element function
+        static bool sortBySuitabilityValue
+        (
+            const iterationData& lhsObject,
+            const iterationData& rhsObject
+        );
+
+
 public:
 
     //- Runtime type information
@@ -202,13 +221,6 @@ public:
 
         //- Update the fringe
         virtual void update() const;
-
-        //- Sort function - third parameter for max_element function
-        static bool sortBySuitabilityValue
-        (
-            const iterationData& lhsObject,
-            const iterationData& rhsObject
-        );
 
         //- Loop through all iteration data objects from iterationDataHistory_
         //  data member and calculate slope, i.e. suitability fraction values

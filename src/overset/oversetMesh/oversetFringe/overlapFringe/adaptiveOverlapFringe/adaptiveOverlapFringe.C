@@ -48,6 +48,76 @@ namespace Foam
 }
 
 
+// * * * * * * * * * * * * * Static Member Functions  * * * * * * * * * * * * //
+
+bool Foam::adaptiveOverlapFringe::sortBySuitabilityValue
+(
+    const iterationData& lhs,
+    const iterationData& rhs
+)
+{
+    return lhs.suitability() < rhs.suitability();
+}
+
+
+void Foam::adaptiveOverlapFringe::suitabilityFractionSlope
+(
+    FIFOStack<iterationData> iterHist,
+    scalar& alpha,
+    scalar& beta
+) const
+{
+    // Linear regression coefficients equations implemented down there:
+    // beta = (n*sum(x_i*y_i)-sum(x_i)*sum(y_i)) / (n*sum(x_i^2)-(sum(x_i))^2)
+    // alpha = sum(y_i)/n - beta* (sum(x_i)/n
+
+    // Iteration ordinal numbers sum (iteration ordinal number represents x
+    // value in x-y coordinate system)
+    scalar iterSum = 0;
+
+    // Sum of squared iteration ordinal numbers
+    scalar iterSquaredSum = 0;
+
+    // Average donor/acceptor suitability fraction values sum (average
+    // suitability represents y value in x-y coordinate system)
+    scalar suitabilitySum = 0;
+
+    // Sum of iteration ordinal number multiplied by donor/acceptor suitability
+    // fraction value from one iteration
+    scalar iterXSuitabilitySum = 0;
+
+    // Loop through all iteration data objects and calculate values needed for
+    // linear regression calculation
+    forAllConstIter(FIFOStack<iterationData>, iterHist, it)
+    {
+        iterSum += it().iteration();
+        iterSquaredSum += pow(it().iteration(), 2);
+        suitabilitySum += it().suitability();
+        iterXSuitabilitySum += it().iteration()*it().suitability();
+    }
+
+    // Number of iterations is equal to iterationDataHistory_ size
+    const label n = iterationDataHistory_.size();
+
+    // Calculate slope (i.e. if y = alpha + beta*x, slope is beta)
+    beta =
+        (n*iterXSuitabilitySum - iterSum*suitabilitySum)/
+        (n*iterSquaredSum - pow(iterSum, 2));
+
+    // Calculate mean iteration number - actually we don't need to calculate
+    // it beacuse we are only interested in trend, i.e we need only slope
+    // (beta). Maybe I will need it for diagrams in my master thesis, so
+    // calculate it for now.
+    const scalar meanIter = iterSum/n;
+
+    // Calculate mean suitability from all iterations
+    const scalar meanSuitability = suitabilitySum/n;
+
+    // Calculate intercept
+    alpha = meanSuitability - beta*meanIter;
+}
+
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 void Foam::adaptiveOverlapFringe::calcAddressing() const
@@ -63,8 +133,8 @@ void Foam::adaptiveOverlapFringe::calcAddressing() const
     // Algorithm:
     //    - Create indicator field for correct data exchange accross processor
     //      boundaries
-    //    - Get holes from overset region and mark immediate neighbours of
-    //      holes as acceptors
+    //    - Get holes from overset region (and optionally from specified set)
+    //      and mark immediate neighbours of holes as acceptors
     //    - Loop through (optionally) user specified patches for
     //      initialising the overlap fringe assembly, marking face cells
 
@@ -109,9 +179,26 @@ void Foam::adaptiveOverlapFringe::calcAddressing() const
     // holes)
     boolList eligibleAcceptors(mesh.nCells(), true);
 
-    forAll (cutHoles, hI)
+    // Read user specified holes into allHoles list. Note: if the cell set
+    // is not found, the list will be empty
+    labelList allHoles
+    (
+        cellSet
+        (
+            mesh,
+            holesSetName_,
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        ).toc()
+    );
+
+    // Extend allHoles with cutHoles
+    allHoles.append(cutHoles);
+
+    // Mark all holes
+    forAll (allHoles, hI)
     {
-        const label& holeCellI = cutHoles[hI];
+        const label& holeCellI = allHoles[hI];
 
         // Mask eligible acceptors
         eligibleAcceptors[holeCellI] = false;
@@ -120,6 +207,7 @@ void Foam::adaptiveOverlapFringe::calcAddressing() const
         processorIndicatorIn[holeCellI] = 1.0;
     }
 
+
     // Dynamic list for storing acceptors.
     // Note 1: capacity set to number of cells (trading off memory for
     // efficiency)
@@ -127,11 +215,11 @@ void Foam::adaptiveOverlapFringe::calcAddressing() const
     // mask
     dynamicLabelList candidateAcceptors(mesh.nCells());
 
-    // Loop through cut holes and find acceptor candidates
-    forAll (cutHoles, hI)
+    // Loop through all holes and find acceptor candidates
+    forAll (allHoles, hI)
     {
         // Get neighbours of this hole cell
-        const labelList& hNbrs = cc[cutHoles[hI]];
+        const labelList& hNbrs = cc[allHoles[hI]];
 
         // Loop through neighbours of this hole cell
         forAll (hNbrs, nbrI)
@@ -158,6 +246,7 @@ void Foam::adaptiveOverlapFringe::calcAddressing() const
 
     // Get reference to region cell zone
     const cellZone& rcz = region().zone();
+
 
     // Loop through patches and mark face cells as eligible acceptors
     forAll (initPatchNames_, nameI)
@@ -249,6 +338,23 @@ void Foam::adaptiveOverlapFringe::calcAddressing() const
         }
     }
 
+    // Issue an error if no acceptors have been found for initial guess
+    if (returnReduce(candidateAcceptors.size(), sumOp<label>()) == 0)
+    {
+        FatalErrorIn
+        (
+            "void adaptiveOverlapFringe::calcAddressing() const"
+        )   << "Did not find any acceptors to begin with."
+            << "Check definition of adaptiveOverlap in oversetMeshDict"
+            << " for region: " << this->region().name() << nl
+            << "More specifically, check definition of:" << nl
+            << "1. holePatches (mandatory entry)" << nl
+            << "2. holes (optional entry)" << nl
+            << "3. initPatchNames (optional entry)"
+            << abort(FatalError);
+    }
+
+
     // Now we have a decent first guess for acceptors that will be used as
     // an initial condition for the iterative overlap assembly
     // process.
@@ -285,13 +391,16 @@ Foam::adaptiveOverlapFringe::adaptiveOverlapFringe
     fringeHolesPtr_(NULL),
     acceptorsPtr_(NULL),
     finalDonorAcceptorsPtr_(NULL),
-    donorSuitability_
-    (
-        donorSuitability::donorSuitability::New(*this, dict)
-    ),
+
+    holesSetName_(dict.lookupOrDefault<word>("holes", word())),
     initPatchNames_
     (
         dict.lookupOrDefault<wordList>("initPatchNames", wordList())
+    ),
+
+    donorSuitability_
+    (
+        donorSuitability::donorSuitability::New(*this, dict)
     ),
     fringeIter_(0),
     specifiedIterationsNumber_
@@ -1026,74 +1135,6 @@ bool Foam::adaptiveOverlapFringe::updateIteration
     }
 
     return foundSuitableOverlap();
-}
-
-
-bool Foam::adaptiveOverlapFringe::sortBySuitabilityValue
-(
-    const iterationData& lhs,
-    const iterationData& rhs
-)
-{
-    return lhs.suitability() < rhs.suitability();
-}
-
-
-void Foam::adaptiveOverlapFringe::suitabilityFractionSlope
-(
-    FIFOStack<iterationData> iterHist,
-    scalar& alpha,
-    scalar& beta
-) const
-{
-    // Linear regression coefficients equations implemented down there:
-    // beta = (n*sum(x_i*y_i)-sum(x_i)*sum(y_i)) / (n*sum(x_i^2)-(sum(x_i))^2)
-    // alpha = sum(y_i)/n - beta* (sum(x_i)/n
-
-    // Iteration ordinal numbers sum (iteration ordinal number represents x
-    // value in x-y coordinate system)
-    scalar iterSum = 0;
-
-    // Sum of squared iteration ordinal numbers
-    scalar iterSquaredSum = 0;
-
-    // Average donor/acceptor suitability fraction values sum (average
-    // suitability represents y value in x-y coordinate system)
-    scalar suitabilitySum = 0;
-
-    // Sum of iteration ordinal number multiplied by donor/acceptor suitability
-    // fraction value from one iteration
-    scalar iterXSuitabilitySum = 0;
-
-    // Loop through all iteration data objects and calculate values needed for
-    // linear regression calculation
-    forAllConstIter(FIFOStack<iterationData>, iterHist, it)
-    {
-        iterSum += it().iteration();
-        iterSquaredSum += pow(it().iteration(), 2);
-        suitabilitySum += it().suitability();
-        iterXSuitabilitySum += it().iteration()*it().suitability();
-    }
-
-    // Number of iterations is equal to iterationDataHistory_ size
-    const label n = iterationDataHistory_.size();
-
-    // Calculate slope (i.e. if y = alpha + beta*x, slope is beta)
-    beta =
-        (n*iterXSuitabilitySum - iterSum*suitabilitySum)/
-        (n*iterSquaredSum - pow(iterSum, 2));
-
-    // Calculate mean iteration number - actually we don't need to calculate
-    // it beacuse we are only interested in trend, i.e we need only slope
-    // (beta). Maybe I will need it for diagrams in my master thesis, so
-    // calculate it for now.
-    const scalar meanIter = iterSum/n;
-
-    // Calculate mean suitability from all iterations
-    const scalar meanSuitability = suitabilitySum/n;
-
-    // Calculate intercept
-    alpha = meanSuitability - beta*meanIter;
 }
 
 

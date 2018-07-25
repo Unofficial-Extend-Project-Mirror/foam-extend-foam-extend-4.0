@@ -142,8 +142,8 @@ void Foam::overlapFringe::calcAddressing() const
     // Algorithm:
     //    - Create indicator field for correct data exchange accross processor
     //      boundaries
-    //    - Get holes from overset region and mark immediate neighbours of
-    //      holes as acceptors
+    //    - Get holes from overset region (and optionally from specified set)
+    //      and mark immediate neighbours of holes as acceptors
     //    - Loop through (optionally) user specified patches for
     //      initialising the overlap fringe assembly, marking face cells
 
@@ -188,9 +188,26 @@ void Foam::overlapFringe::calcAddressing() const
     // holes)
     boolList eligibleAcceptors(mesh.nCells(), true);
 
-    forAll (cutHoles, hI)
+    // Read user specified holes into allHoles list. Note: if the cell set
+    // is not found, the list will be empty
+    labelList allHoles
+    (
+        cellSet
+        (
+            mesh,
+            holesSetName_,
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        ).toc()
+    );
+
+    // Extend allHoles with cutHoles
+    allHoles.append(cutHoles);
+
+    // Mark all holes
+    forAll (allHoles, hI)
     {
-        const label& holeCellI = cutHoles[hI];
+        const label& holeCellI = allHoles[hI];
 
         // Mask eligible acceptors
         eligibleAcceptors[holeCellI] = false;
@@ -199,6 +216,7 @@ void Foam::overlapFringe::calcAddressing() const
         processorIndicatorIn[holeCellI] = 1.0;
     }
 
+
     // Dynamic list for storing acceptors.
     // Note 1: capacity set to number of cells (trading off memory for
     // efficiency)
@@ -206,11 +224,11 @@ void Foam::overlapFringe::calcAddressing() const
     // mask
     dynamicLabelList candidateAcceptors(mesh.nCells());
 
-    // Loop through cut holes and find acceptor candidates
-    forAll (cutHoles, hI)
+    // Loop through all holes and find acceptor candidates
+    forAll (allHoles, hI)
     {
         // Get neighbours of this hole cell
-        const labelList& hNbrs = cc[cutHoles[hI]];
+        const labelList& hNbrs = cc[allHoles[hI]];
 
         // Loop through neighbours of this hole cell
         forAll (hNbrs, nbrI)
@@ -237,6 +255,7 @@ void Foam::overlapFringe::calcAddressing() const
 
     // Get reference to region cell zone
     const cellZone& rcz = region().zone();
+
 
     // Loop through patches and mark face cells as eligible acceptors
     forAll (initPatchNames_, nameI)
@@ -328,6 +347,23 @@ void Foam::overlapFringe::calcAddressing() const
         }
     }
 
+    // Issue an error if no acceptors have been found for initial guess
+    if (returnReduce(candidateAcceptors.size(), sumOp<label>()) == 0)
+    {
+        FatalErrorIn
+        (
+            "void adaptiveOverlapFringe::calcAddressing() const"
+        )   << "Did not find any acceptors to begin with."
+            << "Check definition of adaptiveOverlap in oversetMeshDict"
+            << " for region: " << this->region().name() << nl
+            << "More specifically, check definition of:" << nl
+            << "1. holePatches (mandatory entry)" << nl
+            << "2. holes (optional entry)" << nl
+            << "3. initPatchNames (optional entry)"
+            << abort(FatalError);
+    }
+
+
     // Now we have a decent first guess for acceptors that will be used as
     // an initial condition for the iterative overlap assembly
     // process.
@@ -362,13 +398,15 @@ Foam::overlapFringe::overlapFringe
     acceptorsPtr_(NULL),
     finalDonorAcceptorsPtr_(NULL),
 
-    donorSuitability_
-    (
-        donorSuitability::donorSuitability::New(*this, dict)
-    ),
+    holesSetName_(dict.lookupOrDefault<word>("holes", word())),
     initPatchNames_
     (
         dict.lookupOrDefault<wordList>("initPatchNames", wordList())
+    ),
+
+    donorSuitability_
+    (
+        donorSuitability::donorSuitability::New(*this, dict)
     ),
     minGlobalFraction_
     (
@@ -820,7 +858,6 @@ bool Foam::overlapFringe::updateIteration
 
     return foundSuitableOverlap();
 }
-
 
 
 const Foam::labelList& Foam::overlapFringe::fringeHoles() const

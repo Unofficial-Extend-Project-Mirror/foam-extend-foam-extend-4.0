@@ -39,9 +39,6 @@ Description
         acceptor search from
       - minGlobalFraction_: minimum allowable global fraction of suitable pairs
       - cumulativeDonorAcceptorsPtr_: list of suitable donor/acceptor pairs
-      - cacheFringe_: switch to control whether to cache the fringe for next
-        mesh updates (start from latest suitable set of acceptors, rather than
-        from the beginning)
       - fringeIter_: iteration counter
 
     Member function updateIteration controls the iterative process:
@@ -94,14 +91,23 @@ class overlapFringe
         mutable donorAcceptorList* finalDonorAcceptorsPtr_;
 
 
+        // Optional initialization data
+
+            //- Name of the cell set defining initial holes (empty by default).
+            //  Useful when the resolution of the background mesh is much
+            //  coarser than the front mesh and no hole is found
+            const word holesSetName_;
+
+            //- Optional list of patches to start the iterative fringe assembly
+            //  process (empty list by default). Useful when we actually have
+            //  a hole as a patch in the background mesh
+            const wordList initPatchNames_;
+
+
         // Data for iteration control
 
             //- Run-time selectable donor/acceptor suitability handler
             autoPtr<donorSuitability::donorSuitability> donorSuitability_;
-
-            //- List of patches to start the iterative fringe assembly process
-            //  (empty list by default)
-            const wordList initPatchNames_;
 
             //- Minimum global fraction of suitable donors. Iteration process
             //  stops if the calculated fraction is greater than the minimum
