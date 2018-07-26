@@ -155,13 +155,19 @@ Foam::protectedInitialRefinement::unrefinementPointCandidates() const
     // Loop through all cells and count number of protected points
     label nProtectedPoints = 0;
 
+    // Get current cell level
+    const labelIOList& curCellLevel =
+        mesh().lookupObject<labelIOList>("cellLevel");
+
     forAll (initialCellLevelIn, cellI)
     {
         const scalar& cl = initialCellLevelIn[cellI];
+        const scalar curcl = curCellLevel[cellI];
 
-        if (cl > SMALL)
+        if ((cl > SMALL) && equal(cl, curcl))
         {
-            // Cell has been refined during meshing, mark all of its points
+            // Cell has been refined during meshing and the original level is
+            // equal to the current level, mark all of its points
             const labelList& curCellPoints = meshCellPoints[cellI];
 
             forAll (curCellPoints, i)
@@ -177,6 +183,21 @@ Foam::protectedInitialRefinement::unrefinementPointCandidates() const
                     ++nProtectedPoints;
                 }
             }
+        }
+        else if (cl > (curcl + SMALL))
+        {
+            FatalErrorIn
+            (
+                "Xfer<labelList>\n"
+                "protectedInitialRefinement::unrefinementPointCandidates()"
+                " const"
+            )   << "Detected a cell with initial refinement level greater"
+                << " than current refinement level." << nl
+                << "cellI: " << cellI << nl
+                << "current level: " << curcl << nl
+                << "initial level: " << cl << nl
+                << "This should not happen."
+                << abort(FatalError);
         }
     }
 
