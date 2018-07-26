@@ -122,7 +122,7 @@ class adaptiveOverlapFringe
             mutable label fringeIter_;
 
             //- User defined number of iterations - by default 4 iterations will
-            // be made
+            //  be made
             const label specifiedIterationsNumber_;
 
             //- Relative iteration counter
@@ -134,12 +134,6 @@ class adaptiveOverlapFringe
             //- Penalty coefficient for orhpan donors, i.e. orhpan donors
             // suitability
             const scalar orphanSuitability_;
-
-            //- Minimum local suitability - if donor/acceptor suitability
-            //  of donor/acceptor pair is lower than minimum local
-            //  fraction, neighbours of this acceptor are new acceptor
-            //  candidates
-            const scalar minLocalSuit_;
 
             // Suitable donor/acceptor pairs
             mutable donorAcceptorDynamicList suitableDAPairs_;

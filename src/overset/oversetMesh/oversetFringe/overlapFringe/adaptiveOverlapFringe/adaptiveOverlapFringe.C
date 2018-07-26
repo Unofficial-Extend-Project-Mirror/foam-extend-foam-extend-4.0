@@ -181,24 +181,25 @@ void Foam::adaptiveOverlapFringe::calcAddressing() const
 
     // Read user specified holes into allHoles list. Note: if the cell set
     // is not found, the list will be empty
-    labelList allHoles
+    cellSet allHoles
     (
-        cellSet
-        (
-            mesh,
-            holesSetName_,
-            IOobject::READ_IF_PRESENT,
-            IOobject::NO_WRITE
-        ).toc()
+        mesh,
+        holesSetName_,
+        IOobject::READ_IF_PRESENT,
+        IOobject::NO_WRITE
     );
 
     // Extend allHoles with cutHoles
-    allHoles.append(cutHoles);
+    forAll (cutHoles, chI)
+    {
+        // Note: cellSet is a hashSet so it automatically removes duplicates
+        allHoles.insert(cutHoles[chI]);
+    }
 
     // Mark all holes
-    forAll (allHoles, hI)
+    forAllConstIter (labelHashSet, allHoles, iter)
     {
-        const label& holeCellI = allHoles[hI];
+        const label& holeCellI = iter.key();
 
         // Mask eligible acceptors
         eligibleAcceptors[holeCellI] = false;
@@ -216,10 +217,10 @@ void Foam::adaptiveOverlapFringe::calcAddressing() const
     dynamicLabelList candidateAcceptors(mesh.nCells());
 
     // Loop through all holes and find acceptor candidates
-    forAll (allHoles, hI)
+    forAllConstIter (labelHashSet, allHoles, iter)
     {
         // Get neighbours of this hole cell
-        const labelList& hNbrs = cc[allHoles[hI]];
+        const labelList& hNbrs = cc[iter.key()];
 
         // Loop through neighbours of this hole cell
         forAll (hNbrs, nbrI)
@@ -361,7 +362,7 @@ void Foam::adaptiveOverlapFringe::calcAddressing() const
     // Transfer the acceptor list and allocate empty fringeHoles list, which
     // may be populated in updateIteration member function
     acceptorsPtr_ = new labelList(candidateAcceptors.xfer());
-    fringeHolesPtr_ = new labelList(cutHoles);
+    fringeHolesPtr_ = new labelList(allHoles.toc().xfer());
 }
 
 
@@ -416,48 +417,9 @@ Foam::adaptiveOverlapFringe::adaptiveOverlapFringe
     (
         dict.lookupOrDefault<scalar>("orphanSuitability", 1)
     ),
-    minLocalSuit_
-    (
-        dict.lookupOrDefault<scalar>("minLocalSuit", 1)
-    ),
     suitablePairsSuit_(0)
 
-{
-    if (minLocalSuit_ < 0)
-    {
-        WarningIn
-        (
-            "Foam::adaptiveOverlapFringe::adaptiveOverlapFringe \n"
-            "\t( "
-               "\n \t const fvMesh& mesh,"
-               "\n \t const oversetRegion& region, "
-               "\n \t const dictionary& dict"
-            "\n \t)"
-        )   << "Chosen minimal local suitability is less than or equal to 0."
-            << nl
-            << "This means all donor/acceptor pairs, except the ones "
-            << "whose donor is not within bounding box, will be "
-            << "considered as suitable."
-            << nl << endl;
-    }
-
-    if (minLocalSuit_ > 1)
-    {
-        WarningIn
-        (
-            "Foam::adaptiveOverlapFringe::adaptiveOverlapFringe \n"
-            "\t( "
-               "\n \t const fvMesh& mesh,"
-               "\n \t const oversetRegion& region, "
-               "\n \t const dictionary& dict"
-            "\n \t)"
-        )   << "Chosen minimal local suitability is greater than 1."
-            << nl
-            << "This means all donor/acceptor pairs will be considered"
-            << " unsuitable. "
-            << nl << endl;
-    }
-}
+{}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -502,7 +464,7 @@ bool Foam::adaptiveOverlapFringe::updateIteration
         << fringeIter_ << endl;
 
     // Store donor/acceptor pairs whose donors are not within bounding box or
-    // their suitability is lower than minLocalSuit_ into unsuitableDAPairs
+    // their suitability is lower than threshold into unsuitableDAPairs
     // donorAcceptorDynamicList. Neighbours of those acceptors will be
     // candidates for new acceptors.
     donorAcceptorDynamicList unsuitableDAPairs(donorAcceptorRegionData.size());
@@ -550,9 +512,9 @@ bool Foam::adaptiveOverlapFringe::updateIteration
             const scalar donorAcceptorSuit =
                 donorSuitability_->suitabilityFraction(curDA);
 
-            if (donorAcceptorSuit < minLocalSuit_)
+            if (!donorSuitability_->isDonorSuitable(curDA))
             {
-                // Suitability of this pair is lower than minLocalSuit_.
+                // Suitability of this pair is lower than threshold.
                 // Append it to unsuitableDAPairs list.
                 unsuitableDAPairs.append(curDA);
 
@@ -561,7 +523,7 @@ bool Foam::adaptiveOverlapFringe::updateIteration
             }
             else
             {
-                // Suitability of this pair is greater than minLocalSuit_.
+                // Suitability of this pair is greater than threshold.
 
                 // Add suitability to suitablePairsSuit_
                 suitablePairsSuit_ += donorAcceptorSuit;
@@ -1125,7 +1087,7 @@ bool Foam::adaptiveOverlapFringe::updateIteration
             << " iteration. " << nl
             << "Average donor/acceptor suitability is "
             << maxObject().suitability()*100 << "%."
-            << endl;
+            << nl << endl;
 
         // Final overlap is found. Clear iteration history.
         iterationDataHistory_.clear();

@@ -172,7 +172,7 @@ public:
 
 
     //- Destructor
-    // Note: the destructor is pure virtual to make this class abstract
+    //  Note: the destructor is pure virtual to make this class abstract
     virtual ~donorSuitability() = 0;
 
 
@@ -181,10 +181,22 @@ public:
         // Access
 
             //- Return a const reference to oversetFringe algorithm
-            const oversetFringe& oversetFringeAlgorithm() const;
+            inline const oversetFringe& oversetFringeAlgorithm() const
+            {
+                return oversetFringe_;
+            }
 
             //- Return coefficient dictionary
-            const dictionary& coeffDict() const;
+            inline const dictionary& coeffDict() const
+            {
+                return coeffDict_;
+            }
+
+            //- Return threshold
+            inline const scalar& threshold() const
+            {
+                return threshold_;
+            }
 
 
         // Overlap minimisation via Donor Suitability Function
@@ -194,7 +206,7 @@ public:
             //  greater DSF to get relative difference. Return relative
             //  difference (a value which is always between 0 and 1. Higher
             //  value means better suitability).
-            scalar suitabilityFraction 
+            scalar suitabilityFraction
             (
                 const donorAcceptor& daPair
             ) const
@@ -222,13 +234,13 @@ public:
 
 
             //- Is this donor/acceptor pair suitable?
-            //  if (1 - sutabilityFraction) < threshold
+            //  if sutabilityFraction > threshold
             bool isDonorSuitable
             (
                 const donorAcceptor& daPair
             ) const
             {
-                return (1 - suitabilityFraction(daPair)) < threshold_;
+                return (suitabilityFraction(daPair)) > threshold_;
             }
 };
 

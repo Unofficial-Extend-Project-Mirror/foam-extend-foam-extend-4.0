@@ -100,20 +100,4 @@ void Foam::donorSuitability::donorSuitability::combineDonorSuitabilityFunction
 }
 
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-const Foam::oversetFringe&
-Foam::donorSuitability::donorSuitability::oversetFringeAlgorithm() const
-{
-    return oversetFringe_;
-}
-
-
-const Foam::dictionary&
-Foam::donorSuitability::donorSuitability::coeffDict() const
-{
-    return coeffDict_;
-}
-
-
 // ************************************************************************* //
