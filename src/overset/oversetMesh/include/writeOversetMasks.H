@@ -42,5 +42,6 @@
         }
     }
 
-//     regionIndex.write();
+    // Write region index
+    regionIndex.write();
 }
