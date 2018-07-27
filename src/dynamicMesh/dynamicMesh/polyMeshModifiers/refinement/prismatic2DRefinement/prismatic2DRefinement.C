@@ -31,6 +31,7 @@ Author
 #include "faceSet.H"
 #include "pointSet.H"
 #include "emptyPolyPatch.H"
+#include "wedgePolyPatch.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -75,7 +76,8 @@ Foam::label Foam::prismatic2DRefinement::getAnchorLevel
     }
 
     // Sanity check: if we are expecting to find 4 points on a face which is not
-    // on empty patch and we find a face with 3 points, issue an error
+    // on special patch (empty or wedge) and we find a face with 3 points, issue
+    // an error
     if (f.size() <= 3 && nPoints == 4)
     {
         FatalErrorIn
@@ -120,7 +122,7 @@ Foam::label Foam::prismatic2DRefinement::getAnchorLevel
 void Foam::prismatic2DRefinement::appendFaceSplitInfo
 (
     const label& faceI,
-    const boolList& edgeOnEmptyPatch,
+    const boolList& edgeOnPatchToCut,
     const labelList& edgeMidPoint,
     DynamicList<label>& splitFacesIntoTwo,
     DynamicList<Pair<label> >& splitFacesEmptyEdges
@@ -134,36 +136,36 @@ void Foam::prismatic2DRefinement::appendFaceSplitInfo
 
     // Create placeholders for two edge levels. Initialise with -1
     // for sanity checks later on
-    label emptyPatchEdgeI = -1;
-    label emptyPatchEdgeJ = -1;
+    label specialPatchEdgeI = -1;
+    label specialPatchEdgeJ = -1;
 
     // Count number of edges for sanity checks
-    label nEdgesOnEmptyPatch = 0;
+    label nEdgesOnSpecialPatch = 0;
 
-    // Collect the two edge labels found on the empty patch
+    // Collect the two edge labels found on the special patch (empty or wedge)
     forAll (curEdges, i)
     {
         // Get edge index
         const label edgeI = curEdges[i];
 
-        if (edgeOnEmptyPatch[edgeI])
+        if (edgeOnPatchToCut[edgeI])
         {
-            // This edge is on empty patch, check whether its first,
-            // second or invalid
-            switch (nEdgesOnEmptyPatch)
+            // This edge is on special patch (empty or wedge), check whether it
+            // is first, second or invalid
+            switch (nEdgesOnSpecialPatch)
             {
                 case 0:
-                    emptyPatchEdgeI = edgeI;
+                    specialPatchEdgeI = edgeI;
                     break;
                 case 1:
-                    emptyPatchEdgeJ = edgeI;
+                    specialPatchEdgeJ = edgeI;
                     break;
                 default:
                     FatalErrorIn
                     (
                         "prismatic2DRefinement::appendFaceSplitInfo(...)"
                     )   << "Found more than two edges on face " << faceI
-                        << " on the empty patch."
+                        << " on the special patch (empty or wedge)."
                         << nl
                         << "Either this is not a valid 2D mesh or"
                         << " we are visiting wrong faces."
@@ -171,9 +173,9 @@ void Foam::prismatic2DRefinement::appendFaceSplitInfo
             }
 
             // Increment the counter
-            ++nEdgesOnEmptyPatch;
+            ++nEdgesOnSpecialPatch;
 
-        } // End if edge on empty patch
+        } // End if edge on special patch (empty or wedge)
 
     } // End loop over all edges
 
@@ -181,24 +183,24 @@ void Foam::prismatic2DRefinement::appendFaceSplitInfo
     // refinement (they should be)
     if (debug)
     {
-        if (edgeMidPoint[emptyPatchEdgeI] == -1)
+        if (edgeMidPoint[specialPatchEdgeI] == -1)
         {
             FatalErrorIn
             (
                 "prismatic2DRefinement::appendFaceSplitInfo(...)"
-            )   << "Empty patch edge with index: " << emptyPatchEdgeI
+            )   << "Empty patch edge with index: " << specialPatchEdgeI
                 << " not marked for splitting"
                 << nl
                 << "Check edgeMidPoint selection algorithm."
                 << abort(FatalError);
         }
 
-        if (edgeMidPoint[emptyPatchEdgeI] == -1)
+        if (edgeMidPoint[specialPatchEdgeI] == -1)
         {
             FatalErrorIn
             (
                 "prismatic2DRefinement::appendFaceSplitInfo(...)"
-            )   << "Empty patch edge with index: " << emptyPatchEdgeJ
+            )   << "Empty patch edge with index: " << specialPatchEdgeJ
                 << " not marked for splitting"
                 << nl
                 << "Check edgeMidPoint selection algorithm."
@@ -208,22 +210,22 @@ void Foam::prismatic2DRefinement::appendFaceSplitInfo
 
     // At this point, we should have the two edges we were looking
     // for, collect them into the list with additional sanity check
-    if (emptyPatchEdgeI > -1 && emptyPatchEdgeJ > -1)
+    if (specialPatchEdgeI > -1 && specialPatchEdgeJ > -1)
     {
         // Append the list of two edges in increasing order (just in
         // case we end up needing this information
-        if (emptyPatchEdgeI < emptyPatchEdgeJ)
+        if (specialPatchEdgeI < specialPatchEdgeJ)
         {
             splitFacesEmptyEdges.append
             (
-                Pair<label>(emptyPatchEdgeI, emptyPatchEdgeJ)
+                Pair<label>(specialPatchEdgeI, specialPatchEdgeJ)
             );
         }
         else
         {
             splitFacesEmptyEdges.append
             (
-                Pair<label>(emptyPatchEdgeJ, emptyPatchEdgeI)
+                Pair<label>(specialPatchEdgeJ, specialPatchEdgeI)
             );
         }
     }
@@ -232,10 +234,10 @@ void Foam::prismatic2DRefinement::appendFaceSplitInfo
         FatalErrorIn
         (
             "prismatic2DRefinement::appendFaceSplitInfo(...)"
-        )   << "Found invalid indices for edges on empty patches:"
+        )   << "Found invalid indices for edges on special patches:"
             << nl
-            << "emptyPatchEdgeI: " << emptyPatchEdgeI
-            << ", emptyPatchEdgeJ: " << emptyPatchEdgeJ
+            << "specialPatchEdgeI: " << specialPatchEdgeI
+            << ", specialPatchEdgeJ: " << specialPatchEdgeJ
             << nl
             << "Something went wrong. Check face edges."
             << abort(FatalError);
@@ -471,7 +473,7 @@ Foam::label Foam::prismatic2DRefinement::findMinEdgeConnectedLevel
 void Foam::prismatic2DRefinement::addFaceMids
 (
     const labelList& faceMidPoint,
-    const boolList& faceOnEmptyPatch,
+    const boolList& faceOnPatchToCut,
     const label& faceI,
     const label& cellI,
     face& newFace
@@ -482,7 +484,7 @@ void Foam::prismatic2DRefinement::addFaceMids
 
     // c) faceMidPoint for the face on the other side
     // The other face is uniquely defined as the other face of the same cell
-    // which is on empty patch
+    // which is on special patch (empty or wedge)
 
     // Get the cell
     const cell& cFaces = mesh_.cells()[cellI];
@@ -493,7 +495,7 @@ void Foam::prismatic2DRefinement::addFaceMids
         // Get face index
         const label& faceJ = cFaces[i];
 
-        if (faceOnEmptyPatch[faceJ] && (faceI != faceJ))
+        if (faceOnPatchToCut[faceJ] && (faceI != faceJ))
         {
             // This is the face we're looking for, add its
             // midpoint and double check if it is valid
@@ -661,10 +663,10 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
             << endl;
     }
 
-    // First mark faces and edges on empty patches. This data is used in
-    // PART 2 (collecting edges) and also PART 3 (collecting faces)
-    boolList faceOnEmptyPatch(mesh_.nFaces(), false);
-    boolList edgeOnEmptyPatch(mesh_.nEdges(), false);
+    // First mark faces and edges on special patches (empty or wedge). This data
+    // is used in PART 2 (collecting edges) and also PART 3 (collecting faces)
+    boolList faceOnPatchToCut(mesh_.nFaces(), false);
+    boolList edgeOnPatchToCut(mesh_.nEdges(), false);
 
     // Get boundary
     const polyBoundaryMesh& boundaryMesh = mesh_.boundaryMesh();
@@ -678,8 +680,8 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
         // Get current patch
         const polyPatch& curPatch = boundaryMesh[patchI];
 
-        // Check whether this patch is emptyPolyPatch
-        if (isA<emptyPolyPatch>(curPatch))
+        // Check whether this patch is special (empty or wedge)
+        if (isA<emptyPolyPatch>(curPatch) || isA<wedgePolyPatch>(curPatch))
         {
             // Get start and end face labels
             const label startFaceI = curPatch.start();
@@ -689,7 +691,7 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
             for (label faceI = startFaceI; faceI < endFaceI; ++faceI)
             {
                 // Mark face
-                faceOnEmptyPatch[faceI] = true;
+                faceOnPatchToCut[faceI] = true;
 
                 // Get edges of this face
                 const labelList& curEdges = meshFaceEdges[faceI];
@@ -697,16 +699,17 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
                 // Mark all edges
                 forAll (curEdges, i)
                 {
-                    edgeOnEmptyPatch[curEdges[i]] = true;
+                    edgeOnPatchToCut[curEdges[i]] = true;
                 }
             }
         }
     }
 
-    // Now that we have marked faces and edges on empty patches, let's collect
-    // refined edges. Refined edges are defined by having both their point
-    // levels <= cell level, i.e. if any cell that gets split uses this edge
-    // and the edge is on empty patch, the edge needs to be split
+    // Now that we have marked faces and edges on special patches (empty or
+    // wedge), let's collect refined edges. Refined edges are defined by having
+    // both their point levels <= cell level, i.e. if any cell that gets split
+    // uses this edge and the edge is on special patch (empty or wedge), the
+    // edge needs to be split
 
     // Get necessary mesh data
     const labelListList& meshCellEdges = mesh_.cellEdges();
@@ -732,9 +735,10 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
             const label& edgeI = cEdges[j];
             const edge& e = meshEdges[edgeI];
 
-            if (edgeOnEmptyPatch[edgeI])
+            if (edgeOnPatchToCut[edgeI])
             {
-                // Edge is on empty patch, check whether it needs to be split
+                // Edge is on special patch (empty or wedge), check whether it
+                // needs to be split
                 if
                 (
                     pointLevel_[e[0]] <= cellLevel_[cellI]
@@ -746,7 +750,8 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
                     edgeMidPoint[edgeI] = 12345;
                 }
             }
-            // Else nothing to do: can't split edges that are not on empty patch
+            // Else nothing to do: can't split edges that are not on special
+            // patch (empty or wedge)
         } // End for all edges of the refined cell
     } // End for all cells
 
@@ -835,50 +840,52 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
 
     // PART 3: Collect faces for refinement. Faces need to be collected in two
     // distinct categories:
-    // 1. Faces found on empty patches that will be split into n faces (where n
-    //    is the number of edges per face),
-    // 2. Faces not on empty patches that will be always split into two
-    //    faces. For each of these faces, collect the two edges found on
-    //    opposing sides of the empty patch.
+    // 1. Faces found on special patches (empty or wedge) that will be split
+    //    into n faces (where n is the number of edges per face),
+    // 2. Faces not on special patches (empty or wedge) that will be always
+    //    split into two faces. For each of these faces, collect the two edges
+    //    found on opposing sides of the special patch (empty or wedge).
 
     if (debug)
     {
         Pout<< "prismatic2DRefinement::setRefinementInstruction" << nl
             << "Allocating face midpoints and collecting faces that are"
-            << " not on empty patch."
+            << " not on special patch (empty or wedge)."
             << endl;
     }
 
     // Get face anchor level based on the face type. For split face found on
-    // empty patch, it is guaranteeed that we will have at least 3 points with
-    // level <= anchor level. For split face not on empty patch, it is
-    // guaranteed that we will have at least 4 points with level <= anchor
-    // level. These are the corner points.
+    // special patch (empty or wedge), it is guaranteeed that we will have at
+    // least 3 points with level <= anchor level. For split face not on special
+    // (empty or wedge patch), it is guaranteed that we will have at least 4
+    // points with level <= anchor level. These are the corner points.
     labelList faceAnchorLevel(mesh_.nFaces());
     for (label faceI = 0; faceI < mesh_.nFaces(); ++faceI)
     {
-        if (faceOnEmptyPatch[faceI])
+        if (faceOnPatchToCut[faceI])
         {
-            // Face on empty patch, at least 3 points need to have
+            // Face on special patch, at least 3 points need to have
             // level <= anchor level
             faceAnchorLevel[faceI] = getAnchorLevel(faceI, 3);
         }
         else
         {
-            // Face not on empty patch, at least 4 points need to have
+            // Face not on special patch, at least 4 points need to have
             // level <= anchor level
             faceAnchorLevel[faceI] = getAnchorLevel(faceI, 4);
         }
     }
 
-    // Split faces on empty patches will be collected in faceMidPoint list:
+    // Split faces on special patches (empty or wedge) will be collected in
+    // faceMidPoint list:
     // Not refined = -1
     // Shall be refined > -1 (label of added mid point)
     labelList faceMidPoint(mesh_.nFaces(), -1);
 
-    // Split faces not on empty patches will be collected into splitFacesIntoTwo
-    // dynamic list. For each of these faces, we also need to collect its two
-    // edges that are found on empty patch
+    // Split faces not on special patches (empty or wedge) will be collected
+    // into splitFacesIntoTwo dynamic list. For each of these faces, we also
+    // need to collect its two edges that are found on special patch (empty or
+    // wedge)
 
     // Allocate enough storage to prevent excessive resizing
     const label nSplitFacesIntoTwo = 3*cellsToRefine_.size();
@@ -913,16 +920,17 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
         )
         {
             // Note: this is internal face so we don't need to check whether the
-            // face is on empty patch. It can't be by definition
+            // face is on special patch (empty or wedge). It can't be by
+            // definition
 
             // Does two things:
             // 1. Appends the face to splitFacesIntoTwo list
-            // 2. Append the two edges on empty patch to splitFaceEmptyEdges
-            //    list
+            // 2. Append the two edges on special patch (empty or wedge) to
+            //    splitFaceEmptyEdges list
             appendFaceSplitInfo
             (
                 faceI,
-                edgeOnEmptyPatch,
+                edgeOnPatchToCut,
                 edgeMidPoint,
                 splitFacesIntoTwo,
                 splitFacesEmptyEdges
@@ -970,28 +978,29 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
              || newNeiLevel[i] > faceAnchorLevel[faceI]
             )
             {
-                if (faceOnEmptyPatch[faceI])
+                if (faceOnPatchToCut[faceI])
                 {
-                    // This face is on the empty patch and will be split into n
-                    // faces (n is the number of edges for this face) and the
-                    // face mid point will be added. Mark the face for splitting
+                    // This face is on the special patch (empty or wedge) and
+                    // will be split into n faces (n is the number of edges for
+                    // this face) and the face mid point will be added. Mark the
+                    // face for splitting
                     faceMidPoint[faceI] = 12345;
                 }
                 else
                 {
                     // Does two things:
                     // 1. Appends the face to splitFacesIntoTwo list
-                    // 2. Append the two edges on empty patch to splitFaceEmptyEdges
-                    //    list
+                    // 2. Append the two edges on special patch (empty or wedge)
+                    //    to splitFaceEmptyEdges list
                     appendFaceSplitInfo
                     (
                         faceI,
-                        edgeOnEmptyPatch,
+                        edgeOnPatchToCut,
                         edgeMidPoint,
                         splitFacesIntoTwo,
                         splitFacesEmptyEdges
                     );
-                } // End if the face is not on empty patch
+                } // End if the face is not on special patch (empty or wedge)
             } // End whether the face needs to be considered
         } // End loop over all boundary faces
     } // End memory management for syncing owner/neighbour face levels
@@ -999,31 +1008,32 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
 
     // Add face points. Note: no need to sync face mid points (as we did for
     // edge mid points) since processor faces do not introduce new points, only
-    // faces on empty patch do
+    // faces on special patch (empty or wedge) do
 
     // Get face centres
     const vectorField& meshFaceCentres = mesh_.faceCentres();
 
-    // Loop through faces on empty patches only
+    // Loop through faces on special patches (empty or wedge) only
     forAll (boundaryMesh, patchI)
     {
         // Get current patch
         const polyPatch& curPatch = boundaryMesh[patchI];
 
-        // Check whether this patch is emptyPolyPatch
-        if (isA<emptyPolyPatch>(curPatch))
+        // Check whether this patch is special (empty or wedge)
+        if (isA<emptyPolyPatch>(curPatch) || isA<wedgePolyPatch>(curPatch))
         {
             // Get start and face labels
             const label startFaceI = curPatch.start();
             const label endFaceI = startFaceI + curPatch.size();
 
-            // Loop through all empty patch faces (global indexing)
+            // Loop through all special patch faces (global indexing)
             for (label faceI = startFaceI; faceI < endFaceI; ++faceI)
             {
                 if (faceMidPoint[faceI] > -1)
                 {
-                    // Face on empty patch marked to be split. Add the point at
-                    // face centre and replace faceMidPoint with new point label
+                    // Face on special patch (empty or wedge) marked to be
+                    // split. Add the point at face centre and replace
+                    // faceMidPoint with new point label
 
                     faceMidPoint[faceI] = ref.setAction
                     (
@@ -1036,8 +1046,8 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
                         )
                     );
                 } // End if face marked for splitting
-            } // End loop over all faces on empty patch
-        } // End if emptyPolyPatch check
+            } // End loop over all faces on special patch (empty or wedge)
+        } // End if special patch check
     } // End loop for all patches
 
     // Write out all split faces as a face set for debugging
@@ -1063,7 +1073,7 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
         splitNFaces.write();
 
         // Create faceSet containing all faces that need to be split into 2
-        // faces (faces not on empty patch)
+        // faces (faces not on special patch: empty or wedge)
         faceSet splitTwoFaces(mesh_, "splitTwoFaces", 3*cellsToRefine_.size());
 
         forAll (splitFacesIntoTwo, i)
@@ -1084,11 +1094,11 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
     // Now we have all the information we need to perform the refinement and we
     // no longer need to refer to cellsToRefine_. The information is in:
     // - refineCellsMask = true : cell needs to be split
-    // - edgeMidPoint >= 0     : edge on empty patch that needs to be split
-    // - faceMidPoint >= 0     : face on empty patch that needs to be split
+    // - edgeMidPoint >= 0     : edge on special patch that needs to be split
+    // - faceMidPoint >= 0     : face on special patch that needs to be split
     //                           into n faces (where n is the number of edges)
     // - splitFacesIntoTwo     : list of faces that need to be split into two
-    //                           (face not on empty patch)
+    //                           (face not on special patch)
     // - splitFacesEmptyEdges  : holds the two edges of the face which needs to
     //                           be split into two
 
@@ -1217,7 +1227,7 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
     // owner/neighbours of new and modified faces, we need to know which cell
     // came from which point. The mapping is not uniquely defined as in
     // polyhedralRefinement when we had 1 point = 1 cell. Here, we have two
-    // points that correspond to a single cell, one on one side of the empty
+    // points that correspond to a single cell, one on one side of the special
     // patch and the other on other side. This information will be collected in
     // a HashTable<label, Pair<label> >, where the key will be a pair of
     // global point index and global cell index, while the value is local index
@@ -1239,8 +1249,9 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
         // Check whether this face needs to be split into n faces
         if (faceMidPoint[faceI] > -1)
         {
-            // This is a face that will be split and is on empty patch by
-            // definition, get the cell index by looking at owner only
+            // This is a face that will be split and is on special patch (empty
+            // or wedge) by definition, get the cell index by looking at owner
+            // only
             const label& cellI = meshFaceOwner[faceI];
 
             // Get cell added cells
@@ -1253,7 +1264,8 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
             {
                 // First face that hasn't been visited. Start adding cells
                 // point-by-point and keep track of mapping necessary for
-                // splitting other (not on empty patch) faces into two
+                // splitting other (not on special patch: empty or wedge) faces
+                // into two
 
                 // Set the total number of added cells to number of anchors
                 // divided by two. Note: number of anchors needs to be an even
@@ -1327,11 +1339,12 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
                             // Get the edge index
                             const label& edgeI = pEdges[peI];
 
-                            if (!edgeOnEmptyPatch[edgeI])
+                            if (!edgeOnPatchToCut[edgeI])
                             {
-                                // Edge is not on empty patch, therefore
-                                // this is the edge we're looking
-                                // for. Collect the other point of the edge
+                                // Edge is not on special patch (empty or
+                                // wedge), therefore this is the edge we're
+                                // looking for. Collect the other point of the
+                                // edge
                                 const label pointJ =
                                     meshEdges[edgeI].otherVertex(pointI);
 
@@ -1364,8 +1377,9 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
                         "prismatic2DRefinement::setRefinementInstruction(...)"
                     )   << "Problem while adding cells."
                         << nl
-                        << "Going through base face on empty patch and adding"
-                        << " cells, we collected: " << cellCounter << " cells."
+                        << "Going through base face on special patch"
+                        << " (empty or wedge) and adding cells, we collected: "
+                        << cellCounter << " cells."
                         << nl
                         << "While the number of anchor points is: "
                         << cAnchors.size()
@@ -1387,9 +1401,9 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
 
     // PART 6: Adding faces
 
-    // 6.1. Existing faces on empty patches that get split (into n faces
-    //      where n is the number of points or edges)
-    // 6.2. Existing faces not on empty patches that get split into two
+    // 6.1. Existing faces on special patches (empty or wedge) that get split
+    //      (into n faces where n is the number of points or edges)
+    // 6.2. Existing faces not on special patches that get split into two
     // 6.3. Existing faces that do not get split but only edges get split
     // 6.4. Existing faces that do not get split but get new owner/neighbour
     // 6.5. New internal faces inside split cells
@@ -1403,8 +1417,8 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
 
     // Get all faces to split:
     // a) All faces of a cell being split
-    // b) All faces on empty patch that are being split
-    // c) All faces not on empty patch that are being split
+    // b) All faces on special patch that are being split
+    // c) All faces not on special patch that are being split
     // d) Both faces of an edge that is being split
     // Note: although a bit redundant, loop over everything above
     boolList facesToSplit(mesh_.nFaces(), false);
@@ -1429,7 +1443,7 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
         }
     }
 
-    // b) All faces on empty patch that are being split
+    // b) All faces on special patch that are being split
     forAll(faceMidPoint, faceI)
     {
         if (faceMidPoint[faceI] > -1)
@@ -1440,7 +1454,7 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
         }
     }
 
-    // c) All faces not on empty patch that are being split
+    // c) All faces not on special patch that are being split
     forAll(splitFacesIntoTwo, i)
     {
         // Get face index
@@ -1469,13 +1483,13 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
     // facesToSplit for that face will be set back to 0, i.e. marked as finished
 
 
-    // PART 6.1. Add/modify faces for each face on empty patch that is being
+    // PART 6.1. Add/modify faces for each face on special patch that is being
     // split
 
     if (debug)
     {
         Pout<< "prismatic2DRefinement::setRefinementInstruction(...)" << endl
-            << "Splitting faces on empty patches..." << endl;
+            << "Splitting faces on special patches (empty or wedge)..." << endl;
     }
 
     forAll(faceMidPoint, faceI)
@@ -1589,18 +1603,18 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
     } // End for all faces
 
 
-    // PART 6.2. Add/modify faces for each face not on empty patch that is being
-    // split into two
+    // PART 6.2. Add/modify faces for each face not on special patch that is
+    // being split into two
 
     if (debug)
     {
         Pout<< "prismatic2DRefinement::setRefinementInstruction(...)" << nl
-            << "Splitting faces not on empty patches..."
+            << "Splitting faces not on special patches (empty or wedge)..."
             << endl;
     }
 
-    // Loop through faces that are not on empty patch. These will be split into
-    // two faces only
+    // Loop through faces that are not on special patch. These will be split
+    // into two faces only
     forAll (splitFacesIntoTwo, i)
     {
         // Get face index
@@ -1637,7 +1651,7 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
             boolList visitedPoint(f.size(), false);
 
             // New face always has four points/edges for 2D face splitting of
-            // a face that is not on empty patch
+            // a face that is not on special patch
             face newFace(4);
 
             // Loop through all points of original face
@@ -1689,7 +1703,8 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
                         (
                             "prismatic2DRefinement::appendFaceSplitInfo(...)"
                         )   << "Trying to split a face into two, but"
-                            << " edges on empty patches are not properly set."
+                            << " edges on special patches (empty or wedge)"
+                            << " are not properly set."
                             << nl
                             << "Edge: " << edgeIndexI << " with new point: "
                             << edgeMidPoint[edgeIndexI]
@@ -1747,14 +1762,16 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
                         // Get the edge index
                         const label& pointEdgeI = pEdges[peI];
 
-                        if (!edgeOnEmptyPatch[pointEdgeI])
+                        if (!edgeOnPatchToCut[pointEdgeI])
                         {
-                            // Edge is not on empty patch, therefore this is the
-                            // edge we're looking for. Collect the other point
+                            // Edge is not on special patch (empty or wedge),
+                            // therefore this is the edge we're looking for.
+                            // Collect the other point
                             const label pointJ =
                                 meshEdges[pointEdgeI].otherVertex(pointI);
 
-                            // Insert the point into the face at the last location
+                            // Insert the point into the face at the last
+                            // location
                             newFace[3] = pointJ;
 
                             // Mask local point index as visited by going
@@ -1979,7 +1996,7 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
     // owner/neighbour cells for new faces
     forAll(faceMidPoint, faceI)
     {
-        // Get owner of the face. For face on empty patch
+        // Get owner of the face. For face on special patch (empty or wedge)
         const label& cellI = meshFaceOwner[faceI];
 
         // Check whether this face has been split and whether the cell has been
@@ -2057,7 +2074,7 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
                 // is an anchor
                 if (isEdgeSplit && isOtherEdgePointAnchor)
                 {
-                    // Variant i) Edge is split and other edge point is an anchor
+                    // Variant i) Edge is split and other edge point is anchor
 
                     // Create the new face and start collecting points
                     // a) edgeMidPoint for this edge
@@ -2072,15 +2089,15 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
                     addFaceMids
                     (
                         faceMidPoint,
-                        faceOnEmptyPatch,
+                        faceOnPatchToCut,
                         faceI,
                         cellI,
                         newFace
                     );
 
                     // d) edgeMidPoint for the edge on the other side
-                    // The other edge is uniquely defined as the edge on empty
-                    // patch sharing the same face as this edge
+                    // The other edge is uniquely defined as the edge on special
+                    // patch (empty or wedge) sharing the same face as this edge
 
                     // Get the edge faces
                     const labelList& eFaces = meshEdgeFaces[edgeI];
@@ -2088,10 +2105,10 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
                     // Loop through edge faces
                     forAll(eFaces, i)
                     {
-                        // Get the face and check whether it is on empty patch
+                        // Get the face and check whether it is on special patch
                         const label& faceK = eFaces[i];
 
-                        if (!faceOnEmptyPatch[faceK])
+                        if (!faceOnPatchToCut[faceK])
                         {
                             // Found the face, need to search its edges
                             const labelList& otherFaceEdges =
@@ -2102,11 +2119,12 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
                                 // Get the edge
                                 const label& edgeJ = otherFaceEdges[j];
 
-                                if (edgeOnEmptyPatch[edgeJ] && (edgeI != edgeJ))
+                                if (edgeOnPatchToCut[edgeJ] && (edgeI != edgeJ))
                                 {
-                                    // Edge is on empty patch, this must be the
-                                    // one we are looking for. Add its midpoint
-                                    // and double check if it is valid
+                                    // Edge is on special patch (empty or
+                                    // wedge), this must be the one we are
+                                    // looking for. Add its midpoint and double
+                                    // check if it is valid
                                     if (edgeMidPoint[edgeJ] > -1)
                                     {
                                         newFace[3] = edgeMidPoint[edgeJ];
@@ -2120,19 +2138,21 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
                                             "setRefinementInstruction(...)"
                                         )   << "Other edge: "
                                             << edgeJ
-                                            << " has not been selected for splitting,"
-                                            << " while the edge on original side: "
+                                            << " has not been selected for"
+                                            << " splitting, while the edge on"
+                                            << " original side: "
                                             << edgeI
                                             << " has been selected."
                                             << abort(FatalError);
                                     }
                                 } // End if this is our "other" edge
-                            } // End for all other (non empty patch) face edges
+                            } // End for all other (non special patch: empty or
+                              // wedge) face edges
 
                             // Break out since we must have found the candidate
                             break;
 
-                        } // End if face not on empty patch
+                        } // End if face not on special patch (empty or wedge)
 
                     } // End for all edge faces
 
@@ -2156,7 +2176,7 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
                     addFaceMids
                     (
                         faceMidPoint,
-                        faceOnEmptyPatch,
+                        faceOnPatchToCut,
                         faceI,
                         cellI,
                         newFace
@@ -2164,7 +2184,7 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
 
                     // d) other point on the other side
                     // The other point is uniquely defined as the other point of
-                    // the edge of this point which is not on empty patch
+                    // the edge of this point which is not on special patch
 
                     // Get point edges
                     const labelList& pEdges = meshPointEdges[pointJ];
@@ -2175,7 +2195,7 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
                         // Get the edge index
                         const label& edgeJ = pEdges[i];
 
-                        if (!edgeOnEmptyPatch[edgeJ])
+                        if (!edgeOnPatchToCut[edgeJ])
                         {
                             // Found our edge, set the point on the other side
                             // of the edge as the last point in face
@@ -2427,8 +2447,8 @@ void Foam::prismatic2DRefinement::setUnrefinementInstruction
 
     // Memory management
     {
-        // Mark faces on empty patches to exclude them
-        boolList faceOnEmptyPatch(mesh_.nFaces(), false);
+        // Mark faces on special patches (empty or wedge) to exclude them
+        boolList faceOnPatchToCut(mesh_.nFaces(), false);
 
         // Get boundary
         const polyBoundaryMesh& boundaryMesh = mesh_.boundaryMesh();
@@ -2439,8 +2459,8 @@ void Foam::prismatic2DRefinement::setUnrefinementInstruction
             // Get current patch
             const polyPatch& curPatch = boundaryMesh[patchI];
 
-            // Check whether this patch is emptyPolyPatch
-            if (isA<emptyPolyPatch>(curPatch))
+            // Check whether this patch is special (empty or wedge)
+            if (isA<emptyPolyPatch>(curPatch) || isA<wedgePolyPatch>(curPatch))
             {
                 // Get start and end face labels
                 const label startFaceI = curPatch.start();
@@ -2450,7 +2470,7 @@ void Foam::prismatic2DRefinement::setUnrefinementInstruction
                 for (label faceI = startFaceI; faceI < endFaceI; ++faceI)
                 {
                     // Mark face
-                    faceOnEmptyPatch[faceI] = true;
+                    faceOnPatchToCut[faceI] = true;
                 }
             }
         }
@@ -2473,9 +2493,9 @@ void Foam::prismatic2DRefinement::setUnrefinementInstruction
                 // Get face index
                 const label& faceI = pFaces[j];
 
-                if (!faceOnEmptyPatch[faceI])
+                if (!faceOnPatchToCut[faceI])
                 {
-                    // Face is not on empty patch, insert it into hash set
+                    // Face is not on special patch, insert it into hash set
                     splitFaces.insert(faceI);
                 }
             }

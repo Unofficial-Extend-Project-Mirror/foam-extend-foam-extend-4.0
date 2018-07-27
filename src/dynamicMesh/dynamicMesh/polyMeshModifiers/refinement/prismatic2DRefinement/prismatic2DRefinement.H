@@ -32,16 +32,17 @@ Description
 
     Each prismatic cell is split by the following procedure:
     1. Adding points at the face centres and edge centres of all faces found on
-       an empty patch.
+       an special patch: empty or wedge.
     2. Adding n cells per existing cell where n is the number of corner points
-       at the face on empty patch.
-    3. Splitting each of the faces on empty patch into multiple faces going
-       from: existing corner point -> new edge centre point -> new face centre
-       point -> other new edge centre point (sharing the same corner point)
-    4. Spliiting each of the faces not on an empty patch into two faces going
-       from: existing corner point -> existing corner point on the other side
-       -> new edge centre point on the other side -> new edge centre point on
-       my side
+       at the face on special patch (empty or wedge).
+    3. Splitting each of the faces on special patch (empty or wedge) into
+       multiple faces going from: existing corner point -> new edge centre point
+       -> new face centre point -> other new edge centre point (sharing the same
+       corner point)
+    4. Spliiting each of the faces not on an special patch (empty or wedge) into
+       two faces going from: existing corner point -> existing corner point on
+       the other side -> new edge centre point on the other side -> new edge
+       centre point on my side
     4. Adding internal faces going from:
        new edge centre point -> new face centre point -> new other face
        centre point on the other side -> new other edge mid point on the other
@@ -92,7 +93,7 @@ private:
             //- Append given face into a dynamic list containing split faces
             //  that will be split into two faces (third parameter). Additionaly
             //  append information on which of the two edges of the face are on
-            //  empty patch into a dynamic list (fourth parameter)
+            //  special patch into a dynamic list (fourth parameter)
             void appendFaceSplitInfo
             (
                 const label& faceI,
