@@ -131,7 +131,7 @@ void Foam::periodicOscillation::stabilise
     x -= (x & dir_)*dir_;
 
     // ... then add the correct displacement
-    x += dir_*sin(omega_*t + phi_);
+    x += dir_*a_*sin(omega_*t + phi_);
 
 
     // Set the velocity according to periodic oscillation
@@ -140,7 +140,7 @@ void Foam::periodicOscillation::stabilise
     u -= (u & dir_)*dir_;
 
     // ... then add the correct velocity
-    u += dir_*cos(omega_*t + phi_);
+    u += dir_*a_*omega_*cos(omega_*t + phi_);
 }
 
 
