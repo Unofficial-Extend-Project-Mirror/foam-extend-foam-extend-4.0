@@ -121,9 +121,15 @@ rpm_make()
             packageTarBall=`basename $_PACKAGE_URL`
 
             if [ ! -e "SOURCES/$packageTarBall" ]; then
-		echo "Download $packageTarBall from : $_PACKAGE_URL"
-		#( cd SOURCES; wget --no-check-certificate $_PACKAGE_URL )
-		( cd SOURCES; curl -L -k -O $_PACKAGE_URL )
+				echo "Download $packageTarBall from : $_PACKAGE_URL"
+				#( cd SOURCES; wget --no-check-certificate $_PACKAGE_URL )
+
+				( cd SOURCES; curl --connect-timeout 60 \
+								   --max-time 3600 \
+								   --retry 6 \
+								   --retry-delay 10 \
+								   --retry-max-time 60 \
+								   -L -k -O $_PACKAGE_URL )
             fi
 	fi
 
@@ -284,22 +290,42 @@ uninstallPackage()
     pkg="$1";
 
     echo "Removing ${pkg}"
-    [ -f $WM_THIRD_PARTY_DIR/rpmBuild/RPMS/$architecture/${pkg}*.rpm ] && \
-      rm -f $WM_THIRD_PARTY_DIR/rpmBuild/RPMS/$architecture/${pkg}*.rpm || \
-      echo "Not found: $WM_THIRD_PARTY_DIR/rpmBuild/RPMS/$architecture/${pkg}*.rpm"
-    [ -f $WM_THIRD_PARTY_DIR/rpmBuild/SOURCES/${pkg}.tar.gz ] && \
-      rm -f $WM_THIRD_PARTY_DIR/rpmBuild/SOURCES/${pkg}.tar.gz || \
-      echo "Not found: $WM_THIRD_PARTY_DIR/rpmBuild/SOURCES/${pkg}.tar.gz"
-    [ -f $WM_THIRD_PARTY_DIR/rpmBuild/TGZS/$architecture/${pkg}.tgz ] && \
-      rm -f $WM_THIRD_PARTY_DIR/rpmBuild/TGZS/$architecture/${pkg}.tgz || \
-      echo "Not found: $WM_THIRD_PARTY_DIR/rpmBuild/TGZS/$architecture/${pkg}.tgz"
-    [ -d $WM_THIRD_PARTY_DIR/rpmBuild/BUILD/${pkg}* ] && \
-      rm -rf $WM_THIRD_PARTY_DIR/rpmBuild/BUILD/${pkg}* || \
-      echo "Not found: $WM_THIRD_PARTY_DIR/rpmBuild/BUILD/${pkg}*"
-    if [ "$2" = "alsoPackage" ]; then
-      [ -d $WM_THIRD_PARTY_DIR/packages/$pkg ] && \
-        rm -rf $WM_THIRD_PARTY_DIR/packages/$pkg || \
-        echo "Not found: $WM_THIRD_PARTY_DIR/packages/$pkg"
+    if [[ -f $WM_THIRD_PARTY_DIR/rpmBuild/RPMS/$architecture/${pkg}-$WM_OPTIONS.$architecture.rpm ]]; then
+		rm -f $WM_THIRD_PARTY_DIR/rpmBuild/RPMS/$architecture/${pkg}-$WM_OPTIONS.$architecture.rpm
+	else
+		echo "Not found: $WM_THIRD_PARTY_DIR/rpmBuild/RPMS/$architecture/${pkg}*.rpm"
+	fi
+
+	if [[ -f $WM_THIRD_PARTY_DIR/rpmBuild/SOURCES/${pkg}.tar.gz ]]; then
+		rm -f $WM_THIRD_PARTY_DIR/rpmBuild/SOURCES/${pkg}.tar.gz
+	else
+		echo "Not found: $WM_THIRD_PARTY_DIR/rpmBuild/SOURCES/${pkg}.tar.gz"
+	fi
+
+    if [[ -f $WM_THIRD_PARTY_DIR/rpmBuild/TGZS/$architecture/${pkg}.tgz ]]; then
+		rm -f $WM_THIRD_PARTY_DIR/rpmBuild/TGZS/$architecture/${pkg}.tgz
+	else
+		echo "Not found: $WM_THIRD_PARTY_DIR/rpmBuild/TGZS/$architecture/${pkg}.tgz"
+	fi
+
+	foundDir=false
+	for dir_ in $WM_THIRD_PARTY_DIR/rpmBuild/BUILD/${pkg}*
+	do
+		if [[ -d "$dir_" ]]; then
+			rm -rf $WM_THIRD_PARTY_DIR/rpmBuild/BUILD/${pkg}*
+			foundDir=true
+		fi
+	done
+	if [ "$foundDir" = false ] ; then
+		echo "Not found: $WM_THIRD_PARTY_DIR/rpmBuild/BUILD/${pkg}*"
+	fi
+
+    if [[ "$2" = "alsoPackage" ]]; then
+      if [[ -d $WM_THIRD_PARTY_DIR/packages/$pkg ]]; then
+          rm -rf $WM_THIRD_PARTY_DIR/packages/$pkg
+	  else
+          echo "Not found: $WM_THIRD_PARTY_DIR/packages/$pkg"
+		  fi
     else
         echo "Add option alsoPackage to remove the installed files."
     fi

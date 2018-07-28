@@ -91,7 +91,7 @@ runParallel ()
     fi
         cat system/fvSchemes > $LOG_NAME
         cat system/fvSolution >> $LOG_NAME
-        ( $mpirunProg -np $1 $APP_RUN -parallel < /dev/null > $LOG_NAME 2>&1 )
+        ( $mpirunProg $MPIRUN_OPTIONS -np $1 $APP_RUN -parallel < /dev/null > $LOG_NAME 2>&1 )
     fi
 }
 

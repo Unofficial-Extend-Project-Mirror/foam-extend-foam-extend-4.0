@@ -108,6 +108,13 @@ then
 	echo "Building Mesquite 2.1.2"
 	( rpm_make -p mesquite-2.1.2 -s mesquite-2.1.2.spec -u http://downloads.sourceforge.net/project/foam-extend/ThirdParty/mesquite-2.1.2.tar.gz )
     }
+    # Mesquite 2.3.0
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_MESQUITE_230" ] && {
+	echo "Building Mesquite 2.3.0"
+	( rpm_make -p mesquite-2.3.0 -s mesquite-2.3.0.spec -u https://software.sandia.gov/mesquite/mesquite-2.3.0.tar.gz )
+	# ( rpm_make -p mesquite-2.3.0 -s mesquite-2.3.0.spec -u http://downloads.sourceforge.net/project/foam-extend/ThirdParty/mesquite-2.3.0.tar.gz )
+    }
 else
     echo "Using system installed Mesquite"
     echo ""
@@ -183,6 +190,18 @@ then
 	echo "Building PyFoam 0.6.4"
 	( rpm_make -p PyFoam-0.6.4 -s PyFoam-0.6.4.spec  -u http://openfoamwiki.net/images/3/3b/PyFoam-0.6.4.tar.gz -n PyFoam-0.6.4-1.noarch -a noarch)
     }
+    # PyFoam 0.6.6
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_PYFOAM_066" ] && {
+	echo "Building PyFoam 0.6.6"
+	( rpm_make -p PyFoam-0.6.6 -s PyFoam-0.6.6.spec  -u https://openfoamwiki.net/images/a/af/PyFoam-0.6.6.tar.gz -n PyFoam-0.6.6-1.noarch -a noarch)
+    }
+    # PyFoam 0.6.9
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_PYFOAM_069" ] && {
+	echo "Building PyFoam 0.6.9"
+	( rpm_make -p PyFoam-0.6.9 -s PyFoam-0.6.9.spec  -u https://files.pythonhosted.org/packages/78/f5/8f65b66c8ac0e5415f785809e182dd0f0dc562a42094e1a86bd22c7d7ece/PyFoam-0.6.9.tar.gz -n PyFoam-0.6.9-1.noarch -a noarch)
+    }
 else
     echo "Using system installed PyFoam"
     echo ""
@@ -191,6 +210,13 @@ fi
 # hwloc
 if [ -z "$HWLOC_SYSTEM" ]
 then
+    # hwloc 2.0.1
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_HWLOC_201" ] && {
+	echo "Building hwloc 2.0.1"
+    ( rpm_make -p hwloc-2.0.1 -s hwloc-2.0.1.spec  -u http://www.open-mpi.org/software/hwloc/v2.0/downloads/hwloc-2.0.1.tar.gz )
+	# ( rpm_make -p hwloc-2.0.1 -s hwloc-2.0.1.spec  -u http://downloads.sourceforge.net/project/foam-extend/ThirdParty/hwloc-2.0.1.tar.gz )
+    }
     # hwloc 1.10.1
     #
     [ ! -z "$WM_THIRD_PARTY_USE_HWLOC_1101" ] && {
