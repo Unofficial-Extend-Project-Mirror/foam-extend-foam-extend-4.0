@@ -197,10 +197,11 @@ void Foam::oversetRegion::calcDonorAcceptorCells() const
             //  - cellSearch (depends on eligible donors).
             if (!regionFoundSuitableOverlap)
             {
-                deleteDemandDrivenData(curRegion.holeCellsPtr_);
-                deleteDemandDrivenData(curRegion.eligibleDonorCellsPtr_);
                 deleteDemandDrivenData(curRegion.cellSearchPtr_);
             }
+
+            deleteDemandDrivenData(curRegion.holeCellsPtr_);
+            deleteDemandDrivenData(curRegion.eligibleDonorCellsPtr_);
         }
     } while (!foundGlobalOverlap);
 
@@ -1164,14 +1165,17 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
                 // Get index obtained by octree
                 const label donorCandidateIndex = pih.index();
 
+                // Whether acceptor is within donor's bounding box
+                const bool withinBB =  mesh_.pointInCellBB
+                (
+                    curP,
+                    curDonors[donorCandidateIndex]
+                );
+
                 if
                 (
                    !daPair.donorFound()
-                 || mesh_.pointInCellBB
-                    (
-                        curP,
-                        curDonors[donorCandidateIndex]
-                    )
+                 || withinBB
                  || (
                         mag(cc[curDonors[donorCandidateIndex]] - curP)
                       < mag(daPair.donorPoint() - curP)
@@ -1183,7 +1187,8 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
                     (
                         curDonors[donorCandidateIndex],
                         Pstream::myProcNo(),
-                        cc[curDonors[donorCandidateIndex]]
+                        cc[curDonors[donorCandidateIndex]],
+                        withinBB
                     );
 
                     // Set extended donors
@@ -1352,10 +1357,18 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
         {
             // This acceptor has been previously visited, meaning we have to
             // make a choice whether to update it or not. At this point, the
-            // choice will be based on least distance from acceptor cell centre
-            // to donor cell centre. Run-time selectable Donor Suitability
-            // Functions will be applied in oversetFringe
-            if (curDA.distance() < curDACombined.distance())
+            // choice will be based on:
+            // a) If this donor is within bounding box and the original one is
+            //    not, prefer the new donor
+            // b) Otherwise prefert on e with least distance from acceptor cell
+            //    centre to donor cell centre.
+            // Run-time selectable Donor Suitability Function will be applied
+            // in oversetFringe
+            if
+            (
+                (curDA.withinBB() && !curDACombined.withinBB())
+             || (curDA.distance() < curDACombined.distance())
+            )
             {
                 // This is a better candidate for the same acceptor, set donor
                 // accordingly
@@ -1363,9 +1376,32 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
                 (
                     curDA.donorCell(),
                     curDA.donorProcNo(),
-                    curDA.donorPoint()
+                    curDA.donorPoint(),
+                    curDA.withinBB()
                 );
             }
+        }
+    }
+
+    // Update withinBB flag if the donor is within bounding box of acceptor
+    // (previously we checked whether the acceptor is within bounding box of
+    // donor)
+    forAll (combinedDonorAcceptorList, daI)
+    {
+        donorAcceptor& curDA = combinedDonorAcceptorList[daI];
+
+        // If the acceptor is not within bounding box of donor, set the flag
+        // other way around
+        if (!curDA.withinBB())
+        {
+            curDA.setWithinBB
+            (
+                mesh_.pointInCellBB
+                (
+                    curDA.donorPoint(),
+                    curDA.acceptorCell()
+                )
+            );
         }
     }
 

@@ -31,7 +31,7 @@ License
 Foam::autoPtr<Foam::donorSuitability::donorSuitability>
 Foam::donorSuitability::donorSuitability::New
 (
-    const overlapFringe& overlapFringeAlgorithm,
+    const oversetFringe& oversetFringeAlgorithm,
     const dictionary& dict
 )
 {
@@ -48,7 +48,7 @@ Foam::donorSuitability::donorSuitability::New
         (
             "donorSuitability::donorSuitability::New\n"
             "(\n"
-            "    const overlapFringe& overlapFringeAlgorithm,\n"
+            "    const oversetFringe& oversetFringeAlgorithm,\n"
             "    const dictionary& dict\n"
             ")"
         )   << "Unknown donorSuitability type " << donorSuitabilityTypeName
@@ -58,7 +58,7 @@ Foam::donorSuitability::donorSuitability::New
             << exit(FatalError);
     }
 
-    return autoPtr<donorSuitability>(cstrIter()(overlapFringeAlgorithm, dict));
+    return autoPtr<donorSuitability>(cstrIter()(oversetFringeAlgorithm, dict));
 }
 
 

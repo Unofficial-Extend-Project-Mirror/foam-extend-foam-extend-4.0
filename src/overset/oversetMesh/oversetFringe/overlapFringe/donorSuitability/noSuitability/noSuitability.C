@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "noSuitability.H"
-#include "overlapFringe.H"
+#include "oversetFringe.H"
 #include "oversetRegion.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -45,14 +45,14 @@ addToRunTimeSelectionTable(donorSuitability, noSuitability, dictionary);
 
 Foam::donorSuitability::noSuitability::noSuitability
 (
-    const overlapFringe& overlapFringeAlgorithm,
+    const oversetFringe& oversetFringeAlgorithm,
     const dictionary& dict
 )
 :
-    donorSuitability(overlapFringeAlgorithm, dict)
+    donorSuitability(oversetFringeAlgorithm, dict)
 {
     // Need to initialise donor suitability function
-    const scalarField localDsf(overlapFringeAlgorithm.mesh().nCells(), 0);
+    const scalarField localDsf(oversetFringeAlgorithm.mesh().nCells(), 0);
     this->combineDonorSuitabilityFunction(localDsf);
 
     // Set threshold to dummy large value

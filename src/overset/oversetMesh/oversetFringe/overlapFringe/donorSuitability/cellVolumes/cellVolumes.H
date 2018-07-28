@@ -70,7 +70,7 @@ public:
         //- Construct from components
         cellVolumes
         (
-            const overlapFringe& overlapFringeAlgorithm,
+            const oversetFringe& oversetFringeAlgorithm,
             const dictionary& dict
         );
 

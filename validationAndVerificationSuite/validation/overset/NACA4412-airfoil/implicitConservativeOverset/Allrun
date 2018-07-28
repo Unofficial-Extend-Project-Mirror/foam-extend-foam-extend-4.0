@@ -10,14 +10,14 @@ application2="simpleOversetFoam"
 \cp -r ../oversetMeshes/backgroundMesh/constant/polyMesh constant/.
 
 # Merge meshes and clean up
-runApplication mergeMeshes .. explicitOverset . ../oversetMeshes/middleMesh
+runApplication mergeMeshes .. implicitConservativeOverset . ../oversetMeshes/middleMesh
 \rm -rf constant/polyMesh
 \mv 1/polyMesh constant
 rm -rf 1
 \rm -f constant/polyMesh/pointZones constant/polyMesh/pointZones.gz constant/polyMesh/faceZones constant/polyMesh/faceZones.gz constant/polyMesh/cellZones constant/polyMesh/cellZones.gz
 \mv log.mergeMeshes log.mergeMeshes-backgroundMiddle
 
-runApplication mergeMeshes .. explicitOverset . ../oversetMeshes/frontMesh
+runApplication mergeMeshes .. implicitConservativeOverset . ../oversetMeshes/frontMesh
 \rm -rf constant/polyMesh
 \mv 1/polyMesh constant
 rm -rf 1
@@ -46,4 +46,4 @@ runApplication $application2
 # Perform sampling
 runApplication sample -latestTime
 timeStep=$(grep "^endTime" system/controlDict | awk '{ print $2 }' | sed 's/;//g')
-cp -v surfaces/$timeStep/p_solidWall.raw .
+cp -v postProcessing/surfaces/$timeStep/p_solidWall.raw .

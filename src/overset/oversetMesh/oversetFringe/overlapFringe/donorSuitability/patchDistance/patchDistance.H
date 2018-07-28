@@ -71,7 +71,7 @@ public:
         //- Construct from components
         patchDistance
         (
-            const overlapFringe& overlapFringeAlgorithm,
+            const oversetFringe& oversetFringeAlgorithm,
             const dictionary& dict
         );
 

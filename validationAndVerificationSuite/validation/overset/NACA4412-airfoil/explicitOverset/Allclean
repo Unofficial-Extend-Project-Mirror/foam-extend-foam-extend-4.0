@@ -12,6 +12,7 @@ cleanCase
 \rm -rf surfaces
 \rm -f *raw
 \rm -rf logs nohup.out
+\rm -rf postProcessing
 
 mkdir constant/polyMesh
 cp -r save 0
