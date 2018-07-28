@@ -25,7 +25,11 @@ Class
     Foam::dynamicPolyRefinementFvMesh
 
 Description
-    Adaptive mesh refinement for arbitrary polyhedral cells.
+    Adaptive mesh refinement for isotropic refinement of arbitrary polyhedral
+    cells in 3D and arbitrary prismatic cells in 2D.
+    Automatically switches between:
+    - 3D refinement uses polyhedralRefinement engine
+    - 2D refinement uses prismatic2DRefinement engine
 
 SourceFiles
     dynamicPolyRefinementFvMesh.C
@@ -35,6 +39,7 @@ Author
 
 Notes
     Generalisation and refactorisation of dynamicRefineMesh for polyhedral cells
+    in 3D and prismatic cells in 2D.
 
 \*---------------------------------------------------------------------------*/
 
