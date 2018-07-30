@@ -55,8 +55,8 @@ Foam::donorSuitability::noSuitability::noSuitability
     const scalarField localDsf(oversetFringeAlgorithm.mesh().nCells(), 0);
     this->combineDonorSuitabilityFunction(localDsf);
 
-    // Set threshold to dummy large value
-    this->threshold() = GREAT;
+    // Set threshold to SMALL such that all the pairs become suitable
+    this->threshold() = SMALL;
 }
 
 
