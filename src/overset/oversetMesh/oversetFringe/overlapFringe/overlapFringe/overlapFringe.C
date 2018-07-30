@@ -846,6 +846,15 @@ bool Foam::overlapFringe::updateIteration
             }
         }
 
+        if (newAcceptors.empty())
+        {
+            FatalErrorIn("overlapFringe::updateIteration()")
+                << "Did not find any new candidate acceptors."
+                << nl
+                << "Please review your overlap fringe assembly settings."
+                << abort(FatalError);
+        }
+
         // Transfer back cumulative fringe holes into the fringeHolesPtr_
         fringeHolesPtr_->transfer(cumFringeHoles);
 

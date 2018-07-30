@@ -211,8 +211,23 @@ public:
                 const donorAcceptor& daPair
             ) const
             {
-                // Note: do not check whether a donor is valid (has been found)
-                // for this acceptor.
+                // Check whether the donor is valid for this pair
+                if (!daPair.donorFound())
+                {
+                    FatalErrorIn
+                    (
+                        "scalar donorSuitability::suitabilityFraction"
+                        "\n("
+                        "\n    const donorAcceptor& daPair"
+                        "\n) const"
+                    )   << "Acceptor: " << daPair.acceptorCell()
+                        << " on processor: " << daPair.acceptorProcNo()
+                        << " did not find donor candidate."
+                        << nl
+                        << "Please review your fringe assembly settings"
+                        << " (or try using adaptiveOverlap fringe algorithm)."
+                        << abort(FatalError);
+                }
 
                 // Get donor suitability function in acceptor/donor pair
                 const scalar& dsfAcceptor =
