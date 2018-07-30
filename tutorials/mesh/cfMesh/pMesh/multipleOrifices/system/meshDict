@@ -21,7 +21,9 @@ surfaceFile "multipleOrifices.stl";
 
 maxCellSize 5.0;
 
-//boundaryCellSize 2.0;
+boundaryCellSize 2.0;
+
+minCellSize 1.0;
 
 localRefinement
 {
@@ -40,15 +42,15 @@ localRefinement
         cellSize 0.3;
     }
 
-    "tubes.*"
-    {
-        cellSize 0.4;
-    }
+//    "tubes.*"
+//    {
+//        cellSize 0.6;
+//    }
 }
 
 boundaryLayers
 {
-    nLayers 1;
+    nLayers 0;
 }
 
 renameBoundary
