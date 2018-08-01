@@ -42,7 +42,8 @@ boundaryField
 
     defaultFaces
     {
-        type            empty;
+        type            kqRWallFunction;
+        value           uniform 0;
     }
 }
 

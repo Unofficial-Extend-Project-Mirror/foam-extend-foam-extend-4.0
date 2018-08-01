@@ -42,7 +42,8 @@ boundaryField
 
     defaultFaces
     {
-        type            empty;
+        type            epsilonWallFunction;
+        value           $internalField;
     }
 }
 
