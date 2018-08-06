@@ -864,7 +864,7 @@ bool Foam::adaptiveOverlapFringe::updateIteration
             }
         }
 
-        if (newAcceptors.empty())
+        if (returnReduce(newAcceptors.empty(), andOp<bool>()))
         {
             FatalErrorIn("adaptiveOverlapFringe::updateIteration()")
                 << "Did not find any new candidate acceptors."
