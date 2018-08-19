@@ -278,13 +278,9 @@ void Foam::KinematicCloud<CloudType>::updateMesh()
 template<class CloudType>
 void Foam::KinematicCloud<CloudType>::autoMap(const mapPolyMesh& mapper)
 {
-    //typedef typename particle::TrackingData<KinematicCloud<CloudType>> tdType;
+    Cloud<parcelType>::autoMap(mapper);
 
-    //tdType td(*this);
-
-    //Cloud<parcelType>::template autoMap<tdType>(td, mapper);
-
-    updateMesh();
+    this->updateMesh();
 }
 
 

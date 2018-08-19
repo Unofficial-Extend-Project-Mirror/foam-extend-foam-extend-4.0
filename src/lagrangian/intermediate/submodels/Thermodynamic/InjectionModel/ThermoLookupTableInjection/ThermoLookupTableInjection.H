@@ -131,6 +131,9 @@ public:
         //- Flag to indicate whether model activates injection model
         bool active() const;
 
+        //- Set injector locations when mesh is updated
+        virtual void updateMesh();
+
         //- Return the end-of-injection time
         scalar timeEnd() const;
 

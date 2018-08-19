@@ -226,6 +226,15 @@ void Foam::ThermoCloud<ParcelType>::evolve()
 
 
 template<class ParcelType>
+void Foam::ThermoCloud<ParcelType>::autoMap(const mapPolyMesh& mapper)
+{
+    Cloud<parcelType>::autoMap(mapper);
+
+    this->updateMesh();
+}
+
+
+template<class ParcelType>
 void Foam::ThermoCloud<ParcelType>::info() const
 {
     KinematicCloud<ParcelType>::info();
