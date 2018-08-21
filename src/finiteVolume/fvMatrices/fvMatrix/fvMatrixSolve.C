@@ -80,7 +80,7 @@ Foam::lduSolverPerformance Foam::fvMatrix<Type>::solve
     Field<Type> source = source_;
 
     // At this point include the boundary source from the coupled boundaries.
-    // This is corrected for the implicit part by correctCmptBoundarySource
+    // This is corrected for the implicit part by correctImplicitBoundarySource
     // within the component loop.
 
     // Note: this is related to non-parallel coupled implicit boundaries
