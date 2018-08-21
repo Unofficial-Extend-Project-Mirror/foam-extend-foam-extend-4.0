@@ -167,7 +167,15 @@ set mpi_version=unknown
 
 switch ("$WM_MPLIB")
 case OPENMPI:
-    if ($?WM_THIRD_PARTY_USE_OPENMPI_188 != 0 && -d $WM_THIRD_PARTY_DIR/packages/openmpi-1.8.8/platforms/$WM_OPTIONS ) then
+    if ($?WM_THIRD_PARTY_USE_OPENMPI_311 != 0 && -d $WM_THIRD_PARTY_DIR/packages/openmpi-3.1.1/platforms/$WM_OPTIONS ) then
+        set mpi_version=openmpi-3.1.1
+
+        if ($?FOAM_VERBOSE && $?prompt) then
+            echo "Using openmpi-3.1.1 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
+        endif
+        _foamSource $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
+
+    else if ($?WM_THIRD_PARTY_USE_OPENMPI_188 != 0 && -d $WM_THIRD_PARTY_DIR/packages/openmpi-1.8.8/platforms/$WM_OPTIONS ) then
         set mpi_version=openmpi-1.8.8
 
         if ($?FOAM_VERBOSE && $?prompt) then
@@ -514,6 +522,9 @@ endif
 if ( $?MESQUITE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_MESQUITE_212 != 0 && -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS/etc/mesquite-2.1.2.csh
 endif
+if ( $?MESQUITE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_MESQUITE_230 != 0 && -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.3.0/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/mesquite-2.3.0/platforms/$WM_OPTIONS/etc/mesquite-2.3.0.csh
+endif
 
 # Metis library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -559,6 +570,9 @@ endif
 
 # cmake
 # ~~~~~
+if ( $?CMAKE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_CMAKE_3114 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-3.11.4/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-3.11.4/platforms/$WM_OPTIONS/etc/cmake-3.11.4.csh
+endif
 if ( $?CMAKE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_CMAKE_332 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-3.3.2/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-3.3.2/platforms/$WM_OPTIONS/etc/cmake-3.3.2.csh
 endif
@@ -607,9 +621,18 @@ endif
 if ( $?PYFOAM_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_PYFOAM_064 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.6.4/platforms/noarch ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.4/platforms/noarch/etc/PyFoam-0.6.4.csh
 endif
+if ( $?PYFOAM_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_PYFOAM_066 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.6.6/platforms/noarch ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.6/platforms/noarch/etc/PyFoam-0.6.6.csh
+endif
+if ( $?PYFOAM_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_PYFOAM_069 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.6.9/platforms/noarch ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.9/platforms/noarch/etc/PyFoam-0.6.9.csh
+endif
 
 # hwloc
 # ~~~~~
+if ( $?HWLOC_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_HWLOC_201 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/hwloc-2.0.1/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-2.0.1/platforms/$WM_OPTIONS/etc/hwloc-2.0.1.csh
+endif
 if ( $?HWLOC_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_HWLOC_1101 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/hwloc-1.10.1/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-1.10.1/platforms/$WM_OPTIONS/etc/hwloc-1.10.1.csh
 endif
@@ -619,6 +642,9 @@ endif
 
 # QT
 # ~~~~~
+if ( $?QT_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_QT_5111 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/qt-everywhere-src-5.11.1/platforms/$WM_OPTIONS )then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-src-5.11.1/platforms/$WM_OPTIONS/etc/qt-everywhere-src-5.11.1.csh
+endif
 if ( $?QT_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_QT_580 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/qt-everywhere-opensource-src-5.8.0/platforms/$WM_OPTIONS )then
     _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-5.8.0/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-5.8.0.csh
 endif
@@ -628,6 +654,9 @@ endif
 
 # PARAVIEW
 # ~~~~~
+if ( $?PARAVIEW_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_PARAVIEW_552 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-5.5.2/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-5.5.2/platforms/$WM_OPTIONS/etc/ParaView-5.5.2.csh
+endif
 if ( $?PARAVIEW_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_PARAVIEW_541 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-5.4.1/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-5.4.1/platforms/$WM_OPTIONS/etc/ParaView-5.4.1.csh
 endif

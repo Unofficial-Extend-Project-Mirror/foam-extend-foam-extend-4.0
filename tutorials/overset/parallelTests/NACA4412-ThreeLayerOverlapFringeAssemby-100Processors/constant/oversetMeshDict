@@ -49,10 +49,10 @@ regions
 
             donorSuitability
             {
-                // Donor/acceptor pair must have cell volumes that differ not
-                // more than 60% of the larger cell
+                // Donor/acceptor pair must have cell volumes that are at least
+                // 40% within each other
                 type        cellVolumes;
-                threshold   0.6;
+                threshold   0.4;
             }
         }
     }
@@ -79,10 +79,10 @@ regions
 
             donorSuitability
             {
-                // Donor/acceptor pair must have cell volumes that differ not
-                // more than 60% of the larger cell
+                // Donor/acceptor pair must have cell volumes that are at least
+                // 50% within each other
                 type        cellVolumes;
-                threshold   0.6;
+                threshold   0.5;
             }
         }
     }
@@ -109,8 +109,8 @@ regions
 
             donorSuitability
             {
-                // Donor/acceptor pair must have cell volumes that differ not
-                // more than 40% of the larger cell
+                // Donor/acceptor pair must have cell volumes that are at least
+                // 40% within each other
                 type        cellVolumes;
                 threshold   0.4;
             }

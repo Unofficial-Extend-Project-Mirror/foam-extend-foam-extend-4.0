@@ -44,6 +44,9 @@ wmake libso lduSolvers
 
 wmake libso tetFiniteElement
 
+# We can now compile this library from decompositionMethods
+wmake libso decompositionMethods/decomposeReconstruct
+
 # Make dynamicMesh tools
 dynamicMesh/AllwmakeLnInclude
 dynamicMesh/Allwmake

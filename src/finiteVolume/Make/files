@@ -239,6 +239,8 @@ $(interpolation)/interpolationCellPoint/makeInterpolationCellPoint.C
 $(interpolation)/interpolationCellPointFace/makeInterpolationCellPointFace.C
 $(interpolation)/interpolationCellPointWallModified/cellPointWeightWallModified/cellPointWeightWallModified.C
 $(interpolation)/interpolationCellPointWallModified/makeInterpolationCellPointWallModified.C
+$(interpolation)/interpolationPointMVC/pointMVCWeight.C
+$(interpolation)/interpolationPointMVC/makeInterpolationPointMVC.C
 
 volPointInterpolation = interpolation/volPointInterpolation
 $(volPointInterpolation)/pointPatchInterpolation/pointPatchInterpolation.C

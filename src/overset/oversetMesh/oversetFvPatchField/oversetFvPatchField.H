@@ -35,7 +35,7 @@ SourceFiles
 #ifndef oversetFvPatchField_H
 #define oversetFvPatchField_H
 
-#include "coupledFvPatchField.H"
+#include "coupledFvPatchFields.H"
 #include "oversetLduInterfaceField.H"
 #include "oversetFvPatch.H"
 #include "oversetMesh.H"

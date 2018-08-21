@@ -182,11 +182,16 @@ echo
     ( rpm_make -p cmake-3.3.2 -s cmake-3.3.2.spec -u http://www.cmake.org/files/v3.3/cmake-3.3.2.tar.gz        )
 }
 
+# cmake 3.11.4
+#
+[ ! -z "$WM_THIRD_PARTY_USE_CMAKE_3114" ] && {
+    echo "Building cmake 3.11.4"
+    ( rpm_make -p cmake-3.11.4 -s cmake-3.11.4.spec -u http://www.cmake.org/files/v3.11/cmake-3.11.4.tar.gz        )
+}
+
 echo ========================================
 echo Done ThirdParty AllMake: Stage1
 echo ========================================
 echo
 
 # ----------------------------------------------------------------- end-of-file
-
-

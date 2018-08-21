@@ -144,7 +144,7 @@ public:
             //- Return reference to the fluctuation scale to allow adjustment
             graph& timeData()
             {
-                return timeDataPtr_;
+                return timeDataPtr_();
             }
 
             const engineTime& engineDB() const

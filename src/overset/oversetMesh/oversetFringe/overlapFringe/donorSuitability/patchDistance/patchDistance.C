@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "patchDistance.H"
-#include "overlapFringe.H"
+#include "oversetFringe.H"
 #include "oversetRegion.H"
 #include "patchWave.H"
 #include "polyPatchID.H"
@@ -52,14 +52,14 @@ addToRunTimeSelectionTable
 
 Foam::donorSuitability::patchDistance::patchDistance
 (
-    const overlapFringe& overlapFringeAlgorithm,
+    const oversetFringe& oversetFringeAlgorithm,
     const dictionary& dict
 )
 :
-    donorSuitability(overlapFringeAlgorithm, dict)
+    donorSuitability(oversetFringeAlgorithm, dict)
 {
     // Get reference to fvMesh
-    const fvMesh& mesh = overlapFringeAlgorithm.mesh();
+    const fvMesh& mesh = oversetFringeAlgorithm.mesh();
 
     // Get distance patch names for master and donor regions
     wordList masterRegionPatchNames =

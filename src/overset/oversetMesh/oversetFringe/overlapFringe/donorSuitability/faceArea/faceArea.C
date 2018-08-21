@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "faceArea.H"
-#include "overlapFringe.H"
+#include "oversetFringe.H"
 #include "oversetRegion.H"
 #include "surfaceFields.H"
 #include "addToRunTimeSelectionTable.H"
@@ -51,14 +51,14 @@ addToRunTimeSelectionTable
 
 Foam::donorSuitability::faceArea::faceArea
 (
-    const overlapFringe& overlapFringeAlgorithm,
+    const oversetFringe& oversetFringeAlgorithm,
     const dictionary& dict
 )
 :
-    donorSuitability(overlapFringeAlgorithm, dict)
+    donorSuitability(oversetFringeAlgorithm, dict)
 {
     // Get fvMesh reference
-    const fvMesh& mesh = overlapFringeAlgorithm.mesh();
+    const fvMesh& mesh = oversetFringeAlgorithm.mesh();
 
     // Get local donor suitability function using minium face area of a cell
     scalarField localDsf(mesh.nCells(), GREAT);

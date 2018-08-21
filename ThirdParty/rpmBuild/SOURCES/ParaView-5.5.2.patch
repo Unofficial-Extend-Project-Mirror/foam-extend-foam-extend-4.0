@@ -1,0 +1,122 @@
+# From https://gitlab.kitware.com/bob.obara/paraview/commit/931c779dde8460fe32aa8a3d19956b175b96e4f9.patch
+diff --git a/Plugins/SLACTools/pqSLACDataLoadManager.cxx b/Plugins/SLACTools/pqSLACDataLoadManager.cxx
+index 3ba019c26b177f2cd93d19f01a0b3a280aaf6ac2..ce38396f6844e7628d4d225d165f2ac4f6598f19 100644
+--- a/Plugins/SLACTools/pqSLACDataLoadManager.cxx
++++ b/Plugins/SLACTools/pqSLACDataLoadManager.cxx
+@@ -34,6 +34,7 @@
+ #include "vtkSMProperty.h"
+ #include "vtkSMSourceProxy.h"
+ 
++#include <QAction>
+ #include <QPushButton>
+ #include <QtDebug>
+ 
+diff --git a/Qt/ApplicationComponents/pqColorMapEditor.cxx b/Qt/ApplicationComponents/pqColorMapEditor.cxx
+index 0395185e0ab17a544233e9add78cc926ae19f2cd..88b56745eb0d58e5a6b2f2d2cacd62e66c230901 100644
+--- a/Qt/ApplicationComponents/pqColorMapEditor.cxx
++++ b/Qt/ApplicationComponents/pqColorMapEditor.cxx
+@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include <QDebug>
+ #include <QKeyEvent>
+ #include <QPointer>
++#include <QStyle>
+ #include <QVBoxLayout>
+ 
+ class pqColorMapEditor::pqInternals
+diff --git a/Qt/ApplicationComponents/pqDoubleRangeSliderPropertyWidget.cxx b/Qt/ApplicationComponents/pqDoubleRangeSliderPropertyWidget.cxx
+index 908e4598e025fab059a7b6b4097ceddf9cffef6a..820361a2b34abc0af6e4f317d7f77c6a954f7129 100644
+--- a/Qt/ApplicationComponents/pqDoubleRangeSliderPropertyWidget.cxx
++++ b/Qt/ApplicationComponents/pqDoubleRangeSliderPropertyWidget.cxx
+@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include "vtkSMUncheckedPropertyHelper.h"
+ 
+ #include <QGridLayout>
++#include <QStyle>
+ 
+ class pqDoubleRangeSliderPropertyWidget::pqInternals
+ {
+diff --git a/Qt/ApplicationComponents/pqStandardViewFrameActionsImplementation.cxx b/Qt/ApplicationComponents/pqStandardViewFrameActionsImplementation.cxx
+index c297dc3d9e7acab31d5fe326a6207fb326893e73..501633f63a1facae26371e9ea75eccdab582a6cc 100644
+--- a/Qt/ApplicationComponents/pqStandardViewFrameActionsImplementation.cxx
++++ b/Qt/ApplicationComponents/pqStandardViewFrameActionsImplementation.cxx
+@@ -69,6 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include <QPushButton>
+ #include <QSet>
+ #include <QShortcut>
++#include <QStyle>
+ 
+ //-----------------------------------------------------------------------------
+ pqStandardViewFrameActionsImplementation::pqStandardViewFrameActionsImplementation(
+diff --git a/Qt/ApplicationComponents/pqTimeInspectorWidget.cxx b/Qt/ApplicationComponents/pqTimeInspectorWidget.cxx
+index 6774c2e48e61e6e8278da02075a47b0ecabcd396..e85e614f042143700f938cc855ef486f9f8be2d7 100644
+--- a/Qt/ApplicationComponents/pqTimeInspectorWidget.cxx
++++ b/Qt/ApplicationComponents/pqTimeInspectorWidget.cxx
+@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include "vtkSMPropertyHelper.h"
+ #include "vtkSMSourceProxy.h"
+ 
++#include <QHeaderView>
+ #include <QLineF>
+ #include <QPainter>
+ #include <QVariant>
+diff --git a/Qt/ApplicationComponents/pqTransferFunctionWidgetPropertyDialog.cxx b/Qt/ApplicationComponents/pqTransferFunctionWidgetPropertyDialog.cxx
+index 55d31464474eff2f965d959f99dd2db0b5c185bf..93cd995d92e1bbe361857bb9e88d710463da9914 100644
+--- a/Qt/ApplicationComponents/pqTransferFunctionWidgetPropertyDialog.cxx
++++ b/Qt/ApplicationComponents/pqTransferFunctionWidgetPropertyDialog.cxx
+@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include "vtkPiecewiseFunction.h"
+ #include <QString>
+ 
++#include <QDoubleValidator>
++
+ class pqTransferFunctionWidgetPropertyDialog::pqInternals
+ {
+ public:
+diff --git a/Qt/ApplicationComponents/pqViewResolutionPropertyWidget.cxx b/Qt/ApplicationComponents/pqViewResolutionPropertyWidget.cxx
+index 6d2865431ef930a13a9fa0796474dbfb126fc4ac..8d2c4b61cd1038836feb610437f6539dcc6e00bd 100644
+--- a/Qt/ApplicationComponents/pqViewResolutionPropertyWidget.cxx
++++ b/Qt/ApplicationComponents/pqViewResolutionPropertyWidget.cxx
+@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include "vtkSMProxy.h"
+ 
+ #include <QIntValidator>
++#include <QStyle>
+ 
+ class pqViewResolutionPropertyWidget::pqInternals
+ {
+diff --git a/Qt/Components/pqChangeInputDialog.cxx b/Qt/Components/pqChangeInputDialog.cxx
+index 8a67b10095ee037ad3ee1179b342c72d62d11db9..86db3de01c7dccb0727148e709616d9f4c7debe6 100644
+--- a/Qt/Components/pqChangeInputDialog.cxx
++++ b/Qt/Components/pqChangeInputDialog.cxx
+@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include "vtkSMProxy.h"
+ #include "vtkSmartPointer.h"
+ 
++#include <QHeaderView>
+ #include <QItemSelectionModel>
+ #include <QLineEdit>
+ #include <QRadioButton>
+diff --git a/Qt/Components/pqCinemaTrackSelection.cxx b/Qt/Components/pqCinemaTrackSelection.cxx
+index 3d6d9dde19f3860c3f0af54f088e4f3b28d1f7b9..eea2e37680126ced46921749c4e70b1295680032 100644
+--- a/Qt/Components/pqCinemaTrackSelection.cxx
++++ b/Qt/Components/pqCinemaTrackSelection.cxx
+@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ ========================================================================*/
+ #include <QDebug>
++#include <QHeaderView>
+ 
+ #include "vtkPVArrayInformation.h"
+ #include "vtkPVDataInformation.h"
+diff --git a/Qt/Python/pqPythonShell.cxx b/Qt/Python/pqPythonShell.cxx
+index 3d01fd0a96deda60a5c946820b10c54992a6c9fb..bc1a0149360a1d4ae2caa8622ac76f2176608109 100644
+--- a/Qt/Python/pqPythonShell.cxx
++++ b/Qt/Python/pqPythonShell.cxx
+@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include "vtkStringOutputWindow.h"
+ #include "vtkWeakPointer.h"
+ 
++#include <QAbstractItemView>
+ #include <QApplication>
+ #include <QCursor>
+ #include <QFile>

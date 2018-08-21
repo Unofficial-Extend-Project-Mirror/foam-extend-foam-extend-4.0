@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "cellBoundingBoxDiagonal.H"
-#include "overlapFringe.H"
+#include "oversetFringe.H"
 #include "oversetRegion.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -50,14 +50,14 @@ addToRunTimeSelectionTable
 
 Foam::donorSuitability::cellBoundingBoxDiagonal::cellBoundingBoxDiagonal
 (
-    const overlapFringe& overlapFringeAlgorithm,
+    const oversetFringe& oversetFringeAlgorithm,
     const dictionary& dict
 )
 :
-    donorSuitability(overlapFringeAlgorithm, dict)
+    donorSuitability(oversetFringeAlgorithm, dict)
 {
     // Get reference to fvMesh
-    const fvMesh& mesh = overlapFringeAlgorithm.mesh();
+    const fvMesh& mesh = oversetFringeAlgorithm.mesh();
 
     // Get necessary mesh data
     const cellList& cells = mesh.cells();

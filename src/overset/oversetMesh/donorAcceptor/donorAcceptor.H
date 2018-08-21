@@ -115,6 +115,10 @@ private:
             // Note that the processor number is the same for all extended
             // donors
 
+            //- Whether donor (or acceptor) is within bounding box of acceptor
+            //  (or donor)
+            bool withinBB_;
+
 
 public:
 
@@ -148,7 +152,8 @@ public:
             donorProcNo_(-1),
             donorPoint_(vector::zero),
             extendedDonorCells_(),
-            extendedDonorPoints_()
+            extendedDonorPoints_(),
+            withinBB_(false)
         {}
 
         //- Construct from Istream
@@ -161,7 +166,8 @@ public:
             donorProcNo_(readLabel(is)),
             donorPoint_(is),
             extendedDonorCells_(is),
-            extendedDonorPoints_(is)
+            extendedDonorPoints_(is),
+            withinBB_(is)
         {}
 
         //- Copy constructor - default
@@ -275,19 +281,34 @@ public:
                 }
             }
 
+            //- Return whether the donor is within bounding box
+            bool withinBB() const
+            {
+                return withinBB_;
+            }
+
+
         // Edit
+
+            //- Set withinBB
+            void setWithinBB(const bool withinBB)
+            {
+                withinBB_ = withinBB;
+            }
 
             //- Set hit: donor found
             void setDonor
             (
                 const label& donorCell,
                 const label& donorProcNo,
-                const point& donorPoint
+                const point& donorPoint,
+                const bool withinBB
             )
             {
                 donorCell_ = donorCell;
                 donorProcNo_ = donorProcNo;
                 donorPoint_ = donorPoint;
+                withinBB_ = withinBB;
             }
 
             //- Set extended donors by going through neighbours of currently set
@@ -355,6 +376,8 @@ public:
 
             extendedDonorCells_ = rd.extendedDonorCells_;
             extendedDonorPoints_ = rd.extendedDonorPoints_;
+
+            withinBB_ = rd.withinBB_;
         }
 
 
@@ -371,7 +394,8 @@ public:
              && a.acceptorProcNo_ == b.acceptorProcNo_
              && a.acceptorPoint_ == b.acceptorPoint_
              && a.donorCell_ == b.donorCell_
-             && a.donorProcNo_ == b.donorProcNo_;
+             && a.donorProcNo_ == b.donorProcNo_
+             && a.withinBB_ == b.withinBB_;
 
              // Note: do not check whether extended neighbours are the same, we
              // assume they will be if donor data is the same
@@ -399,8 +423,8 @@ public:
                 >> rd.donorProcNo_
                 >> rd.donorPoint_
                 >> rd.extendedDonorCells_
-                >> rd.extendedDonorPoints_;
-
+                >> rd.extendedDonorPoints_
+                >> rd.withinBB_;
             return is;
         }
 
@@ -414,8 +438,8 @@ public:
                 << rd.donorProcNo_ << token::SPACE
                 << rd.donorPoint_ << token::SPACE
                 << rd.extendedDonorCells_ << token::SPACE
-                << rd.extendedDonorPoints_;
-
+                << rd.extendedDonorPoints_ << token::SPACE
+                << rd.withinBB_;
             return os;
         }
 };

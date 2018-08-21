@@ -9,5 +9,6 @@ cleanTimeDirectories
 \rm -rf forces
 \rm -f *raw
 \rm -rf logs nohup.out
+\rm -rf postProcessing
 
 cp -r save 0

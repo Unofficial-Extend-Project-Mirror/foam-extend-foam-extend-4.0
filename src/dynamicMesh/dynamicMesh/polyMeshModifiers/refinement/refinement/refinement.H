@@ -22,23 +22,28 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::polyhedralRefinement
+    Foam::refinement
 
 Description
-    Isotropic refinement of polyhedral cells using the mesh modifier engine
+    Abstract base class for adaptive mesh refinement using the mesh modifier
+    engine. The class provides common interface and functionalities for 3D
+    polyhedral refinement and 2D prismatic refinement.
 
-    Each polyhedral cell is split by the following procedure:
-    1. Adding points at the edge centre, face centre and cell centre,
-    2. Adding cells n cells where n is the number of points of the cell,
-    3. Splitting each face into multiple faces going from:
-       existing corner point -> new edge centre point -> new face centre
-       point -> other new edge centre point (sharing the same corner point)
-    4. Adding internal faces going from:
-       new edge centre point -> new face centre point -> new cell centre
-       point -> other new face centre point (sharing the same edge)
+    The common interface includes (pure virtuals) following member functions:
+    - setCellsToRefine
+    - setSplitPointsToUnrefine
+    - calcLevel0EdgeLength
+
+    With a lot of ordinary protected member functions which are used by both
+    derived classes.
+
+    Note: I've written it this way in order to avoid unnecesasry code
+    duplication, but I'm 99% sure that if someone else wants to write additional
+    refinement strategy (e.g. directional refinement) as derived class, the
+    interface will need to change.
 
 SourceFiles
-    polyhedralRefinement.C
+    refinement.C
 
 Author
     Vuko Vukcevic, Wikki Ltd.  All rights reserved.
@@ -49,8 +54,8 @@ Notes
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef polyhedralRefinement_H
-#define polyhedralRefinement_H
+#ifndef refinement_H
+#define refinement_H
 
 #include "polyMeshModifier.H"
 #include "labelIOList.H"
@@ -62,16 +67,16 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                    Class polyhedralRefinement Declaration
+                    Class refinement Declaration
 \*---------------------------------------------------------------------------*/
 
-class polyhedralRefinement
+class refinement
 :
     public polyMeshModifier
 {
-public:
+protected:
 
-    // Public enumeration for refinement status
+    // Protected enumeration for refinement status
     enum refinementStatus
     {
         UNREFINED = -1,
@@ -80,9 +85,7 @@ public:
     };
 
 
-private:
-
-    // Private data
+    // Protected data
 
         //- Reference to polyMesh for easy access in helper functions
         const polyMesh& mesh_;
@@ -112,9 +115,6 @@ private:
             //  c) REFINED   = +1 = cell is refined
             mutable labelList refinementLevelIndicator_;
 
-            //- Typical edge length between unrefined points
-            scalar level0EdgeLength_;
-
             //- Face remover engine
             mutable removeFaces faceRemover_;
 
@@ -132,21 +132,30 @@ private:
 
             //- Number of buffer layers for unrefinement, controlling how far
             //  the unrefinement region needs to be from current refinement
-            //  region. Therefore, this should always be at least
-            //  nRefinementBufferLayers + 2 to avoid level inconsistencies
+            //  region
             label nUnrefinementBufferLayers_;
 
 
-    // Private Member Functions
+    // Protected Pure Virtual Member Functions
 
-        // Helper functions
+        // Global topology modification functions (operate on whole polyMesh)
 
-            //- Get least cell level such that the face has at least three
-            //  points smaller than the level
-            label getAnchorLevel(const label faceI) const;
+            //- Set refinement instruction
+            virtual void setRefinementInstruction
+            (
+                polyTopoChange& ref
+            ) const = 0;
 
-            //- Calculate level0EdgeLength_ (constructor helper)
-            void calcLevel0EdgeLength();
+            //- Set unrefinement instruction
+            virtual void setUnrefinementInstruction
+            (
+                polyTopoChange& ref
+            ) const = 0;
+
+
+    // Protected Member Functions
+
+        // Useful helper functions used by derived classes
 
             //- Set file instance for cellLevel_ and pointLevel_
             void setInstance(const fileName& inst) const;
@@ -156,31 +165,6 @@ private:
 
             //- Extend marked cells across points
             void extendMarkedCellsAcrossPoints(boolList& markedCell) const;
-
-
-        // Global topology modification functions (operate on whole polyMesh)
-        // and directly use local topology modification functions below
-
-            //- Refine polyhedral cells. All cellsToRefine_ cells will be split
-            //  into n cells where n is the number of points per cell.
-            //  Guarantees that the 0th element is the original cell label.
-            //  Mapping:
-            //  -split cells: n new ones get added from original
-            //  -split faces: original gets modified; n - 1 new ones get added
-            //                from original
-            //  -added internal faces: added from original cell face (if
-            //   that was internal) or created out-of-nothing (so will not
-            //   get mapped!). Note: could make this inflate from point but
-            //   that will allocate interpolation.
-            //  -points added to split edge: added from edge start()
-            //  -midpoints added: added from cellPoints[0].
-            void setPolyhedralRefinement(polyTopoChange& ref) const;
-
-            //- Remove some of the previously performed refinement. Uses
-            //  splitPointLabels_ to determine the unrefinement.
-            //  All n pointCells of a split point will be combined into
-            //  the lowest numbered cell of those n.
-            void setPolyhedralUnrefinement(polyTopoChange& ref) const;
 
 
         // Local topology modification functions (operate on cells/faces)
@@ -217,45 +201,8 @@ private:
                 const label nei
             ) const;
 
-            //- Create all internal faces of split cellI into n cells where n is the
-            //  number of cell points
-            void createInternalFaces
-            (
-                const labelListList& cellAnchorPoints,
-                const labelListList& cellAddedCells,
-                const labelList& cellMidPoint,
-                const labelList& faceMidPoint,
-                const labelList& faceAnchorLevel,
-                const labelList& edgeMidPoint,
-                const label cellI,
-                polyTopoChange& ref
-            ) const;
-
 
         // Topological change helper functions
-
-            //- Get cell added to point of cellI (if any)
-            label getAnchorCell
-            (
-                const labelListList& cellAnchorPoints,
-                const labelListList& cellAddedCells,
-                const label cellI,
-                const label faceI,
-                const label pointI
-            ) const;
-
-            //- Set new owner and neighbour (in unspecified order) of pointI
-            //  on faceI
-            void setNewFaceNeighbours
-            (
-                const labelListList& cellAnchorPoints,
-                const labelListList& cellAddedCells,
-                const label faceI,
-                const label pointI,
-
-                label& own,
-                label& nei
-            ) const;
 
             //- Store vertices from startFp up to face split point.
             //  Used when splitting face into n faces where n is the number of
@@ -290,45 +237,6 @@ private:
             (
                 const labelList& f,
                 const label anchorLevel
-            ) const;
-
-            //- Find index of point with wantedLevel, starting from fp
-            label findLevel
-            (
-                const face& f,
-                const label startFp,
-                const bool searchForward,
-                const label wantedLevel
-            ) const;
-
-            //- Store in maps correspondence from midpoint to anchors and
-            //  faces. Used when creating internal faces
-            label storeMidPointInfo
-            (
-                const labelListList& cellAnchorPoints,
-                const labelListList& cellAddedCells,
-                const labelList& cellMidPoint,
-                const labelList& edgeMidPoint,
-                const label cellI,
-                const label faceI,
-                const bool faceOrder,
-                const label midPointI,
-                const label anchorPointI,
-                const label faceMidPointI,
-
-                Map<edge>& midPointToAnchors,
-                Map<edge>& midPointToFaceMids,
-                polyTopoChange& ref
-            ) const;
-
-            //- If p0 and p1 are existing vertices check if edge is split and insert
-            //  splitPoint. Used with storing mid point
-            void insertEdgeSplit
-            (
-                const labelList& edgeMidPoint,
-                const label p0,
-                const label p1,
-                dynamicLabelList& verts
             ) const;
 
 
@@ -379,22 +287,22 @@ private:
         // Copy control
 
             //- Disallow default bitwise copy construct
-            polyhedralRefinement(const polyhedralRefinement&);
+            refinement(const refinement&);
 
             //- Disallow default bitwise assignment
-            void operator=(const polyhedralRefinement&);
+            void operator=(const refinement&);
 
 
 public:
 
     //- Runtime type information
-    TypeName("polyhedralRefinement");
+    TypeName("refinement");
 
 
     // Constructors
 
         //- Construct from dictionary
-        polyhedralRefinement
+        refinement
         (
             const word& name,
             const dictionary& dict,
@@ -405,7 +313,7 @@ public:
 
     // Destructor
 
-        virtual ~polyhedralRefinement();
+        virtual ~refinement();
 
 
     // Member Functions
@@ -422,12 +330,6 @@ public:
                 return pointLevel_;
             }
 
-            //- Typical edge length between unrefined points
-            scalar level0EdgeLength() const
-            {
-                return level0EdgeLength_;
-            }
-
 
         // Edit
 
@@ -436,7 +338,10 @@ public:
             //  function due to possible 4:1 conflicts and specified number of
             //  buffer layers.
             //  Note: must be called BEFORE setSplitPointsToUnrefine
-            void setCellsToRefine(const labelList& refinementCellCandidates);
+            virtual void setCellsToRefine
+            (
+                const labelList& refinementCellCandidates
+            ) = 0;
 
             //- Set split points to unrefine given a list of all mesh points
             //  that are candidates for unrefinement. Split points are
@@ -444,10 +349,10 @@ public:
             //  splitting points of cells that are going to be refined at the
             //  same time and ensuring consistent unrefinement.
             //  Note: must be called AFTER setCellsToRefine
-            void setSplitPointsToUnrefine
+            virtual void setSplitPointsToUnrefine
             (
                 const labelList& unrefinementPointCandidates
-            );
+            ) = 0;
 
 
         // Inherited interface from polyMeshModifier

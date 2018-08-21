@@ -65,13 +65,24 @@ ADD_PARAVIEW_PLUGIN(
 if(NOT FOAM_FOUND)
   # Config when compiling FOAM library with wmake
 
-  TARGET_LINK_LIBRARIES(
-    PVFoamReader_SM
-    foam
-    finiteVolume
-    vtkPVFoam
-    pqCore
-  )
+  if(${CMAKE_VERSION} VERSION_LESS "2.8.12") 
+    TARGET_LINK_LIBRARIES(
+      PVFoamReader_SM
+      foam
+      finiteVolume
+      vtkPVFoam
+      pqCore
+    )
+  else()
+    TARGET_LINK_LIBRARIES(
+      PVFoamReader_SM
+      PUBLIC foam
+      finiteVolume
+      vtkPVFoam
+      pqCore
+    )
+  endif()
+
 else()
   # Config when compiling FOAM library with cmake
 
