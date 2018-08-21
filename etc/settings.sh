@@ -404,6 +404,18 @@ MVAPICH2)
     unset mpi_version
     ;;
 
+SYSTEMMPICH)
+    mpi_version=mpich-system
+    export MPI_HOME=$CRAY_MPICH2_DIR
+    export MPI_ARCH_PATH=$CRAY_MPICH2_DIR
+    export MPICH_ROOT=$MPI_ARCH_PATH
+
+    _foamAddPath $MPI_ARCH_PATH/bin
+    _foamAddLib  $MPI_ARCH_PATH/lib
+
+    unset mpi_version
+    ;;
+
 MPICH)
     mpi_version=mpich-1.2.4
     export MPI_HOME=$WM_THIRD_PARTY_DIR/$mpi_version

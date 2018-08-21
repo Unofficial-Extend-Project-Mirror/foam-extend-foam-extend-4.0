@@ -328,6 +328,18 @@ case MVAPICH2:
     unset mpi_version
     breaksw
 
+case SYSTEMMPICH:
+    set mpi_version=mpich-system
+    setenv MPI_HOME $CRAY_MPICH2_DIR
+    setenv MPI_ARCH_PATH $CRAY_MPICH2_DIR
+    setenv MPICH_ROOT $MPI_ARCH_PATH
+
+    _foamAddPath $MPI_ARCH_PATH/bin
+    _foamAddLib  $MPI_ARCH_PATH/lib
+
+    unset mpi_version
+    breaksw
+
 case MPICH:
     set mpi_version=mpich-1.2.4
     setenv MPI_HOME $WM_THIRD_PARTY_DIR/$mpi_version
