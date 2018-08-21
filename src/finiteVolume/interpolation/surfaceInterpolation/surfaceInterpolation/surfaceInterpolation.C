@@ -42,7 +42,7 @@ namespace Foam
 void Foam::surfaceInterpolation::clearOut()
 {
     deleteDemandDrivenData(weightingFactors_);
-    deleteDemandDrivenData(differenceFactors_);
+    deleteDemandDrivenData(deltaCoeffs_);
     deleteDemandDrivenData(correctionVectors_);
 }
 
@@ -55,7 +55,7 @@ Foam::surfaceInterpolation::surfaceInterpolation(const fvMesh& fvm)
     schemesDict_(fvm),
     solutionDict_(fvm),
     weightingFactors_(NULL),
-    differenceFactors_(NULL),
+    deltaCoeffs_(NULL),
     orthogonal_(false),
     correctionVectors_(NULL)
 {}
@@ -84,12 +84,12 @@ const Foam::surfaceScalarField& Foam::surfaceInterpolation::weights() const
 
 const Foam::surfaceScalarField& Foam::surfaceInterpolation::deltaCoeffs() const
 {
-    if (!differenceFactors_)
+    if (!deltaCoeffs_)
     {
         makeDeltaCoeffs();
     }
 
-    return (*differenceFactors_);
+    return (*deltaCoeffs_);
 }
 
 
@@ -121,7 +121,7 @@ Foam::surfaceInterpolation::correctionVectors() const
 bool Foam::surfaceInterpolation::movePoints()
 {
     deleteDemandDrivenData(weightingFactors_);
-    deleteDemandDrivenData(differenceFactors_);
+    deleteDemandDrivenData(deltaCoeffs_);
 
     orthogonal_ = false;
     deleteDemandDrivenData(correctionVectors_);
@@ -209,18 +209,18 @@ void Foam::surfaceInterpolation::makeDeltaCoeffs() const
     // needed to make sure deltaCoeffs are calculated for parallel runs.
     weights();
 
-    differenceFactors_ = new surfaceScalarField
+    deltaCoeffs_ = new surfaceScalarField
     (
         IOobject
         (
-            "differenceFactors_",
+            "deltaCoeffs",
             mesh_.pointsInstance(),
             mesh_
         ),
         mesh_,
         dimless/dimLength
     );
-    surfaceScalarField& DeltaCoeffs = *differenceFactors_;
+    surfaceScalarField& DeltaCoeffs = *deltaCoeffs_;
 
 
     // Set local references to mesh data

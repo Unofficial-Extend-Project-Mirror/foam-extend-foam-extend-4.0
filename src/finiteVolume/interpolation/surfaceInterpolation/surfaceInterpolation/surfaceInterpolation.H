@@ -72,7 +72,7 @@ class surfaceInterpolation
             mutable surfaceScalarField* weightingFactors_;
 
             //- Face-gradient difference factors
-            mutable surfaceScalarField* differenceFactors_;
+            mutable surfaceScalarField* deltaCoeffs_;
 
             //- Is mesh orthogonal
             mutable bool orthogonal_;
