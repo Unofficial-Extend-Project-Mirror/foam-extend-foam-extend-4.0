@@ -91,8 +91,6 @@ void Foam::wallDist::correct()
 
     forAll (patches, patchI)
     {
-        fvPatchScalarField& yPatch = boundaryField()[patchI];
-
         boundaryField()[patchI] = 1/patches[patchI].deltaCoeffs();
     }
 
