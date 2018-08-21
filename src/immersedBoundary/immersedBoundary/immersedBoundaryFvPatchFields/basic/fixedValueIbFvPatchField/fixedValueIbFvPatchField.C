@@ -23,51 +23,64 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "immersedBoundaryFvPatchField.H"
-#include "fvPatchFieldMapper.H"
-#include "fvMatrix.H"
+#include "fixedValueIbFvPatchField.H"
+#include "surfaceWriter.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+template<class Type>
+void fixedValueIbFvPatchField<Type>::updateIbValues()
+{
+    // Interpolate the values from tri surface using nearest triangle
+    const labelList& nt = this->ibPatch().ibPolyPatch().nearestTri();
+
+    Field<Type>::operator=(Field<Type>(triValue_, nt));
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
+fixedValueIbFvPatchField<Type>::fixedValueIbFvPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF
 )
 :
-    fvPatchField<Type>(p, iF),
-    immersedBoundaryFieldBase<Type>(p, false, pTraits<Type>::zero)
+    fixedValueFvPatchField<Type>(p, iF),
+    immersedBoundaryFieldBase<Type>(p, false, pTraits<Type>::zero),
+    triValue_(this->ibPatch().ibMesh().size(), pTraits<Type>::zero)
 {}
 
 
 template<class Type>
-immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
+fixedValueIbFvPatchField<Type>::fixedValueIbFvPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
     const dictionary& dict
 )
 :
-    fvPatchField<Type>(p, iF),   // Do not read data
+    fixedValueFvPatchField<Type>(p, iF),   // Do not read mixed data
     immersedBoundaryFieldBase<Type>
     (
         p,
         Switch(dict.lookup("setDeadValue")),
         pTraits<Type>(dict.lookup("deadValue"))
-    )
+    ),
+    triValue_("triValue", dict, this->ibPatch().ibMesh().size())
 {
     if (!isType<immersedBoundaryFvPatch>(p))
     {
         FatalIOErrorIn
         (
-            "immersedBoundaryFvPatchField<Type>::"
-            "immersedBoundaryFvPatchField\n"
+            "fixedValueIbFvPatchField<Type>::"
+            "fixedValueIbFvPatchField\n"
             "(\n"
             "    const fvPatch& p,\n"
             "    const Field<Type>& field,\n"
@@ -82,26 +95,30 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
             << exit(FatalIOError);
     }
 
-    Field<Type>::operator=(this->patchInternalField());
+    // Re-interpolate the data related to immersed boundary
+    this->updateIbValues();
+
+    fixedValueFvPatchField<Type>::evaluate();
 }
 
 
 template<class Type>
-immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
+fixedValueIbFvPatchField<Type>::fixedValueIbFvPatchField
 (
-    const immersedBoundaryFvPatchField<Type>& ptf,
+    const fixedValueIbFvPatchField<Type>& ptf,
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
     const fvPatchFieldMapper& mapper
 )
 :
-    fvPatchField<Type>(p, iF),  // Do not map base data
+    fixedValueFvPatchField<Type>(p, iF),  // Do not map mixed data
     immersedBoundaryFieldBase<Type>
     (
         p,
         ptf.setDeadValue(),
         ptf.deadValue()
-    )
+    ),
+    triValue_(ptf.triValue())
 {
     // Note: NO MAPPING.  Fields are created on the immersed boundary
     // HJ, 12/Apr/2012
@@ -109,10 +126,10 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
     {
         FatalErrorIn
         (
-            "immersedBoundaryFvPatchField<Type>::"
-            "immersedBoundaryFvPatchField\n"
+            "fixedValueIbFvPatchField<Type>::"
+            "fixedValueIbFvPatchField\n"
             "(\n"
-            "    const immersedBoundaryFvPatchField<Type>&,\n"
+            "    const fixedValueIbFvPatchField<Type>&,\n"
             "    const fvPatch& p,\n"
             "    const DimensionedField<Type, volMesh>& iF,\n"
             "    const fvPatchFieldMapper& mapper\n"
@@ -125,111 +142,125 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
             << exit(FatalIOError);
     }
 
+    // Re-interpolate the data related to immersed boundary
+    this->updateIbValues();
+
     // On creation of the mapped field, the internal field is dummy and
     // cannot be used.  Initialise the value to avoid errors
     // HJ, 1/Dec/2017
-    Field<Type>::operator=(Field<Type>(p.size(), pTraits<Type>::zero));
+    Field<Type>::operator=(pTraits<Type>::zero);
 }
 
 
 template<class Type>
-immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
+fixedValueIbFvPatchField<Type>::fixedValueIbFvPatchField
 (
-    const immersedBoundaryFvPatchField<Type>& ptf
+    const fixedValueIbFvPatchField<Type>& ptf
 )
 :
-    fvPatchField<Type>(ptf),
+    fixedValueFvPatchField<Type>(ptf),
     immersedBoundaryFieldBase<Type>
     (
         ptf.ibPatch(),
         ptf.setDeadValue(),
         ptf.deadValue()
-    )
+    ),
+    triValue_(ptf.triValue())
 {}
 
 
 template<class Type>
-immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
+fixedValueIbFvPatchField<Type>::fixedValueIbFvPatchField
 (
-    const immersedBoundaryFvPatchField<Type>& ptf,
+    const fixedValueIbFvPatchField<Type>& ptf,
     const DimensionedField<Type, volMesh>& iF
 )
 :
-    fvPatchField<Type>(ptf, iF),
+    fixedValueFvPatchField<Type>(ptf, iF),
     immersedBoundaryFieldBase<Type>
     (
         ptf.ibPatch(),
         ptf.setDeadValue(),
         ptf.deadValue()
-    )
+    ),
+    triValue_(ptf.triValue())
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-void immersedBoundaryFvPatchField<Type>::autoMap
+void fixedValueIbFvPatchField<Type>::autoMap
 (
     const fvPatchFieldMapper& m
 )
 {
-    // Use internal values
-    Field<Type>::operator=(this->patchInternalField());
+    // Base fields do not map: re-interpolate them from tri data
+    this->updateIbValues();
 }
 
 
 template<class Type>
-void immersedBoundaryFvPatchField<Type>::rmap
+void fixedValueIbFvPatchField<Type>::rmap
 (
     const fvPatchField<Type>& ptf,
     const labelList&
 )
 {
-    // Base fields do not rmap
-    this->setSize(this->patch().size(), pTraits<Type>::zero);
+    // Base fields do not rmap: re-interpolate them from tri data
+
+    const fixedValueIbFvPatchField<Type>& mptf =
+        refCast<const fixedValueIbFvPatchField<Type> >(ptf);
+
+    // Set rmap tri data
+    triValue_ = mptf.triValue_;
+
+    this->updateIbValues();
 }
 
 
 template<class Type>
-void immersedBoundaryFvPatchField<Type>::updateOnMotion()
+void fixedValueIbFvPatchField<Type>::updateOnMotion()
 {
     if (this->size() != this->ibPatch().size())
     {
-        // Use internal values, resizing the file if needed
-        Field<Type>::operator=(this->patchInternalField());
+        this->updateIbValues();
     }
 }
 
 
 template<class Type>
-void immersedBoundaryFvPatchField<Type>::evaluate
+void fixedValueIbFvPatchField<Type>::evaluate
 (
     const Pstream::commsTypes
 )
 {
-    // Use internal values
-    Field<Type>::operator=(this->patchInternalField());
+    this->updateIbValues();
 
     // Get non-constant reference to internal field
     Field<Type>& intField = const_cast<Field<Type>&>(this->internalField());
 
-    // Set dead values
+    // Set dead value
     this->setDeadValues(intField);
 
-    fvPatchField<Type>::evaluate();
+    // Evaluate fixed value condition
+    fixedValueFvPatchField<Type>::evaluate();
 }
 
 
 template<class Type>
-void immersedBoundaryFvPatchField<Type>::write(Ostream& os) const
+void fixedValueIbFvPatchField<Type>::write(Ostream& os) const
 {
     // Resolve post-processing issues.  HJ, 1/Dec/2017
     fvPatchField<Type>::write(os);
+    os.writeKeyword("patchType")
+        << immersedBoundaryFvPatch::typeName << token::END_STATEMENT << nl;
+    triValue_.writeEntry("triValue", os);
+
     // The value entry needs to be written with zero size
     Field<Type>::null().writeEntry("value", os);
     // this->writeEntry("value", os);
 
-    this->writeDeadData(os);
     this->writeField(*this);
 }
 

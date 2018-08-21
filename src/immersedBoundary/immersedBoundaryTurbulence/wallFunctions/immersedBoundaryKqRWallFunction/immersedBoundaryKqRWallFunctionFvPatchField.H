@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.1
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -22,99 +22,86 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::mixedIbFvPatchField
+    Foam::incompressible::RASModels::immersedBoundaryKqRWallFunctionFvPatchField
 
 Description
-    Foam::mixedIbFvPatchField
-
-Author
-    Hrvoje Jasak
+    Boundary condition for turbulence k, Q, and R when using wall functions.
+    Simply acts as a zero gradient condition.
 
 SourceFiles
-    mixedIbFvPatchField.C
+    immersedBoundaryKqRWallFunctionFvPatchField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef mixedIbFvPatchField_H
-#define mixedIbFvPatchField_H
+#ifndef immersedBoundaryKqRWallFunctionFvPatchField_H
+#define immersedBoundaryKqRWallFunctionFvPatchField_H
 
-#include "mixedFvPatchFields.H"
+#include "kqRWallFunctionFvPatchFields.H"
 #include "immersedBoundaryFieldBase.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+namespace incompressible
+{
+namespace RASModels
+{
 
 /*---------------------------------------------------------------------------*\
-                      Class mixedIbFvPatchField Declaration
+         Class immersedBoundaryKqRWallFunctionFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class mixedIbFvPatchField
+class immersedBoundaryKqRWallFunctionFvPatchField
 :
-    public mixedFvPatchField<Type>,
+    public kqRWallFunctionFvPatchField<Type>,
     public immersedBoundaryFieldBase<Type>
 {
-    // Private data
+    // Private member functions
 
-        // Defining fields
-        // Note: defining fields carry values on faces of the IB patch
-        // represented as a triangulated surface
-
-            //- Defining value field
-            Field<Type> triValue_;
-
-            //- Defining normal gradient field
-            Field<Type> triGrad_;
-
-            //- Fraction (0-1) of value used for boundary condition
-            scalarField triValueFraction_;
-
-
-    // Private Member Functions
-
-        //- Update IB value and gradient
-        void updateIbValues();
+        //- Check the type of the patch
+        void checkType();
 
 
 public:
 
     //- Runtime type information
-    TypeName("mixedIb");
+    TypeName("immersedBoundaryKqRWallFunction");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        mixedIbFvPatchField
+        immersedBoundaryKqRWallFunctionFvPatchField
         (
             const fvPatch&,
             const DimensionedField<Type, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        mixedIbFvPatchField
+        immersedBoundaryKqRWallFunctionFvPatchField
         (
             const fvPatch&,
             const DimensionedField<Type, volMesh>&,
             const dictionary&
         );
 
-        //- Construct by mapping given mixedIbFvPatchField
+        //- Construct by mapping given
+        // immersedBoundaryKqRWallFunctionFvPatchField
         //  onto a new patch
-        mixedIbFvPatchField
+        immersedBoundaryKqRWallFunctionFvPatchField
         (
-            const mixedIbFvPatchField<Type>&,
+            const immersedBoundaryKqRWallFunctionFvPatchField&,
             const fvPatch&,
             const DimensionedField<Type, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        mixedIbFvPatchField
+        immersedBoundaryKqRWallFunctionFvPatchField
         (
-            const mixedIbFvPatchField<Type>&
+            const immersedBoundaryKqRWallFunctionFvPatchField&
         );
 
         //- Construct and return a clone
@@ -122,14 +109,14 @@ public:
         {
             return tmp<fvPatchField<Type> >
             (
-                new mixedIbFvPatchField<Type>(*this)
+                new immersedBoundaryKqRWallFunctionFvPatchField(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        mixedIbFvPatchField
+        immersedBoundaryKqRWallFunctionFvPatchField
         (
-            const mixedIbFvPatchField<Type>&,
+            const immersedBoundaryKqRWallFunctionFvPatchField&,
             const DimensionedField<Type, volMesh>&
         );
 
@@ -141,73 +128,19 @@ public:
         {
             return tmp<fvPatchField<Type> >
             (
-                new mixedIbFvPatchField<Type>(*this, iF)
+                new immersedBoundaryKqRWallFunctionFvPatchField(*this, iF)
             );
         }
 
 
     //- Destructor
-    virtual ~mixedIbFvPatchField()
+    virtual ~immersedBoundaryKqRWallFunctionFvPatchField()
     {}
 
 
     // Member functions
 
-        // Return defining fields
-        // Note: defining fields carry values on faces of the IB patch
-        // represented as a triangulated surface
-
-            //- Return reference value
-            const Field<Type>& triValue() const
-            {
-                return triValue_;
-            }
-
-            //- Return access to reference value
-            Field<Type>& triValue()
-            {
-                return triValue_;
-            }
-
-            //- Return reference gradient
-            const Field<Type>& triGrad() const
-            {
-                return triGrad_;
-            }
-
-            //- Return access to reference gradient
-            Field<Type>& triGrad()
-            {
-                return triGrad_;
-            }
-
-            //- Return value fraction
-            virtual const scalarField& triValueFraction() const
-            {
-                return triValueFraction_;
-            }
-
-            //- Return access to value fraction
-            scalarField& triValueFraction()
-            {
-                return triValueFraction_;
-            }
-
-
         // Mapping functions
-
-            //- Map (and resize as needed) from self given a mapping object
-            virtual void autoMap
-            (
-                const fvPatchFieldMapper&
-            );
-
-            //- Reverse map the given fvPatchField onto this fvPatchField
-            virtual void rmap
-            (
-                const fvPatchField<Type>&,
-                const labelList&
-            );
 
             //- Update on mesh motion
             virtual void updateOnMotion();
@@ -215,7 +148,7 @@ public:
 
         // Evaluation functions
 
-            //- Evaluate the patch field
+            //- Evaluate the patchField
             virtual void evaluate
             (
                 const Pstream::commsTypes commsType = Pstream::blocking
@@ -225,18 +158,20 @@ public:
         // I-O
 
             //- Write
-            virtual void write(Ostream&) const;
+            void write(Ostream&) const;
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace RASModels
+} // End namespace incompressible
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "mixedIbFvPatchField.C"
+#   include "immersedBoundaryKqRWallFunctionFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

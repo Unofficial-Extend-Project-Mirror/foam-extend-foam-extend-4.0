@@ -22,23 +22,23 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::mixedIbFvPatchField
+    Foam::fixedValueIbFvPatchField
 
 Description
-    Foam::mixedIbFvPatchField
+    Foam::fixedValueIbFvPatchField
 
 Author
     Hrvoje Jasak
 
 SourceFiles
-    mixedIbFvPatchField.C
+    fixedValueIbFvPatchField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef mixedIbFvPatchField_H
-#define mixedIbFvPatchField_H
+#ifndef fixedValueIbFvPatchField_H
+#define fixedValueIbFvPatchField_H
 
-#include "mixedFvPatchFields.H"
+#include "fixedValueFvPatchFields.H"
 #include "immersedBoundaryFieldBase.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -47,29 +47,23 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class mixedIbFvPatchField Declaration
+                    Class fixedValueIbFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class mixedIbFvPatchField
+class fixedValueIbFvPatchField
 :
-    public mixedFvPatchField<Type>,
+    public fixedValueFvPatchField<Type>,
     public immersedBoundaryFieldBase<Type>
 {
     // Private data
 
-        // Defining fields
-        // Note: defining fields carry values on faces of the IB patch
+        // Fixed value field
+        // Note: defining field carry values on faces of the IB patch
         // represented as a triangulated surface
 
             //- Defining value field
             Field<Type> triValue_;
-
-            //- Defining normal gradient field
-            Field<Type> triGrad_;
-
-            //- Fraction (0-1) of value used for boundary condition
-            scalarField triValueFraction_;
 
 
     // Private Member Functions
@@ -81,40 +75,40 @@ class mixedIbFvPatchField
 public:
 
     //- Runtime type information
-    TypeName("mixedIb");
+    TypeName("fixedValueIb");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        mixedIbFvPatchField
+        fixedValueIbFvPatchField
         (
             const fvPatch&,
             const DimensionedField<Type, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        mixedIbFvPatchField
+        fixedValueIbFvPatchField
         (
             const fvPatch&,
             const DimensionedField<Type, volMesh>&,
             const dictionary&
         );
 
-        //- Construct by mapping given mixedIbFvPatchField
+        //- Construct by mapping given fixedValueIbFvPatchField
         //  onto a new patch
-        mixedIbFvPatchField
+        fixedValueIbFvPatchField
         (
-            const mixedIbFvPatchField<Type>&,
+            const fixedValueIbFvPatchField<Type>&,
             const fvPatch&,
             const DimensionedField<Type, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        mixedIbFvPatchField
+        fixedValueIbFvPatchField
         (
-            const mixedIbFvPatchField<Type>&
+            const fixedValueIbFvPatchField<Type>&
         );
 
         //- Construct and return a clone
@@ -122,14 +116,14 @@ public:
         {
             return tmp<fvPatchField<Type> >
             (
-                new mixedIbFvPatchField<Type>(*this)
+                new fixedValueIbFvPatchField<Type>(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        mixedIbFvPatchField
+        fixedValueIbFvPatchField
         (
-            const mixedIbFvPatchField<Type>&,
+            const fixedValueIbFvPatchField<Type>&,
             const DimensionedField<Type, volMesh>&
         );
 
@@ -141,13 +135,13 @@ public:
         {
             return tmp<fvPatchField<Type> >
             (
-                new mixedIbFvPatchField<Type>(*this, iF)
+                new fixedValueIbFvPatchField<Type>(*this, iF)
             );
         }
 
 
     //- Destructor
-    virtual ~mixedIbFvPatchField()
+    virtual ~fixedValueIbFvPatchField()
     {}
 
 
@@ -167,30 +161,6 @@ public:
             Field<Type>& triValue()
             {
                 return triValue_;
-            }
-
-            //- Return reference gradient
-            const Field<Type>& triGrad() const
-            {
-                return triGrad_;
-            }
-
-            //- Return access to reference gradient
-            Field<Type>& triGrad()
-            {
-                return triGrad_;
-            }
-
-            //- Return value fraction
-            virtual const scalarField& triValueFraction() const
-            {
-                return triValueFraction_;
-            }
-
-            //- Return access to value fraction
-            scalarField& triValueFraction()
-            {
-                return triValueFraction_;
             }
 
 
@@ -236,7 +206,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "mixedIbFvPatchField.C"
+#   include "fixedValueIbFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

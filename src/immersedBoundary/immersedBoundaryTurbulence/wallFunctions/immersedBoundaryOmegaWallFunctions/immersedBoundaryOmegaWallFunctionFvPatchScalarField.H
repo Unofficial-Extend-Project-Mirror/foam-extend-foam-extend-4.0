@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.1
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -22,111 +22,132 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::movingImmersedBoundaryVelocityFvPatchVectorField
+    Foam::incompressible::RASModels::omegaWallFunctionFvPatchScalarField
 
 Description
-    Foam::movingImmersedBoundaryVelocityFvPatchVectorField
+    Provides a wall function boundary condition/constraint on omega
+
+    Computed value is:
+
+        omega = sqrt(omega_vis^2 + omega_log^2)
+
+    where
+        omega_vis = omega in viscous region
+        omega_log = omega in logarithmic region
+
+    Model described by Eq.(15) of:
+    @verbatim
+        Menter, F., Esch, T.
+        "Elements of Industrial Heat Transfer Prediction"
+        16th Brazilian Congress of Mechanical Engineering (COBEM),
+        Nov. 2001
+    @endverbatim
+
+Description
+    Boundary condition for omega when using wall functions
+    on immersed boundary patches
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
 SourceFiles
-    movingImmersedBoundaryVelocityFvPatchVectorField.C
+    immersedBoundaryOmegaWallFunctionFvPatchScalarField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef movingImmersedBoundaryVelocityFvPatchVectorField_H
-#define movingImmersedBoundaryVelocityFvPatchVectorField_H
+#ifndef immersedBoundaryOmegaWallFunctionFvPatchScalarField_H
+#define immersedBoundaryOmegaWallFunctionFvPatchScalarField_H
 
-#include "fvPatchFields.H"
-#include "fixedValueFvPatchFields.H"
+#include "omegaWallFunctionFvPatchScalarField.H"
 #include "immersedBoundaryFieldBase.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+namespace incompressible
+{
+namespace RASModels
+{
 
 /*---------------------------------------------------------------------------*\
-             Class movingImmersedBoundaryVelocityFvPatch Declaration
+     Class immersedBoundaryOmegaWallFunctionFvPatchScalarField Declaration
 \*---------------------------------------------------------------------------*/
 
-class movingImmersedBoundaryVelocityFvPatchVectorField
+class immersedBoundaryOmegaWallFunctionFvPatchScalarField
 :
-    public fixedValueFvPatchVectorField,
-    public immersedBoundaryFieldBase<vector>
+    public omegaWallFunctionFvPatchScalarField,
+    public immersedBoundaryFieldBase<scalar>
 {
-    // Private Member Functions
-
-        //- Update IB value based on complete boundary velocity
-        //  Note: regular evaluation should use the face flux and is
-        //  performed in the updateCoeffs() function
-        //  HJ, 15/Jul/2018
-        void updateIbValues();
-
-
 public:
 
     //- Runtime type information
-    TypeName("movingImmersedBoundaryVelocity");
+    TypeName("immersedBoundaryOmegaWallFunction");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        movingImmersedBoundaryVelocityFvPatchVectorField
+        immersedBoundaryOmegaWallFunctionFvPatchScalarField
         (
             const fvPatch&,
-            const DimensionedField<vector, volMesh>&
+            const DimensionedField<scalar, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        movingImmersedBoundaryVelocityFvPatchVectorField
+        immersedBoundaryOmegaWallFunctionFvPatchScalarField
         (
             const fvPatch&,
-            const DimensionedField<vector, volMesh>&,
+            const DimensionedField<scalar, volMesh>&,
             const dictionary&
         );
 
         //- Construct by mapping given
-        //  movingImmersedBoundaryVelocityFvPatchVectorField
+        // immersedBoundaryOmegaWallFunctionFvPatchScalarField
         //  onto a new patch
-        movingImmersedBoundaryVelocityFvPatchVectorField
+        immersedBoundaryOmegaWallFunctionFvPatchScalarField
         (
-            const movingImmersedBoundaryVelocityFvPatchVectorField&,
+            const immersedBoundaryOmegaWallFunctionFvPatchScalarField&,
             const fvPatch&,
-            const DimensionedField<vector, volMesh>&,
+            const DimensionedField<scalar, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        movingImmersedBoundaryVelocityFvPatchVectorField
+        immersedBoundaryOmegaWallFunctionFvPatchScalarField
         (
-            const movingImmersedBoundaryVelocityFvPatchVectorField&
+            const immersedBoundaryOmegaWallFunctionFvPatchScalarField&
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchVectorField> clone() const
+        virtual tmp<fvPatchScalarField> clone() const
         {
-            return tmp<fvPatchVectorField>
+            return tmp<fvPatchScalarField>
             (
-                new movingImmersedBoundaryVelocityFvPatchVectorField(*this)
+                new immersedBoundaryOmegaWallFunctionFvPatchScalarField(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        movingImmersedBoundaryVelocityFvPatchVectorField
+        immersedBoundaryOmegaWallFunctionFvPatchScalarField
         (
-            const movingImmersedBoundaryVelocityFvPatchVectorField&,
-            const DimensionedField<vector, volMesh>&
+            const immersedBoundaryOmegaWallFunctionFvPatchScalarField&,
+            const DimensionedField<scalar, volMesh>&
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchVectorField> clone
+        virtual tmp<fvPatchScalarField> clone
         (
-            const DimensionedField<vector, volMesh>& iF
+            const DimensionedField<scalar, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchVectorField>
+            return tmp<fvPatchScalarField>
             (
-                new movingImmersedBoundaryVelocityFvPatchVectorField(*this, iF)
+                new immersedBoundaryOmegaWallFunctionFvPatchScalarField
+                (
+                    *this,
+                    iF
+                )
             );
         }
 
@@ -134,19 +155,6 @@ public:
     // Member functions
 
         // Mapping functions
-
-            //- Map (and resize as needed) from self given a mapping object
-            virtual void autoMap
-            (
-                const fvPatchFieldMapper&
-            );
-
-            //- Reverse map the given fvPatchField onto this fvPatchField
-            virtual void rmap
-            (
-                const fvPatchVectorField&,
-                const labelList&
-            );
 
             //- Update on mesh motion
             virtual void updateOnMotion();
@@ -157,22 +165,18 @@ public:
             //- Update the coefficients associated with the patch field
             virtual void updateCoeffs();
 
-            //- Evaluate the patch field
-            virtual void evaluate
-            (
-                const Pstream::commsTypes commsType = Pstream::blocking
-            );
-
 
         // I-O
 
             //- Write
-            virtual void write(Ostream&) const;
+            void write(Ostream&) const;
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace RASModels
+} // End namespace incompressible
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -22,131 +22,125 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::movingImmersedBoundaryVelocityFvPatchVectorField
+    Foam::incompressible::RASModels::immersedBoundaryEpsilonWallFunctionFvPatchScalarField
 
 Description
-    Foam::movingImmersedBoundaryVelocityFvPatchVectorField
+    Boundary condition for epsilon when using wall functions
+    on immersed boundary patches
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
 SourceFiles
-    movingImmersedBoundaryVelocityFvPatchVectorField.C
+    immersedBoundaryEpsilonWallFunctionFvPatchScalarField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef movingImmersedBoundaryVelocityFvPatchVectorField_H
-#define movingImmersedBoundaryVelocityFvPatchVectorField_H
+#ifndef immersedBoundaryEpsilonWallFunctionFvPatchScalarField_H
+#define immersedBoundaryEpsilonWallFunctionFvPatchScalarField_H
 
-#include "fvPatchFields.H"
-#include "fixedValueFvPatchFields.H"
+#include "epsilonWallFunctionFvPatchScalarField.H"
 #include "immersedBoundaryFieldBase.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+namespace incompressible
+{
+namespace RASModels
+{
 
 /*---------------------------------------------------------------------------*\
-             Class movingImmersedBoundaryVelocityFvPatch Declaration
+    Class immersedBoundaryEpsilonWallFunctionFvPatchScalarField Declaration
 \*---------------------------------------------------------------------------*/
 
-class movingImmersedBoundaryVelocityFvPatchVectorField
+class immersedBoundaryEpsilonWallFunctionFvPatchScalarField
 :
-    public fixedValueFvPatchVectorField,
-    public immersedBoundaryFieldBase<vector>
+    public epsilonWallFunctionFvPatchScalarField,
+    public immersedBoundaryFieldBase<scalar>
 {
-    // Private Member Functions
-
-        //- Update IB value based on complete boundary velocity
-        //  Note: regular evaluation should use the face flux and is
-        //  performed in the updateCoeffs() function
-        //  HJ, 15/Jul/2018
-        void updateIbValues();
-
-
 public:
 
     //- Runtime type information
-    TypeName("movingImmersedBoundaryVelocity");
+    TypeName("immersedBoundaryEpsilonWallFunction");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        movingImmersedBoundaryVelocityFvPatchVectorField
+        immersedBoundaryEpsilonWallFunctionFvPatchScalarField
         (
             const fvPatch&,
-            const DimensionedField<vector, volMesh>&
+            const DimensionedField<scalar, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        movingImmersedBoundaryVelocityFvPatchVectorField
+        immersedBoundaryEpsilonWallFunctionFvPatchScalarField
         (
             const fvPatch&,
-            const DimensionedField<vector, volMesh>&,
+            const DimensionedField<scalar, volMesh>&,
             const dictionary&
         );
 
         //- Construct by mapping given
-        //  movingImmersedBoundaryVelocityFvPatchVectorField
+        //  immersedBoundaryEpsilonWallFunctionFvPatchScalarField
         //  onto a new patch
-        movingImmersedBoundaryVelocityFvPatchVectorField
+        immersedBoundaryEpsilonWallFunctionFvPatchScalarField
         (
-            const movingImmersedBoundaryVelocityFvPatchVectorField&,
+            const immersedBoundaryEpsilonWallFunctionFvPatchScalarField&,
             const fvPatch&,
-            const DimensionedField<vector, volMesh>&,
+            const DimensionedField<scalar, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        movingImmersedBoundaryVelocityFvPatchVectorField
+        immersedBoundaryEpsilonWallFunctionFvPatchScalarField
         (
-            const movingImmersedBoundaryVelocityFvPatchVectorField&
+            const immersedBoundaryEpsilonWallFunctionFvPatchScalarField&
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchVectorField> clone() const
+        virtual tmp<fvPatchScalarField> clone() const
         {
-            return tmp<fvPatchVectorField>
+            return tmp<fvPatchScalarField>
             (
-                new movingImmersedBoundaryVelocityFvPatchVectorField(*this)
+                new immersedBoundaryEpsilonWallFunctionFvPatchScalarField(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        movingImmersedBoundaryVelocityFvPatchVectorField
+        immersedBoundaryEpsilonWallFunctionFvPatchScalarField
         (
-            const movingImmersedBoundaryVelocityFvPatchVectorField&,
-            const DimensionedField<vector, volMesh>&
+            const immersedBoundaryEpsilonWallFunctionFvPatchScalarField&,
+            const DimensionedField<scalar, volMesh>&
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchVectorField> clone
+        virtual tmp<fvPatchScalarField> clone
         (
-            const DimensionedField<vector, volMesh>& iF
+            const DimensionedField<scalar, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchVectorField>
+            return tmp<fvPatchScalarField>
             (
-                new movingImmersedBoundaryVelocityFvPatchVectorField(*this, iF)
+                new immersedBoundaryEpsilonWallFunctionFvPatchScalarField
+                (
+                    *this,
+                    iF
+                )
             );
         }
+
+
+    //- Destructor
+    virtual ~immersedBoundaryEpsilonWallFunctionFvPatchScalarField()
+    {}
 
 
     // Member functions
 
         // Mapping functions
-
-            //- Map (and resize as needed) from self given a mapping object
-            virtual void autoMap
-            (
-                const fvPatchFieldMapper&
-            );
-
-            //- Reverse map the given fvPatchField onto this fvPatchField
-            virtual void rmap
-            (
-                const fvPatchVectorField&,
-                const labelList&
-            );
 
             //- Update on mesh motion
             virtual void updateOnMotion();
@@ -157,22 +151,24 @@ public:
             //- Update the coefficients associated with the patch field
             virtual void updateCoeffs();
 
-            //- Evaluate the patch field
+            //- Evaluate the patchField
             virtual void evaluate
             (
-                const Pstream::commsTypes commsType = Pstream::blocking
+                const Pstream::commsTypes  = Pstream::blocking
             );
 
 
         // I-O
 
             //- Write
-            virtual void write(Ostream&) const;
+            void write(Ostream&) const;
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace RASModels
+} // End namespace incompressible
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

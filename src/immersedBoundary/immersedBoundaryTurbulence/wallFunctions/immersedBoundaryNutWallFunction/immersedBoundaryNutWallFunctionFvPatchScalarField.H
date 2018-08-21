@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.1
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -22,116 +22,113 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::immersedBoundaryFvPatchField
+    Foam::incompressible::RASModels::immersedBoundaryNutWallFunctionFvPatchScalarField
 
 Description
-    Constrained immersedBoundaryFvPatchField of calculated functionality
-    with appropriate resizing on topo change or motion of the immersed surface.
-    The patch field shall take the values of intersected cells.
-
-    Note: This patch field is used instead of the calculated type in the
-    immersedBoundaryFvPatch.  It does not support discretisation.
-    For matrix operations, use the mixedIbFvPatchField.
-
-Author
-    Hrvoje Jasak
+    Boundary condition for turbulent (kinematic) viscosity when using wall
+    functions on immersed boundary patches
+    - replicates OpenFOAM v1.5 (and earlier) behaviour
 
 SourceFiles
-    immersedBoundaryFvPatchField.C
+    immersedBoundaryNutWallFunctionFvPatchScalarField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef immersedBoundaryFvPatchField_H
-#define immersedBoundaryFvPatchField_H
+#ifndef immersedBoundaryNutWallFunctionFvPatchScalarField_H
+#define immersedBoundaryNutWallFunctionFvPatchScalarField_H
 
-#include "fvPatchFields.H"
+#include "nutkWallFunctionFvPatchScalarField.H"
 #include "immersedBoundaryFieldBase.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+namespace incompressible
+{
+namespace RASModels
+{
 
 /*---------------------------------------------------------------------------*\
-                  Class immersedBoundaryFvPatchField Declaration
+      Class immersedBoundaryNutWallFunctionFvPatchScalarField Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class Type>
-class immersedBoundaryFvPatchField
+class immersedBoundaryNutWallFunctionFvPatchScalarField
 :
-    public fvPatchField<Type>,
-    public immersedBoundaryFieldBase<Type>
+    public nutkWallFunctionFvPatchScalarField,
+    public immersedBoundaryFieldBase<scalar>
 {
 public:
 
-    //- Runtime type information: constrained type
-    TypeName(immersedBoundaryFvPatch::typeName_());
+    //- Runtime type information
+    TypeName("immersedBoundaryNutWallFunction");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        immersedBoundaryFvPatchField
+        immersedBoundaryNutWallFunctionFvPatchScalarField
         (
             const fvPatch&,
-            const DimensionedField<Type, volMesh>&
+            const DimensionedField<scalar, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        immersedBoundaryFvPatchField
+        immersedBoundaryNutWallFunctionFvPatchScalarField
         (
             const fvPatch&,
-            const DimensionedField<Type, volMesh>&,
+            const DimensionedField<scalar, volMesh>&,
             const dictionary&
         );
 
-        //- Construct by mapping given immersedBoundaryFvPatchField
+        //- Construct by mapping given
+        //  immersedBoundaryNutWallFunctionFvPatchScalarField
         //  onto a new patch
-        immersedBoundaryFvPatchField
+        immersedBoundaryNutWallFunctionFvPatchScalarField
         (
-            const immersedBoundaryFvPatchField<Type>&,
+            const immersedBoundaryNutWallFunctionFvPatchScalarField&,
             const fvPatch&,
-            const DimensionedField<Type, volMesh>&,
+            const DimensionedField<scalar, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        immersedBoundaryFvPatchField
+        immersedBoundaryNutWallFunctionFvPatchScalarField
         (
-            const immersedBoundaryFvPatchField<Type>&
+            const immersedBoundaryNutWallFunctionFvPatchScalarField&
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchField<Type> > clone() const
+        virtual tmp<fvPatchScalarField> clone() const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchScalarField>
             (
-                new immersedBoundaryFvPatchField<Type>(*this)
+                new immersedBoundaryNutWallFunctionFvPatchScalarField(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        immersedBoundaryFvPatchField
+        immersedBoundaryNutWallFunctionFvPatchScalarField
         (
-            const immersedBoundaryFvPatchField<Type>&,
-            const DimensionedField<Type, volMesh>&
+            const immersedBoundaryNutWallFunctionFvPatchScalarField&,
+            const DimensionedField<scalar, volMesh>&
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<Type> > clone
+        virtual tmp<fvPatchScalarField> clone
         (
-            const DimensionedField<Type, volMesh>& iF
+            const DimensionedField<scalar, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchScalarField>
             (
-                new immersedBoundaryFvPatchField<Type>(*this, iF)
+                new immersedBoundaryNutWallFunctionFvPatchScalarField(*this, iF)
             );
         }
 
 
     //- Destructor
-    virtual ~immersedBoundaryFvPatchField()
+    virtual ~immersedBoundaryNutWallFunctionFvPatchScalarField()
     {}
 
 
@@ -139,30 +136,8 @@ public:
 
         // Mapping functions
 
-            //- Map (and resize as needed) from self given a mapping object
-            virtual void autoMap
-            (
-                const fvPatchFieldMapper&
-            );
-
-            //- Reverse map the given fvPatchField onto this fvPatchField
-            virtual void rmap
-            (
-                const fvPatchField<Type>&,
-                const labelList&
-            );
-
             //- Update on mesh motion
             virtual void updateOnMotion();
-
-
-        // Evaluation functions
-
-            //- Evaluate the patch field
-            virtual void evaluate
-            (
-                const Pstream::commsTypes commsType = Pstream::blocking
-            );
 
 
         // I-O
@@ -174,13 +149,9 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace RASModels
+} // End namespace incompressible
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#ifdef NoRepository
-#   include "immersedBoundaryFvPatchField.C"
-#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

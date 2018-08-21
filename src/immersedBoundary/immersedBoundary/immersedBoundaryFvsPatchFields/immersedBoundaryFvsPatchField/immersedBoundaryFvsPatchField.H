@@ -171,6 +171,9 @@ public:
                 const labelList&
             );
 
+            //- Update on mesh motion
+            virtual void updateOnMotion();
+
 
         // Evaluation functions
 

@@ -138,6 +138,13 @@ void immersedBoundaryFvsPatchField<Type>::rmap
 
 
 template<class Type>
+void immersedBoundaryFvsPatchField<Type>::updateOnMotion()
+{
+    this->updateSize();
+}
+
+
+template<class Type>
 void immersedBoundaryFvsPatchField<Type>::evaluate
 (
     const Pstream::commsTypes

@@ -81,20 +81,9 @@ int main(int argc, char *argv[])
 
         bool meshChanged = mesh.update();
 
-        U.correctBoundaryConditions();
-        p.correctBoundaryConditions();
-        aU.correctBoundaryConditions();
-        phi.correctBoundaryConditions();
-        turbulence->correct();
-
+#       include "updateIbPatchFields.H"
 #       include "updateIbMasks.H"
 #       include "volContinuity.H"
-
-        if (runTime.outputTime())
-        {
-            volScalarField divMeshPhi("divMeshPhi", mag(fvc::surfaceIntegrate(mesh.phi())));
-            divMeshPhi.write();
-        }
 
         if (checkMeshCourantNo)
         {

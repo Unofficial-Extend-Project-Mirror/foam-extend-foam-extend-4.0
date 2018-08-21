@@ -32,21 +32,14 @@ License
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::setDeadValues()
+void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::updateIbValues()
 {
-    // Fix the value in dead cells
-    if (setDeadValue_)
-    {
-        const labelList& dc = ibPatch_.ibPolyPatch().deadCells();
-
-        // Get non-const access to internal field
-        vectorField& psiI = const_cast<vectorField&>(this->internalField());
-
-        forAll (dc, dcI)
-        {
-            psiI[dc[dcI]] = deadValue_;
-        }
-    }
+    // Evaluate with complete boundary velocity
+    vectorField::operator=
+    (
+        this->ibPatch().ibPolyPatch().motionDistance()/
+        patch().boundaryMesh().mesh().time().deltaT().value()
+    );
 }
 
 
@@ -60,9 +53,7 @@ movingImmersedBoundaryVelocityFvPatchVectorField
 )
 :
     fixedValueFvPatchVectorField(p, iF),
-    ibPatch_(refCast<const immersedBoundaryFvPatch>(p)),
-    setDeadValue_(false),
-    deadValue_(vector::zero)
+    immersedBoundaryFieldBase<vector>(p, false, vector::zero)
 {}
 
 
@@ -75,16 +66,10 @@ movingImmersedBoundaryVelocityFvPatchVectorField
 )
 :
     fixedValueFvPatchVectorField(p, iF),   // Do not read data
-    ibPatch_(refCast<const immersedBoundaryFvPatch>(p)),
-    setDeadValue_(dict.lookup("setDeadValue")),
-    deadValue_(dict.lookup("deadValue"))
+    immersedBoundaryFieldBase<vector>(p, false, vector::zero)
 {
-    // Evaluate with complete boundary velocity
-    vectorField::operator=
-    (
-        ibPatch_.ibPolyPatch().motionDistance()/
-        patch().boundaryMesh().mesh().time().deltaT().value()
-    );
+    readPatchType(dict);
+    updateIbValues();
 }
 
 
@@ -98,16 +83,9 @@ movingImmersedBoundaryVelocityFvPatchVectorField
 )
 :
     fixedValueFvPatchVectorField(p, iF),   // Do not  data
-    ibPatch_(refCast<const immersedBoundaryFvPatch>(p)),
-    setDeadValue_(ptf.setDeadValue_),
-    deadValue_(ptf.deadValue_)
+    immersedBoundaryFieldBase<vector>(p, false, vector::zero)
 {
-    // Evaluate with complete boundary velocity
-    vectorField::operator=
-    (
-        ibPatch_.ibPolyPatch().motionDistance()/
-        patch().boundaryMesh().mesh().time().deltaT().value()
-    );
+    updateIbValues();
 }
 
 
@@ -118,9 +96,7 @@ movingImmersedBoundaryVelocityFvPatchVectorField
 )
 :
     fixedValueFvPatchVectorField(ptf),
-    ibPatch_(ptf.ibPatch()),
-    setDeadValue_(ptf.setDeadValue_),
-    deadValue_(ptf.deadValue_)
+    immersedBoundaryFieldBase<vector>(ptf.ibPatch(), false, vector::zero)
 {}
 
 
@@ -132,13 +108,44 @@ movingImmersedBoundaryVelocityFvPatchVectorField
 )
 :
     fixedValueFvPatchVectorField(ptf, iF),
-    ibPatch_(ptf.ibPatch()),
-    setDeadValue_(ptf.setDeadValue_),
-    deadValue_(ptf.deadValue_)
+    immersedBoundaryFieldBase<vector>(ptf.ibPatch(), false, vector::zero)
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::autoMap
+(
+    const fvPatchFieldMapper&
+)
+{
+    updateIbValues();
+}
+
+
+void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::rmap
+(
+    const fvPatchVectorField&,
+    const labelList&
+)
+{
+    if (size() != ibPatch().size())
+    {
+        updateIbValues();
+    }
+}
+
+
+void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::updateOnMotion()
+{
+    Info<< "Update on motion, 1" << endl;
+    if (size() != ibPatch().size())
+    {
+        Info<< "Update on motion, 2" << endl;
+        updateIbValues();
+    }
+}
+
 
 void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::updateCoeffs()
 {
@@ -154,7 +161,7 @@ void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::updateCoeffs()
         const fvPatch& p = patch();
 
         // Get wall-parallel mesh motion velocity from immersed boundary
-        vectorField Up = ibPatch_.ibPolyPatch().motionDistance()/
+        vectorField Up = this->ibPatch().ibPolyPatch().motionDistance()/
             mesh.time().deltaT().value();
 
         const volVectorField& U =
@@ -183,8 +190,11 @@ void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::evaluate
     const Pstream::commsTypes
 )
 {
+    // Get non-constant reference to internal field
+    vectorField& intField = const_cast<vectorField&>(this->internalField());
+
     // Set dead value
-    this->setDeadValues();
+    this->setDeadValues(intField);
 
     // Evaluate mixed condition
     fixedValueFvPatchVectorField::evaluate();
@@ -197,40 +207,11 @@ void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::write
 ) const
 {
     fvPatchVectorField::write(os);
-    os.writeKeyword("patchType")
-        << immersedBoundaryFvPatch::typeName << token::END_STATEMENT << nl;
-    os.writeKeyword("setDeadValue")
-        << setDeadValue_ << token::END_STATEMENT << nl;
-    os.writeKeyword("deadValue")
-        << deadValue_ << token::END_STATEMENT << nl;
 
     vectorField::null().writeEntry("value", os);
     // writeEntry("value", os);
 
-    // Write VTK on master only
-    if (Pstream::master())
-    {
-        // Add parallel reduction of all faces and data to proc 0
-        // and write the whola patch together
-
-        // Write immersed boundary data as a vtk file
-        autoPtr<surfaceWriter> writerPtr = surfaceWriter::New("vtk");
-
-        // Get the intersected patch
-        const standAlonePatch& ts = ibPatch_.ibPolyPatch().ibPatch();
-
-        writerPtr->write
-        (
-            this->dimensionedInternalField().path(),
-            ibPatch_.name(),
-            ts.points(),
-            ts,
-            this->dimensionedInternalField().name(),
-            *this,
-            false,  // FACE_DATA
-            false   // verbose
-        );
-    }
+    this->writeField(*this);
 }
 
 

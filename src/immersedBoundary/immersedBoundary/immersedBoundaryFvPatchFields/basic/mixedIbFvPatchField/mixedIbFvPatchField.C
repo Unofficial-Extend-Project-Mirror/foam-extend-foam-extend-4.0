@@ -37,30 +37,11 @@ template<class Type>
 void mixedIbFvPatchField<Type>::updateIbValues()
 {
     // Interpolate the values from tri surface using nearest triangle
-    const labelList& nt = ibPatch_.ibPolyPatch().nearestTri();
+    const labelList& nt = this->ibPatch().ibPolyPatch().nearestTri();
 
     this->refValue() = Field<Type>(triValue_, nt);
     this->refGrad() = Field<Type>(triGrad_, nt);
     this->valueFraction() = scalarField(triValueFraction_, nt);
-}
-
-
-template<class Type>
-void mixedIbFvPatchField<Type>::setDeadValues()
-{
-    // Fix the value in dead cells
-    if (setDeadValue_)
-    {
-        const labelList& dc = ibPatch_.ibPolyPatch().deadCells();
-
-        // Get non-const access to internal field
-        Field<Type>& psiI = const_cast<Field<Type>&>(this->internalField());
-
-        forAll (dc, dcI)
-        {
-            psiI[dc[dcI]] = deadValue_;
-        }
-    }
 }
 
 
@@ -74,12 +55,10 @@ mixedIbFvPatchField<Type>::mixedIbFvPatchField
 )
 :
     mixedFvPatchField<Type>(p, iF),
-    ibPatch_(refCast<const immersedBoundaryFvPatch>(p)),
-    triValue_(ibPatch_.ibMesh().size(), pTraits<Type>::zero),
-    triGrad_(ibPatch_.ibMesh().size(), pTraits<Type>::zero),
-    triValueFraction_(false),
-    setDeadValue_(false),
-    deadValue_(pTraits<Type>::zero)
+    immersedBoundaryFieldBase<Type>(p, false, pTraits<Type>::zero),
+    triValue_(this->ibPatch().ibMesh().size(), pTraits<Type>::zero),
+    triGrad_(this->ibPatch().ibMesh().size(), pTraits<Type>::zero),
+    triValueFraction_(false)
 {}
 
 
@@ -92,12 +71,15 @@ mixedIbFvPatchField<Type>::mixedIbFvPatchField
 )
 :
     mixedFvPatchField<Type>(p, iF),   // Do not read mixed data
-    ibPatch_(refCast<const immersedBoundaryFvPatch>(p)),
-    triValue_("triValue", dict, ibPatch_.ibMesh().size()),
-    triGrad_("triGradient", dict, ibPatch_.ibMesh().size()),
-    triValueFraction_("triValueFraction", dict, ibPatch_.ibMesh().size()),
-    setDeadValue_(dict.lookup("setDeadValue")),
-    deadValue_(pTraits<Type>(dict.lookup("deadValue")))
+    immersedBoundaryFieldBase<Type>
+    (
+        p,
+        Switch(dict.lookup("setDeadValue")),
+        pTraits<Type>(dict.lookup("deadValue"))
+    ),
+    triValue_("triValue", dict, this->ibPatch().ibMesh().size()),
+    triGrad_("triGradient", dict, this->ibPatch().ibMesh().size()),
+    triValueFraction_("triValueFraction", dict, this->ibPatch().ibMesh().size())
 {
     if (!isType<immersedBoundaryFvPatch>(p))
     {
@@ -136,12 +118,15 @@ mixedIbFvPatchField<Type>::mixedIbFvPatchField
 )
 :
     mixedFvPatchField<Type>(p, iF),  // Do not map mixed data
-    ibPatch_(refCast<const immersedBoundaryFvPatch>(p)),
+    immersedBoundaryFieldBase<Type>
+    (
+        p,
+        ptf.setDeadValue(),
+        ptf.deadValue()
+    ),
     triValue_(ptf.triValue()),
     triGrad_(ptf.triGrad()),
-    triValueFraction_(ptf.triValueFraction()),
-    setDeadValue_(ptf.setDeadValue_),
-    deadValue_(ptf.deadValue_)
+    triValueFraction_(ptf.triValueFraction())
 {
     // Note: NO MAPPING.  Fields are created on the immersed boundary
     // HJ, 12/Apr/2012
@@ -182,12 +167,15 @@ mixedIbFvPatchField<Type>::mixedIbFvPatchField
 )
 :
     mixedFvPatchField<Type>(ptf),
-    ibPatch_(ptf.ibPatch()),
+    immersedBoundaryFieldBase<Type>
+    (
+        ptf.ibPatch(),
+        ptf.setDeadValue(),
+        ptf.deadValue()
+    ),
     triValue_(ptf.triValue()),
     triGrad_(ptf.triGrad()),
-    triValueFraction_(ptf.triValueFraction()),
-    setDeadValue_(ptf.setDeadValue_),
-    deadValue_(ptf.deadValue_)
+    triValueFraction_(ptf.triValueFraction())
 {}
 
 
@@ -199,12 +187,15 @@ mixedIbFvPatchField<Type>::mixedIbFvPatchField
 )
 :
     mixedFvPatchField<Type>(ptf, iF),
-    ibPatch_(ptf.ibPatch()),
+    immersedBoundaryFieldBase<Type>
+    (
+        ptf.ibPatch(),
+        ptf.setDeadValue(),
+        ptf.deadValue()
+    ),
     triValue_(ptf.triValue()),
     triGrad_(ptf.triGrad()),
-    triValueFraction_(ptf.triValueFraction()),
-    setDeadValue_(ptf.setDeadValue_),
-    deadValue_(ptf.deadValue_)
+    triValueFraction_(ptf.triValueFraction())
 {}
 
 
@@ -218,6 +209,7 @@ void mixedIbFvPatchField<Type>::autoMap
 {
     // Base fields do not map: re-interpolate them from tri data
     this->updateIbValues();
+    mixedFvPatchField<Type>::evaluate();
 }
 
 
@@ -243,6 +235,17 @@ void mixedIbFvPatchField<Type>::rmap
 
 
 template<class Type>
+void mixedIbFvPatchField<Type>::updateOnMotion()
+{
+    if (this->size() != this->ibPatch().size())
+    {
+        this->updateIbValues();
+        mixedFvPatchField<Type>::evaluate();
+    }
+}
+
+
+template<class Type>
 void mixedIbFvPatchField<Type>::evaluate
 (
     const Pstream::commsTypes
@@ -250,8 +253,11 @@ void mixedIbFvPatchField<Type>::evaluate
 {
     this->updateIbValues();
 
+    // Get non-constant reference to internal field
+    Field<Type>& intField = const_cast<Field<Type>&>(this->internalField());
+
     // Set dead value
-    this->setDeadValues();
+    this->setDeadValues(intField);
 
     // Evaluate mixed condition
     mixedFvPatchField<Type>::evaluate();
@@ -263,44 +269,16 @@ void mixedIbFvPatchField<Type>::write(Ostream& os) const
 {
     // Resolve post-processing issues.  HJ, 1/Dec/2017
     fvPatchField<Type>::write(os);
-    os.writeKeyword("patchType")
-        << immersedBoundaryFvPatch::typeName << token::END_STATEMENT << nl;
     triValue_.writeEntry("triValue", os);
     triGrad_.writeEntry("triGradient", os);
     triValueFraction_.writeEntry("triValueFraction", os);
-    os.writeKeyword("setDeadValue")
-        << setDeadValue_ << token::END_STATEMENT << nl;
-    os.writeKeyword("deadValue")
-        << deadValue_ << token::END_STATEMENT << nl;
+    this->writeDeadData(os);
 
     // The value entry needs to be written with zero size
     Field<Type>::null().writeEntry("value", os);
     // this->writeEntry("value", os);
 
-    // Write VTK on master only
-    if (Pstream::master())
-    {
-        // Add parallel reduction of all faces and data to proc 0
-        // and write the whola patch together
-
-        // Write immersed boundary data as a vtk file
-        autoPtr<surfaceWriter> writerPtr = surfaceWriter::New("vtk");
-
-        // Get the intersected patch
-        const standAlonePatch& ts = ibPatch_.ibPolyPatch().ibPatch();
-
-        writerPtr->write
-        (
-            this->dimensionedInternalField().path(),
-            ibPatch_.name(),
-            ts.points(),
-            ts,
-            this->dimensionedInternalField().name(),
-            *this,
-            false, // FACE_DATA
-            false  // verbose
-        );
-    }
+    this->writeField(*this);
 }
 
 
