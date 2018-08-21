@@ -369,6 +369,14 @@ public:
             );
 
 
+            //- Update on mesh motion
+            //  This function is used for special conditions such as
+            //  immersed boundary which need to be updated when the mesh
+            //  is moving (as opposed to topo change update)
+            virtual void updateOnMotion()
+            {}
+
+
         // Evaluation functions
 
             //- Return patch-normal gradient
