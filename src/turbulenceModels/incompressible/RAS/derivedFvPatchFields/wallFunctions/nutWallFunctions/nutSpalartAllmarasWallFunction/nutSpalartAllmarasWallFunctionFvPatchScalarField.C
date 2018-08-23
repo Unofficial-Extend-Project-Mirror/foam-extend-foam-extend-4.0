@@ -52,9 +52,9 @@ nutSpalartAllmarasWallFunctionFvPatchScalarField::calcNut() const
     const scalarField magGradU = mag(Uw.snGrad());
     const scalarField& nuw = turbModel.nu().boundaryField()[patchI];
 
-    return max
+    return Foam::max
     (
-        0.0,
+        scalar(0),
         sqr(calcUTau(magGradU))/(magGradU + ROOTVSMALL) - nuw
     );
 }
