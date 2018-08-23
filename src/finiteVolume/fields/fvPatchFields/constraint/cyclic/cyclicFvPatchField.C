@@ -177,6 +177,28 @@ tmp<Field<Type> > cyclicFvPatchField<Type>::patchNeighbourField() const
 
 
 template<class Type>
+tmp<scalarField>
+cyclicFvPatchField<Type>::untransformedInterpolate(const direction cmpt) const
+{
+    const Field<Type>& iField = this->internalField();
+    const unallocLabelList& faceCells = cyclicPatch_.faceCells();
+
+    tmp<scalarField> tpnf(new scalarField(this->size()));
+    scalarField& pnf = tpnf();
+
+    label sizeby2 = this->size()/2;
+
+    for (label facei = 0; facei < sizeby2; facei++)
+    {
+        pnf[facei] = component(iField[faceCells[facei + sizeby2]], cmpt);
+        pnf[facei + sizeby2] = component(iField[faceCells[facei]], cmpt);
+    }
+
+    return tpnf;
+}
+
+
+template<class Type>
 void cyclicFvPatchField<Type>::updateInterfaceMatrix
 (
     const scalarField& psiInternal,

@@ -462,6 +462,56 @@ tmp<Field<Type> > mixingPlaneFvPatchField<Type>::patchNeighbourField() const
 
 
 template<class Type>
+tmp<scalarField>
+mixingPlaneFvPatchField<Type>::untransformedInterpolate
+(
+    const direction cmpt
+) const
+{
+    const Field<Type>& iField = this->internalField();
+
+    // Get shadow face-cells and assemble shadow field
+    const unallocLabelList& sfc = mixingPlanePatch_.shadow().faceCells();
+
+    scalarField sField(sfc.size());
+
+    forAll (sField, i)
+    {
+        sField[i] = component(iField[sfc[i]], cmpt);
+    }
+
+    // if (mixing_ == mixingPlaneInterpolation::AREA_AVERAGING)
+    {
+        // Area-weighted averaging
+        return mixingPlanePatch_.interpolate(sField);
+    }
+    // else if (mixing_ == mixingPlaneInterpolation::FLUX_AVERAGING)
+    // {
+    //     // Flux averaging
+    //     // - for outgoing flux, use zero gradient condition
+    //     // - for incoming flux, use interpolated flux-weighted value
+
+    //     //HJ, HERE:!!!
+    // }
+    // else if (mixing_ == mixingPlaneInterpolation::ZERO_GRADIENT)
+    // {
+    //     return this->patchInternalField()().component(cmpt);
+    // }
+    // else
+    // {
+    //     FatalErrorIn
+    //     (
+    //         "tmp<scalarField> mixingPlaneFvPatchField<Type>::"
+    //         "untransformedInterpolate(const direction cmpt) const"
+    //     )   << "Unknown mixing type for patch " << this->patch().name()
+    //         << " for field "
+    //         <<  this->dimensionedInternalField().name()
+    //         << abort(FatalError);
+    // }
+}
+
+
+template<class Type>
 void mixingPlaneFvPatchField<Type>::initEvaluate
 (
     const Pstream::commsTypes commsType

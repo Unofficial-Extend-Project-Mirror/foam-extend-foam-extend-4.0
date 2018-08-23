@@ -143,6 +143,10 @@ public:
             //  See processofFvPatchField for details HJ, 11/May/2009
             virtual tmp<Field<Type> > patchNeighbourField() const;
 
+            //- Return neighbour field of internal field, untransformed
+            virtual tmp<scalarField>
+            untransformedInterpolate(const direction cmpt) const;
+
             //- Initialise the evaluation of the patch field
             virtual void initEvaluate(const Pstream::commsTypes commsType);
 

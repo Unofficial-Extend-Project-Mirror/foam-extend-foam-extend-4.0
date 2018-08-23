@@ -179,6 +179,54 @@ tmp<Field<Type> > cyclicGgiFvPatchField<Type>::patchNeighbourField() const
 
 
 template<class Type>
+tmp<scalarField>
+cyclicGgiFvPatchField<Type>::untransformedInterpolate
+(
+    const direction cmpt
+) const
+{
+    const Field<Type>& iField = this->internalField();
+
+    // Get shadow face-cells and assemble shadow field
+    const unallocLabelList& sfc = cyclicGgiPatch_.shadow().faceCells();
+
+    scalarField sField(sfc.size());
+
+    forAll (sField, i)
+    {
+        sField[i] = component(iField[sfc[i]], cmpt);
+    }
+
+    tmp<scalarField> tresult
+    (
+        new scalarField(cyclicGgiPatch_.size())
+    );
+
+    scalarField& result = tresult();
+
+    result = cyclicGgiPatch_.interpolate(sField);
+
+    if (cyclicGgiPatch_.bridgeOverlap())
+    {
+        scalarField cmptMirrorField =
+            this->patchInternalField()().component(cmpt);
+
+        // Set mirror values to fully uncovered faces
+        cyclicGgiPatch_.setUncoveredFaces
+        (
+            cmptMirrorField,
+            result
+        );
+
+        // Add part of the mirror field to partially covered faces
+        cyclicGgiPatch_.addToPartialFaces(cmptMirrorField, result);
+    }
+
+    return tresult;
+}
+
+
+template<class Type>
 void cyclicGgiFvPatchField<Type>::initEvaluate
 (
     const Pstream::commsTypes commsType

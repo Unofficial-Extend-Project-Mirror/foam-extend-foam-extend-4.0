@@ -207,6 +207,10 @@ public:
             //- Return neighbour patch field
             virtual tmp<Field<Type> > patchNeighbourField() const;
 
+            //- Return neighbour field of internal field, untransformed
+            virtual tmp<scalarField>
+            untransformedInterpolate(const direction cmpt) const;
+
             //- Initialise the evaluation of the patch field
             virtual void initEvaluate(const Pstream::commsTypes commsType);
 

@@ -154,6 +154,10 @@ public:
             //- Return neighbour coupled given internal cell data
             virtual tmp<Field<Type> > patchNeighbourField() const;
 
+            //- Return neighbour field of internal field, untransformed
+            virtual tmp<scalarField>
+            untransformedInterpolate(const direction cmpt) const;
+
 
         // Coupled interface functionality
 

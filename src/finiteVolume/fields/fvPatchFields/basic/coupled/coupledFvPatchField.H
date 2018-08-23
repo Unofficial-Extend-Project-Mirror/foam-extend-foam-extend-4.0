@@ -136,6 +136,15 @@ public:
             //- Return neighbour field of internal field
             virtual tmp<Field<Type> > patchNeighbourField() const = 0;
 
+            //- Return neighbour field of internal field, untransformed
+            //  This is used for source compensation in the segregated
+            //  solver.  HJ and GC, 22/Aug/2018
+            virtual tmp<scalarField>
+            untransformedInterpolate(const direction cmpt) const
+            {
+                return this->patchNeighbourField()().component(cmpt);
+            }
+
 
         // Evaluation functions
 

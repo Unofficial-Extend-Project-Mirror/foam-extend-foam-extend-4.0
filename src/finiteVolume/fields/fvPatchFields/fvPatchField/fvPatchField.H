@@ -399,6 +399,19 @@ public:
                 return *this;
             }
 
+            //- Return neighbour field of internal field, untransformed
+            virtual tmp<scalarField>
+            untransformedInterpolate(const direction cmpt) const
+            {
+                notImplemented
+                (
+                    type()
+                  + "::untransformedInterpolate(const direction cmpt)"
+                );
+
+                return this->component(cmpt);
+            }
+
             //- Initialise the evaluation of the patch field
             virtual void initEvaluate
             (

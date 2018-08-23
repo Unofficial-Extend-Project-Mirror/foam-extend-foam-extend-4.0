@@ -203,30 +203,17 @@ void Foam::fvMatrix<Type>::correctImplicitBoundarySource
             const lduInterfaceField& lf =
                 refCast<const lduInterfaceField>(ptf);
 
-            const coupledFvPatch& cfvp =
-                refCast<const coupledFvPatch>(ptf.patch());
-
             // Get the component of "other side" field that will be handled
             // implicitly.  Note that patchNeighbourField function gives
             // the neighbour field AFTER transform, where the implicit
             // components are mis-aligned: it needs to be transformed back
             // HJ, 10/Apr/2014
-            scalarField pnf;
 
-            if (cfvp.parallel())
-            {
-                // No transformation needed
-                pnf = ptf.patchNeighbourField()().component(cmpt);
-            }
-            else
-            {
-                // Transform back to this side to get the implicit component
-                pnf = transform
-                (
-                    cfvp.reverseT(),
-                    ptf.patchNeighbourField()
-                )().component(cmpt);
-            }
+            // Avoid transformation problems by providing untransformed
+            // interpolate from the patch field virtual function interface
+            // which is consistent with component-wise access in the
+            // segregated solver.  HJ and GC, 22/Aug/2018
+            scalarField pnf = ptf.untransformedInterpolate(cmpt);
 
             // Identical implicitness transformation (back)
             lf.transformCoupleField(pnf, cmpt);
