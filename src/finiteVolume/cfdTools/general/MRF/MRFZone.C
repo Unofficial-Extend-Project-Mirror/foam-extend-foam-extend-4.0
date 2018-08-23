@@ -283,7 +283,7 @@ void Foam::MRFZone::calcMeshVelocity() const
     meshVelTime_ = mesh_.time().value();
 
     // If there is no rotation, return
-    if (omega_.value() < SMALL)
+    if (mag(omega_.value()) < SMALL)
     {
         return;
     }
@@ -355,12 +355,15 @@ void Foam::MRFZone::calcMeshVelocity() const
             << endl;
     }
 
+    // mag(Omega()) loses direction information
+    // Bug fix, GC, 23/Aug/2018
+
     // Calculate new points
     const vectorField newP =
         cs.globalPosition
         (
             cs.localPosition(p)
-          + vector(0, mag(Omega())*deltaT, 0)*movingPointsMask
+          + vector(0, mag(Omega())*deltaT*sign(omega_.value()), 0)*movingPointsMask
         );
 
     // Calculate mesh velocity for all moving faces
