@@ -27,7 +27,7 @@ if (nAlphaSubCycles > 1)
 }
 else
 {
-#       include "alphaEqn.H"
+#   include "alphaEqn.H"
 }
 
 interface.correct();
