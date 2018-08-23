@@ -23,6 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "foamTime.H"
 #include "pointPatchFields.H"
 #include "fieldTypes.H"
 

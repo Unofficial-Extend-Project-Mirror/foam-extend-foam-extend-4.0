@@ -38,6 +38,7 @@ SourceFiles
 #ifndef DimensionedField_H
 #define DimensionedField_H
 
+#include "foamTime.H"
 #include "regIOobject.H"
 #include "Field.H"
 #include "dimensionedType.H"
