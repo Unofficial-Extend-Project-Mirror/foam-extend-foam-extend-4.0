@@ -752,7 +752,7 @@ int main(int argc, char *argv[])
          || pointTensorFields.size()
         )
         {
-            const pointMesh& procPMesh = pointMesh::New(procMesh);
+            const pointMesh& procPMesh = pointMesh::New(procMesh, true);
 
             pointFieldDecomposer fieldDecomposer
             (
