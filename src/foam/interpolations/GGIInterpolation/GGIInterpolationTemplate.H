@@ -242,7 +242,7 @@ class GGIInterpolation
             mutable scalarField* slaveFaceUncoveredFractionsPtr_;
 
 
-  // Private static data
+    // Private static data
 
         //- Facet area error tolerance
         static const debug::tolerancesSwitch areaErrorTol_;
@@ -253,38 +253,35 @@ class GGIInterpolation
         //- Facet bound box extension factor
         static const debug::tolerancesSwitch faceBoundBoxExtendSpanFraction_;
 
-        //- Tolerance for uncovered face areas
-        static const debug::tolerancesSwitch uncoveredFaceAreaTol_;
+        //- The next 3 attributes are parameters controlling the creation
+        //  of an octree search engine for the GGI facets neighbourhood
+        //  determination.
+        //
+        //  Tests using GGI patches of up to ~100K facets have shown that
+        //  the following values gave the best compromise between the
+        //  "octree creation time" vs "octree search time":
+        //
+        //     octreeSearchMinNLevel_     : 3
+        //     octreeSearchMaxLeafRatio_  : 3
+        //     octreeSearchMaxShapeRatio_ : 1
+        //
+        //  For GGI patches larger than ~100K facets, your mileage may vary.
+        //  So these 3 control parameters are adjustable using the following
+        //  global optimization switches:
+        //
+        //     GGIOctreeSearchMinNLevel
+        //     GGIOctreeSearchMaxLeafRatio
+        //     GGIOctreeSearchMaxShapeRatio
+        //
 
-       //- The next 3 attributes are parameters controlling the creation
-       //  of an octree search engine for the GGI facets neighbourhood
-       //  determination.
-       //
-       //  Tests using GGI patches of up to ~100K facets have shown that
-       //  the following values gave the best compromise between the
-       //  "octree creation time" vs "octree search time":
-       //
-       //     octreeSearchMinNLevel_     : 3
-       //     octreeSearchMaxLeafRatio_  : 3
-       //     octreeSearchMaxShapeRatio_ : 1
-       //
-       //  For GGI patches larger than ~100K facets, your mileage may vary.
-       //  So these 3 control parameters are adjustable using the following
-       //  global optimization switches:
-       //
-       //     GGIOctreeSearchMinNLevel
-       //     GGIOctreeSearchMaxLeafRatio
-       //     GGIOctreeSearchMaxShapeRatio
-       //
+        //- Octree search: minNlevel parameter for octree constructor
+        static const debug::optimisationSwitch octreeSearchMinNLevel_;
 
-       //- Octree search: minNlevel parameter for octree constructor
-       static const debug::optimisationSwitch octreeSearchMinNLevel_;
+        //- Octree search: maxLeafRatio parameter for octree constructor
+        static const debug::optimisationSwitch octreeSearchMaxLeafRatio_;
 
-       //- Octree search: maxLeafRatio parameter for octree constructor
-       static const debug::optimisationSwitch octreeSearchMaxLeafRatio_;
-
-       //- Octree search: maxShapeRatio parameter for octree constructor
-       static const debug::optimisationSwitch octreeSearchMaxShapeRatio_;
+        //- Octree search: maxShapeRatio parameter for octree constructor
+        static const debug::optimisationSwitch octreeSearchMaxShapeRatio_;
 
 
     // Private Member Functions
@@ -306,6 +303,7 @@ class GGIInterpolation
 
         //- Calculate point weights
         void calcSlavePointWeights() const;
+
 
     // Helper functions for parallel search
 
@@ -580,6 +578,14 @@ public:
 
     // Destructor
     ~GGIInterpolation();
+
+
+    // Public static data
+
+        //- Tolerance for uncovered face areas. Public since the
+        //  MixingPlaneInterpolation needs to be able to change it. Seems more
+        //  appropriate than having friends.
+        static debug::tolerancesSwitch uncoveredFaceAreaTol_;
 
 
     // Member Functions
