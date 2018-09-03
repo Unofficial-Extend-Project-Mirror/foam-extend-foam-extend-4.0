@@ -18,7 +18,8 @@
             IOobject::NO_WRITE
         ),
         mesh,
-        dimless
+        dimless,
+        "zeroGradient"
     );
     scalarField& regionIndexIn = regionIndex.internalField();
 
@@ -32,13 +33,18 @@
         }
     }
 
-    // Update boundary values
-    forAll (regionIndex.boundaryField(), patchI)
+    // Update boundary values, making sure that we skip the overset patch
+    volScalarField::GeometricBoundaryField& regionIndexb =
+        regionIndex.boundaryField();
+
+    forAll(regionIndexb, patchI)
     {
-        if (!regionIndex.boundaryField()[patchI].coupled())
+        // Get the patch field
+        fvPatchScalarField& ripf = regionIndexb[patchI];
+
+        if (!isA<oversetFvPatchScalarField>(ripf))
         {
-            regionIndex.boundaryField()[patchI] =
-                regionIndex.boundaryField()[patchI].patchInternalField();
+            ripf = ripf.patchInternalField();
         }
     }
 
