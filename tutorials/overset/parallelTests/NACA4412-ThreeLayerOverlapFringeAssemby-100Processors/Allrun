@@ -44,5 +44,6 @@ transformPoints -scale "(0.901 1 0.905512)" > log.transformPoints
 
 runApplication decomposePar -cellDist
 runApplication decomposeSets -writeEmptySets
-runParallel calcOverset 100
-runParallel oversetRegionIndex 100
+
+# Run with -oversubscribe flag to circumvent mpi config issues on small machines
+mpirun -oversubscribe -np 100 calcOverset -parallel > log.calcOverset
