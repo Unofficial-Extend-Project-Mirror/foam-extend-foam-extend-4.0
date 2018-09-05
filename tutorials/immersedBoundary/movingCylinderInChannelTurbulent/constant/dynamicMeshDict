@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     4.1                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -10,61 +10,34 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      blockMeshDict;
+    object      dynamicMeshDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-convertToMeters 1;
+// dynamicFvMesh   staticFvMesh;
+dynamicFvMesh   immersedBoundarySolidBodyMotionFvMesh;
 
-vertices
-(
-    (-1   -0.5   -0.02)
-    ( 2   -0.5   -0.02)
-    ( 2    0.5   -0.02)
-    (-1    0.5   -0.02)
-    (-1   -0.5    0.02)
-    ( 2   -0.5    0.02)
-    ( 2    0.5    0.02)
-    (-1    0.5    0.02)
-);
+immersedBoundarySolidBodyMotionFvMeshCoeffs
+{
+    motionFunctions
+    (
+        ibCylinder
+        {
+//             solidBodyMotionFunction     translation;
+//             translationCoeffs
+//             {
+//                 velocity (0.1 0 0);
+//             }
 
-blocks
-(
-    hex (0 1 2 3 4 5 6 7) (75 25 1) simpleGrading (1 1 1)
-);
-
-edges
-(
-);
-
-patches
-(
-    patch in
-    (
-        (0 4 7 3)
-    )
-    patch out
-    (
-        (2 6 5 1)
-    )
-    patch top
-    (
-        (3 7 6 2)
-    )
-    patch bottom
-    (
-        (1 5 4 0)
-    )
-    empty frontAndBack
-    (
-        (0 3 2 1)
-        (4 5 6 7)
-    )
-);
-
-mergePatchPairs
-(
-);
+            solidBodyMotionFunction     linearOscillation;
+            linearOscillationCoeffs
+            {
+                amplitude    (0.5 0 0);
+                period       2.5;
+            }
+        }
+    );
+}
 
 
 // ************************************************************************* //

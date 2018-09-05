@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     4.1                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -21,7 +21,7 @@ internalField   uniform 0.375;
 
 boundaryField
 {
-    pitzDailyIB
+    ibCylinder
     {
         type            immersedBoundaryKqRWallFunction;
         patchType       immersedBoundary;
@@ -31,12 +31,12 @@ boundaryField
     {
         type            zeroGradient;
     }
-    inlet
+    in
     {
         type            fixedValue;
         value           uniform 0.375;
     }
-    outlet
+    out
     {
         type            inletOutlet;
         inletValue      uniform 0.375;

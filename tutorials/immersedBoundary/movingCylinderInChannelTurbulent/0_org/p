@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     4.1                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -10,45 +10,47 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    location    "0";
-    object      k;
+    object      p;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 2 -2 0 0 0 0];
+dimensions [0 2 -2 0 0 0 0];
 
-internalField   uniform 0.375;
+internalField uniform 0;
 
 boundaryField
 {
-    pitzDailyIB
+    ibCylinder
     {
-        type            immersedBoundaryKqRWallFunction;
-        patchType       immersedBoundary;
-        value           uniform 0.375;
+        type mixedIb;
+        patchType immersedBoundary;
+        triValue uniform 0;
+        triGradient  uniform 0;
+        triValueFraction uniform 0;
+        setDeadValue   no;
+        deadValue      0;
+        value uniform 0;
+    }
+    in
+    {
+        type zeroGradient;
+    }
+    out
+    {
+        type fixedValue;
+        value uniform 0;
     }
     top
     {
-        type            zeroGradient;
-    }
-    inlet
-    {
-        type            fixedValue;
-        value           uniform 0.375;
-    }
-    outlet
-    {
-        type            inletOutlet;
-        inletValue      uniform 0.375;
-        value           uniform 0.375;
+        type zeroGradient;
     }
     bottom
     {
-        type            zeroGradient;
+        type zeroGradient;
     }
     frontAndBack
     {
-        type            empty;
+        type empty;
     }
 }
 

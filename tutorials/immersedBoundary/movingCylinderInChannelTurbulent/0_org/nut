@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     4.1                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -11,40 +11,41 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0";
-    object      k;
+    object      nut;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 2 -2 0 0 0 0];
+dimensions      [0 2 -1 0 0 0 0];
 
-internalField   uniform 0.375;
+internalField   uniform 0;
 
 boundaryField
 {
-    pitzDailyIB
+    ibCylinder
     {
-        type            immersedBoundaryKqRWallFunction;
+        type            immersedBoundaryNutWallFunction;
         patchType       immersedBoundary;
-        value           uniform 0.375;
+        value           uniform 0;
     }
     top
     {
         type            zeroGradient;
+        value           uniform 0;
     }
-    inlet
+    in
     {
-        type            fixedValue;
-        value           uniform 0.375;
+        type            zeroGradient;
+        value           uniform 0;
     }
-    outlet
+    out
     {
-        type            inletOutlet;
-        inletValue      uniform 0.375;
-        value           uniform 0.375;
+        type            zeroGradient;
+        value           uniform 0;
     }
     bottom
     {
         type            zeroGradient;
+        value           uniform 0;
     }
     frontAndBack
     {

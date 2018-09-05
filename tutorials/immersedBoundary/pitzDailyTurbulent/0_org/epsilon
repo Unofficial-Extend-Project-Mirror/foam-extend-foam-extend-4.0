@@ -23,7 +23,7 @@ boundaryField
 {
     pitzDailyIB
     {
-        type            epsilonWallFunction;
+        type            immersedBoundaryEpsilonWallFunction;
         patchType       immersedBoundary;
         Cmu             0.09;
         kappa           0.41;

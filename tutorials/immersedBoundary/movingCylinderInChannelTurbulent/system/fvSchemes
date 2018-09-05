@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     4.1                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -10,61 +10,45 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      blockMeshDict;
+    object      fvSchemes;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-convertToMeters 1;
+ddtSchemes
+{
+    default Euler;
+}
 
-vertices
-(
-    (-1   -0.5   -0.02)
-    ( 2   -0.5   -0.02)
-    ( 2    0.5   -0.02)
-    (-1    0.5   -0.02)
-    (-1   -0.5    0.02)
-    ( 2   -0.5    0.02)
-    ( 2    0.5    0.02)
-    (-1    0.5    0.02)
-);
+gradSchemes
+{
+    default         cellLimited Gauss linear 1;
+}
 
-blocks
-(
-    hex (0 1 2 3 4 5 6 7) (75 25 1) simpleGrading (1 1 1)
-);
+divSchemes
+{
+    default         none;
+    div(phi,U)      Gauss upwind;
+    div(phi,k)      Gauss upwind;
+    div(phi,epsilon) Gauss upwind;
+    div(phi,omega)  Gauss upwind;
 
-edges
-(
-);
+    div((nuEff*dev(T(grad(U))))) Gauss linear;
+}
 
-patches
-(
-    patch in
-    (
-        (0 4 7 3)
-    )
-    patch out
-    (
-        (2 6 5 1)
-    )
-    patch top
-    (
-        (3 7 6 2)
-    )
-    patch bottom
-    (
-        (1 5 4 0)
-    )
-    empty frontAndBack
-    (
-        (0 3 2 1)
-        (4 5 6 7)
-    )
-);
+laplacianSchemes
+{
+    default         Gauss linear limited 0.5;
+}
 
-mergePatchPairs
-(
-);
+interpolationSchemes
+{
+    default         linear;
+}
+
+snGradSchemes
+{
+    default         limited 0.5;
+}
 
 
 // ************************************************************************* //

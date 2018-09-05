@@ -9,48 +9,54 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      k;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 2 -2 0 0 0 0];
-
-internalField   uniform 0.375;
-
-boundaryField
-{
-    pitzDailyIB
+6
+(
+    ibCylinder
     {
-        type            immersedBoundaryKqRWallFunction;
-        patchType       immersedBoundary;
-        value           uniform 0.375;
+        type            immersedBoundary;
+        nFaces          0;
+        startFace       3650;
+
+        internalFlow    no;
+        isWall          yes;
+    }
+    in
+    {
+        type            patch;
+        nFaces          25;
+        startFace       3650;
+    }
+    out
+    {
+        type            patch;
+        nFaces          25;
+        startFace       3675;
     }
     top
     {
-        type            zeroGradient;
-    }
-    inlet
-    {
-        type            fixedValue;
-        value           uniform 0.375;
-    }
-    outlet
-    {
-        type            inletOutlet;
-        inletValue      uniform 0.375;
-        value           uniform 0.375;
+        type            patch;
+        nFaces          75;
+        startFace       3700;
     }
     bottom
     {
-        type            zeroGradient;
+        type            patch;
+        nFaces          75;
+        startFace       3775;
     }
     frontAndBack
     {
         type            empty;
+        nFaces          3750;
+        startFace       3850;
     }
-}
+)
 
 
 // ************************************************************************* //

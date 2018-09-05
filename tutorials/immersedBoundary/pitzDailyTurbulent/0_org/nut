@@ -23,7 +23,7 @@ boundaryField
 {
     pitzDailyIB
     {
-        type            nutkWallFunction;
+        type            immersedBoundaryNutWallFunction;
         patchType       immersedBoundary;
         value           uniform 0;
     }

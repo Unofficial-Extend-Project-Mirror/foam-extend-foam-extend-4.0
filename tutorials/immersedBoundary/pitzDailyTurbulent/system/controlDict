@@ -17,6 +17,7 @@ FoamFile
 libs
 (
     "libimmersedBoundary.so"
+    "libimmersedBoundaryTurbulence.so"
     "liblduSolvers.so"
 )
 
