@@ -1232,10 +1232,11 @@ Foam::tmp<Foam::scalarField> Foam::polyMesh::movePoints
     geometricD_ = Vector<label>::zero;
     solutionD_ = Vector<label>::zero;
 
-    // Update all function objects
+    // Update all mesh objects
     // Moved from fvMesh.C in 1.6.x merge.  HJ, 29/Aug/2010
     meshObjectBase::allMovePoints<polyMesh>(*this);
 
+    // Update all function objects
     const_cast<Time&>(time()).functionObjects().movePoints(allPoints_);
 
     return sweptVols;

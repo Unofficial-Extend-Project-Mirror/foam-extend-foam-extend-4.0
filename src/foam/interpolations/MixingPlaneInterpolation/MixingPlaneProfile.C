@@ -313,13 +313,13 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcProfile() const
     if (debug > 1)
     {
         // Write histograms
-        forAllIter (profileHistogram, masterHistogram, zHi)
+        forAllConstIter (profileHistogram, masterHistogram, zHi)
         {
             Info<< "master histo (z, n): (" << zHi->first << " "
                 << static_cast<int>(zHi->second.size()) << ")" << endl;
         }
 
-        forAllIter (profileHistogram, slaveHistogram, zHi)
+        forAllConstIter (profileHistogram, slaveHistogram, zHi)
         {
             Info<< "slave histo (z, n): (" << zHi->first << " "
                 << static_cast<int>(zHi->second.size()) << ")" << endl;

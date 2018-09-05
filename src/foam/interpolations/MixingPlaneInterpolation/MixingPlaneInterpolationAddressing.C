@@ -125,6 +125,30 @@ void MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
     //     introduced by the possibly different
     //     master and slave patch mesh resolution.
 
+    // Note: The weights in the GGI interpolation must be scaled when using
+    // interpolation from/to ribbon patches. Now, the GGI interpolation can also
+    // take care of partially overlapping faces where we must not scale the
+    // weights (e.g. bridgeOverlap option for partial symmetry plane
+    // treatment in uncovered faces). In order to avoid having partially
+    // overlapping faces in the mixing plane, we will manually set the
+    // corresponding tolerance here and reset it after we calculate the
+    // addressing. VV, 31/Aug/2018.
+    // Save old tolerance
+    const scalar oldTolerance =
+        GGIInterpolation
+        <
+            standAlonePatch,
+            standAlonePatch
+        >::uncoveredFaceAreaTol_();
+
+    // Set tolerance to zero such that no faces qualify as partially
+    // overlapping faces and all the weights are properly scaled
+    GGIInterpolation
+    <
+        standAlonePatch,
+        standAlonePatch
+    >::uncoveredFaceAreaTol_ = 0.0;
+
     GGIInterpolation<standAlonePatch, standAlonePatch>
         masterCircumAvgPatchToPatch
         (
@@ -202,6 +226,16 @@ void MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
 
     slaveProfileToPatchWeightsPtr_ =
         new scalarListList(slaveCircumAvgPatchToPatch.slaveWeights());
+
+
+    // Now that we have finished calculating the addressing and the weights,
+    // let's reset the old tolerances in case some other GGIInterpolation with
+    // stand alone patches uses the partially covered face machinery.
+    GGIInterpolation
+    <
+        standAlonePatch,
+        standAlonePatch
+    >::uncoveredFaceAreaTol_ = oldTolerance;
 }
 
 

@@ -69,7 +69,7 @@ GGIInterpolation<MasterPatch, SlavePatch>::featureCosTol_
 
 
 template<class MasterPatch, class SlavePatch>
-const Foam::debug::tolerancesSwitch
+Foam::debug::tolerancesSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::uncoveredFaceAreaTol_
 (
     "GGIUncoveredFaceAreaTol",

@@ -116,11 +116,11 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
 
     forAll (owner, faceI)
     {
-        label own = owner[faceI];
-        label nei = neighbour[faceI];
+        const label own = owner[faceI];
+        const label nei = neighbour[faceI];
 
-        vector d = C[nei] - C[own];
-        symmTensor wdd = (1.0/magSqr(d))*sqr(d);
+        const vector d = C[nei] - C[own];
+        const symmTensor wdd = (1.0/magSqr(d))*sqr(d);
 
         dd[own] += wdd;
         dd[nei] += wdd;
@@ -134,21 +134,10 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
         // Better version of d-vectors: Zeljko Tukovic, 25/Apr/2010
         const vectorField pd = p.delta();
 
-        if (p.coupled())
+        forAll (pd, pFaceI)
         {
-            forAll (pd, pFaceI)
-            {
-                const vector& d = pd[pFaceI];
-                dd[fc[pFaceI]] += (1.0/magSqr(d))*sqr(d);
-            }
-        }
-        else
-        {
-            forAll (pd, pFaceI)
-            {
-                const vector& d = pd[pFaceI];
-                dd[fc[pFaceI]] += (1.0/magSqr(d))*sqr(d);
-            }
+            const vector& d = pd[pFaceI];
+            dd[fc[pFaceI]] += (1.0/magSqr(d))*sqr(d);
         }
     }
 
@@ -186,15 +175,19 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
     // Least squares vectors on internal faces
     forAll (owner, faceI)
     {
-        label own = owner[faceI];
-        label nei = neighbour[faceI];
+        const label own = owner[faceI];
+        const label nei = neighbour[faceI];
 
-        vector d = C[nei] - C[own];
-        scalar magSfByMagSqrd = 1.0/magSqr(d);
+        const vector d = C[nei] - C[own];
+        const scalar magSfByMagSqrd = 1.0/magSqr(d);
 
         lsPIn[faceI] = magSfByMagSqrd*(invDd[own] & d);
         lsNIn[faceI] = -magSfByMagSqrd*(invDd[nei] & d);
     }
+
+    // Get inverse dd boundary field to grab the neighbouring side eventually
+    const volSymmTensorField::GeometricBoundaryField& volInvDdb =
+        volInvDd.boundaryField();
 
     // Least squares vectors on boundary faces
     forAll (lsP.boundaryField(), patchI)
@@ -204,13 +197,14 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
         const fvPatch& p = mesh().boundary()[patchI];
         const unallocLabelList& fc = p.faceCells();
 
+        const fvPatchSymmTensorField& volInvDdp = volInvDdb[patchI];
+
         // Better version of d-vectors: Zeljko Tukovic, 25/Apr/2010
         const vectorField pd = p.delta();
 
-        if (p.coupled())
+        if (volInvDdp.coupled())
         {
-            const symmTensorField invDdNei =
-                volInvDd.boundaryField()[patchI].patchNeighbourField();
+            const symmTensorField invDdNei = volInvDdp.patchNeighbourField();
 
             forAll (pd, pFaceI)
             {
@@ -347,8 +341,8 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
     // Internal faces
     forAll (owner, faceI)
     {
-        label own = owner[faceI];
-        label nei = neighbour[faceI];
+        const label own = owner[faceI];
+        const label nei = neighbour[faceI];
 
         if (uggIn[own] > SMALL)
         {
@@ -363,6 +357,10 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
         }
     }
 
+    // Get boundary field for cell volumes to fetch the other side eventually
+    const volScalarField::GeometricBoundaryField& cellVb =
+        cellV.boundaryField();
+
     // Boundary faces
     forAll (lsP.boundaryField(), patchI)
     {
@@ -372,16 +370,16 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
         const unallocLabelList& fc = p.faceCells();
 
         const fvsPatchScalarField& pw = w.boundaryField()[patchI];
+        const fvPatchScalarField& cellVp = cellVb[patchI];
         const vectorField& pSf = Sf.boundaryField()[patchI];
 
         // Get indicator for local side
         const fvPatchScalarField& ugg = useGaussGrad.boundaryField()[patchI];
         const scalarField pUgg = ugg.patchInternalField();
 
-        if (p.coupled())
+        if (cellVp.coupled())
         {
-            const scalarField cellVInNei =
-                cellV.boundaryField()[patchI].patchNeighbourField();
+            const scalarField cellVInNei = cellVp.patchNeighbourField();
 
             // Get indicator for neighbour side
             const scalarField nUgg = ugg.patchNeighbourField();
@@ -414,40 +412,6 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
                         (1 - pw[pFaceI])*pSf[pFaceI]/cellVIn[fc[pFaceI]];
                 }
             }
-        }
-    }
-
-    // Manual check of least squares vectors
-
-    vectorField sumLsq(mesh().nCells(), vector::zero);
-    vectorField sumSf(mesh().nCells(), vector::zero);
-
-    const vectorField& sfIn = mesh().Sf().internalField();
-
-    // Least squares vectors on internal faces
-    forAll (owner, faceI)
-    {
-        sumLsq[owner[faceI]] += lsPIn[faceI];
-        sumLsq[neighbour[faceI]] += lsNIn[faceI];
-
-        sumSf[owner[faceI]] += sfIn[faceI];
-        sumSf[neighbour[faceI]] -= sfIn[faceI];
-    }
-
-    // Least squares vectors on boundary faces
-    forAll (lsP.boundaryField(), patchI)
-    {
-        const vectorField& patchLsP = lsP.boundaryField()[patchI];
-        const vectorField& patchSf = mesh().Sf().boundaryField()[patchI];
-
-        const unallocLabelList& fc = mesh().boundary()[patchI].faceCells();
-
-        forAll (fc, pFaceI)
-        {
-            //sumLsq[fc[pFaceI]] += 0.5*patchLsP[pFaceI]; // works!!!
-            sumLsq[fc[pFaceI]] += patchLsP[pFaceI];
-
-            sumSf[fc[pFaceI]] += patchSf[pFaceI];
         }
     }
 
