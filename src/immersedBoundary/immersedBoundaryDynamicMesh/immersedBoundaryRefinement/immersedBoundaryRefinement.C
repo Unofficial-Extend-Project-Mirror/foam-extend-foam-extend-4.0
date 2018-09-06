@@ -126,8 +126,9 @@ Foam::immersedBoundaryRefinement::refinementCellCandidates() const
     {
         if
         (
-             cellDistance[cellI] > -refinementDistance_
-          && cellDistance[cellI] < 0
+            cellDistance[cellI] > -refinementDistance_
+         && cellDistance[cellI] < 0
+            // mag(cellDistance[cellI]) < refinementDistance_
         )
         {
             // Found a refinement cell
