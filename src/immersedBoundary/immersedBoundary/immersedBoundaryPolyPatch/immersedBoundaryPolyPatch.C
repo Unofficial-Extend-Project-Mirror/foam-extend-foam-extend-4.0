@@ -987,7 +987,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                     else if (faceFactor > (1 - liveFactor_()))
                     {
                         // Thick cut: face is wet
-                        intersectedFace[faceI] = immersedPoly::DRY;
+                        intersectedFace[faceI] = immersedPoly::WET;
                     }
                     else
                     {
