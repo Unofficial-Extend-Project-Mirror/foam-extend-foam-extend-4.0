@@ -61,7 +61,12 @@ immersedBoundaryOmegaWallFunctionFvPatchScalarField
 )
 :
     omegaWallFunctionFvPatchScalarField(p, iF, dict),
-    immersedBoundaryFieldBase<scalar>(p, true, 90)
+    immersedBoundaryFieldBase<scalar>
+    (
+        p,
+        Switch(dict.lookup("setDeadValue")),
+        readScalar(dict.lookup("deadValue"))
+    )    
 {}
 
 
@@ -75,7 +80,12 @@ immersedBoundaryOmegaWallFunctionFvPatchScalarField
 )
 :
     omegaWallFunctionFvPatchScalarField(ptf, p, iF, mapper),
-    immersedBoundaryFieldBase<scalar>(p, true, 90)
+    immersedBoundaryFieldBase<scalar>
+    (
+        p,
+        ptf.setDeadValue(),
+        ptf.deadValue()
+    )
 {}
 
 
@@ -86,7 +96,12 @@ immersedBoundaryOmegaWallFunctionFvPatchScalarField
 )
 :
     omegaWallFunctionFvPatchScalarField(ptf),
-    immersedBoundaryFieldBase<scalar>(ptf.ibPatch(), true, 90)
+    immersedBoundaryFieldBase<scalar>
+    (
+        ptf.ibPatch(),
+        ptf.setDeadValue(),
+        ptf.deadValue()
+    )
 {}
 
 
@@ -98,11 +113,36 @@ immersedBoundaryOmegaWallFunctionFvPatchScalarField
 )
 :
     omegaWallFunctionFvPatchScalarField(ptf, iF),
-    immersedBoundaryFieldBase<scalar>(ptf.ibPatch(), true, 90)
+    immersedBoundaryFieldBase<scalar>
+    (
+        ptf.ibPatch(),
+        ptf.setDeadValue(),
+        ptf.deadValue()
+    )
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+void immersedBoundaryOmegaWallFunctionFvPatchScalarField::autoMap
+(
+    const fvPatchFieldMapper&
+)
+{
+    scalarField::operator=(this->patchInternalField());
+
+    // Resize refValue as well.  HJ, 10/Jul/2018
+    refValue() = this->patchInternalField();
+}
+
+
+void immersedBoundaryOmegaWallFunctionFvPatchScalarField::rmap
+(
+    const fvPatchScalarField& ptf,
+    const labelList&
+)
+{}
+
 
 void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateOnMotion()
 {
@@ -127,7 +167,7 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateCoeffs()
     // Resize fields
     if (size() != patch().size())
     {
-        Info<< "Resizing immersedBoundaryEpsilonWallFunction in evaluate: "
+        Info<< "Resizing immersedBoundaryOmegaWallFunction in evaluate: "
             << "patch: " << patch().size() << " field: " << size()
             << endl;
 
@@ -145,6 +185,31 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateCoeffs()
 }
 
 
+void immersedBoundaryOmegaWallFunctionFvPatchScalarField::evaluate
+(
+    const Pstream::commsTypes commsType
+)
+{
+    // Resize fields
+    if (size() != patch().size())
+    {
+        Info<< "Resizing immersedBoundaryOmegaWallFunction in evaluate"
+            << endl;
+
+        *this == patchInternalField();
+        refValue() = patchInternalField();
+    }
+
+    // Get non-constant reference to internal field
+    scalarField& intField = const_cast<scalarField&>(this->internalField());
+
+    // Set dead value
+    this->setDeadValues(intField);
+
+    omegaWallFunctionFvPatchScalarField::evaluate(commsType);
+}
+
+
 void immersedBoundaryOmegaWallFunctionFvPatchScalarField::write
 (
     Ostream& os
@@ -152,6 +217,7 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::write
 {
     fvPatchScalarField::write(os);
     writeLocalEntries(os);
+    this->writeDeadData(os);
 
     // The value entry needs to be written with zero size
     scalarField::null().writeEntry("value", os);

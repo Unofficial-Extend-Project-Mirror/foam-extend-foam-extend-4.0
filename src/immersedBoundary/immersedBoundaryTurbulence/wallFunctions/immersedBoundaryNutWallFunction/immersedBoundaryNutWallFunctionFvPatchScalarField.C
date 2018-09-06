@@ -105,6 +105,23 @@ immersedBoundaryNutWallFunctionFvPatchScalarField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+void immersedBoundaryNutWallFunctionFvPatchScalarField::autoMap
+(
+    const fvPatchFieldMapper&
+)
+{
+    scalarField::operator=(this->patchInternalField());
+}
+
+
+void immersedBoundaryNutWallFunctionFvPatchScalarField::rmap
+(
+    const fvPatchScalarField& ptf,
+    const labelList&
+)
+{}
+
+
 void immersedBoundaryNutWallFunctionFvPatchScalarField::updateOnMotion()
 {
     if (size() != ibPatch().size())
@@ -112,6 +129,30 @@ void immersedBoundaryNutWallFunctionFvPatchScalarField::updateOnMotion()
         // Use internal values, resizing the file if needed
         scalarField::operator=(this->patchInternalField());
     }
+}
+
+
+void immersedBoundaryNutWallFunctionFvPatchScalarField::evaluate
+(
+    const Pstream::commsTypes commsType
+)
+{
+    // Resize fields
+    if (size() != patch().size())
+    {
+        Info<< "Resizing immersedBoundaryNutWallFunction in evaluate"
+            << endl;
+
+        *this == patchInternalField();
+    }
+
+    // Get non-constant reference to internal field
+    scalarField& intField = const_cast<scalarField&>(this->internalField());
+
+    // Set dead value
+    this->setDeadValues(intField);
+
+    nutkWallFunctionFvPatchScalarField::evaluate(commsType);
 }
 
 

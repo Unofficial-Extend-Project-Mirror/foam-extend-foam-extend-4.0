@@ -63,7 +63,12 @@ immersedBoundaryEpsilonWallFunctionFvPatchScalarField
 )
 :
     epsilonWallFunctionFvPatchScalarField(p, iF, dict),
-    immersedBoundaryFieldBase<scalar>(p, true, 0.09)
+    immersedBoundaryFieldBase<scalar>
+    (
+        p,
+        Switch(dict.lookup("setDeadValue")),
+        readScalar(dict.lookup("deadValue"))
+    )    
 {}
 
 
@@ -77,7 +82,12 @@ immersedBoundaryEpsilonWallFunctionFvPatchScalarField
 )
 :
     epsilonWallFunctionFvPatchScalarField(ptf, p, iF, mapper),
-    immersedBoundaryFieldBase<scalar>(p, true, 0.09)
+    immersedBoundaryFieldBase<scalar>
+    (
+        p,
+        ptf.setDeadValue(),
+        ptf.deadValue()
+    )
 {}
 
 
@@ -88,7 +98,12 @@ immersedBoundaryEpsilonWallFunctionFvPatchScalarField
 )
 :
     epsilonWallFunctionFvPatchScalarField(ptf),
-    immersedBoundaryFieldBase<scalar>(ptf.ibPatch(), true, 0.09)
+    immersedBoundaryFieldBase<scalar>
+    (
+        ptf.ibPatch(),
+        ptf.setDeadValue(),
+        ptf.deadValue()
+    )
 {}
 
 
@@ -100,11 +115,36 @@ immersedBoundaryEpsilonWallFunctionFvPatchScalarField
 )
 :
     epsilonWallFunctionFvPatchScalarField(ptf, iF),
-    immersedBoundaryFieldBase<scalar>(ptf.ibPatch(), true, 0.09)
+    immersedBoundaryFieldBase<scalar>
+    (
+        ptf.ibPatch(),
+        ptf.setDeadValue(),
+        ptf.deadValue()
+    )
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+void immersedBoundaryEpsilonWallFunctionFvPatchScalarField::autoMap
+(
+    const fvPatchFieldMapper&
+)
+{
+    scalarField::operator=(this->patchInternalField());
+
+    // Resize refValue as well.  HJ, 10/Jul/2018
+    refValue() = this->patchInternalField();
+}
+
+
+void immersedBoundaryEpsilonWallFunctionFvPatchScalarField::rmap
+(
+    const fvPatchScalarField& ptf,
+    const labelList&
+)
+{}
+
 
 void immersedBoundaryEpsilonWallFunctionFvPatchScalarField::updateOnMotion()
 {
@@ -163,6 +203,12 @@ void immersedBoundaryEpsilonWallFunctionFvPatchScalarField::evaluate
         refValue() = patchInternalField();
     }
 
+    // Get non-constant reference to internal field
+    scalarField& intField = const_cast<scalarField&>(this->internalField());
+
+    // Set dead value
+    this->setDeadValues(intField);
+
     epsilonWallFunctionFvPatchScalarField::evaluate(commsType);
 }
 
@@ -174,6 +220,7 @@ void immersedBoundaryEpsilonWallFunctionFvPatchScalarField::write
 {
     fvPatchScalarField::write(os);
     writeLocalEntries(os);
+    this->writeDeadData(os);
 
     // The value entry needs to be written with zero size
     scalarField::null().writeEntry("value", os);

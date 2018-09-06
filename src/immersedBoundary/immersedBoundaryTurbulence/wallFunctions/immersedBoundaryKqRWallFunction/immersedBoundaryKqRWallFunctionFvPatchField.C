@@ -83,7 +83,12 @@ immersedBoundaryKqRWallFunctionFvPatchField
 )
 :
     kqRWallFunctionFvPatchField<Type>(p, iF),
-    immersedBoundaryFieldBase<Type>(p, true, pTraits<Type>::one*SMALL)
+    immersedBoundaryFieldBase<Type>
+    (
+        p,
+        Switch(dict.lookup("setDeadValue")),
+        pTraits<Type>(dict.lookup("deadValue"))
+    )
 {
     this->checkType();
 
@@ -102,7 +107,12 @@ immersedBoundaryKqRWallFunctionFvPatchField
 )
 :
     kqRWallFunctionFvPatchField<Type>(ptf, p, iF, mapper),
-    immersedBoundaryFieldBase<Type>(p, true, pTraits<Type>::one*SMALL)
+    immersedBoundaryFieldBase<Type>
+    (
+        p,
+        ptf.setDeadValue(),
+        ptf.deadValue()
+    )
 {
     this->checkType();
 }
@@ -119,8 +129,8 @@ immersedBoundaryKqRWallFunctionFvPatchField
     immersedBoundaryFieldBase<Type>
     (
         ptf.ibPatch(),
-        true,
-        pTraits<Type>::one*SMALL
+        ptf.setDeadValue(),
+        ptf.deadValue()
     )
 {
     this->checkType();
@@ -139,8 +149,8 @@ immersedBoundaryKqRWallFunctionFvPatchField
     immersedBoundaryFieldBase<Type>
     (
         ptf.ibPatch(),
-        true,
-        pTraits<Type>::one*SMALL
+        ptf.setDeadValue(),
+        ptf.deadValue()        
     )
 {
     this->checkType();
@@ -148,6 +158,25 @@ immersedBoundaryKqRWallFunctionFvPatchField
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Type>
+void immersedBoundaryKqRWallFunctionFvPatchField<Type>::autoMap
+(
+    const fvPatchFieldMapper&
+)
+{
+    Field<Type>::operator=(this->patchInternalField());
+}
+
+
+template<class Type>
+void immersedBoundaryKqRWallFunctionFvPatchField<Type>::rmap
+(
+    const fvPatchField<Type>& ptf,
+    const labelList&
+)
+{}
+
 
 template<class Type>
 void immersedBoundaryKqRWallFunctionFvPatchField<Type>::updateOnMotion()
@@ -173,6 +202,12 @@ void immersedBoundaryKqRWallFunctionFvPatchField<Type>::evaluate
         Field<Type>::operator=(this->patchInternalField());
     }
 
+    // Get non-constant reference to internal field
+    Field<Type>& intField = const_cast<Field<Type>&>(this->internalField());
+
+    // Set dead value
+    this->setDeadValues(intField);
+
     kqRWallFunctionFvPatchField<Type>::evaluate(commsType);
 }
 
@@ -181,6 +216,8 @@ template<class Type>
 void immersedBoundaryKqRWallFunctionFvPatchField<Type>::write(Ostream& os) const
 {
     fvPatchField<Type>::write(os);
+    this->writeDeadData(os);
+
     // The value entry needs to be written with zero size
     Field<Type>::null().writeEntry("value", os);
     // this->writeEntry("value", os);
