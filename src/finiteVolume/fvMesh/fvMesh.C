@@ -514,7 +514,9 @@ void Foam::fvMesh::mapFields(const mapPolyMesh& meshMap) const
 
     // Map all the volFields in the objectRegistry
     MapGeometricFields<scalar, fvPatchField, fvMeshMapper, volMesh>(mapper);
+
     MapGeometricFields<vector, fvPatchField, fvMeshMapper, volMesh>(mapper);
+
     MapGeometricFields<sphericalTensor, fvPatchField, fvMeshMapper, volMesh>
         (mapper);
 
@@ -522,10 +524,10 @@ void Foam::fvMesh::mapFields(const mapPolyMesh& meshMap) const
         (mapper);
 
     MapGeometricFields<symmTensor4thOrder, fvPatchField, fvMeshMapper, volMesh>
-      (mapper);
+        (mapper);
 
     MapGeometricFields<diagTensor, fvPatchField, fvMeshMapper, volMesh>
-      (mapper);
+        (mapper);
 
     MapGeometricFields<tensor, fvPatchField, fvMeshMapper, volMesh>(mapper);
 
@@ -538,14 +540,15 @@ void Foam::fvMesh::mapFields(const mapPolyMesh& meshMap) const
 
     MapGeometricFields
         <sphericalTensor, fvsPatchField, fvMeshMapper, surfaceMesh>(mapper);
+
     MapGeometricFields<symmTensor, fvsPatchField, fvMeshMapper, surfaceMesh>
         (mapper);
 
-    MapGeometricFields<symmTensor4thOrder, fvsPatchField, fvMeshMapper, surfaceMesh>
-      (mapper);
+    MapGeometricFields
+        <symmTensor4thOrder, fvsPatchField, fvMeshMapper, surfaceMesh>(mapper);
 
     MapGeometricFields<diagTensor, fvsPatchField, fvMeshMapper, surfaceMesh>
-      (mapper);
+        (mapper);
 
     MapGeometricFields<tensor, fvsPatchField, fvMeshMapper, surfaceMesh>
         (mapper);
