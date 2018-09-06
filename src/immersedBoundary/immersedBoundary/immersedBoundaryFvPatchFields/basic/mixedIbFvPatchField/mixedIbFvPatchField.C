@@ -209,7 +209,6 @@ void mixedIbFvPatchField<Type>::autoMap
 {
     // Base fields do not map: re-interpolate them from tri data
     this->updateIbValues();
-    mixedFvPatchField<Type>::evaluate();
 }
 
 

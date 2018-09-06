@@ -253,8 +253,6 @@ void fixedValueIbFvPatchField<Type>::write(Ostream& os) const
 {
     // Resolve post-processing issues.  HJ, 1/Dec/2017
     fvPatchField<Type>::write(os);
-    os.writeKeyword("patchType")
-        << immersedBoundaryFvPatch::typeName << token::END_STATEMENT << nl;
     triValue_.writeEntry("triValue", os);
 
     // The value entry needs to be written with zero size

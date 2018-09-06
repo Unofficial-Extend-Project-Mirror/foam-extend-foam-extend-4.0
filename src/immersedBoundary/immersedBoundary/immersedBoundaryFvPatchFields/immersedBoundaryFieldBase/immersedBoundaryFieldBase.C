@@ -66,8 +66,6 @@ void Foam::immersedBoundaryFieldBase<Type>::setDeadValues
 template<class Type>
 void Foam::immersedBoundaryFieldBase<Type>::writeDeadData(Ostream& os) const
 {
-    os.writeKeyword("patchType")
-        << immersedBoundaryFvPatch::typeName << token::END_STATEMENT << nl;
     os.writeKeyword("setDeadValue")
         << setDeadValue_ << token::END_STATEMENT << nl;
     os.writeKeyword("deadValue")
