@@ -53,7 +53,6 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
         dimensionedScalar("one", dimless, 1)
     );
     gamma.internalField() = mesh.V()/mesh.cellVolumes();
-    gamma.write();
 
     // Report minimal live cell volume
     scalar minLiveGamma = GREAT;
@@ -123,6 +122,7 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
     }
 
     sGamma.write();
+    gamma.write();
 
     // Check consistency of face area vectors
 
