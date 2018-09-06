@@ -12,4 +12,5 @@ mkdir 0
 \cp -f 0_org/* 0/
 
 runApplication potentialFoam
+runApplication writeIbMasks
 runApplication $application
