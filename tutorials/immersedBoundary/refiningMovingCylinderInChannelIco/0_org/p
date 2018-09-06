@@ -50,7 +50,7 @@ boundaryField
     }
     frontAndBack
     {
-        type symmetryPlane;
+        type empty;
     }
 }
 

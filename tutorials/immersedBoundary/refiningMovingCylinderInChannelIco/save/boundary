@@ -52,7 +52,7 @@ FoamFile
     }
     frontAndBack
     {
-        type            symmetryPlane;
+        type            empty;
         nFaces          3750;
         startFace       3850;
     }
