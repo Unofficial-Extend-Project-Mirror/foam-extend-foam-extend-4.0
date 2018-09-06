@@ -66,7 +66,12 @@ movingImmersedBoundaryVelocityFvPatchVectorField
 )
 :
     fixedValueFvPatchVectorField(p, iF),   // Do not read data
-    immersedBoundaryFieldBase<vector>(p, false, vector::zero)
+    immersedBoundaryFieldBase<vector>
+    (
+        p,
+        Switch(dict.lookup("setDeadValue")),
+        vector(dict.lookup("deadValue"))
+    )
 {
     readPatchType(dict);
     updateIbValues();
@@ -83,7 +88,7 @@ movingImmersedBoundaryVelocityFvPatchVectorField
 )
 :
     fixedValueFvPatchVectorField(p, iF),   // Do not  data
-    immersedBoundaryFieldBase<vector>(p, false, vector::zero)
+    immersedBoundaryFieldBase<vector>(p, ptf.setDeadValue(), ptf.deadValue())
 {
     updateIbValues();
 }
@@ -96,7 +101,12 @@ movingImmersedBoundaryVelocityFvPatchVectorField
 )
 :
     fixedValueFvPatchVectorField(ptf),
-    immersedBoundaryFieldBase<vector>(ptf.ibPatch(), false, vector::zero)
+    immersedBoundaryFieldBase<vector>
+    (
+        ptf.ibPatch(),
+        ptf.setDeadValue(),
+        ptf.deadValue()
+    )
 {}
 
 
@@ -108,7 +118,12 @@ movingImmersedBoundaryVelocityFvPatchVectorField
 )
 :
     fixedValueFvPatchVectorField(ptf, iF),
-    immersedBoundaryFieldBase<vector>(ptf.ibPatch(), false, vector::zero)
+    immersedBoundaryFieldBase<vector>
+    (
+        ptf.ibPatch(),
+        ptf.setDeadValue(),
+        ptf.deadValue()
+    )
 {}
 
 
@@ -138,10 +153,8 @@ void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::rmap
 
 void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::updateOnMotion()
 {
-    Info<< "Update on motion, 1" << endl;
     if (size() != ibPatch().size())
     {
-        Info<< "Update on motion, 2" << endl;
         updateIbValues();
     }
 }
@@ -207,6 +220,8 @@ void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::write
 ) const
 {
     fvPatchVectorField::write(os);
+
+    this->writeDeadData(os);
 
     vectorField::null().writeEntry("value", os);
     // writeEntry("value", os);
