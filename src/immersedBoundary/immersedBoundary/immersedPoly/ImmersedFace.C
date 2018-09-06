@@ -274,7 +274,8 @@ void Foam::ImmersedFace<Distance>::createSubfaces
             if
             (
                 drySubface_.mag(facePointsAndIntersections_)
-              < immersedPoly::tolerance_()
+              < immersedPoly::tolerance_()*
+                localFace.mag(facePointsAndIntersections_)
             )
             {
                 // The face is practically wet
@@ -297,10 +298,13 @@ void Foam::ImmersedFace<Distance>::createSubfaces
             wetSubface_.setSize(nWet);
 
             // Check area: if it is very small, reset the face
+            // Note: must use relative tolerance, ie divide with original face
+            // area magnitude.  HJ, 30/Aug/2018
             if
             (
                 wetSubface_.mag(facePointsAndIntersections_)
-              < immersedPoly::tolerance_()
+              < immersedPoly::tolerance_()*
+                localFace.mag(facePointsAndIntersections_)
             )
             {
                 // The face is practically dry
