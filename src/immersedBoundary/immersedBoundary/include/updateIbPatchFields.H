@@ -120,8 +120,8 @@
                     Info<< ".";
                     f.boundaryField()[ibPatches[ibpI]].updateOnMotion();
                 }
-                Info<< endl;
             }
+            Info<< endl;
         }
     }
 }
