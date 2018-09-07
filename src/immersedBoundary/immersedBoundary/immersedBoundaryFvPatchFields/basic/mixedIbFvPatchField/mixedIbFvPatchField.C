@@ -81,6 +81,10 @@ mixedIbFvPatchField<Type>::mixedIbFvPatchField
     triGrad_("triGradient", dict, this->ibPatch().ibMesh().size()),
     triValueFraction_("triValueFraction", dict, this->ibPatch().ibMesh().size())
 {
+    // Since patch does not read a dictionary, the patch type needs to be read
+    // manually.  HJ, 6/Sep/2018
+    this->readPatchType(dict);
+    
     if (!isType<immersedBoundaryFvPatch>(p))
     {
         FatalIOErrorIn
