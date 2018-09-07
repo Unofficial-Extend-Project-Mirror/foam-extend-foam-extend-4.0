@@ -17,7 +17,7 @@ FoamFile
 
 dimensions      [0 2 -2 0 0 0 0];
 
-internalField   uniform 0.375;
+internalField   uniform 1.5e-4;
 
 boundaryField
 {
@@ -25,7 +25,9 @@ boundaryField
     {
         type            immersedBoundaryKqRWallFunction;
         patchType       immersedBoundary;
-        value           uniform 0.375;
+        setDeadValue    true;
+        deadValue       1.5e-4;
+        value           uniform 1.5e-4;
     }
     top
     {
@@ -34,13 +36,13 @@ boundaryField
     in
     {
         type            fixedValue;
-        value           uniform 0.375;
+        value           uniform 1.5e-4;
     }
     out
     {
         type            inletOutlet;
-        inletValue      uniform 0.375;
-        value           uniform 0.375;
+        inletValue      uniform 1.5e-4;
+        value           uniform 1.5e-4;
     }
     bottom
     {

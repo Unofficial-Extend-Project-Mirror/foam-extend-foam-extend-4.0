@@ -17,7 +17,7 @@ FoamFile
 
 dimensions      [0 2 -3 0 0 0 0];
 
-internalField   uniform 14.855;
+internalField   uniform 2e-4;
 
 boundaryField
 {
@@ -28,8 +28,10 @@ boundaryField
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
+        setDeadValue    true;
+        deadValue       2e-4;
 
-        value           uniform 14.855;
+        value           uniform 2e-4;
     }
     top
     {
@@ -38,13 +40,13 @@ boundaryField
     in
     {
         type            fixedValue;
-        value           uniform 14.855;
+        value           uniform 2e-4;
     }
     out
     {
         type            inletOutlet;
-        inletValue      uniform 14.855;
-        value           uniform 14.855;
+        inletValue      uniform 2e-4;
+        value           uniform 2e-4;
     }
     bottom
     {

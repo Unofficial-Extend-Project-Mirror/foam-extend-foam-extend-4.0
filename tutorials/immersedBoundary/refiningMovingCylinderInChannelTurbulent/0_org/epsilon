@@ -30,7 +30,6 @@ boundaryField
         E               9.8;
         setDeadValue    true;
         deadValue       2e-4;
-
         value           uniform 2e-4;
     }
     top
