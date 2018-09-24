@@ -34,21 +34,22 @@ namespace Foam
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class Type>
-Field<Type> interpolateXY
+tmp<Field<Type> > interpolateXY
 (
     const scalarField& xNew,
     const scalarField& xOld,
     const Field<Type>& yOld
 )
 {
-    scalarField yNew(xNew.size());
+    tmp<Field<Type> > tyNew(new Field<Type>(xNew.size()));
+    Field<Type>& yNew = tyNew();
 
     forAll(xNew, i)
     {
         yNew[i] = interpolateXY(xNew[i], xOld, yOld);
     }
 
-    return yNew;
+    return tyNew;
 }
 
 

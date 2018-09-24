@@ -47,7 +47,7 @@ namespace Foam
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class Type>
-Field<Type> interpolateXY
+tmp<Field<Type> > interpolateXY
 (
     const scalarField& xNew,
     const scalarField& xOld,
