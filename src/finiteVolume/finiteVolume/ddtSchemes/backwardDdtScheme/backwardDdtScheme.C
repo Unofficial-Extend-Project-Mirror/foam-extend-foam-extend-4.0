@@ -801,16 +801,15 @@ tmp<surfaceScalarField> backwardDdtScheme<Type>::meshPhi
     const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
-    scalar deltaT = deltaT_();
-    scalar deltaT0 = deltaT0_(vf);
+    const scalar deltaT = deltaT_();
+    const scalar deltaT0 = deltaT0_(vf);
 
-    // Coefficient for t-3/2 (between times 0 and 00)
-    scalar coefft0_00 = deltaT/(deltaT + deltaT0);
+    // Bugfix: missing possibility of having the variable time step
+    // Reported by Sopheak Seng, Bureau Veritas, 6/Sep/2018.
+    const scalar coefft00 = deltaT*deltaT/(deltaT0*(deltaT + deltaT0));
+    const scalar coefft  = 1 + deltaT/(deltaT + deltaT0);
 
-    // Coefficient for t-1/2 (between times n and 0)
-    scalar coefftn_0 = 1 + coefft0_00;
-
-    return coefftn_0*mesh().phi() - coefft0_00*mesh().phi().oldTime();
+    return coefft*mesh().phi() - coefft00*mesh().phi().oldTime();
 }
 
 
