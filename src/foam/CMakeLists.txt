@@ -712,6 +712,7 @@ list(APPEND SOURCES
   ${meshTools}/mergePoints.C
   fields/UniformDimensionedFields/uniformDimensionedFields.C
   fields/cloud/cloud.C
+  fields/cloudDistribute/cloudDistribute.C
 )
 
 set(Fields fields/Fields)

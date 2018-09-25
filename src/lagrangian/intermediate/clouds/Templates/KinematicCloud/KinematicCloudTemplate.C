@@ -266,6 +266,24 @@ void Foam::KinematicCloud<ParcelType>::evolve()
 }
 
 
+template<class CloudType>
+void Foam::KinematicCloud<CloudType>::updateMesh()
+{
+    UTrans_.setSize(this->pMesh().nCells());
+
+    injection().updateMesh();
+}
+
+
+template<class CloudType>
+void Foam::KinematicCloud<CloudType>::autoMap(const mapPolyMesh& mapper)
+{
+    Cloud<parcelType>::autoMap(mapper);
+
+    this->updateMesh();
+}
+
+
 template<class ParcelType>
 void Foam::KinematicCloud<ParcelType>::info() const
 {

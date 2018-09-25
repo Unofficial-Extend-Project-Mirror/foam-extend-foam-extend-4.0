@@ -260,6 +260,12 @@ public:
         virtual bool active() const = 0;
 
 
+        // Mapping
+
+            //- Update mesh
+            virtual void updateMesh();
+
+
         // Global information
 
             //- Return the start-of-injection time

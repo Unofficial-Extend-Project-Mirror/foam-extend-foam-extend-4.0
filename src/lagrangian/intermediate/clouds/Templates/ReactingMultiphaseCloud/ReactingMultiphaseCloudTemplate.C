@@ -235,6 +235,18 @@ void Foam::ReactingMultiphaseCloud<ParcelType>::evolve()
 
 
 template<class ParcelType>
+void Foam::ReactingMultiphaseCloud<ParcelType>::autoMap
+(
+    const mapPolyMesh& mapper
+)
+{
+    Cloud<parcelType>::autoMap(mapper);
+
+    this->updateMesh();
+}
+
+
+template<class ParcelType>
 void Foam::ReactingMultiphaseCloud<ParcelType>::info() const
 {
     ReactingCloud<ParcelType>::info();

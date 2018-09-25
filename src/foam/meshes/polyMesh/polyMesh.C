@@ -739,14 +739,23 @@ void Foam::polyMesh::resetPrimitives
         // Faces will be reset in initMesh(), using size of owner list
     }
 
+    // HR 25.06.18: A mesh with a single cell has an empty neighbour list and
+    // we need to be able reset to such a mesh eg. during load balancing
     if (!own().empty())
     {
+        // Mesh has at least one face in owner list. Reset both lists even if
+        // neighbours are empty (single cell mesh).
         owner_.transfer(own());
-    }
-
-    if (!nei().empty())
-    {
         neighbour_.transfer(nei());
+    }
+    else
+    {
+        if (!nei().empty())
+        {
+            // This mesh is invalid, but the operation was valid before.
+            // Therefore we do what was done before.
+            neighbour_.transfer(nei());
+        }
     }
 
 
