@@ -31,6 +31,14 @@
             gamma.boundaryField()[patchI] =
                 sGamma.boundaryField()[patchI];
         }
+        else
+        {
+            sGamma.boundaryField()[patchI] =
+                scalarField(mesh.boundary()[patchI].size(), 1);
+
+            gamma.boundaryField()[patchI] =
+                scalarField(mesh.boundary()[patchI].size(), 1);
+        }
     }
 
     // Adjust the mask in dead faces and dead cells
