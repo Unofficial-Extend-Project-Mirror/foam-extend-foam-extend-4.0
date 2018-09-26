@@ -53,7 +53,11 @@
 
         if (!excludeVsf.found(f.name()))
         {
-            Info<< "Updating vs field " << f.name() << ": ";
+            if (immersedBoundaryFvPatch::debug)
+            {
+                Info<< "Updating vs field " << f.name() << ": ";
+            }
+
             forAll (ibPatches, ibpI)
             {
                 if
@@ -62,11 +66,19 @@
                  != patches[ibPatches[ibpI]].size()
                 )
                 {
-                    Info<< ".";
+                    if (immersedBoundaryFvPatch::debug)
+                    {
+                        Info<< ".";
+                    }
+
                     f.boundaryField()[ibPatches[ibpI]].updateOnMotion();
                 }
             }
-            Info<< endl;
+
+            if (immersedBoundaryFvPatch::debug)
+            {
+                Info<< endl;
+            }
         }
     }
 
@@ -84,13 +96,25 @@
 
         if (!excludeVvf.found(f.name()))
         {
-            Info<< "Updating vv field " << f.name() << ": ";
+            if (immersedBoundaryFvPatch::debug)
+            {
+                Info<< "Updating vv field " << f.name() << ": ";
+            }
+
             forAll (ibPatches, ibpI)
             {
-                Info<< ".";
+                if (immersedBoundaryFvPatch::debug)
+                {
+                    Info<< ".";
+                }
+
                 f.boundaryField()[ibPatches[ibpI]].updateOnMotion();
             }
-            Info<< endl;
+
+            if (immersedBoundaryFvPatch::debug)
+            {
+                Info<< endl;
+            }
         }
     }
 
@@ -108,7 +132,11 @@
 
         if (!excludeSsf.found(f.name()))
         {
-            Info<< "Updating ss field " << f.name() << ": ";
+            if (immersedBoundaryFvPatch::debug)
+            {
+                Info<< "Updating ss field " << f.name() << ": ";
+            }
+
             forAll (ibPatches, ibpI)
             {
                 if
@@ -117,11 +145,19 @@
                  != patches[ibPatches[ibpI]].size()
                 )
                 {
-                    Info<< ".";
+                    if (immersedBoundaryFvPatch::debug)
+                    {
+                        Info<< ".";
+                    }
+
                     f.boundaryField()[ibPatches[ibpI]].updateOnMotion();
                 }
             }
-            Info<< endl;
+
+            if (immersedBoundaryFvPatch::debug)
+            {
+                Info<< endl;
+            }
         }
     }
 }
