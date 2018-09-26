@@ -43,7 +43,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class mixedFvPatch Declaration
+                    Class mixedFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
