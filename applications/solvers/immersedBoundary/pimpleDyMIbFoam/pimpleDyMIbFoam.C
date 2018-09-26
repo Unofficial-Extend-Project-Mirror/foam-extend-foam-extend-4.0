@@ -75,11 +75,15 @@ int main(int argc, char *argv[])
 #       include "CourantNo.H"
 #       include "setDeltaT.H"
 
+        // Make the fluxes absolute
+        fvc::makeAbsolute(phi, U);
+
         runTime++;
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         bool meshChanged = mesh.update();
+        reduce(meshChanged, orOp<bool>());
 
 #       include "updateIbPatchFields.H"
 #       include "updateIbMasks.H"
