@@ -567,6 +567,7 @@ $(meshTools)/mergePoints.C
 
 fields/UniformDimensionedFields/uniformDimensionedFields.C
 fields/cloud/cloud.C
+fields/cloudDistribute/cloudDistribute.C
 
 Fields = fields/Fields
 $(Fields)/labelField/labelField.C

@@ -318,7 +318,7 @@ void Foam::sharedPoints::calcSharedPoints()
 
             forAll (curMarkedPoints, pointI)
             {
-                if (curMarkedPoints[pointI] > 2)
+                if (curMarkedPoints[pointI] > 1)
                 {
                     nShared++;
                 }
@@ -332,7 +332,7 @@ void Foam::sharedPoints::calcSharedPoints()
 
             forAll (curMarkedPoints, pointI)
             {
-                if (curMarkedPoints[pointI] > 2)
+                if (curMarkedPoints[pointI] > 1)
                 {
                     curShared[nShared] = pointI;
                     nShared++;

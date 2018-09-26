@@ -21,68 +21,57 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
+Description
+    Lagrangian field decomposer.
+
 \*---------------------------------------------------------------------------*/
 
-#include "cloud.H"
-#include "foamTime.H"
+#include "cloudDistribute.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::cloud, 0);
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-const Foam::word Foam::cloud::prefix("lagrangian");
-Foam::word Foam::cloud::defaultName("defaultCloud");
+namespace Foam
+{
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::cloud::cloud(const objectRegistry& obr, const word& cloudName)
-:
-    objectRegistry
-    (
-        IOobject
-        (
-            ( cloudName.size() ? cloudName : defaultName ),
-            obr.time().timeName(),
-            prefix,
-            obr,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        )
-    )
+cloudDistribute::cloudDistribute()
 {}
-
-
-Foam::autoPtr<Foam::cloudDistribute> Foam::cloud::cloudDist
-(
-    const labelList& cellToProc,
-    const labelListList& procCellAddressing,
-    const labelListList& procFaceAddressing
-)
-{
-    NotImplemented;
-    return autoPtr<cloudDistribute>(NULL);
-}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::cloud::~cloud()
+cloudDistribute::~cloudDistribute()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::label Foam::cloud::size() const
-{
-    NotImplemented;
-    return 0;
-}
-
-
-void Foam::cloud::autoMap(const mapPolyMesh&)
+void cloudDistribute::send(Ostream& toProc, const label procIndex)
 {
     NotImplemented;
 }
 
+
+void cloudDistribute::receive(Istream& fromProc, const label procIndex)
+{
+    NotImplemented;
+}
+
+
+void cloudDistribute::rebuild
+(
+    const PtrList<labelIOList>& cellProcAddressing,
+    const PtrList<labelIOList>& faceProcAddressing
+)
+{
+    NotImplemented;
+}
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
 
 // ************************************************************************* //

@@ -22,91 +22,68 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::cloud
+    Foam::cloudDistribute
 
 Description
-    A cloud is a collection of lagrangian particles
+    Lagrangian field decomposer.
 
 SourceFiles
-    cloud.C
+    cloudDistribute.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef cloud_H
-#define cloud_H
+#ifndef cloudDistribute_H
+#define cloudDistribute_H
 
-#include "objectRegistry.H"
-#include "cloudDistribute.H"
+#include "labelIOList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// Forward declaration of classes
-class mapPolyMesh;
-class polyMesh;
-
 /*---------------------------------------------------------------------------*\
-                            Class cloud Declaration
+                    Class cloudDistribute Declaration
 \*---------------------------------------------------------------------------*/
 
-class cloud
-:
-    public objectRegistry
+class cloudDistribute
 {
-
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        cloud(const cloud&);
+        cloudDistribute(const cloudDistribute&);
 
         //- Disallow default bitwise assignment
-        void operator=(const cloud&);
+        void operator=(const cloudDistribute&);
 
 
 public:
 
-    //- Runtime type information
-    TypeName("cloud");
-
-        //- The prefix to local: %lagrangian
-        static const word prefix;
-
-        //- The default cloud name: %defaultCloud
-        static word defaultName;
-
-
     // Constructors
 
-        //- Construct for the given objectRegistry and named cloud instance
-        cloud(const objectRegistry&, const word& cloudName = "");
-
-        virtual autoPtr<cloudDistribute> cloudDist
-        (
-            const labelList& cellToProc,
-            const labelListList& procCellAddressing,
-            const labelListList& procFaceAddressing
-        );
+        //- Null constructor
+        cloudDistribute();
 
 
     //- Destructor
-        virtual ~cloud();
+    virtual ~cloudDistribute();
 
 
     // Member Functions
 
-        // Access
+        // Send particles
+        virtual void send(Ostream& toProc, const label procIndex);
 
-            //- Return size of the cloud
-            virtual label size() const;
+        // Receive particles
+        virtual void receive(Istream& fromProc, const label procIndex);
 
-    
-        // Edit
+        // Receive particles
+        virtual void rebuild
+        (
+            const PtrList<labelIOList>& cellProcAddressing,
+            const PtrList<labelIOList>& faceProcAddressing
+        );
 
-            //- Remap the cells of particles corresponding to the
-            //  mesh topology change
-            virtual void autoMap(const mapPolyMesh&);
 };
 
 

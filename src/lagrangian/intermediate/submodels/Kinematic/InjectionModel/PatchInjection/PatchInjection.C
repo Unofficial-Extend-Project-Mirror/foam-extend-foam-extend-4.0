@@ -117,18 +117,7 @@ Foam::PatchInjection<CloudType>::PatchInjection
             << nl << exit(FatalError);
     }
 
-    const polyPatch& patch = owner.mesh().boundaryMesh()[patchId];
-
-    cellOwners_ = patch.faceCells();
-
-    label patchSize = cellOwners_.size();
-    label totalPatchSize = patchSize;
-    reduce(totalPatchSize, sumOp<label>());
-    fraction_ = scalar(patchSize)/totalPatchSize;
-
-    // Set total volume/mass to inject
-    this->volumeTotal_ = fraction_*volumeFlowRate_().integrate(0.0, duration_);
-    this->massTotal_ *= fraction_;
+    updateMesh();
 }
 
 
@@ -145,6 +134,27 @@ template<class CloudType>
 bool Foam::PatchInjection<CloudType>::active() const
 {
     return true;
+}
+
+
+template<class CloudType>
+void Foam::PatchInjection<CloudType>::updateMesh()
+{
+    label patchId =
+        this->owner().mesh().boundaryMesh().findPatchID(patchName_);
+
+    const polyPatch& patch = this->owner().mesh().boundaryMesh()[patchId];
+
+    cellOwners_ = patch.faceCells();
+
+    label patchSize = cellOwners_.size();
+    label totalPatchSize = patchSize;
+    reduce(totalPatchSize, sumOp<label>());
+    fraction_ = scalar(patchSize)/totalPatchSize;
+
+    // Set total volume/mass to inject
+    this->volumeTotal_ = fraction_*volumeFlowRate_().integrate(0.0, duration_);
+    this->massTotal_ *= fraction_;
 }
 
 

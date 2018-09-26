@@ -131,15 +131,7 @@ Foam::FieldActivatedInjection<CloudType>::FieldActivatedInjection
     this->volumeTotal_ =
         nParcelsPerInjector_*sum(pow3(diameters_))*mathematicalConstant::pi/6.0;
 
-    // Set/cache the injector cells
-    forAll(positions_, i)
-    {
-        this->findCellAtPosition
-        (
-            injectorCells_[i],
-            positions_[i]
-        );
-    }
+    updateMesh();
 }
 
 
@@ -156,6 +148,17 @@ template<class CloudType>
 bool Foam::FieldActivatedInjection<CloudType>::active() const
 {
     return true;
+}
+
+
+template<class CloudType>
+void Foam::FieldActivatedInjection<CloudType>::updateMesh()
+{
+    // Set/cache the injector cell
+    forAll(positions_, i)
+    {
+        this->findCellAtPosition(injectorCells_[i], positions_[i]);
+    }
 }
 
 

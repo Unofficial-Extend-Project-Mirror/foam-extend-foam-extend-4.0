@@ -1147,7 +1147,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                                      != masterPpAddr[curMF[pointI]]
                                     )
                                     {
-                                        WarningIn
+                                        FatalErrorIn
                                         (
                                             "autoPtr<fvMesh> "
                                             "processorMeshesReconstructor::"
@@ -1213,7 +1213,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                      != ppAddr[curSpl[splI]]
                     )
                     {
-                        WarningIn
+                        FatalErrorIn
                         (
                             "autoPtr<fvMesh> "
                             "processorMeshesReconstructor::"

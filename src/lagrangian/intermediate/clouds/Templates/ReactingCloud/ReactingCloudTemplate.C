@@ -278,6 +278,15 @@ void Foam::ReactingCloud<ParcelType>::evolve()
 }
 
 
+template<class CloudType>
+void Foam::ReactingCloud<CloudType>::autoMap(const mapPolyMesh& mapper)
+{
+    Cloud<parcelType>::autoMap(mapper);
+
+    this->updateMesh();
+}
+
+
 template<class ParcelType>
 void Foam::ReactingCloud<ParcelType>::info() const
 {

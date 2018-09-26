@@ -96,10 +96,8 @@ Foam::ReactingLookupTableInjection<CloudType>::ReactingLookupTableInjection
 {
     // Set/cache the injector cells
     injectorCells_.setSize(injectors_.size());
-    forAll(injectors_, i)
-    {
-        this->findCellAtPosition(injectorCells_[i], injectors_[i].x());
-    }
+
+    this->updateMesh();
 
     // Determine volume of particles to inject
     this->volumeTotal_ = 0.0;
@@ -124,6 +122,17 @@ template<class CloudType>
 bool Foam::ReactingLookupTableInjection<CloudType>::active() const
 {
     return true;
+}
+
+
+template<class CloudType>
+void Foam::ReactingLookupTableInjection<CloudType>::updateMesh()
+{
+    // Set/cache the injector cell
+    forAll(injectors_, i)
+    {
+        this->findCellAtPosition(injectorCells_[i], injectors_[i].x());
+    }
 }
 
 

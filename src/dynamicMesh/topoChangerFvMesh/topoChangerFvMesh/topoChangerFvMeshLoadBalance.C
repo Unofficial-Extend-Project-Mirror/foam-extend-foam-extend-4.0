@@ -30,6 +30,8 @@ License
 #include "fvFieldReconstructor.H"
 #include "passiveProcessorPolyPatch.H"
 #include "addToRunTimeSelectionTable.H"
+#include "cloud.H"
+#include "cloudDistribute.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -87,7 +89,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
 
     // forAll(cellToProc, celli)
     // {
-    //    cellDist[celli] = cellToProc[celli];
+    //     cellDist[celli] = cellToProc[celli];
     // }
 
     // cellDist.write();
@@ -102,8 +104,29 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
     Pstream::gatherList(migratedCells);
     Pstream::scatterList(migratedCells);
     Info<< "Migrated cells per processor: " << migratedCells << endl;
+
     // Reading through second index now tells how many cells will arrive
     // from which processor
+    forAll (migratedCells, i)
+    {
+        bool allZero = true;
+        forAll (migratedCells, j)
+        {
+            if (migratedCells[j][i] > 0)
+            {
+                allZero = false;
+                break;
+            }
+        }
+
+        if (allZero)
+        {
+            FatalErrorIn("bool topoChangerFvMesh::loadBalance()")
+                << "Reconstructed mesh must have at least one cell "
+                    "on each processor"
+                << abort(FatalError);
+        }
+    }
 
     // Find out which processor faces will become local internal faces
     // by comparing decomposition index from the other side
@@ -134,6 +157,14 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
 
     HashTable<const surfaceVectorField*> surfaceVectorFields =
         thisDb().lookupClass<surfaceVectorField>();
+
+    // Particles
+    HashTable<const cloud*> clouds = thisDb().lookupClass<cloud>();
+
+    forAllConstIter(HashTable<const cloud*>, clouds, iter)
+    {
+        cloud& c = const_cast<cloud&>(*iter());
+    }
 
     //HJ, HERE: remove the fields that should not be load balanced
 
@@ -180,6 +211,26 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         receivedSurfaceVectorFields[fieldI].setSize(Pstream::nProcs());
     }
 
+    PtrList<cloudDistribute> cloudDistributes(clouds.size());
+    {
+        label cloudI = 0;
+        forAllConstIter(HashTable<const cloud*>, clouds, iter)
+        {
+            cloud& c = const_cast<cloud&>(*iter());
+            cloudDistributes.set
+            (
+                cloudI++,
+                c.cloudDist
+                (
+                    meshDecomp.cellToProc(),
+                    meshDecomp.procCellAddressing(),
+                    meshDecomp.procFaceAddressing()
+                )
+            );
+        }
+    }
+
+
     for (label procI = 0; procI < meshDecomp.nProcs(); procI++)
     {
         // Check if there is a mesh to send
@@ -225,6 +276,12 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                 sendFields(volVectorFields, fieldDecomposer, toProc);
                 sendFields(surfaceScalarFields, fieldDecomposer, toProc);
                 sendFields(surfaceVectorFields, fieldDecomposer, toProc);
+
+                // Send clouds
+                forAll(cloudDistributes, cloudI)
+                {
+                    cloudDistributes[cloudI].send(toProc, procI);
+                }
             }
             else
             {
@@ -343,6 +400,11 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                     procMeshes[procI],
                     fromProc
                 );
+
+                forAll(cloudDistributes, cloudI)
+                {
+                    cloudDistributes[cloudI].receive(fromProc, procI);
+                }
             }
         }
     }
@@ -368,6 +430,8 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
 
     Pout<< "Reconstructed mesh stats: "
         << " nCells: " << reconMesh.nCells()
+        << " nFaces: " << reconMesh.nFaces()
+        << " nIntFaces: " << reconMesh.nInternalFaces()
         << " polyPatches: "
         << reconMesh.boundaryMesh().size()
         << " patches: "
@@ -623,7 +687,6 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         oldPatchNMeshPoints         // oldPatchNMeshPoints
     );
 
-
     // Reset fvMesh and patches
     resetFvPrimitives
     (
@@ -680,6 +743,15 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         receivedSurfaceVectorFields,
         meshMap
     );
+
+    forAll(cloudDistributes, cloudI)
+    {
+        cloudDistributes[cloudI].rebuild
+        (
+            meshRecon.cellProcAddressing(),
+            meshRecon.faceProcAddressing()
+        );
+    }
 
     // Debug
     checkMesh(true);

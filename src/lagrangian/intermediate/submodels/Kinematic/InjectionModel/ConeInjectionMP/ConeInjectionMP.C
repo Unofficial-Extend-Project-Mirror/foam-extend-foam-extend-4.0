@@ -182,15 +182,7 @@ Foam::ConeInjectionMP<CloudType>::ConeInjectionMP
     // Set total volume to inject
     this->volumeTotal_ = volumeFlowRate_().integrate(0.0, duration_);
 
-    // Set/cache the injector cells
-    forAll(positions_, i)
-    {
-        this->findCellAtPosition
-        (
-            injectorCells_[i],
-            positions_[i]
-        );
-    }
+    this->updateMesh();
 }
 
 
@@ -207,6 +199,17 @@ template<class CloudType>
 bool Foam::ConeInjectionMP<CloudType>::active() const
 {
     return true;
+}
+
+
+template<class CloudType>
+void Foam::ConeInjectionMP<CloudType>::updateMesh()
+{
+    // Set/cache the injector cell
+    forAll(positions_, i)
+    {
+        this->findCellAtPosition(injectorCells_[i], positions_[i]);
+    }
 }
 
 

@@ -239,6 +239,12 @@ public:
 
             //- Evolve the spray (inject, move)
             void evolve();
+
+        // Mapping
+
+            //- Remap the cells of particles corresponding to the
+            //  mesh topology change with a default tracking data object
+            virtual void autoMap(const mapPolyMesh&);
 };
 
 
