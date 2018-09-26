@@ -151,10 +151,6 @@ void immersedBoundaryFvsPatchField<Type>::evaluate
 )
 {
     this->updateSize();
-    Field<Type>::operator=
-    (
-        Field<Type>(this->patch().size(), pTraits<Type>::zero)
-    );
 }
 
 
