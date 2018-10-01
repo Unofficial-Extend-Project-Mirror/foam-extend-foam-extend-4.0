@@ -114,7 +114,7 @@ bool Foam::immersedBoundarySolidBodyMotionFvMesh::update()
         ibMotions_[ibI].movePoints();
     }
 
-    // Force quasi-topological change to rebuild addressng on motion of the
+    // Force quasi-topological change to rebuild addressing on motion of the
     // immersed boundary
     // HJ, 12/Dec/2017
     fvMesh::syncUpdateMesh();
