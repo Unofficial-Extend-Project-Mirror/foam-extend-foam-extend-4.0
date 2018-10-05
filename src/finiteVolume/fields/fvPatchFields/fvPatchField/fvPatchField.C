@@ -162,6 +162,13 @@ void Foam::fvPatchField<Type>::readPatchType(const dictionary& dict)
 
 
 template<class Type>
+void Foam::fvPatchField<Type>::setPatchType(const fvPatchField<Type>& ptf)
+{
+    patchType_ = ptf.patchType();
+}
+
+
+template<class Type>
 const Foam::objectRegistry& Foam::fvPatchField<Type>::db() const
 {
     //HR 12.3.10: Lookup fields from the field DB rather than the mesh
