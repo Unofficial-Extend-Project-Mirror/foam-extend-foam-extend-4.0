@@ -343,6 +343,12 @@ bool Foam::dynamicPolyRefinementFvMesh::update()
 
         return topoChangeMap->morphing();
     }
+    else
+    {
+        // Update current time index to skip multiple topo change checks
+        // per time step
+        curTimeIndex_ = time().timeIndex();
+    }        
 
     // No refinement/unrefinement at this time step. Return false
     return false;
