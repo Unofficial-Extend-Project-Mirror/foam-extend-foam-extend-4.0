@@ -87,9 +87,12 @@ movingImmersedBoundaryVelocityFvPatchVectorField
     const fvPatchFieldMapper& mapper
 )
 :
-    fixedValueFvPatchVectorField(p, iF),   // Do not  data
+    fixedValueFvPatchVectorField(p, iF), // Do not map mixed data.  Set patchType later
     immersedBoundaryFieldBase<vector>(p, ptf.setDeadValue(), ptf.deadValue())
 {
+    // Copy the patch type since mixed data was not mapped
+    this->setPatchType(ptf);
+
     updateIbValues();
 }
 

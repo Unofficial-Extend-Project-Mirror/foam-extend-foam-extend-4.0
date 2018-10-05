@@ -84,7 +84,7 @@ mixedIbFvPatchField<Type>::mixedIbFvPatchField
     // Since patch does not read a dictionary, the patch type needs to be read
     // manually.  HJ, 6/Sep/2018
     this->readPatchType(dict);
-    
+
     if (!isType<immersedBoundaryFvPatch>(p))
     {
         FatalIOErrorIn
@@ -121,7 +121,7 @@ mixedIbFvPatchField<Type>::mixedIbFvPatchField
     const fvPatchFieldMapper& mapper
 )
 :
-    mixedFvPatchField<Type>(p, iF),  // Do not map mixed data
+    mixedFvPatchField<Type>(p, iF), // Do not map mixed data.  Set patchType later
     immersedBoundaryFieldBase<Type>
     (
         p,
@@ -153,6 +153,9 @@ mixedIbFvPatchField<Type>::mixedIbFvPatchField
             << " in file " << this->dimensionedInternalField().objectPath()
             << exit(FatalIOError);
     }
+
+    // Copy the patch type since mixed data was not mapped
+    this->setPatchType(ptf);
 
     // Re-interpolate the data related to immersed boundary
     this->updateIbValues();
