@@ -252,6 +252,9 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
         }
     }
 
+    // Count all IB cells and faces for debug
+    labelList totalIbCount(4);
+
     // Collect intersection points and faces.  Primitive patch will be created
     // after renumbering
 
@@ -625,15 +628,16 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                     // Record the nearest triangle to the face centre
                     nearestTri[nIbCells] =
                         tss.nearest(Cf[faceI], span).index();
-                    Info<< "ADDED COUPLED PROC FACE: " << patchFaceI << endl;
                     nIbCells++;
                 }
             }
         }
     }
 
+    // Record the number of IB cells for debug
+    totalIbCount[0] = nIbCells;
+
     // Reset the cell lists
-    Info<< "nIbCells: " << nIbCells << endl;
     unmergedFaces.setSize(nIbCells);
     ibCells.setSize(nIbCells);
     ibCellCentres.setSize(nIbCells);
@@ -723,7 +727,6 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
         }
 
         // Allocate storage and collect dead cells
-        Info<< "nDeadCells: " << nDeadCells << endl;
         deadCellsPtr_ = new labelList(nDeadCells);
         labelList& dc = *deadCellsPtr_;
 
@@ -738,6 +741,9 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                 nDeadCells++;
             }
         }
+
+        // Record the number of dead cells for debug
+        totalIbCount[1] = nDeadCells;
     }
 
     // IB faces: faces intersected by the IB patch
@@ -1010,8 +1016,10 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
         }
     }
 
+    // Record the number of IB faces for debug
+    totalIbCount[2] = nIbFaces;
+
     // Reset the sizes of the list
-    Info<< "nIbFaces: " << nIbFaces << endl;
     ibFaces.setSize(nIbFaces);
     ibFaceCentres.setSize(nIbFaces);
 
@@ -1029,7 +1037,6 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
         }
 
         // Allocate storage and collect dead faces
-        Info<< "nDeadFaces: " << nDeadFaces << endl;
         deadFacesPtr_ = new labelList(nDeadFaces);
         labelList& df = *deadFacesPtr_;
 
@@ -1044,6 +1051,21 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                 nDeadFaces++;
             }
         }
+
+        // Record the number of dead faces for debug
+        totalIbCount[3] = nDeadFaces;
+    }
+
+    // if (debug)
+    {
+        reduce(totalIbCount, sumOp<List<label> >());
+
+        Info<< "Immersed boundary " << name() << " info: "
+            << "nIbCells: " << totalIbCount[0]
+            << " nDeadCells: " << totalIbCount[1]
+            << " nIbFaces: " << totalIbCount[2]
+            << " nDeadFaces: " << totalIbCount[3]
+            << endl;
     }
 }
 
