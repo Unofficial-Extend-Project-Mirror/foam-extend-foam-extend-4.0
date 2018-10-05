@@ -81,9 +81,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~multiMaterialZonesThermal();
+    //- Destructor
+    virtual ~multiMaterialZonesThermal();
 };
 
 

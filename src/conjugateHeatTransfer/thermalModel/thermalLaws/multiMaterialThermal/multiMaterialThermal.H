@@ -138,7 +138,7 @@ public:
         //- Return reference temperature
         virtual tmp<volScalarField> T0() const;
 
-        //- Correct the rheological model
+        //- Correct the thermal model
         virtual void correct();
 };
 
