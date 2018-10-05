@@ -63,6 +63,14 @@ Foam::immersedBoundaryRefinement::immersedBoundaryRefinement
     unrefinementDistance_
     (
         readScalar(coeffDict().lookup("unrefinementDistance"))
+    ),
+    internalRefinementDistance_
+    (
+        readScalar(coeffDict().lookup("internalRefinementDistance"))
+    ),
+    internalUnrefinementDistance_
+    (
+        readScalar(coeffDict().lookup("internalUnrefinementDistance"))
     )
 {}
 
@@ -127,8 +135,7 @@ Foam::immersedBoundaryRefinement::refinementCellCandidates() const
         if
         (
             cellDistance[cellI] > -refinementDistance_
-         && cellDistance[cellI] < 0
-            // mag(cellDistance[cellI]) < refinementDistance_
+         && cellDistance[cellI] < internalRefinementDistance_
         )
         {
             // Found a refinement cell
@@ -197,7 +204,7 @@ Foam::immersedBoundaryRefinement::unrefinementPointCandidates() const
         if
         (
             pointDistance[pointI] < -unrefinementDistance_
-         || pointDistance[pointI] > SMALL
+         || pointDistance[pointI] > internalUnrefinementDistance_
         )
         {
             unrefinementCandidates.append(pointI);

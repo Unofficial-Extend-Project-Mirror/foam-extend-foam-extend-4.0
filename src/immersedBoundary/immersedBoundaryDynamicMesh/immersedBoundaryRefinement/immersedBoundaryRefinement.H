@@ -60,6 +60,12 @@ class immersedBoundaryRefinement
         //- Unrefinement distance to immersed boundary
         scalar unrefinementDistance_;
 
+        //- Refinement distance to immersed boundary inside of the body
+        scalar internalRefinementDistance_;
+
+        //- Unefinement distance to immersed boundary inside of the body
+        scalar internalUnrefinementDistance_;
+
 
     // Private Member Functions
 
