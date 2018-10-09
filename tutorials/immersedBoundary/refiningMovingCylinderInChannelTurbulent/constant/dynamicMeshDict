@@ -55,6 +55,9 @@ immersedBoundaryDynamicRefineSolidBodyMotionFvMeshCoeffs
         type        immersedBoundaryRefinement;
         refinementDistance   0.08;
         unrefinementDistance 0.08;
+
+        internalRefinementDistance   0.03;
+        internalUnrefinementDistance 0.04;
     }
 
     // Polyhedral refinement engine controls
