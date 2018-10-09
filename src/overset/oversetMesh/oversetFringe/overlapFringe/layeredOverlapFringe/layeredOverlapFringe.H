@@ -78,10 +78,6 @@ class layeredOverlapFringe
         //- Final donor/acceptor pairs for this region (fringe)
         mutable donorAcceptorList* finalDonorAcceptorsPtr_;
 
-        //- Switch whether to update acceptors/donors for possible topo changes
-        //in mesh
-        const Switch updateFringe_;
-
         //- Number of layers
         const label nLayers_;
 

@@ -336,10 +336,6 @@ Foam::layeredOverlapFringe::layeredOverlapFringe
     acceptorsPtr_(NULL),
     finalDonorAcceptorsPtr_(NULL),
 
-    updateFringe_
-    (
-        dict.lookupOrDefault<Switch>("updateAcceptors", false)
-    ),
     nLayers_(readLabel(dict.lookup("nLayers"))),
     layerIter_(0),
 
@@ -462,16 +458,15 @@ Foam::donorAcceptorList& Foam::layeredOverlapFringe::finalDonorAcceptors() const
 
 void Foam::layeredOverlapFringe::update() const
 {
-    if (updateFringe_)
-    {
-        Info<< "layeredOverlapFringe::update() const" << endl;
+    Info<< "layeredOverlapFringe::update() const" << endl;
 
-        // Clear everything, including acceptors and fringe holes
-        clearAddressing();
-    }
+    // Clear everything, including acceptors and fringe holes
+    clearAddressing();
+
+    // Reset counter to zero
+    layerIter_ = 0;
 
     // Set flag to false and clear final donor/acceptors only
-    deleteDemandDrivenData(finalDonorAcceptorsPtr_);
     updateSuitableOverlapFlag(false);
 }
 
