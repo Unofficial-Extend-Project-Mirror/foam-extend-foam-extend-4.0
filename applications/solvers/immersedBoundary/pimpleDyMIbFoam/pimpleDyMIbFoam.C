@@ -72,34 +72,14 @@ int main(int argc, char *argv[])
     while (runTime.run())
     {
 #       include "readControls.H"
-#       include "CourantNo.H"
+#       include "immersedBoundaryCourantNo.H"
 #       include "setDeltaT.H"
-
-        // Make the fluxes absolute
-        fvc::makeAbsolute(phi, U);
 
         runTime++;
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        bool meshChanged = mesh.update();
-        reduce(meshChanged, orOp<bool>());
-
-#       include "updateIbPatchFields.H"
-#       include "updateIbMasks.H"
-#       include "volContinuity.H"
-
-        if (checkMeshCourantNo)
-        {
-#           include "meshCourantNo.H"
-        }
-
-        // Fluxes will be corrected to absolute velocity
-        // HJ, 6/Feb/2009
-#       include "correctPhi.H"
-
-        // Make the fluxes relative to the mesh motion
-        fvc::makeRelative(phi, U);
+#       include "correctMeshMotion.H"
 
         // --- PIMPLE loop
         while (pimple.loop())
