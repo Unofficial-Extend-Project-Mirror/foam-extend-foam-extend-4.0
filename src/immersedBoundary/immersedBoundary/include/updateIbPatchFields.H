@@ -63,7 +63,7 @@
                 if
                 (
                     f.boundaryField()[ibPatches[ibpI]].size()
-                 != patches[ibPatches[ibpI]].size()
+                 != mesh.boundary()[ibPatches[ibpI]].size()
                 )
                 {
                     if (immersedBoundaryFvPatch::debug)
@@ -103,12 +103,19 @@
 
             forAll (ibPatches, ibpI)
             {
-                if (immersedBoundaryFvPatch::debug)
+                if
+                (
+                    f.boundaryField()[ibPatches[ibpI]].size()
+                 != mesh.boundary()[ibPatches[ibpI]].size()
+                )
                 {
-                    Info<< ".";
-                }
+                    if (immersedBoundaryFvPatch::debug)
+                    {
+                        Info<< ".";
+                    }
 
-                f.boundaryField()[ibPatches[ibpI]].updateOnMotion();
+                    f.boundaryField()[ibPatches[ibpI]].updateOnMotion();
+                }
             }
 
             if (immersedBoundaryFvPatch::debug)
@@ -142,7 +149,7 @@
                 if
                 (
                     f.boundaryField()[ibPatches[ibpI]].size()
-                 != patches[ibPatches[ibpI]].size()
+                 != mesh.boundary()[ibPatches[ibpI]].size()
                 )
                 {
                     if (immersedBoundaryFvPatch::debug)
