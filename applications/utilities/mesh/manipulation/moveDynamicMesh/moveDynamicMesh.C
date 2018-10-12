@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 
         mesh.update();
 
-#       include "checkVolContinuity.H"
+#       include "volContinuity.H"
 #       include "meshCourantNo.H"
 
         if (runTime.timeIndex() % checkFrequency == 0)
