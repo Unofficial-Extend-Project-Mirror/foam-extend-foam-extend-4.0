@@ -117,81 +117,86 @@ Foam::dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh
     // protectedInitialRefinement)
     refinementSelectionPtr_()
 {
-    // Only one topo changer engine
-    topoChanger_.setSize(1);
-
-    // Get number of valid geometric dimensions
-    const label nGeometricDirs = this->nGeometricD();
-
-    switch(nGeometricDirs)
+    // Only create topo modifiers if they haven't been read in
+    // HJ, 16/Oct/2018
+    if (topoChanger_.empty())
     {
-        case 3:
-            // Add the polyhedralRefinement engine for 3D isotropic refinement
-            Info<< "3D case detected. "
-                << "Adding polyhedralRefinement topology modifier" << endl;
-            topoChanger_.set
-            (
-                0,
-                new polyhedralRefinement
+        // Only one topo changer engine
+        topoChanger_.setSize(1);
+
+        // Get number of valid geometric dimensions
+        const label nGeometricDirs = this->nGeometricD();
+
+        switch(nGeometricDirs)
+        {
+            case 3:
+                // Add the polyhedralRefinement engine for 3D isotropic refinement
+                Info<< "3D case detected. "
+                    << "Adding polyhedralRefinement topology modifier" << endl;
+                topoChanger_.set
                 (
-                    "polyhedralRefinement",
-                    refinementDict_,
                     0,
-                    topoChanger_
-                )
-            );
-            break;
+                    new polyhedralRefinement
+                    (
+                        "polyhedralRefinement",
+                        refinementDict_,
+                        0,
+                        topoChanger_
+                    )
+                );
+                break;
 
-        case 2:
-            // Add the prismatic2DRefinement engine for 2D isotropic refinement
-            Info<< "2D case detected. "
-                << "Adding prismatic2DRefinement topology modifier" << endl;
-            topoChanger_.set
-            (
-                0,
-                new prismatic2DRefinement
+            case 2:
+                // Add the prismatic2DRefinement engine for 2D isotropic refinement
+                Info<< "2D case detected. "
+                    << "Adding prismatic2DRefinement topology modifier" << endl;
+                topoChanger_.set
                 (
-                    "prismatic2DRefinement",
-                    refinementDict_,
                     0,
-                    topoChanger_
-                )
-            );
-            break;
+                    new prismatic2DRefinement
+                    (
+                        "prismatic2DRefinement",
+                        refinementDict_,
+                        0,
+                        topoChanger_
+                    )
+                );
+                break;
 
-        case 1:
-            FatalErrorIn
-            (
-                "dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh"
-                "\n("
-                "\n    const IOobject& io,"
-                "\n    const word subDictName"
-                "\n)"
-            )   << "1D case detected. No valid refinement strategy is"
-                <<  " available for 1D cases."
-                << abort(FatalError);
-            break;
+            case 1:
+                FatalErrorIn
+                (
+                    "dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh"
+                    "\n("
+                    "\n    const IOobject& io,"
+                    "\n    const word subDictName"
+                    "\n)"
+                )   << "1D case detected. No valid refinement strategy is"
+                    <<  " available for 1D cases."
+                    << abort(FatalError);
+                break;
 
-        default:
-            FatalErrorIn
-            (
-                "dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh"
-                "\n("
-                "\n    const IOobject& io,"
-                "\n    const word subDictName"
-                "\n)"
-            )   << "Invalid number of geometric meshes detected: "
-                << nGeometricDirs
-                << nl << "It appears that this mesh is neither 1D, 2D or 3D."
-                << nl << " the mesh."
-                << abort(FatalError);
+            default:
+                FatalErrorIn
+                (
+                    "dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh"
+                    "\n("
+                    "\n    const IOobject& io,"
+                    "\n    const word subDictName"
+                    "\n)"
+                )   << "Invalid number of geometric meshes detected: "
+                    << nGeometricDirs
+                    << nl << "It appears that this mesh is neither 1D, 2D or 3D."
+                    << nl << " the mesh."
+                    << abort(FatalError);
 
+        }
+
+        // Write mesh and modifiers
+        topoChanger_.writeOpt() = IOobject::AUTO_WRITE;
+        topoChanger_.write();
+        write();
     }
-
-    // Write mesh and modifiers
-    topoChanger_.writeOpt() = IOobject::AUTO_WRITE;
-    topoChanger_.write();
-    write();
 
     // Initialize refinement selection algorithm after modifiers
     refinementSelectionPtr_ = refinementSelection::New(*this, refinementDict_);
