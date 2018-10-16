@@ -202,9 +202,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~polyhedralRefinement();
+    //- Destructor
+    virtual ~polyhedralRefinement();
 
 
     // Member Functions

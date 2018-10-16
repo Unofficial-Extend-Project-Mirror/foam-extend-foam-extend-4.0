@@ -212,9 +212,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~prismatic2DRefinement();
+    //- Destructor
+    virtual ~prismatic2DRefinement();
 
 
     // Member Functions
