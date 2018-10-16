@@ -65,6 +65,7 @@ Foam::autoPtr<Foam::refinementSelection> Foam::refinementSelection::New
 
     // Get the name of the desired refinement selection algorithm
     const word refinementSelectionTypeName(coeffDict.lookup("type"));
+    Info<< "Creating refinementSelection " << refinementSelectionTypeName << endl;
 
     dictionaryConstructorTable::iterator cstrIter =
         dictionaryConstructorTablePtr_->find(refinementSelectionTypeName);
