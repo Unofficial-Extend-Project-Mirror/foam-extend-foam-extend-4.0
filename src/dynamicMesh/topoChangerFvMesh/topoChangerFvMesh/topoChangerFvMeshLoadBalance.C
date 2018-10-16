@@ -26,6 +26,7 @@ License
 #include "topoChangerFvMesh.H"
 #include "domainDecomposition.H"
 #include "fvFieldDecomposer.H"
+#include "labelIOField.H"
 #include "processorMeshesReconstructor.H"
 #include "fvFieldReconstructor.H"
 #include "passiveProcessorPolyPatch.H"
@@ -161,10 +162,15 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
     // Particles
     HashTable<const cloud*> clouds = thisDb().lookupClass<cloud>();
 
-    forAllConstIter(HashTable<const cloud*>, clouds, iter)
-    {
-        cloud& c = const_cast<cloud&>(*iter());
-    }
+    // Distribute cell and point level for AMR + DLB runs. VV, 18/May/2018
+
+    // Get (non-const) reference to cellLevel
+    labelIOField& cellLevel = const_cast<labelIOField&>
+        (this->lookupObject<labelIOField>("cellLevel"));
+
+    // Get (non-const) reference to pointLevel
+    labelIOField& pointLevel = const_cast<labelIOField&>
+        (this->lookupObject<labelIOField>("pointLevel"));
 
     //HJ, HERE: remove the fields that should not be load balanced
 
@@ -211,6 +217,12 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         receivedSurfaceVectorFields[fieldI].setSize(Pstream::nProcs());
     }
 
+    // Cell and point level
+    // Note: ordinary lists instead of IO lists
+    PtrList<labelList> receivedCellLevel(Pstream::nProcs());
+    PtrList<labelList> receivedPointLevel(Pstream::nProcs());
+
+    // Clouds
     PtrList<cloudDistribute> cloudDistributes(clouds.size());
     {
         label cloudI = 0;
@@ -229,7 +241,6 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
             );
         }
     }
-
 
     for (label procI = 0; procI < meshDecomp.nProcs(); procI++)
     {
@@ -276,6 +287,24 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                 sendFields(volVectorFields, fieldDecomposer, toProc);
                 sendFields(surfaceScalarFields, fieldDecomposer, toProc);
                 sendFields(surfaceVectorFields, fieldDecomposer, toProc);
+
+                // Send cell level with procCellAddressing
+                toProc <<
+                    labelList
+                    (
+                        cellLevel,
+                        meshDecomp.procCellAddressing()[procI]
+                    )
+                    << nl;
+
+                // Send point level with procPointAddressing
+                toProc <<
+                    labelList
+                    (
+                        pointLevel,
+                        meshDecomp.procPointAddressing()[procI]
+                    )
+                    << nl;
 
                 // Send clouds
                 forAll(cloudDistributes, cloudI)
@@ -325,6 +354,32 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                     fieldDecomposer,
                     receivedSurfaceVectorFields
                 );
+
+                // Insert cell level
+                receivedCellLevel.set
+                (
+                    Pstream::myProcNo(),
+                    new labelList
+                    (
+                        cellLevel,
+                        meshDecomp.procCellAddressing()
+                           [Pstream::myProcNo()]
+                    )
+                );
+
+                // Insert point level
+                receivedPointLevel.set
+                (
+                    Pstream::myProcNo(),
+                    new labelList
+                    (
+                        pointLevel,
+                        meshDecomp.procPointAddressing()
+                            [Pstream::myProcNo()]
+                    )
+                );
+
+                //HJ Insert clouds missing.  HJ, 12/Oct/2018
             }
         }
     }
@@ -401,6 +456,21 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                     fromProc
                 );
 
+                // Receive cell level
+                receivedCellLevel.set
+                (
+                    procI,
+                    new labelList(fromProc)
+                );
+
+                // Receive point level
+                receivedPointLevel.set
+                (
+                    procI,
+                    new labelList(fromProc)
+                );
+
+                // Receive clouds
                 forAll(cloudDistributes, cloudI)
                 {
                     cloudDistributes[cloudI].receive(fromProc, procI);
@@ -687,6 +757,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         oldPatchNMeshPoints         // oldPatchNMeshPoints
     );
 
+
     // Reset fvMesh and patches
     resetFvPrimitives
     (
@@ -744,6 +815,47 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         meshMap
     );
 
+    // Rebuild cell level field from components
+    if (cellLevel.size() != this->nCells())
+    {
+        Pout<< "Setting cell level size from: "
+            << cellLevel.size() << " to " << this->nCells() << endl;
+        cellLevel.setSize(this->nCells());
+    }
+
+    forAll (receivedCellLevel, procI)
+    {
+        if (receivedCellLevel.set(procI))
+        {
+            cellLevel.rmap
+            (
+                receivedCellLevel[procI],
+                meshRecon.cellProcAddressing()[procI]
+            );
+        }
+    }
+
+    // Rebuild point level field from components
+    if (pointLevel.size() != this->nPoints())
+    {
+        Pout<< "Setting point level size from: "
+            << pointLevel.size() << " to " << this->nPoints() << endl;
+        pointLevel.setSize(this->nPoints());
+    }
+
+    forAll (receivedPointLevel, procI)
+    {
+        if (receivedPointLevel.set(procI))
+        {
+            pointLevel.rmap
+            (
+                receivedPointLevel[procI],
+                meshRecon.pointProcAddressing()[procI]
+            );
+        }
+    }
+
+    // Rebuild clouds
     forAll(cloudDistributes, cloudI)
     {
         cloudDistributes[cloudI].rebuild

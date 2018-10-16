@@ -32,7 +32,6 @@ Description
     The common interface includes (pure virtuals) following member functions:
     - setCellsToRefine
     - setSplitPointsToUnrefine
-    - calcLevel0EdgeLength
 
     With a lot of ordinary protected member functions which are used by both
     derived classes.
@@ -58,7 +57,7 @@ Notes
 #define refinement_H
 
 #include "polyMeshModifier.H"
-#include "labelIOList.H"
+#include "labelIOField.H"
 #include "removeFaces.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -67,7 +66,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                    Class refinement Declaration
+                            Class refinement Declaration
 \*---------------------------------------------------------------------------*/
 
 class refinement
@@ -100,10 +99,10 @@ protected:
             mutable labelList splitPointsToUnrefine_;
 
             //- Cell refinement level
-            mutable labelIOList cellLevel_;
+            mutable labelIOField cellLevel_;
 
             //- Point refinement level
-            mutable labelIOList pointLevel_;
+            mutable labelIOField pointLevel_;
 
             //- Helper list for original (old) cells that will be refined or
             //  unrefined. The list is updated in setPolyhedralRefinement and
@@ -311,21 +310,22 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~refinement();
+    //- Destructor
+    virtual ~refinement();
 
 
     // Member Functions
 
         // Access
 
-            const labelIOList& cellLevel() const
+            //- Return refinement cell level
+            const labelIOField& cellLevel() const
             {
                 return cellLevel_;
             }
 
-            const labelIOList& pointLevel() const
+            //- Return refinement point level
+            const labelIOField& pointLevel() const
             {
                 return pointLevel_;
             }

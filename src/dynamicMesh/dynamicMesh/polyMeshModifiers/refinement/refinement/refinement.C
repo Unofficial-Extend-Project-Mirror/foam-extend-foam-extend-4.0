@@ -1228,7 +1228,7 @@ Foam::refinement::refinement
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        labelList(mesh_.nCells(), 0)
+        labelField(mesh_.nCells(), 0)
     ),
     pointLevel_
     (
@@ -1241,7 +1241,7 @@ Foam::refinement::refinement
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        labelList(mesh_.nPoints(), 0)
+        labelField(mesh_.nPoints(), 0)
     ),
     refinementLevelIndicator_(0), // Must be empty before setting refinement
     faceRemover_(mesh_, GREAT),   // Merge boundary faces wherever possible
@@ -1260,6 +1260,9 @@ Foam::refinement::refinement
         readScalar(dict.lookup("nUnrefinementBufferLayers"))
     )
 {
+    Info<< "refinement::refinement: " << "Created pointLevel and cellLevel"
+        << endl;
+
     // Check consistency between cellLevel and number of cells and pointLevel
     // and number of points in the mesh
     if

@@ -27,8 +27,9 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "protectedInitialRefinement.H"
-#include "addToRunTimeSelectionTable.H"
+#include "labelIOField.H"
 #include "zeroGradientFvPatchFields.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -51,7 +52,7 @@ Foam::tmp<Foam::volScalarField>
 Foam::protectedInitialRefinement::cellLevelAsField() const
 {
     // Get cell level
-    const labelIOList& cLevel = mesh().lookupObject<labelIOList>("cellLevel");
+    const labelIOField& cLevel = mesh().lookupObject<labelIOField>("cellLevel");
 
     // Create cell level field as volScalarField
     tmp<volScalarField> tCellLevelField
@@ -156,8 +157,8 @@ Foam::protectedInitialRefinement::unrefinementPointCandidates() const
     label nProtectedPoints = 0;
 
     // Get current cell level
-    const labelIOList& curCellLevel =
-        mesh().lookupObject<labelIOList>("cellLevel");
+    const labelIOField& curCellLevel =
+        mesh().lookupObject<labelIOField>("cellLevel");
 
     forAll (initialCellLevelIn, cellI)
     {
