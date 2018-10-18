@@ -43,65 +43,7 @@ addToRunTimeSelectionTable(searchableSurface, triSurfaceMesh, dict);
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-//// Special version of Time::findInstance that does not check headerOk
-//// to search for instances of raw files
-//Foam::word Foam::triSurfaceMesh::findRawInstance
-//(
-//    const Time& runTime,
-//    const fileName& dir,
-//    const word& name
-//)
-//{
-//    // Check current time first
-//    if (isFile(runTime.path()/runTime.timeName()/dir/name))
-//    {
-//        return runTime.timeName();
-//    }
-//    instantList ts = runTime.times();
-//    label instanceI;
-//
-//    for (instanceI = ts.size()-1; instanceI >= 0; --instanceI)
-//    {
-//        if (ts[instanceI].value() <= runTime.timeOutputValue())
-//        {
-//            break;
-//        }
-//    }
-//
-//    // continue searching from here
-//    for (; instanceI >= 0; --instanceI)
-//    {
-//        if (isFile(runTime.path()/ts[instanceI].name()/dir/name))
-//        {
-//            return ts[instanceI].name();
-//        }
-//    }
-//
-//
-//    // not in any of the time directories, try constant
-//
-//    // Note. This needs to be a hard-coded constant, rather than the
-//    // constant function of the time, because the latter points to
-//    // the case constant directory in parallel cases
-//
-//    if (isFile(runTime.path()/runTime.constant()/dir/name))
-//    {
-//        return runTime.constant();
-//    }
-//
-//    FatalErrorIn
-//    (
-//        "searchableSurfaces::findRawInstance"
-//        "(const Time&, const fileName&, const word&)"
-//    )   << "Cannot find file \"" << name << "\" in directory "
-//        << runTime.constant()/dir
-//        << exit(FatalError);
-//
-//    return runTime.constant();
-//}
-
-
-//- Check file existence
+// Check file existence
 const Foam::fileName& Foam::triSurfaceMesh::checkFile
 (
     const fileName& fName,
@@ -116,6 +58,7 @@ const Foam::fileName& Foam::triSurfaceMesh::checkFile
         )   << "Cannot find triSurfaceMesh starting from "
             << objectName << exit(FatalError);
     }
+
     return fName;
 }
 
@@ -340,19 +283,6 @@ Foam::triSurfaceMesh::triSurfaceMesh(const IOobject& io)
 :
     // Find instance for triSurfaceMesh
     searchableSurface(io),
-    //(
-    //    IOobject
-    //    (
-    //        io.name(),
-    //        io.time().findInstance(io.local(), word::null),
-    //        io.local(),
-    //        io.db(),
-    //        io.readOpt(),
-    //        io.writeOpt(),
-    //        io.registerObject()
-    //    )
-    //),
-    // Reused found instance in objectRegistry
     objectRegistry
     (
         IOobject
@@ -387,19 +317,6 @@ Foam::triSurfaceMesh::triSurfaceMesh
 )
 :
     searchableSurface(io),
-    //(
-    //    IOobject
-    //    (
-    //        io.name(),
-    //        io.time().findInstance(io.local(), word::null),
-    //        io.local(),
-    //        io.db(),
-    //        io.readOpt(),
-    //        io.writeOpt(),
-    //        io.registerObject()
-    //    )
-    //),
-    // Reused found instance in objectRegistry
     objectRegistry
     (
         IOobject
@@ -427,7 +344,7 @@ Foam::triSurfaceMesh::triSurfaceMesh
 {
     scalar scaleFactor = 0;
 
-    // allow rescaling of the surface points
+    // Allow rescaling of the surface points
     // eg, CAD geometries are often done in millimeters
     if (dict.readIfPresent("scale", scaleFactor) && scaleFactor > 0)
     {
