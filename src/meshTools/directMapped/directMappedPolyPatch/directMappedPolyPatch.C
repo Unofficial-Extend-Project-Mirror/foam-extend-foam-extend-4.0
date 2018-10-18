@@ -123,17 +123,6 @@ Foam::directMappedPolyPatch::directMappedPolyPatch
 Foam::directMappedPolyPatch::directMappedPolyPatch
 (
     const directMappedPolyPatch& pp,
-    const polyBoundaryMesh& bm
-)
-:
-    polyPatch(pp, bm),
-    directMappedPatchBase(*this, pp)
-{}
-
-
-Foam::directMappedPolyPatch::directMappedPolyPatch
-(
-    const directMappedPolyPatch& pp,
     const polyBoundaryMesh& bm,
     const label index,
     const label newSize,
@@ -141,6 +130,27 @@ Foam::directMappedPolyPatch::directMappedPolyPatch
 )
 :
     polyPatch(pp, bm, index, newSize, newStart),
+    directMappedPatchBase(*this, pp)
+{}
+
+
+Foam::directMappedPolyPatch::directMappedPolyPatch
+(
+    const directMappedPolyPatch& pp
+)
+:
+    polyPatch(pp),
+    directMappedPatchBase(*this, pp)
+{}
+
+
+Foam::directMappedPolyPatch::directMappedPolyPatch
+(
+    const directMappedPolyPatch& pp,
+    const polyBoundaryMesh& bm
+)
+:
+    polyPatch(pp, bm),
     directMappedPatchBase(*this, pp)
 {}
 

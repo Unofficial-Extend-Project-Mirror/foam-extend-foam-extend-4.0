@@ -137,10 +137,24 @@ Foam::wedgePolyPatch::wedgePolyPatch
 Foam::wedgePolyPatch::wedgePolyPatch
 (
     const wedgePolyPatch& pp,
-    const polyBoundaryMesh& bm
+    const polyBoundaryMesh& bm,
+    const label index,
+    const label newSize,
+    const label newStart
 )
 :
-    polyPatch(pp, bm)
+    polyPatch(pp, bm, index, newSize, newStart)
+{
+    initTransforms();
+}
+
+
+Foam::wedgePolyPatch::wedgePolyPatch
+(
+    const wedgePolyPatch& pp
+)
+:
+    polyPatch(pp)
 {
     initTransforms();
 }
@@ -149,13 +163,10 @@ Foam::wedgePolyPatch::wedgePolyPatch
 Foam::wedgePolyPatch::wedgePolyPatch
 (
     const wedgePolyPatch& pp,
-    const polyBoundaryMesh& bm,
-    const label index,
-    const label newSize,
-    const label newStart
+    const polyBoundaryMesh& bm
 )
 :
-    polyPatch(pp, bm, index, newSize, newStart)
+    polyPatch(pp, bm)
 {
     initTransforms();
 }

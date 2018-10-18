@@ -229,13 +229,6 @@ public:
             const polyBoundaryMesh&
         );
 
-        //- Construct as copy, resetting the boundary mesh
-        ggiPolyPatch
-        (
-            const ggiPolyPatch&,
-            const polyBoundaryMesh&
-        );
-
         //- Construct as given the original patch and resetting the
         //  face list and boundary mesh information
         ggiPolyPatch
@@ -245,6 +238,16 @@ public:
             const label index,
             const label newSize,
             const label newStart
+        );
+
+        //- Construct as copy
+        ggiPolyPatch(const ggiPolyPatch&);
+
+        //- Construct as copy, resetting the boundary mesh
+        ggiPolyPatch
+        (
+            const ggiPolyPatch&,
+            const polyBoundaryMesh&
         );
 
         //- Construct and return a clone, resetting the boundary mesh

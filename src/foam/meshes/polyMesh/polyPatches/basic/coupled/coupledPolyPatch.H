@@ -131,6 +131,9 @@ public:
             const polyBoundaryMesh& bm
         );
 
+        //- Construct as copy
+        coupledPolyPatch(const coupledPolyPatch&);
+
         //- Construct as copy, resetting the boundary mesh
         coupledPolyPatch(const coupledPolyPatch&, const polyBoundaryMesh&);
 

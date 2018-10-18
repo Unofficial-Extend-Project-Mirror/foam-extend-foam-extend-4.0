@@ -210,14 +210,17 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
 {}
 
 
-//- Construct as copy, resetting the boundary mesh
+// Construct as copy, resetting the face list and boundary mesh data
 Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
 (
     const overlapGgiPolyPatch& pp,
-    const polyBoundaryMesh& bm
+    const polyBoundaryMesh& bm,
+    const label index,
+    const label newSize,
+    const label newStart
 )
 :
-    coupledPolyPatch(pp, bm),
+    coupledPolyPatch(pp, bm, index, newSize, newStart),
     shadowName_(pp.shadowName_),
     zoneName_(pp.zoneName_),
     shadowIndex_(-1),
@@ -232,17 +235,35 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
 {}
 
 
-//- Construct as copy, resetting the face list and boundary mesh data
+// Construct as copy, resetting the boundary mesh
+Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
+(
+    const overlapGgiPolyPatch& pp
+)
+:
+    coupledPolyPatch(pp),
+    shadowName_(pp.shadowName_),
+    zoneName_(pp.zoneName_),
+    shadowIndex_(-1),
+    zoneIndex_(-1),
+    rotationAxis_(pp.rotationAxis_),
+    nCopies_(pp.nCopies_),
+    expandedMasterPtr_(NULL),
+    expandedSlavePtr_(NULL),
+    patchToPatchPtr_(NULL),
+    localParallelPtr_(NULL),
+    reconFaceCellCentresPtr_(NULL)
+{}
+
+
+//- Construct as copy, resetting the boundary mesh
 Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
 (
     const overlapGgiPolyPatch& pp,
-    const polyBoundaryMesh& bm,
-    const label index,
-    const label newSize,
-    const label newStart
+    const polyBoundaryMesh& bm
 )
 :
-    coupledPolyPatch(pp, bm, index, newSize, newStart),
+    coupledPolyPatch(pp, bm),
     shadowName_(pp.shadowName_),
     zoneName_(pp.zoneName_),
     shadowIndex_(-1),

@@ -605,13 +605,17 @@ Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
 }
 
 
+// Construct as copy, resetting the face list and boundary mesh data
 Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
 (
     const mixingPlanePolyPatch& pp,
-    const polyBoundaryMesh& bm
+    const polyBoundaryMesh& bm,
+    const label index,
+    const label newSize,
+    const label newStart
 )
 :
-    coupledPolyPatch(pp, bm),
+    coupledPolyPatch(pp, bm, index, newSize, newStart),
     shadowName_(pp.shadowName_),
     zoneName_(pp.zoneName_),
     csPtr_(pp.csPtr_->clone()),
@@ -628,17 +632,35 @@ Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
 {}
 
 
-//- Construct as copy, resetting the face list and boundary mesh data
+Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
+(
+    const mixingPlanePolyPatch& pp
+)
+:
+    coupledPolyPatch(pp),
+    shadowName_(pp.shadowName_),
+    zoneName_(pp.zoneName_),
+    csPtr_(pp.csPtr_->clone()),
+    discretisationType_(pp.discretisationType_),
+    sweepAxisType_(pp.sweepAxisType_),
+    stackAxisType_(pp.stackAxisType_),
+    userProfileFile_(pp.userProfileFile_),
+    shadowIndex_(-1),
+    patchToPatchPtr_(NULL),
+    zoneAddressingPtr_(NULL),
+    reconFaceCellCentresPtr_(NULL),
+    localParallelPtr_(NULL),
+    receiveAddrPtr_(NULL)
+{}
+
+
 Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
 (
     const mixingPlanePolyPatch& pp,
-    const polyBoundaryMesh& bm,
-    const label index,
-    const label newSize,
-    const label newStart
+    const polyBoundaryMesh& bm
 )
 :
-    coupledPolyPatch(pp, bm, index, newSize, newStart),
+    coupledPolyPatch(pp, bm),
     shadowName_(pp.shadowName_),
     zoneName_(pp.zoneName_),
     csPtr_(pp.csPtr_->clone()),

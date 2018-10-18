@@ -1255,8 +1255,8 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
             name  + ".ftr",
             bm.mesh().time().constant(), // instance
             "triSurface",                // local
-            bm.mesh(),                   // registry
-            IOobject::MUST_READ,
+            bm.mesh().parent(),          // registry
+            IOobject::READ_IF_PRESENT,
             IOobject::NO_WRITE
         )
     ),
@@ -1300,7 +1300,7 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
             name  + ".ftr",
             bm.mesh().time().constant(), // instance
             "triSurface",                // local
-            bm.mesh(),                   // registry
+            bm.mesh().parent(),          // read from parent registry
             IOobject::MUST_READ,
             IOobject::NO_WRITE
         )
@@ -1327,6 +1327,7 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     correctedIbPatchFaceAreasPtr_(NULL),
     oldIbPointsPtr_(NULL)
 {
+    Pout<< "READ CONSTRUCTOR" << endl;
     if (size() > 0)
     {
         FatalIOErrorIn
@@ -1350,10 +1351,13 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
 Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
 (
     const immersedBoundaryPolyPatch& pp,
-    const polyBoundaryMesh& bm
+    const polyBoundaryMesh& bm,
+    const label index,
+    const label newSize,
+    const label newStart
 )
 :
-    polyPatch(pp, bm),
+    polyPatch(pp, bm, index, newSize, newStart),
     ibMesh_
     (
         IOobject
@@ -1361,10 +1365,54 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
             pp.name() + ".ftr",
             bm.mesh().time().constant(), // instance
             "triSurface",                // local
-            bm.mesh(),                   // registry
-            IOobject::MUST_READ,
+            bm.mesh().parent(),          // parent registry
+            IOobject::NO_READ,
             IOobject::NO_WRITE
-        )
+        ),
+        pp.ibMesh()   // Take ibMesh from pp
+    ),
+    internalFlow_(pp.internalFlow_),
+    isWall_(pp.isWall_),
+    movingIb_(false),
+    ibUpdateTimeIndex_(-1),
+    triSurfSearchPtr_(NULL),
+    ibPatchPtr_(NULL),
+    ibCellsPtr_(NULL),
+    ibCellCentresPtr_(NULL),
+    ibCellVolumesPtr_(NULL),
+    ibFacesPtr_(NULL),
+    ibFaceCentresPtr_(NULL),
+    ibFaceAreasPtr_(NULL),
+    nearestTriPtr_(NULL),
+    deadCellsPtr_(NULL),
+    deadFacesPtr_(NULL),
+    correctedCellCentresPtr_(NULL),
+    correctedFaceCentresPtr_(NULL),
+    correctedCellVolumesPtr_(NULL),
+    correctedFaceAreasPtr_(NULL),
+    correctedIbPatchFaceAreasPtr_(NULL),
+    oldIbPointsPtr_(NULL)
+{}
+
+
+Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
+(
+    const immersedBoundaryPolyPatch& pp
+)
+:
+    polyPatch(pp),
+    ibMesh_
+    (
+        IOobject
+        (
+            pp.name() + ".ftr",
+            pp.boundaryMesh().mesh().time().constant(), // instance
+            "triSurface",                               // local
+            pp.boundaryMesh().mesh().parent(),          // parent registry
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        pp.ibMesh()   // Take ibMesh from pp
     ),
     internalFlow_(pp.internalFlow_),
     isWall_(pp.isWall_),
@@ -1393,13 +1441,10 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
 Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
 (
     const immersedBoundaryPolyPatch& pp,
-    const polyBoundaryMesh& bm,
-    const label index,
-    const label newSize,
-    const label newStart
+    const polyBoundaryMesh& bm
 )
 :
-    polyPatch(pp, bm, index, newSize, newStart),
+    polyPatch(pp, bm),
     ibMesh_
     (
         IOobject
@@ -1407,10 +1452,11 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
             pp.name() + ".ftr",
             bm.mesh().time().constant(), // instance
             "triSurface",                // local
-            bm.mesh(),                   // registry
-            IOobject::MUST_READ,
+            bm.mesh().parent(),          // parent registry
+            IOobject::NO_READ,
             IOobject::NO_WRITE
-        )
+        ),
+        pp.ibMesh()   // Take ibMesh from pp
     ),
     internalFlow_(pp.internalFlow_),
     isWall_(pp.isWall_),

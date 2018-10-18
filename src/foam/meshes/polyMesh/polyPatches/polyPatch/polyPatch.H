@@ -288,9 +288,6 @@ public:
             const polyBoundaryMesh& bm
         );
 
-        //- Construct as copy, resetting the boundary mesh
-        polyPatch(const polyPatch&, const polyBoundaryMesh&);
-
         //- Construct given the original patch and resetting the
         //  face list and boundary mesh information
         polyPatch
@@ -304,6 +301,9 @@ public:
 
         //- Construct as copy
         polyPatch(const polyPatch&);
+
+        //- Construct as copy, resetting the boundary mesh
+        polyPatch(const polyPatch&, const polyBoundaryMesh&);
 
         //- Construct and return a clone, resetting the boundary mesh
         virtual autoPtr<polyPatch> clone(const polyBoundaryMesh& bm) const

@@ -66,16 +66,6 @@ Foam::wallPolyPatch::wallPolyPatch
 Foam::wallPolyPatch::wallPolyPatch
 (
     const wallPolyPatch& pp,
-    const polyBoundaryMesh& bm
-)
-:
-    polyPatch(pp, bm)
-{}
-
-
-Foam::wallPolyPatch::wallPolyPatch
-(
-    const wallPolyPatch& pp,
     const polyBoundaryMesh& bm,
     const label index,
     const label newSize,
@@ -83,6 +73,25 @@ Foam::wallPolyPatch::wallPolyPatch
 )
 :
     polyPatch(pp, bm, index, newSize, newStart)
+{}
+
+
+Foam::wallPolyPatch::wallPolyPatch
+(
+    const wallPolyPatch& pp
+)
+:
+    polyPatch(pp)
+{}
+
+
+Foam::wallPolyPatch::wallPolyPatch
+(
+    const wallPolyPatch& pp,
+    const polyBoundaryMesh& bm
+)
+:
+    polyPatch(pp, bm)
 {}
 
 

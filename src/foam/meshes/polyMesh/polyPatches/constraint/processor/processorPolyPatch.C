@@ -90,10 +90,29 @@ Foam::processorPolyPatch::processorPolyPatch
 Foam::processorPolyPatch::processorPolyPatch
 (
     const processorPolyPatch& pp,
-    const polyBoundaryMesh& bm
+    const polyBoundaryMesh& bm,
+    const label index,
+    const label newSize,
+    const label newStart
 )
 :
-    coupledPolyPatch(pp, bm),
+    coupledPolyPatch(pp, bm, index, newSize, newStart),
+    myProcNo_(pp.myProcNo_),
+    neighbProcNo_(pp.neighbProcNo_),
+    neighbFaceCentres_(),
+    neighbFaceAreas_(),
+    neighbFaceCellCentres_(),
+    neighbPointsPtr_(NULL),
+    neighbEdgesPtr_(NULL)
+{}
+
+
+Foam::processorPolyPatch::processorPolyPatch
+(
+    const processorPolyPatch& pp
+)
+:
+    coupledPolyPatch(pp),
     myProcNo_(pp.myProcNo_),
     neighbProcNo_(pp.neighbProcNo_),
     neighbFaceCentres_(),
@@ -107,13 +126,10 @@ Foam::processorPolyPatch::processorPolyPatch
 Foam::processorPolyPatch::processorPolyPatch
 (
     const processorPolyPatch& pp,
-    const polyBoundaryMesh& bm,
-    const label index,
-    const label newSize,
-    const label newStart
+    const polyBoundaryMesh& bm
 )
 :
-    coupledPolyPatch(pp, bm, index, newSize, newStart),
+    coupledPolyPatch(pp, bm),
     myProcNo_(pp.myProcNo_),
     neighbProcNo_(pp.neighbProcNo_),
     neighbFaceCentres_(),

@@ -45,9 +45,6 @@ namespace Foam
 }
 
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
 void Foam::oversetPolyPatch::initAddressing()
@@ -135,16 +132,6 @@ Foam::oversetPolyPatch::oversetPolyPatch
 Foam::oversetPolyPatch::oversetPolyPatch
 (
     const oversetPolyPatch& pp,
-    const polyBoundaryMesh& bm
-)
-:
-    coupledPolyPatch(pp, bm)
-{}
-
-
-Foam::oversetPolyPatch::oversetPolyPatch
-(
-    const oversetPolyPatch& pp,
     const polyBoundaryMesh& bm,
     const label index,
     const label newSize,
@@ -152,6 +139,25 @@ Foam::oversetPolyPatch::oversetPolyPatch
 )
 :
     coupledPolyPatch(pp, bm, index, newSize, newStart)
+{}
+
+
+Foam::oversetPolyPatch::oversetPolyPatch
+(
+    const oversetPolyPatch& pp
+)
+:
+    coupledPolyPatch(pp)
+{}
+
+
+Foam::oversetPolyPatch::oversetPolyPatch
+(
+    const oversetPolyPatch& pp,
+    const polyBoundaryMesh& bm
+)
+:
+    coupledPolyPatch(pp, bm)
 {}
 
 

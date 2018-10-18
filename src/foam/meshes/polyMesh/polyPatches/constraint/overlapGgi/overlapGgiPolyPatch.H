@@ -217,13 +217,6 @@ public:
             const polyBoundaryMesh&
         );
 
-        //- Construct as copy, resetting the boundary mesh
-        overlapGgiPolyPatch
-        (
-            const overlapGgiPolyPatch&,
-            const polyBoundaryMesh&
-        );
-
         //- Construct as given the original patch and resetting the
         //  face list and boundary mesh information
         overlapGgiPolyPatch
@@ -233,6 +226,16 @@ public:
             const label index,
             const label newSize,
             const label newStart
+        );
+
+        //- Construct as copy
+        overlapGgiPolyPatch(const overlapGgiPolyPatch&);
+
+        //- Construct as copy, resetting the boundary mesh
+        overlapGgiPolyPatch
+        (
+            const overlapGgiPolyPatch&,
+            const polyBoundaryMesh&
         );
 
         //- Construct and return a clone, resetting the boundary mesh

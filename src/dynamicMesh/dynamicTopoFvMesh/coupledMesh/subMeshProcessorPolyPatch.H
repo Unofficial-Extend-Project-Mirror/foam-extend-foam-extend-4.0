@@ -84,9 +84,8 @@ public:
             const polyBoundaryMesh&
         );
 
-    // Destructor
-
-        virtual ~subMeshProcessorPolyPatch();
+    //- Destructor
+    virtual ~subMeshProcessorPolyPatch();
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

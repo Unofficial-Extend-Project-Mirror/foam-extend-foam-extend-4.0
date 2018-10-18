@@ -717,13 +717,17 @@ Foam::ggiPolyPatch::ggiPolyPatch
 }
 
 
+// Construct as copy, resetting the face list and boundary mesh data
 Foam::ggiPolyPatch::ggiPolyPatch
 (
     const ggiPolyPatch& pp,
-    const polyBoundaryMesh& bm
+    const polyBoundaryMesh& bm,
+    const label index,
+    const label newSize,
+    const label newStart
 )
 :
-    coupledPolyPatch(pp, bm),
+    coupledPolyPatch(pp, bm, index, newSize, newStart),
     shadowName_(pp.shadowName_),
     zoneName_(pp.zoneName_),
     bridgeOverlap_(pp.bridgeOverlap_),
@@ -741,17 +745,36 @@ Foam::ggiPolyPatch::ggiPolyPatch
 {}
 
 
-//- Construct as copy, resetting the face list and boundary mesh data
+Foam::ggiPolyPatch::ggiPolyPatch
+(
+    const ggiPolyPatch& pp
+)
+:
+    coupledPolyPatch(pp),
+    shadowName_(pp.shadowName_),
+    zoneName_(pp.zoneName_),
+    bridgeOverlap_(pp.bridgeOverlap_),
+    reject_(pp.reject_),
+    shadowIndex_(-1),
+    zoneIndex_(-1),
+    patchToPatchPtr_(NULL),
+    zoneAddressingPtr_(NULL),
+    remoteZoneAddressingPtr_(NULL),
+    reconFaceCellCentresPtr_(NULL),
+    localParallelPtr_(NULL),
+    comm_(pp.comm_),
+    tag_(pp.tag_),
+    mapPtr_(NULL)
+{}
+
+
 Foam::ggiPolyPatch::ggiPolyPatch
 (
     const ggiPolyPatch& pp,
-    const polyBoundaryMesh& bm,
-    const label index,
-    const label newSize,
-    const label newStart
+    const polyBoundaryMesh& bm
 )
 :
-    coupledPolyPatch(pp, bm, index, newSize, newStart),
+    coupledPolyPatch(pp, bm),
     shadowName_(pp.shadowName_),
     zoneName_(pp.zoneName_),
     bridgeOverlap_(pp.bridgeOverlap_),

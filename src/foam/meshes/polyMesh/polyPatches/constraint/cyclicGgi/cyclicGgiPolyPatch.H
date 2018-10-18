@@ -123,13 +123,6 @@ public:
             const polyBoundaryMesh&
         );
 
-        //- Construct as copy, resetting the boundary mesh
-        cyclicGgiPolyPatch
-        (
-            const cyclicGgiPolyPatch&,
-            const polyBoundaryMesh&
-        );
-
         //- Construct as given the original patch and resetting the
         //  face list and boundary mesh information
         cyclicGgiPolyPatch
@@ -139,6 +132,16 @@ public:
             const label index,
             const label newSize,
             const label newStart
+        );
+
+        //- Construct as copy
+        cyclicGgiPolyPatch(const cyclicGgiPolyPatch&);
+
+        //- Construct as copy, resetting the boundary mesh
+        cyclicGgiPolyPatch
+        (
+            const cyclicGgiPolyPatch&,
+            const polyBoundaryMesh&
         );
 
         //- Construct and return a clone, resetting the boundary mesh

@@ -897,10 +897,30 @@ Foam::cyclicPolyPatch::cyclicPolyPatch
 Foam::cyclicPolyPatch::cyclicPolyPatch
 (
     const cyclicPolyPatch& pp,
-    const polyBoundaryMesh& bm
+    const polyBoundaryMesh& bm,
+    const label index,
+    const label newSize,
+    const label newStart
 )
 :
-    coupledPolyPatch(pp, bm),
+    coupledPolyPatch(pp, bm, index, newSize, newStart),
+    coupledPointsPtr_(NULL),
+    coupledEdgesPtr_(NULL),
+    featureCos_(pp.featureCos_),
+    transform_(pp.transform_),
+    rotationAxis_(pp.rotationAxis_),
+    rotationCentre_(pp.rotationCentre_),
+    rotationAngle_(pp.rotationAngle_),
+    separationVector_(pp.separationVector_)
+{}
+
+
+Foam::cyclicPolyPatch::cyclicPolyPatch
+(
+    const cyclicPolyPatch& pp
+)
+:
+    coupledPolyPatch(pp),
     coupledPointsPtr_(NULL),
     coupledEdgesPtr_(NULL),
     featureCos_(pp.featureCos_),
@@ -915,13 +935,10 @@ Foam::cyclicPolyPatch::cyclicPolyPatch
 Foam::cyclicPolyPatch::cyclicPolyPatch
 (
     const cyclicPolyPatch& pp,
-    const polyBoundaryMesh& bm,
-    const label index,
-    const label newSize,
-    const label newStart
+    const polyBoundaryMesh& bm
 )
 :
-    coupledPolyPatch(pp, bm, index, newSize, newStart),
+    coupledPolyPatch(pp, bm),
     coupledPointsPtr_(NULL),
     coupledEdgesPtr_(NULL),
     featureCos_(pp.featureCos_),

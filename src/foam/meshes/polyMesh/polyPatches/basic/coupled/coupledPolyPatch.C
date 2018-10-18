@@ -223,6 +223,15 @@ Foam::coupledPolyPatch::coupledPolyPatch
 
 Foam::coupledPolyPatch::coupledPolyPatch
 (
+    const coupledPolyPatch& pp
+)
+:
+    polyPatch(pp)
+{}
+
+
+Foam::coupledPolyPatch::coupledPolyPatch
+(
     const coupledPolyPatch& pp,
     const polyBoundaryMesh& bm,
     const label index,

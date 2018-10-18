@@ -350,30 +350,6 @@ Foam::polyPatch::polyPatch
 Foam::polyPatch::polyPatch
 (
     const polyPatch& pp,
-    const polyBoundaryMesh& bm
-)
-:
-    patchIdentifier(pp),
-    primitivePatch
-    (
-        faceSubList
-        (
-            bm.mesh().allFaces(),
-            pp.size(),
-            pp.start()
-        ),
-        bm.mesh().allPoints()
-    ),
-    start_(pp.start()),
-    boundaryMesh_(bm),
-    faceCellsPtr_(NULL),
-    mePtr_(NULL)
-{}
-
-
-Foam::polyPatch::polyPatch
-(
-    const polyPatch& pp,
     const polyBoundaryMesh& bm,
     const label index,
     const label newSize,
@@ -404,6 +380,30 @@ Foam::polyPatch::polyPatch(const polyPatch& p)
     primitivePatch(p),
     start_(p.start_),
     boundaryMesh_(p.boundaryMesh_),
+    faceCellsPtr_(NULL),
+    mePtr_(NULL)
+{}
+
+
+Foam::polyPatch::polyPatch
+(
+    const polyPatch& pp,
+    const polyBoundaryMesh& bm
+)
+:
+    patchIdentifier(pp),
+    primitivePatch
+    (
+        faceSubList
+        (
+            bm.mesh().allFaces(),
+            pp.size(),
+            pp.start()
+        ),
+        bm.mesh().allPoints()
+    ),
+    start_(pp.start()),
+    boundaryMesh_(bm),
     faceCellsPtr_(NULL),
     mePtr_(NULL)
 {}

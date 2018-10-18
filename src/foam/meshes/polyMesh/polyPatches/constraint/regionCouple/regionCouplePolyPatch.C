@@ -703,10 +703,38 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
 Foam::regionCouplePolyPatch::regionCouplePolyPatch
 (
     const regionCouplePolyPatch& pp,
-    const polyBoundaryMesh& bm
+    const polyBoundaryMesh& bm,
+    const label index,
+    const label newSize,
+    const label newStart
 )
 :
-    coupledPolyPatch(pp, bm),
+    coupledPolyPatch(pp, bm, index, newSize, newStart),
+    shadowRegionName_(pp.shadowRegionName_),
+    shadowPatchName_(pp.shadowPatchName_),
+    zoneName_(pp.zoneName_),
+    attached_(pp.attached_),
+    master_(pp.master_),
+    isWall_(pp.isWall_),
+    bridgeOverlap_(pp.bridgeOverlap_),
+    reject_(pp.reject_),
+    shadowIndex_(-1),
+    zoneIndex_(-1),
+    patchToPatchPtr_(NULL),
+    zoneAddressingPtr_(NULL),
+    remoteZoneAddressingPtr_(NULL),
+    reconFaceCellCentresPtr_(NULL),
+    localParallelPtr_(NULL),
+    mapPtr_(NULL)
+{}
+
+
+Foam::regionCouplePolyPatch::regionCouplePolyPatch
+(
+    const regionCouplePolyPatch& pp
+)
+:
+    coupledPolyPatch(pp),
     shadowRegionName_(pp.shadowRegionName_),
     shadowPatchName_(pp.shadowPatchName_),
     zoneName_(pp.zoneName_),
@@ -729,13 +757,10 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
 Foam::regionCouplePolyPatch::regionCouplePolyPatch
 (
     const regionCouplePolyPatch& pp,
-    const polyBoundaryMesh& bm,
-    const label index,
-    const label newSize,
-    const label newStart
+    const polyBoundaryMesh& bm
 )
 :
-    coupledPolyPatch(pp, bm, index, newSize, newStart),
+    coupledPolyPatch(pp, bm),
     shadowRegionName_(pp.shadowRegionName_),
     shadowPatchName_(pp.shadowPatchName_),
     zoneName_(pp.zoneName_),
