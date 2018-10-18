@@ -65,7 +65,8 @@ immersedBoundaryDynamicRefineSolidBodyMotionFvMesh(const IOobject& io)
     // subdictionary in dynamicMeshDict (see dynamicPolyRefinementFvMesh
     // constructor). VV, 17/May/2018.
     dynamicPolyRefinementFvMesh(io, typeName),
-    ibMotions_()
+    ibMotions_(),
+    loadBalance_(refinementDict().lookup("loadBalance"))
 {
     // Read Immersed Boundary motion functions from base class dictionary
     PtrList<entry> motionDicts(refinementDict().lookup("motionFunctions"));
@@ -85,6 +86,7 @@ immersedBoundaryDynamicRefineSolidBodyMotionFvMesh(const IOobject& io)
             )
         );
     }
+
 }
 
 
@@ -117,8 +119,16 @@ bool immersedBoundaryDynamicRefineSolidBodyMotionFvMesh::update()
         ibMotions_[ibI].movePoints();
     }
 
+    // Refine the mesh
     bool hasChanged = dynamicPolyRefinementFvMesh::update();
 
+    // Load balance
+    if (loadBalance_)
+    {
+        hasChanged = loadBalance(refinementDict());
+    }
+
+    
     // If the background mesh has not changed, execute dummy mesh sync
     // and mesh motion to re-calculate immersed boundary parameters,
     // since the immersed boundary has been moved

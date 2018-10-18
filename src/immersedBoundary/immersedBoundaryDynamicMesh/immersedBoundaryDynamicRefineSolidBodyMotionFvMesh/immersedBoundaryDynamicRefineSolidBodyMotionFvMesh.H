@@ -67,6 +67,9 @@ class immersedBoundaryDynamicRefineSolidBodyMotionFvMesh
         //- Immersed boundary motion control function
         PtrList<movingImmersedBoundary> ibMotions_;
 
+        //- Load balance
+        Switch loadBalance_;
+
 
     // Private Member Functions
 
