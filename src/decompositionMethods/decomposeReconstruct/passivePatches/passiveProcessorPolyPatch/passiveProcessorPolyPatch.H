@@ -99,13 +99,6 @@ public:
             const polyBoundaryMesh&
         );
 
-        //- Construct as copy, resetting the boundary mesh
-        passiveProcessorPolyPatch
-        (
-            const passiveProcessorPolyPatch&,
-            const polyBoundaryMesh&
-        );
-
         //- Construct as given the original patch and resetting the
         //  face list and boundary mesh information
         passiveProcessorPolyPatch
@@ -115,6 +108,16 @@ public:
             const label index,
             const label newSize,
             const label newStart
+        );
+
+        //- Construct as copy
+        passiveProcessorPolyPatch(const passiveProcessorPolyPatch&);
+
+        //- Construct as copy, resetting the boundary mesh
+        passiveProcessorPolyPatch
+        (
+            const passiveProcessorPolyPatch&,
+            const polyBoundaryMesh&
         );
 
         //- Construct and return a clone, resetting the boundary mesh

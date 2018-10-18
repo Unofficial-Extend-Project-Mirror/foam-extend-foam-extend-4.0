@@ -99,19 +99,6 @@ Foam::passiveProcessorPolyPatch::passiveProcessorPolyPatch
 Foam::passiveProcessorPolyPatch::passiveProcessorPolyPatch
 (
     const passiveProcessorPolyPatch& pp,
-    const polyBoundaryMesh& bm
-)
-:
-    polyPatch(pp, bm),
-    myProcNo_(pp.myProcNo_),
-    neighbProcNo_(pp.neighbProcNo_),
-    globalFaceIndex_(pp.size(), -1)
-{}
-
-
-Foam::passiveProcessorPolyPatch::passiveProcessorPolyPatch
-(
-    const passiveProcessorPolyPatch& pp,
     const polyBoundaryMesh& bm,
     const label index,
     const label newSize,
@@ -122,6 +109,31 @@ Foam::passiveProcessorPolyPatch::passiveProcessorPolyPatch
     myProcNo_(pp.myProcNo_),
     neighbProcNo_(pp.neighbProcNo_),
     globalFaceIndex_(newSize, -1)  // Cannot set global index.  HJ, 4/May/2018
+{}
+
+
+Foam::passiveProcessorPolyPatch::passiveProcessorPolyPatch
+(
+    const passiveProcessorPolyPatch& pp
+)
+:
+    polyPatch(pp),
+    myProcNo_(pp.myProcNo_),
+    neighbProcNo_(pp.neighbProcNo_),
+    globalFaceIndex_(pp.size(), -1)
+{}
+
+
+Foam::passiveProcessorPolyPatch::passiveProcessorPolyPatch
+(
+    const passiveProcessorPolyPatch& pp,
+    const polyBoundaryMesh& bm
+)
+:
+    polyPatch(pp, bm),
+    myProcNo_(pp.myProcNo_),
+    neighbProcNo_(pp.neighbProcNo_),
+    globalFaceIndex_(pp.size(), -1)
 {}
 
 
