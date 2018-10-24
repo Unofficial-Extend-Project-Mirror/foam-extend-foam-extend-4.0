@@ -127,17 +127,7 @@ bool immersedBoundaryDynamicRefineSolidBodyMotionFvMesh::update()
     {
         hasChanged = loadBalance(refinementDict());
     }
-
     
-    // If the background mesh has not changed, execute dummy mesh sync
-    // and mesh motion to re-calculate immersed boundary parameters,
-    // since the immersed boundary has been moved
-    // HJ, 17/May/2018
-    if (!hasChanged)
-    {
-        fvMesh::syncUpdateMesh();
-    }
-
     // Execute dummy mesh motion for the background mesh
     const pointField oldPoints = allPoints();
     fvMesh::movePoints(oldPoints);
