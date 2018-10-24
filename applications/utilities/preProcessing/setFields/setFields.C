@@ -179,12 +179,13 @@ public:
 
 int main(int argc, char *argv[])
 {
+#   include "addRegionOption.H"
 #   include "setRootCase.H"
 #   include "createTime.H"
 
     Info<< "Time = " << runTime.timeName() << endl;
 
-#   include "createMesh.H"
+#   include "createNamedMesh.H"
 
     Info<< "Reading setFieldsDict\n" << endl;
 
