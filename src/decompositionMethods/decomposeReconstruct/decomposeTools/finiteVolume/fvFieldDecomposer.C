@@ -61,7 +61,10 @@ processorVolPatchFieldDecomposer
     addressing_(addressingSlice.size()),
     weights_(addressingSlice.size())
 {
-    const scalarField& weights = mesh.weights().internalField();
+    // Cannot use weights due to parallel comms in load balancing
+    // Use 0.5 instead, as this is not precise mapping
+    // HJ, 21/Oct/2018
+
     const labelList& own = mesh.faceOwner();
     const labelList& neighb = mesh.faceNeighbour();
 
@@ -75,14 +78,12 @@ processorVolPatchFieldDecomposer
             // This is a regular face. it has been an internal face
             // of the original mesh and now it has become a face
             // on the parallel boundary
+            // Use 0.5 weights
             addressing_[i].setSize(2);
-            weights_[i].setSize(2);
+            weights_[i].setSize(2, 0.5);
 
             addressing_[i][0] = own[ai];
             addressing_[i][1] = neighb[ai];
-
-            weights_[i][0] = weights[ai];
-            weights_[i][1] = 1.0 - weights[ai];
         }
         else
         {
@@ -155,8 +156,8 @@ fvFieldDecomposer::fvFieldDecomposer
         static_cast<processorSurfacePatchFieldDecomposer*>(NULL)
     )
 {
-    // HR 25.06.18: Weights may be required for some mappings and might hang in parallel.
-    completeMesh_.weights();
+    // HR 25.06.18: Weights cannot be used for mappings
+    // HJ, 19/Oct/2018
 
     forAll (boundaryAddressing_, patchi)
     {
