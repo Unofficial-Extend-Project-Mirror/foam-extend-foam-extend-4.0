@@ -108,7 +108,12 @@ mixedIbFvPatchField<Type>::mixedIbFvPatchField
     // Re-interpolate the data related to immersed boundary
     this->updateIbValues();
 
-    mixedFvPatchField<Type>::evaluate();
+    // mixedFvPatchField<Type>::evaluate();
+
+    // On creation of the field, intersection cannot be called.
+    // Initialise the value to avoid errors
+    // HJ, 1/Dec/2017
+    Field<Type>::operator=(pTraits<Type>::zero);
 }
 
 
