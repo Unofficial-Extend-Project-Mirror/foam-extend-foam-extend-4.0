@@ -43,6 +43,7 @@ SourceFiles
 #define passiveProcessorPolyPatch_H
 
 #include "polyBoundaryMesh.H"
+#include "labelField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -66,7 +67,7 @@ class passiveProcessorPolyPatch
         int neighbProcNo_;
 
         //- Global processor face index
-        labelList globalFaceIndex_;
+        labelField globalFaceIndex_;
 
 
 public:
@@ -169,7 +170,7 @@ public:
         }
 
         //- Return global processor face index
-        const labelList& globalFaceIndex() const
+        const labelField& globalFaceIndex() const
         {
             return globalFaceIndex_;
         }

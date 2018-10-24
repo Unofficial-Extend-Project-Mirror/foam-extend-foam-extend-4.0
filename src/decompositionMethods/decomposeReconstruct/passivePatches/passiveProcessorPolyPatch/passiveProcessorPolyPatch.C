@@ -92,7 +92,7 @@ Foam::passiveProcessorPolyPatch::passiveProcessorPolyPatch
     polyPatch(name, dict, index, bm),
     myProcNo_(readLabel(dict.lookup("myProcNo"))),
     neighbProcNo_(readLabel(dict.lookup("neighbProcNo"))),
-    globalFaceIndex_(dict.lookup("globalFaceIndex"))
+    globalFaceIndex_("globalFaceIndex", dict, size())
 {}
 
 
@@ -152,7 +152,6 @@ void Foam::passiveProcessorPolyPatch::write(Ostream& os) const
         << token::END_STATEMENT << nl;
     os.writeKeyword("neighbProcNo") << neighbProcNo_
         << token::END_STATEMENT << nl;
-
     globalFaceIndex_.writeEntry("globalFaceIndex", os);
 }
 
