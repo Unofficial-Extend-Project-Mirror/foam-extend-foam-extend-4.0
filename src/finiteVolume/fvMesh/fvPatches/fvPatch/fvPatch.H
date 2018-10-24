@@ -191,10 +191,16 @@ public:
                 return polyPatch_.name();
             }
 
-            //- Return size
+            //- Return patch size
             virtual label size() const
             {
                 return polyPatch_.size();
+            }
+
+            //- Return patch slice size.  Immersed boundary support
+            virtual label sliceSize() const
+            {
+                return size();
             }
 
             //- Return true if this patch is coupled
@@ -233,11 +239,12 @@ public:
             {
                 return typename List<T>::subList
                 (
-                    l, size(),
+                    l, sliceSize(),
                     polyPatch_.start()
                 );
             }
 
+            //- Slice list to patch
             template<class T>
             const typename Field<T>::subField patchSlice
             (
@@ -246,7 +253,7 @@ public:
             {
                 return typename Field<T>::subField
                 (
-                    l, size(),
+                    l, sliceSize(),
                     polyPatch_.start()
                 );
             }

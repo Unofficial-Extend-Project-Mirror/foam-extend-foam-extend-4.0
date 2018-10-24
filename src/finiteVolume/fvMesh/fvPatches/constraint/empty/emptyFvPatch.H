@@ -74,7 +74,14 @@ public:
 
         // Access
 
+            //- Return patch size
             virtual label size() const
+            {
+                return 0;
+            }
+
+            //- Return patch slice size
+            virtual label sliceSize() const
             {
                 return 0;
             }

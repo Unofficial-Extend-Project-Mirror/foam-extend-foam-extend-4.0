@@ -152,6 +152,14 @@ public:
             //- Return size equal to number of intersected cells
             virtual label size() const;
 
+            //- Return patch slice size
+            //  Note: since the immersed boundary patch keeps the faces
+            //  in a separate list, slicing is not allowed.  HJ, 10/Oct/2018
+            virtual label sliceSize() const
+            {
+                return 0;
+            }
+
             //- Return faceCells next to the IB surface
             virtual const unallocLabelList& faceCells() const;
 
