@@ -1056,9 +1056,11 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
         totalIbCount[3] = nDeadFaces;
     }
 
+    // Reduce is not allowed in parallel load balancing
+    // HJ, 24/Oct/2018
     // if (debug)
     {
-        reduce(totalIbCount, sumOp<List<label> >());
+        // reduce(totalIbCount, sumOp<List<label> >());
 
         Info<< "Immersed boundary " << name() << " info: "
             << "nIbCells: " << totalIbCount[0]
@@ -1327,7 +1329,6 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     correctedIbPatchFaceAreasPtr_(NULL),
     oldIbPointsPtr_(NULL)
 {
-    Pout<< "READ CONSTRUCTOR" << endl;
     if (size() > 0)
     {
         FatalIOErrorIn
