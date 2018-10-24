@@ -36,7 +36,7 @@ void Foam::topoChangerFvMesh::sendFields
 ) const
 {
     // Send number of fields
-    toProc<< geoFields.size() << nl;
+    toProc<< geoFields.size() << nl << token::BEGIN_LIST << nl;
 
     label fI = 0;
 
@@ -57,6 +57,7 @@ void Foam::topoChangerFvMesh::sendFields
 
         fI++;
     }
+    toProc<< token::END_LIST << nl << nl;
 }
 
 
@@ -124,6 +125,8 @@ void Foam::topoChangerFvMesh::receiveFields
 
     receivedFields.setSize(nScalarFields);
 
+    fromProc.readBegin("topoChangerFvMeshReceiveFields");
+    
     forAll (receivedFields, fI)
     {
         word fieldName(fromProc);
@@ -148,6 +151,8 @@ void Foam::topoChangerFvMesh::receiveFields
             )
         );
     }
+
+    fromProc.readEnd("topoChangerFvMeshReceiveFields");
 }
 
 
