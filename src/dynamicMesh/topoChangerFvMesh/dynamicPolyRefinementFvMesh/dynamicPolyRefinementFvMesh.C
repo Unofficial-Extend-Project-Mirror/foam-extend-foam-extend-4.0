@@ -130,7 +130,8 @@ Foam::dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh
         switch(nGeometricDirs)
         {
             case 3:
-                // Add the polyhedralRefinement engine for 3D isotropic refinement
+                // Add the polyhedralRefinement engine for
+                // 3D isotropic refinement
                 Info<< "3D case detected. "
                     << "Adding polyhedralRefinement topology modifier" << endl;
                 topoChanger_.set
@@ -147,7 +148,8 @@ Foam::dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh
                 break;
 
             case 2:
-                // Add the prismatic2DRefinement engine for 2D isotropic refinement
+                // Add the prismatic2DRefinement engine for
+                // 2D isotropic refinement
                 Info<< "2D case detected. "
                     << "Adding prismatic2DRefinement topology modifier" << endl;
                 topoChanger_.set
@@ -269,10 +271,13 @@ bool Foam::dynamicPolyRefinementFvMesh::update()
             (
                 refinementSelectionPtr_->refinementCellCandidates()()
             );
+            Pout<< "Selected " << refCandidates.size()
+                << " refinement candidates."
+                << endl;
         }
         else
         {
-            Info<< "Skipping refinement for this time-step..." << endl;
+            Pout<< "Skipping refinement for this time-step..." << endl;
         }
 
         // Set cells to refine. Note: refinement needs to make sure that face
@@ -292,10 +297,13 @@ bool Foam::dynamicPolyRefinementFvMesh::update()
             (
                 refinementSelectionPtr_->unrefinementPointCandidates()()
             );
+            Pout<< "Selected " << unrefCandidates.size()
+                << " unrefinement candidates."
+                << endl;
         }
         else
         {
-            Info<< "Skipping unrefinement for this time-step..." << endl;
+            Pout<< "Skipping unrefinement for this time-step..." << endl;
         }
 
         // Set split points to unrefine around.
@@ -336,13 +344,13 @@ bool Foam::dynamicPolyRefinementFvMesh::update()
         // some topo changes
         if (sizeCellMap)
         {
-            Info<< "Successfully performed polyhedral refinement. "
+            Pout<< "Successfully performed polyhedral refinement. "
                 << "Changed from " << nOldCells << " to " << sizeCellMap
                 << " cells." << endl;
         }
         else
         {
-            Info<< "Refinement/unrefinement not performed in this time step "
+            Pout<< "Refinement/unrefinement not performed in this time step "
                 << "since no cells were selected." << endl;
         }
 
@@ -354,7 +362,7 @@ bool Foam::dynamicPolyRefinementFvMesh::update()
         // per time step
         curTimeIndex_ = time().timeIndex();
     }        
-
+    Pout<< "No refinement/unrefinement" << endl;
     // No refinement/unrefinement at this time step. Return false
     return false;
 }
