@@ -80,6 +80,9 @@ immersedBoundaryDynamicRefineSolidBodyMotionFvMeshCoeffs
     // Whether to use edge based consistency check. Needed when one allows more
     // than 2 refinement levels (automatically switched on)
     edgeBasedConsistency           true;
+
+    // Activate load balance
+    loadBalance yes;
 }
 
 
