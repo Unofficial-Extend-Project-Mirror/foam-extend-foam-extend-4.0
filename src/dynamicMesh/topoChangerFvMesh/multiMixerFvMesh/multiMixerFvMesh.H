@@ -47,7 +47,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                   Class multiMixerFvMesh Declaration
+                       Class multiMixerFvMesh Declaration
 \*---------------------------------------------------------------------------*/
 
 class multiMixerFvMesh
@@ -100,9 +100,8 @@ public:
         explicit multiMixerFvMesh(const IOobject& io);
 
 
-    // Destructor
-
-        virtual ~multiMixerFvMesh();
+    //- Destructor
+    virtual ~multiMixerFvMesh();
 
 
     // Member Functions

@@ -132,9 +132,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~mixerRotor();
+    //- Destructor
+    virtual ~mixerRotor();
 
 
     // Member Functions
