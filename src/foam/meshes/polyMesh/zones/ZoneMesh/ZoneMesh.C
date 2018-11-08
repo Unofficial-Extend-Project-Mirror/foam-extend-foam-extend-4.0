@@ -164,24 +164,28 @@ ZoneMesh<ZoneType, MeshType>::ZoneMesh
     mesh_(mesh),
     zoneMapPtr_(NULL)
 {
-    PtrList<ZoneType>& zones = *this;
-
     PtrList<entry> zoneEntries(is);
-    zones.setSize(zoneEntries.size());
 
-    forAll(zones, zoneI)
+    if (!zoneEntries.empty())
     {
-        zones.set
-        (
-            zoneI,
-            ZoneType::New
+        PtrList<ZoneType>& zones = *this;
+
+        zones.setSize(zoneEntries.size());
+
+        forAll(zones, zoneI)
+        {
+            zones.set
             (
-                zoneEntries[zoneI].keyword(),
-                zoneEntries[zoneI].dict(),
                 zoneI,
-                *this
-            )
-        );
+                ZoneType::New
+                (
+                    zoneEntries[zoneI].keyword(),
+                    zoneEntries[zoneI].dict(),
+                    zoneI,
+                    *this
+                )
+            );
+        }
     }
 }
 
