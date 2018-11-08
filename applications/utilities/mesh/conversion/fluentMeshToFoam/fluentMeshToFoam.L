@@ -930,6 +930,15 @@ int main(int argc, char *argv[])
         {
             label curCell = owner[faceI];
 
+            if (curCell >= nCells)
+            {
+                FatalErrorIn(args.executable())
+                    << "Trying to create face " << faceI
+                    << " whose owner cell index is greater than "
+                    << "the number of cells: " << nCells
+                    << abort(FatalError);
+            }
+
             if (nFacesInCell[curCell] >= cellFaces[curCell].size())
             {
                 FatalErrorIn(args.executable())
