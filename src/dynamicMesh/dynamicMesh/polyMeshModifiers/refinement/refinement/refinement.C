@@ -111,17 +111,9 @@ void Foam::refinement::extendMarkedCellsAcrossFaces
             const label& own = owner[faceI];
             const label& nei = neighbour[faceI];
 
-            if (cellLevel_[own] < maxRefinementLevel_)
-            {
-                // Mark owner
-                markedCell[own] = true;
-            }
-
-            if (cellLevel_[nei] < maxRefinementLevel_)
-            {
-                // Mark neighbour
-                markedCell[nei] = true;
-            }
+            // Mark owner and neighbour cells
+            markedCell[own] = true;
+            markedCell[nei] = true;
         }
     }
 
@@ -134,11 +126,8 @@ void Foam::refinement::extendMarkedCellsAcrossFaces
             // exceeded
             const label& own = owner[faceI];
 
-            if (cellLevel_[own] < maxRefinementLevel_)
-            {
-                // Mark owner
-                markedCell[own] = true;
-            }
+            // Mark owner
+            markedCell[own] = true;
         }
     }
 }
