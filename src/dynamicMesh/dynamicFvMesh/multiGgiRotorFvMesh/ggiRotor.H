@@ -74,6 +74,12 @@ class ggiRotor
         //- Moving cells zone
         const word movingCellsZoneName_;
 
+        //- Moving patches: for zones
+        const wordList movingPatches_;
+
+        //- Static patches: for zones
+        const wordList staticPatches_;
+
         //- Markup field for points.  Moving points marked with 1
         mutable scalarField* movingPointsMaskPtr_;
 

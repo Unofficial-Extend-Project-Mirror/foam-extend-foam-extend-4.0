@@ -25,6 +25,7 @@ License
 
 #include "ggiRotor.H"
 #include "foamTime.H"
+#include "ggiPolyPatch.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -44,8 +45,19 @@ void Foam::ggiRotor::calcMovingMask() const
     const cellList& c = mesh_.cells();
     const faceList& f = mesh_.allFaces();
 
-    const labelList& cellAddr = mesh_.cellZones()
-        [mesh_.cellZones().findZoneID(movingCellsZoneName_)];
+    // Find cellZone
+    const label cellZoneID = mesh_.cellZones().findZoneID(movingCellsZoneName_);
+
+    if (cellZoneID == -1)
+    {
+        FatalErrorIn("void ggiRotor::calcMovingMask() const")
+            << "Cannot find moving cell zone " << movingCellsZoneName_
+            << ".  Available cell zones: " << mesh_.cellZones().names()
+            << abort(FatalError);
+
+    }
+
+    const labelList& cellAddr = mesh_.cellZones()[cellZoneID];
 
     forAll (cellAddr, cellI)
     {
@@ -59,6 +71,66 @@ void Foam::ggiRotor::calcMovingMask() const
             forAll (curFace, pointI)
             {
                 movingPointsMask[curFace[pointI]] = 1;
+            }
+        }
+    }
+
+    // Grab the ggi patches on the moving side
+    forAll (movingPatches_, patchI)
+    {
+        const label movingSliderID =
+            mesh_.boundaryMesh().findPatchID(movingPatches_[patchI]);
+
+        if (movingSliderID < 0)
+        {
+            FatalErrorIn("void mixerGgiFvMesh::calcMovingMasks() const")
+                << "Moving slider named " << movingPatches_[patchI]
+                << " not found.  Valid patch names: "
+                << mesh_.boundaryMesh().names() << abort(FatalError);
+        }
+
+        const ggiPolyPatch& movingGgiPatch =
+            refCast<const ggiPolyPatch>(mesh_.boundaryMesh()[movingSliderID]);
+
+        const labelList& movingSliderAddr = movingGgiPatch.zone();
+
+        forAll (movingSliderAddr, faceI)
+        {
+            const face& curFace = f[movingSliderAddr[faceI]];
+
+            forAll (curFace, pointI)
+            {
+                movingPointsMask[curFace[pointI]] = 1;
+            }
+        }
+    }
+
+    // Grab the ggi patches on the static side
+    forAll (staticPatches_, patchI)
+    {
+        const label staticSliderID =
+            mesh_.boundaryMesh().findPatchID(staticPatches_[patchI]);
+
+        if (staticSliderID < 0)
+        {
+            FatalErrorIn("void mixerGgiFvMesh::calcMovingMasks() const")
+                << "Static slider named " << staticPatches_[patchI]
+                << " not found.  Valid patch names: "
+                << mesh_.boundaryMesh().names() << abort(FatalError);
+        }
+
+        const ggiPolyPatch& staticGgiPatch =
+            refCast<const ggiPolyPatch>(mesh_.boundaryMesh()[staticSliderID]);
+
+        const labelList& staticSliderAddr = staticGgiPatch.zone();
+
+        forAll (staticSliderAddr, faceI)
+        {
+            const face& curFace = f[staticSliderAddr[faceI]];
+
+            forAll (curFace, pointI)
+            {
+                movingPointsMask[curFace[pointI]] = 0;
             }
         }
     }
@@ -101,6 +173,8 @@ Foam::ggiRotor::ggiRotor
     ),
     rpm_(readScalar(dict.lookup("rpm"))),
     movingCellsZoneName_(dict.lookup("movingCells")),
+    movingPatches_(dict.lookup("movingPatches")),
+    staticPatches_(dict.lookup("staticPatches")),
     movingPointsMaskPtr_(NULL)
 {
     // Make sure the coordinate system does not operate in degrees
