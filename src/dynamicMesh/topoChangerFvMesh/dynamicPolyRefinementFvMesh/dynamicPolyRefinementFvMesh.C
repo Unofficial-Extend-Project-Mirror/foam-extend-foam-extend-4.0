@@ -361,8 +361,10 @@ bool Foam::dynamicPolyRefinementFvMesh::update()
         // Update current time index to skip multiple topo change checks
         // per time step
         curTimeIndex_ = time().timeIndex();
-    }        
+    }
+
     Pout<< "No refinement/unrefinement" << endl;
+
     // No refinement/unrefinement at this time step. Return false
     return false;
 }
