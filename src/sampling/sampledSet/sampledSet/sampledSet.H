@@ -48,6 +48,8 @@ SourceFiles
 #include "runTimeSelectionTables.H"
 #include "autoPtr.H"
 #include "coordSet.H"
+#include "debug.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -201,7 +203,11 @@ public:
 
         //- Tolerance when comparing points. Usually relative to difference
         //  between start_ and end_
-        const static scalar tol;
+        static const debug::tolerancesSwitch tol_;
+
+        //- Tolerance used to push points out of the face. It is relative to the
+        //  distance between the cell face centre and cell centre.
+        static const debug::tolerancesSwitch pushTol_;
 
 
     // Constructors

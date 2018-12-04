@@ -65,7 +65,7 @@ bool Foam::curveSet::trackToBoundary
         const vector offset =
             sampleCoords_[sampleI + 1] - sampleCoords_[sampleI];
 
-        const scalar smallDist = mag(tol*offset);
+        const scalar smallDist = mag(tol_()*offset);
 
         point oldPos = trackPt;
         label facei = -1;
@@ -174,7 +174,7 @@ void Foam::curveSet::calcSamples
         {
             const vector offset =
                 sampleCoords_[sampleI+1] - sampleCoords_[sampleI];
-            const scalar smallDist = mag(tol*offset);
+            const scalar smallDist = mag(tol_()*offset);
 
 
             // Get all boundary intersections

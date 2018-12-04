@@ -68,7 +68,7 @@ bool Foam::faceOnlySet::trackToBoundary
 {
     // distance vector between sampling points
     const vector offset = end_ - start_;
-    const vector smallVec = tol*offset;
+    const vector smallVec = tol_()*offset;
     const scalar smallDist = mag(smallVec);
 
     // Alias
@@ -125,7 +125,7 @@ void Foam::faceOnlySet::calcSamples
 
     const vector offset = (end_ - start_);
     const vector normOffset = offset/mag(offset);
-    const vector smallVec = tol*offset;
+    const vector smallVec = tol_()*offset;
     const scalar smallDist = mag(smallVec);
 
 
@@ -208,7 +208,7 @@ void Foam::faceOnlySet::calcSamples
     // index in bHits; current boundary intersection
     label bHitI = 1;
 
-    while(true)
+    while(segmentI <= maxNSteps_())
     {
         if (trackFaceI != -1)
         {
