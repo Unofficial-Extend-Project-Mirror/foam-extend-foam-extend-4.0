@@ -91,6 +91,11 @@ class immersedBoundaryPolyPatch
         //  considered to be live
         static const debug::tolerancesSwitch liveFactor_;
 
+        //- Search span factor
+        //  Factor used to multiply the span of the cell to get the tri-seach
+        //  span
+        static const debug::tolerancesSwitch spanFactor_;
+
 
     // Demand-driven data
 

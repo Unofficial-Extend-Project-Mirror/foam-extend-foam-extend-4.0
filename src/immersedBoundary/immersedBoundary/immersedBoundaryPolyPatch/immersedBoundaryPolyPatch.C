@@ -61,6 +61,14 @@ Foam::immersedBoundaryPolyPatch::liveFactor_
 );
 
 
+const Foam::debug::tolerancesSwitch
+Foam::immersedBoundaryPolyPatch::spanFactor_
+(
+    "immersedBoundarySpanFactor",
+    20
+);
+
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 Foam::vector Foam::immersedBoundaryPolyPatch::cellSpan
@@ -72,7 +80,7 @@ Foam::vector Foam::immersedBoundaryPolyPatch::cellSpan
 
     // Calculate span from the bounding box size (prefactor is arbitrary, IG
     // 10/Nov/2018)
-    const scalar delta = 20*cmptMax
+    const scalar delta = spanFactor_()*cmptMax
     (
         boundBox
         (
@@ -253,7 +261,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
             // If the nearest triangle cannot be found within span than this is
             // most probably a tri surface search error. Mark unknown and check
             // later. (IG 22/Nov/2018)
-            if (tss.nearest(C[cellI], span/20.0).index() == -1)
+            if(tss.nearest(C[cellI], span/spanFactor_()).index() == -1)
             {
                 intersectedCell[cellI] = immersedPoly::UNKNOWN;
             }
