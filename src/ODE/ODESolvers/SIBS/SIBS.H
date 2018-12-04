@@ -115,10 +115,9 @@ public:
         SIBS(ODE& ode);
 
 
-    // Destructor
-
-        virtual ~SIBS()
-        {}
+    //- Destructor
+    virtual ~SIBS()
+    {}
 
 
     // Member Functions
