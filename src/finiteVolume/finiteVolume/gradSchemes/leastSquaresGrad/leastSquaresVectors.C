@@ -129,7 +129,7 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
     forAll (lsP.boundaryField(), patchI)
     {
         const fvPatch& p = mesh().boundary()[patchI];
-        const unallocLabelList& fc = p.patch().faceCells();
+        const unallocLabelList& fc = p.faceCells();
 
         // Better version of d-vectors: Zeljko Tukovic, 25/Apr/2010
         const vectorField pd = p.delta();
