@@ -24,8 +24,8 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "multiMaterialThermal.H"
-#include "addToRunTimeSelectionTable.H"
 #include "zeroGradientFvPatchFields.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
