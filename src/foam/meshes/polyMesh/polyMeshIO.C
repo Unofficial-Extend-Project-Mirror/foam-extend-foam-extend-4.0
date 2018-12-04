@@ -657,7 +657,8 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const polyMesh& m)
         << m.boundaryMesh() << nl
         << m.pointZones() << nl
         << m.faceZones() << nl
-        << m.cellZones();
+        << m.cellZones() << nl
+        << endl;
 
     return os;
 }

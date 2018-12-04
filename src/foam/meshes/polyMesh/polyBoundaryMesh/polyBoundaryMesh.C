@@ -1026,12 +1026,14 @@ bool Foam::polyBoundaryMesh::writeData(Ostream& os) const
 
     os  << patches.size() << nl << token::BEGIN_LIST << incrIndent << nl;
 
+    // Note: careful write: endl is not allowed because it flushes a stream
+    // HJ, 24/Oct/2018
     forAll (patches, patchi)
     {
         os  << indent << patches[patchi].name() << nl
             << indent << token::BEGIN_BLOCK << nl
             << incrIndent << patches[patchi] << decrIndent
-            << indent << token::END_BLOCK << endl;
+            << indent << token::END_BLOCK << nl;
     }
 
     os  << decrIndent << token::END_LIST << endl;
