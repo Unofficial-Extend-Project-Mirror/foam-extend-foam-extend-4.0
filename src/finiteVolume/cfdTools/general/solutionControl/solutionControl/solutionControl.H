@@ -39,6 +39,7 @@ Description
 #include "fvsPatchField.H"
 #include "fvMatrices.H"
 #include "wordRe.H"
+#include "MRFZones.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -183,6 +184,13 @@ protected:
                 const volVectorField& U
             ) const;
 
+            void correctBoundaryFlux
+            (
+                surfaceScalarField& phi,
+                const volVectorField& U,
+                const surfaceScalarField& meshPhi
+            ) const;
+
 
 private:
 
@@ -284,6 +292,20 @@ public:
             (
                 surfaceScalarField& phi,
                 const volVectorField& U
+            ) const;
+
+            void calcSteadyConsistentFlux
+            (
+                surfaceScalarField& phi,
+                const volVectorField& U,
+                const surfaceScalarField& meshPhi
+            ) const;
+
+            void calcSteadyMRFConsistentFlux
+            (
+                surfaceScalarField& phi,
+                const volVectorField& U,
+                const MRFZones& mrfZones
             ) const;
 
             //- Reconstruct velocity for transient solvers (after pressure
