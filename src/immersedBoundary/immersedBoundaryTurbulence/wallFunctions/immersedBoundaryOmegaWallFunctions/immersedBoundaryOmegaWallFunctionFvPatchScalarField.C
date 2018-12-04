@@ -60,14 +60,18 @@ immersedBoundaryOmegaWallFunctionFvPatchScalarField
     const dictionary& dict
 )
 :
-    omegaWallFunctionFvPatchScalarField(p, iF, dict),
+    omegaWallFunctionFvPatchScalarField(p, iF), // Do not read size
     immersedBoundaryFieldBase<scalar>
     (
         p,
         Switch(dict.lookup("setDeadValue")),
         readScalar(dict.lookup("deadValue"))
     )    
-{}
+{
+    this->readPatchType(dict);
+
+    *this == this->patchInternalField();
+}
 
 
 immersedBoundaryOmegaWallFunctionFvPatchScalarField::
@@ -86,7 +90,9 @@ immersedBoundaryOmegaWallFunctionFvPatchScalarField
         ptf.setDeadValue(),
         ptf.deadValue()
     )
-{}
+{
+    this->setPatchType(ptf);
+}
 
 
 immersedBoundaryOmegaWallFunctionFvPatchScalarField::
@@ -102,7 +108,9 @@ immersedBoundaryOmegaWallFunctionFvPatchScalarField
         ptf.setDeadValue(),
         ptf.deadValue()
     )
-{}
+{
+    this->setPatchType(ptf);
+}
 
 
 immersedBoundaryOmegaWallFunctionFvPatchScalarField::
@@ -119,7 +127,9 @@ immersedBoundaryOmegaWallFunctionFvPatchScalarField
         ptf.setDeadValue(),
         ptf.deadValue()
     )
-{}
+{
+    this->setPatchType(ptf);
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -165,7 +175,7 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateCoeffs()
     }
 
     // Resize fields
-    if (size() != patch().size())
+    if (size() != this->ibPatch().size())
     {
         Info<< "Resizing immersedBoundaryOmegaWallFunction in evaluate: "
             << "patch: " << patch().size() << " field: " << size()
@@ -191,7 +201,7 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::evaluate
 )
 {
     // Resize fields
-    if (size() != patch().size())
+    if (size() != this->ibPatch().size())
     {
         Info<< "Resizing immersedBoundaryOmegaWallFunction in evaluate"
             << endl;

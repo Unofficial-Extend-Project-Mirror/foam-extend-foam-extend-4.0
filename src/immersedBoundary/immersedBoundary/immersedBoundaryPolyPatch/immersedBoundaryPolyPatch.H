@@ -32,6 +32,9 @@ Author
     Reorganisation by Hrvoje Jasak
     Complete rewrite of methodology, Hrvoje Jasak
 
+Contributors
+    Inno Gatin, FMENA, Zagreb. All rights reserved.
+
 SourceFiles
     immersedBoundaryPolyPatch.C
 
@@ -46,6 +49,8 @@ SourceFiles
 #include "triSurfaceSearch.H"
 #include "standAlonePatch.H"
 #include "Switch.H"
+#include "volFields.H"
+#include "immersedBoundaryCorrectedMeshFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -134,20 +139,17 @@ class immersedBoundaryPolyPatch
 
         // Corrected mesh geometry
 
-            //- Corrected cell centres
-            mutable vectorField* correctedCellCentresPtr_;
-
-            //- Corrected face centres
-            mutable vectorField* correctedFaceCentresPtr_;
-
-            //- Corrected cell volumes
-            mutable scalarField* correctedCellVolumesPtr_;
-
-            //- Corrected face areas
-            mutable vectorField* correctedFaceAreasPtr_;
+            // MeshObject derived object that holds corrected global field data
+            const immersedBoundaryCorrectedMeshFields& correctedFields_;
 
             //- Corrected face areas for the immersed boundary patch
             mutable vectorField* correctedIbPatchFaceAreasPtr_;
+
+            //- Topo change index, used to update the corrected fields
+            //  MeshObject consistently.
+            //  NOTE: time index cannot be used since multiple topo changes per
+            //  time-step are possible (IG 28/OCT/2018)
+            mutable label topoChangeIndex_;
 
 
         // Immersed boundary motion

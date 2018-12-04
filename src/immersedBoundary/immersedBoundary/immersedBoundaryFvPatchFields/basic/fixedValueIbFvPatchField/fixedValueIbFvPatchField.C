@@ -148,6 +148,7 @@ fixedValueIbFvPatchField<Type>::fixedValueIbFvPatchField
 
     // Re-interpolate the data related to immersed boundary
     this->updateIbValues();
+    this->setPatchType(ptf);
 
     // On creation of the mapped field, the internal field is dummy and
     // cannot be used.  Initialise the value to avoid errors
@@ -170,7 +171,9 @@ fixedValueIbFvPatchField<Type>::fixedValueIbFvPatchField
         ptf.deadValue()
     ),
     triValue_(ptf.triValue())
-{}
+{
+    this->setPatchType(ptf);
+}
 
 
 template<class Type>
@@ -188,7 +191,9 @@ fixedValueIbFvPatchField<Type>::fixedValueIbFvPatchField
         ptf.deadValue()
     ),
     triValue_(ptf.triValue())
-{}
+{
+    this->setPatchType(ptf);
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -258,6 +263,7 @@ void fixedValueIbFvPatchField<Type>::write(Ostream& os) const
     // Resolve post-processing issues.  HJ, 1/Dec/2017
     fvPatchField<Type>::write(os);
     triValue_.writeEntry("triValue", os);
+    immersedBoundaryFieldBase<Type>::writeDeadData(os);
 
     // The value entry needs to be written with zero size
     Field<Type>::null().writeEntry("value", os);

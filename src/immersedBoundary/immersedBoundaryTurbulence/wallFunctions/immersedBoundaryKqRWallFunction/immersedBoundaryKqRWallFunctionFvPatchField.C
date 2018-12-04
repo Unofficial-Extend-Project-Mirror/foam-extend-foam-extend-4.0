@@ -91,6 +91,7 @@ immersedBoundaryKqRWallFunctionFvPatchField
     )
 {
     this->checkType();
+    this->readPatchType(dict);
 
     *this == this->patchInternalField();
 }
@@ -114,6 +115,7 @@ immersedBoundaryKqRWallFunctionFvPatchField
         ptf.deadValue()
     )
 {
+    this->setPatchType(ptf);
     this->checkType();
 }
 
@@ -133,6 +135,7 @@ immersedBoundaryKqRWallFunctionFvPatchField
         ptf.deadValue()
     )
 {
+    this->setPatchType(ptf);
     this->checkType();
 }
 
@@ -153,6 +156,7 @@ immersedBoundaryKqRWallFunctionFvPatchField
         ptf.deadValue()        
     )
 {
+    this->setPatchType(ptf);
     this->checkType();
 }
 

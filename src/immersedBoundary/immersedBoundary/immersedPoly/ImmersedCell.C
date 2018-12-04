@@ -353,6 +353,8 @@ Foam::face Foam::ImmersedCell<Distance>::createInternalFace
     point dryPoint = vector::zero;
     label nDry = 0;
 
+    label nUndecided = 0;
+
     forAll (depth_, i)
     {
         if (depth_[i] > absTol_)
@@ -365,6 +367,20 @@ Foam::face Foam::ImmersedCell<Distance>::createInternalFace
             wetPoint += points_[i];
             nWet++;
         }
+        else
+        {
+            nUndecided++;
+        }
+    }
+
+    if(nUndecided == depth_.size())
+    {
+         FatalErrorIn
+         (
+             "ImmersedCell::createInternalFace(const label nIntersections)"
+         )   << "All points lay on the tri surface, zero volume cell?"
+             << nl << "Points: " << points_
+             << abort(FatalError);
     }
 
     wetPoint /= nWet;
@@ -372,7 +388,7 @@ Foam::face Foam::ImmersedCell<Distance>::createInternalFace
 
     // Good direction points out of the wet cell
     vector dir = dryPoint - wetPoint;
-    dir /= mag(dir);
+    dir /= mag(dir) + SMALL;
 
     vector n = orderedInternalFace.normal(points_);
     n /= mag(n);

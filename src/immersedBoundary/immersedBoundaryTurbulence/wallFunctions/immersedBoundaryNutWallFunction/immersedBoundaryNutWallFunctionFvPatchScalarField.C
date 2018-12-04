@@ -61,9 +61,11 @@ immersedBoundaryNutWallFunctionFvPatchScalarField
     const dictionary& dict
 )
 :
-    nutkWallFunctionFvPatchScalarField(p, iF, dict),
+    nutkWallFunctionFvPatchScalarField(p, iF),  // Do not read size
     immersedBoundaryFieldBase<scalar>(p, true, 1e-6)
-{}
+{
+    this->readPatchType(dict);
+}
 
 
 immersedBoundaryNutWallFunctionFvPatchScalarField::
@@ -77,7 +79,9 @@ immersedBoundaryNutWallFunctionFvPatchScalarField
 :
     nutkWallFunctionFvPatchScalarField(ptf, p, iF, mapper),
     immersedBoundaryFieldBase<scalar>(p, true, 1e-6)
-{}
+{
+    this->setPatchType(ptf);
+}
 
 
 immersedBoundaryNutWallFunctionFvPatchScalarField::
@@ -88,7 +92,9 @@ immersedBoundaryNutWallFunctionFvPatchScalarField
 :
     nutkWallFunctionFvPatchScalarField(ptf),
     immersedBoundaryFieldBase<scalar>(ptf.ibPatch(), true, 1e-6)
-{}
+{
+    this->setPatchType(ptf);
+}
 
 
 immersedBoundaryNutWallFunctionFvPatchScalarField::
@@ -100,7 +106,9 @@ immersedBoundaryNutWallFunctionFvPatchScalarField
 :
     nutkWallFunctionFvPatchScalarField(ptf, iF),
     immersedBoundaryFieldBase<scalar>(ptf.ibPatch(), true, 1e-6)
-{}
+{
+    this->setPatchType(ptf);
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //

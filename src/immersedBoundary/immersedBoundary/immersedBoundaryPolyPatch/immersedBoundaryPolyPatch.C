@@ -57,7 +57,7 @@ const Foam::debug::tolerancesSwitch
 Foam::immersedBoundaryPolyPatch::liveFactor_
 (
     "immersedBoundaryLiveFactor",
-    1e-3
+    1e-6
 );
 
 
@@ -70,8 +70,9 @@ Foam::vector Foam::immersedBoundaryPolyPatch::cellSpan
 {
     const polyMesh& mesh = boundaryMesh().mesh();
 
-    // Calculate span from the bounding box size
-    const scalar delta = 3*cmptMax
+    // Calculate span from the bounding box size (prefactor is arbitrary, IG
+    // 10/Nov/2018)
+    const scalar delta = 20*cmptMax
     (
         boundBox
         (
@@ -246,9 +247,97 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
         }
         else if (foundInside && foundOutside)
         {
-            // Intersected cell
-            intersectedCell[cellI] = immersedPoly::CUT;
-            nIntersectedCells++;
+            // Get span
+            const vector span = cellSpan(cellI);
+
+            // If the nearest triangle cannot be found within span than this is
+            // most probably a tri surface search error. Mark unknown and check
+            // later. (IG 22/Nov/2018)
+            if (tss.nearest(C[cellI], span/20.0).index() == -1)
+            {
+                intersectedCell[cellI] = immersedPoly::UNKNOWN;
+            }
+            else
+            {
+                // Intersected cell
+                intersectedCell[cellI] = immersedPoly::CUT;
+                nIntersectedCells++;
+            }
+        }
+    }
+
+    // Do a check of the cells selected for cutting but not within the span of
+    // the tri surface. The cause of this can either be a stl that is not
+    // perfect or ther was an error in the inside/outside tri-search for other
+    // reasons. Look at the neigbours that are not CUT and assign their status.
+    const cellList& meshCells = mesh.cells();
+    forAll (intersectedCell, cellI)
+    {
+        if (intersectedCell[cellI] == immersedPoly::UNKNOWN)
+        {
+            // Check the neigbours
+            const cell& curCell = meshCells[cellI];
+            Switch foundWetNei = false;
+            Switch foundDryNei = false;
+
+            forAll (curCell, faceI)
+            {
+                // Only do the check for internal faces. If the face is boundary
+                // face then there is nothing to do. NOTE: parallelisation
+                // needed?
+                if (mesh.isInternalFace(curCell[faceI]))
+                {
+                    label own = intersectedCell[owner[curCell[faceI]]];
+                    label nei = intersectedCell[neighbour[curCell[faceI]]];
+
+                    if
+                    (
+                        (nei == immersedPoly::DRY)
+                     || (own == immersedPoly::DRY)
+                    )
+                    {
+                        foundDryNei = true;
+                    }
+                    if
+                    (
+                        (nei == immersedPoly::WET)
+                     || (own == immersedPoly::WET)
+                    )
+                    {
+                        foundWetNei = true;
+                    }
+                }
+            }
+
+            if (foundWetNei && !foundDryNei)
+            {
+                intersectedCell[cellI] = immersedPoly::WET;
+            }
+            else if (!foundWetNei && foundDryNei)
+            {
+                intersectedCell[cellI] = immersedPoly::DRY;
+            }
+            else
+            {
+                // There are either no wet or dry negbours or there are both.
+                // This should not be possible. NOTE: the check is not
+                // parallelised and this can theoretically lead to failiures in
+                // strange arrangaments.
+                // Issue a warning, mark CUT and hope for the best.
+                // (IG 22/Nov/2018)
+                WarningIn
+                (
+                    "immersedBoundaryPolyPatch::calcImmersedBoundary() const"
+                )
+                    << "Cannot find wet or dry neigbours! Cell C:"
+                    << C[cellI]
+                    << " Neighbours: WET:" << foundWetNei
+                    << ", DRY:" << foundDryNei
+                    << endl;
+
+                intersectedCell[cellI] = immersedPoly::CUT;
+                nIntersectedCells++;
+            }
         }
     }
 
@@ -312,7 +401,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
             triSurfaceDistance dist
             (
                 tss,
-                span,
+                2*span,
                 internalFlow(),
                 false               // iterate intersection
             );
@@ -628,6 +717,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                     // Record the nearest triangle to the face centre
                     nearestTri[nIbCells] =
                         tss.nearest(Cf[faceI], span).index();
+
                     nIbCells++;
                 }
             }
@@ -1085,11 +1175,7 @@ void Foam::immersedBoundaryPolyPatch::calcCorrectedGeometry() const
 
     if
     (
-        correctedCellCentresPtr_
-     || correctedFaceCentresPtr_
-     || correctedCellVolumesPtr_
-     || correctedFaceAreasPtr_
-     || correctedIbPatchFaceAreasPtr_
+        correctedIbPatchFaceAreasPtr_
     )
     {
         FatalErrorIn
@@ -1102,18 +1188,11 @@ void Foam::immersedBoundaryPolyPatch::calcCorrectedGeometry() const
     // Get mesh reference
     const polyMesh& mesh = boundaryMesh().mesh();
 
-    // Copy basic fields for corrections
-    correctedCellCentresPtr_ = new vectorField(mesh.cellCentres());
-    vectorField& C = *correctedCellCentresPtr_;
-
-    correctedFaceCentresPtr_ = new vectorField(mesh.faceCentres());
-    vectorField& Cf = *correctedFaceCentresPtr_;
-
-    correctedCellVolumesPtr_ = new scalarField(mesh.cellVolumes());
-    scalarField& V = *correctedCellVolumesPtr_;
-
-    correctedFaceAreasPtr_ = new vectorField(mesh.faceAreas());
-    vectorField& Sf = *correctedFaceAreasPtr_;
+    // Get mesh geometry references from the MeshObject
+    vectorField& C = correctedFields_.correctedCellCentres();;
+    vectorField& Cf = correctedFields_.correctedFaceCentres();
+    scalarField& V = correctedFields_.correctedCellVolumes();
+    vectorField& Sf = correctedFields_.correctedFaceAreas();
 
     // Initialise IB patch face areas with the areas of the stand-alone patch
     // They will be corrected using the Marooney Maneouvre
@@ -1277,11 +1356,9 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     nearestTriPtr_(NULL),
     deadCellsPtr_(NULL),
     deadFacesPtr_(NULL),
-    correctedCellCentresPtr_(NULL),
-    correctedFaceCentresPtr_(NULL),
-    correctedCellVolumesPtr_(NULL),
-    correctedFaceAreasPtr_(NULL),
+    correctedFields_(immersedBoundaryCorrectedMeshFields::New(bm.mesh())),
     correctedIbPatchFaceAreasPtr_(NULL),
+    topoChangeIndex_(-1),
     oldIbPointsPtr_(NULL)
 {}
 
@@ -1322,11 +1399,9 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     nearestTriPtr_(NULL),
     deadCellsPtr_(NULL),
     deadFacesPtr_(NULL),
-    correctedCellCentresPtr_(NULL),
-    correctedFaceCentresPtr_(NULL),
-    correctedCellVolumesPtr_(NULL),
-    correctedFaceAreasPtr_(NULL),
+    correctedFields_(immersedBoundaryCorrectedMeshFields::New(bm.mesh())),
     correctedIbPatchFaceAreasPtr_(NULL),
+    topoChangeIndex_(-1),
     oldIbPointsPtr_(NULL)
 {
     if (size() > 0)
@@ -1387,11 +1462,9 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     nearestTriPtr_(NULL),
     deadCellsPtr_(NULL),
     deadFacesPtr_(NULL),
-    correctedCellCentresPtr_(NULL),
-    correctedFaceCentresPtr_(NULL),
-    correctedCellVolumesPtr_(NULL),
-    correctedFaceAreasPtr_(NULL),
+    correctedFields_(immersedBoundaryCorrectedMeshFields::New(bm.mesh())),
     correctedIbPatchFaceAreasPtr_(NULL),
+    topoChangeIndex_(-1),
     oldIbPointsPtr_(NULL)
 {}
 
@@ -1430,11 +1503,15 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     nearestTriPtr_(NULL),
     deadCellsPtr_(NULL),
     deadFacesPtr_(NULL),
-    correctedCellCentresPtr_(NULL),
-    correctedFaceCentresPtr_(NULL),
-    correctedCellVolumesPtr_(NULL),
-    correctedFaceAreasPtr_(NULL),
+    correctedFields_
+    (
+        immersedBoundaryCorrectedMeshFields::New
+        (
+            pp.boundaryMesh().mesh()
+        )
+    ),
     correctedIbPatchFaceAreasPtr_(NULL),
+    topoChangeIndex_(-1),
     oldIbPointsPtr_(NULL)
 {}
 
@@ -1474,11 +1551,9 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     nearestTriPtr_(NULL),
     deadCellsPtr_(NULL),
     deadFacesPtr_(NULL),
-    correctedCellCentresPtr_(NULL),
-    correctedFaceCentresPtr_(NULL),
-    correctedCellVolumesPtr_(NULL),
-    correctedFaceAreasPtr_(NULL),
+    correctedFields_(immersedBoundaryCorrectedMeshFields::New(bm.mesh())),
     correctedIbPatchFaceAreasPtr_(NULL),
+    topoChangeIndex_(-1),
     oldIbPointsPtr_(NULL)
 {}
 
@@ -1629,48 +1704,48 @@ Foam::immersedBoundaryPolyPatch::deadFaces() const
 const Foam::vectorField&
 Foam::immersedBoundaryPolyPatch::correctedCellCentres() const
 {
-    if (!correctedCellCentresPtr_)
+    if (!correctedIbPatchFaceAreasPtr_)
     {
         calcCorrectedGeometry();
     }
 
-    return *correctedCellCentresPtr_;
+    return correctedFields_.correctedCellCentres();
 }
 
 
 const Foam::vectorField&
 Foam::immersedBoundaryPolyPatch::correctedFaceCentres() const
 {
-    if (!correctedFaceCentresPtr_)
+    if (!correctedIbPatchFaceAreasPtr_)
     {
         calcCorrectedGeometry();
     }
 
-    return *correctedFaceCentresPtr_;
+    return correctedFields_.correctedFaceCentres();
 }
 
 
 const Foam::scalarField&
 Foam::immersedBoundaryPolyPatch::correctedCellVolumes() const
 {
-    if (!correctedCellVolumesPtr_)
+    if (!correctedIbPatchFaceAreasPtr_)
     {
         calcCorrectedGeometry();
     }
 
-    return *correctedCellVolumesPtr_;
+    return correctedFields_.correctedCellVolumes();
 }
 
 
 const Foam::vectorField&
 Foam::immersedBoundaryPolyPatch::correctedFaceAreas() const
 {
-    if (!correctedFaceAreasPtr_)
+    if (!correctedIbPatchFaceAreasPtr_)
     {
         calcCorrectedGeometry();
     }
 
-    return *correctedFaceAreasPtr_;
+    return correctedFields_.correctedFaceAreas();
 }
 
 
@@ -1825,11 +1900,13 @@ void Foam::immersedBoundaryPolyPatch::clearOut() const
     deleteDemandDrivenData(deadCellsPtr_);
     deleteDemandDrivenData(deadFacesPtr_);
 
-    deleteDemandDrivenData(correctedCellCentresPtr_);
-    deleteDemandDrivenData(correctedFaceCentresPtr_);
-    deleteDemandDrivenData(correctedCellVolumesPtr_);
-    deleteDemandDrivenData(correctedFaceAreasPtr_);
     deleteDemandDrivenData(correctedIbPatchFaceAreasPtr_);
+
+    // Update topo change index
+    topoChangeIndex_++;
+
+    // Clear global data MeshObject
+    correctedFields_.clearOut(topoChangeIndex_);
 
     // Cannot delete old motion points.  HJ, 10/Dec/2017
 }

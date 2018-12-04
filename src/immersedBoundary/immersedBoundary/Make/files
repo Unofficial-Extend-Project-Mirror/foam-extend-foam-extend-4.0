@@ -1,6 +1,7 @@
 immersedPoly/immersedPoly.C
 immersedPoly/distanceFunctions/triSurfaceDistance/triSurfaceDistance.C
 
+immersedBoundaryPolyPatch/immersedBoundaryCorrectedMeshFields/immersedBoundaryCorrectedMeshFields.C
 immersedBoundaryPolyPatch/immersedBoundaryPolyPatch.C
 immersedBoundaryPointPatch/immersedBoundaryPointPatch.C
 immersedBoundaryFvPatch/immersedBoundaryFvPatch.C

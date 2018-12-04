@@ -60,10 +60,28 @@ void Foam::immersedBoundaryFvPatch::makeCf(slicedSurfaceVectorField& Cf) const
     // Insert the patch data for the immersed boundary
     // Note: use the face centres from the stand-alone patch within the IB
     // HJ, 30/Nov/2017
-    Cf.boundaryField()[index()].UList::operator=
-    (
-        vectorField::subField(ibPolyPatch_.ibPatch().faceCentres(), size())
-    );
+    // NOTE: Loop though all ib boundaries in order to update the fields
+    // overwritten by reset. Needed for multiple IB patches (IG 2/Nov/2018)
+    const fvMesh& mesh = boundaryMesh().mesh();
+    forAll(mesh.boundary(), patchI)
+    {
+        if(isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
+        {
+            const immersedBoundaryFvPatch& curIbPatch = refCast
+            <
+                const immersedBoundaryFvPatch
+            >(mesh.boundary()[patchI]);
+
+            Cf.boundaryField()[patchI].UList::operator=
+                (
+                    vectorField::subField
+                    (
+                        curIbPatch.ibPolyPatch().ibPatch().faceCentres(),
+                        curIbPatch.size()
+                    )
+                );
+        }
+    }
 }
 
 
@@ -76,10 +94,28 @@ void Foam::immersedBoundaryFvPatch::makeSf(slicedSurfaceVectorField& Sf) const
     // Note: use the corrected face areas from immersed boundary instead of
     // the stand-alone patch areas within the IB
     // HJ, 30/Nov/2017
-    Sf.boundaryField()[index()].UList::operator=
-    (
-        vectorField::subField(ibPolyPatch_.correctedIbPatchFaceAreas(), size())
-    );
+    // NOTE: Loop though all ib boundaries in order to update the fields
+    // overwritten by reset. Needed for multiple IB patches (IG 2/Nov/2018)
+    const fvMesh& mesh = boundaryMesh().mesh();
+    forAll(mesh.boundary(), patchI)
+    {
+        if(isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
+        {
+            const immersedBoundaryFvPatch& curIbPatch = refCast
+            <
+                const immersedBoundaryFvPatch
+            >(mesh.boundary()[patchI]);
+
+            Sf.boundaryField()[patchI].UList::operator=
+                (
+                    vectorField::subField
+                    (
+                        curIbPatch.ibPolyPatch().correctedIbPatchFaceAreas(),
+                        curIbPatch.size()
+                    )
+                );
+        }
+    }
 }
 
 
@@ -95,10 +131,28 @@ void Foam::immersedBoundaryFvPatch::makeC(slicedVolVectorField& C) const
     // Insert the patch data for the immersed boundary
     // Note: use the face centres from the stand-alone patch within the IB
     // HJ, 30/Nov/2017
-    C.boundaryField()[index()].UList::operator=
-    (
-        vectorField::subField(ibPolyPatch_.ibPatch().faceCentres(), size())
-    );
+    // NOTE: Loop though all ib boundaries in order to update the fields
+    // overwritten by reset. Needed for multiple IB patches (IG 2/Nov/2018)
+    const fvMesh& mesh = boundaryMesh().mesh();
+    forAll(mesh.boundary(), patchI)
+    {
+        if(isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
+        {
+            const immersedBoundaryFvPatch& curIbPatch = refCast
+            <
+                const immersedBoundaryFvPatch
+            >(mesh.boundary()[patchI]);
+
+            C.boundaryField()[patchI].UList::operator=
+                (
+                    vectorField::subField
+                    (
+                        curIbPatch.ibPolyPatch().ibPatch().faceCentres(),
+                        curIbPatch.size()
+                    )
+                );
+        }
+    }
 }
 
 
@@ -177,9 +231,14 @@ void Foam::immersedBoundaryFvPatch::updatePhi
 
         const scalarField& pssf = phi.boundaryField()[patchI];
 
-        forAll (pFaceCells, faceI)
+        // Check for size since uninitialised ib patches can have zero size at
+        // this point (IG 7/Nov/2018)
+        if (pssf.size() > 0)
         {
-            divPhi[pFaceCells[faceI]] += pssf[faceI];
+            forAll (pFaceCells, faceI)
+            {
+                divPhi[pFaceCells[faceI]] += pssf[faceI];
+            }
         }
     }
 
@@ -246,7 +305,7 @@ void Foam::immersedBoundaryFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
         if
         (
             gamma[owner[faceI]] < nonOrthogonalFactor_()
-         || gamma[owner[faceI]] < nonOrthogonalFactor_()
+         || gamma[neighbour[faceI]] < nonOrthogonalFactor_()
         )
         {
             // Thin live cut.  Reset correction vectors

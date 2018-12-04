@@ -80,10 +80,10 @@ void Foam::immersedBoundaryFieldBase<Type>::writeField
 ) const
 {
     // Write VTK on master only
-    if (Pstream::master())
+//    if (Pstream::master())
     {
         // Add parallel reduction of all faces and data to proc 0
-        // and write the whole patch together
+        // and write the whole patch together.  To Do: HJ, 4/Dec/2018
 
         // Write immersed boundary data as a vtk file
         autoPtr<surfaceWriter> writerPtr = surfaceWriter::New("vtk");

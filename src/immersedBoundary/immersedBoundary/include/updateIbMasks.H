@@ -20,6 +20,19 @@
     sGammaIn =  magSf.internalField()/
         scalarField::subField(magFaceAreas, mesh.nInternalFaces());
 
+    const scalar maxGamma = max(gammaIn);
+    const scalar maxSGamma = min(sGammaIn);
+    if (maxGamma > 1 || maxSGamma > 1)
+    {
+        WarningIn
+        (
+            "updateIbMasks.H"
+        )
+            << "Unbounded gamma: max(gamma) = "
+            << maxGamma << ", max(sGamma) = " << 
+            << maxSGamma << endl;
+    }
+
     forAll (mesh.boundary(), patchI)
     {
         if (!isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))

@@ -40,6 +40,9 @@ Author
     Zeljko Tukovic
     Reorganisation and optimisation by Hrvoje Jasak
 
+Contributors
+    Inno Gatin, FMENA, Zagreb.
+
 SourceFiles
     immersedBoundaryFvPatch.C
     immersedBoundaryFvPatchTemplates.C
