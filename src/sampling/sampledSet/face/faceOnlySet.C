@@ -43,6 +43,16 @@ namespace Foam
 }
 
 
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+const Foam::debug::optimisationSwitch
+Foam::faceOnlySet::maxNSteps_
+(
+    "maximumFaceOnlySetStepNumber",
+    100
+);
+
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 

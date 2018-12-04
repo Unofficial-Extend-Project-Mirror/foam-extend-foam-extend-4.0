@@ -63,6 +63,13 @@ class faceOnlySet
         point end_;
 
 
+    // Static data
+
+        //- Maximum number of steps for intersection search. Introduced to avoid
+        //  inifinite loops (IG 4/Dec/2018)
+        static const debug::optimisationSwitch maxNSteps_;
+
+
     // Private Member Functions
 
         //- Samples from startTrackPt/CellI. Updates particle/samplePt/sampleI
