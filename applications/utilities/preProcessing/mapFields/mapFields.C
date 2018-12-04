@@ -275,7 +275,7 @@ int main(int argc, char *argv[])
         (
             IOobject
             (
-                fvMesh::defaultRegion,
+                targetRegionName,
                 runTimeTarget.timeName(),
                 runTimeTarget
             )
@@ -300,7 +300,7 @@ int main(int argc, char *argv[])
             (
                 IOobject
                 (
-                    fvMesh::defaultRegion,
+                    sourceRegionName,
                     runTimeSource.timeName(),
                     runTimeSource
                 )
@@ -342,7 +342,7 @@ int main(int argc, char *argv[])
         (
             IOobject
             (
-                fvMesh::defaultRegion,
+                sourceRegionName,
                 runTimeSource.timeName(),
                 runTimeSource
             )
@@ -365,7 +365,7 @@ int main(int argc, char *argv[])
             (
                 IOobject
                 (
-                    fvMesh::defaultRegion,
+                    targetRegionName,
                     runTimeTarget.timeName(),
                     runTimeTarget
                 )
@@ -446,7 +446,7 @@ int main(int argc, char *argv[])
             (
                 IOobject
                 (
-                    fvMesh::defaultRegion,
+                    sourceRegionName,
                     runTimeSource.timeName(),
                     runTimeSource
                 )
@@ -481,7 +481,7 @@ int main(int argc, char *argv[])
                     (
                         IOobject
                         (
-                            fvMesh::defaultRegion,
+                            targetRegionName,
                             runTimeTarget.timeName(),
                             runTimeTarget
                         )
@@ -523,7 +523,7 @@ int main(int argc, char *argv[])
         (
             IOobject
             (
-                fvMesh::defaultRegion,
+                sourceRegionName,
                 runTimeSource.timeName(),
                 runTimeSource
             )
@@ -533,7 +533,7 @@ int main(int argc, char *argv[])
         (
             IOobject
             (
-                fvMesh::defaultRegion,
+                targetRegionName,
                 runTimeTarget.timeName(),
                 runTimeTarget
             )
