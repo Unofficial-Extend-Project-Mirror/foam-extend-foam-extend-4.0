@@ -125,10 +125,10 @@ class PointEdgeWave
         label nChangedEdges_;
 
         //- Number of cyclic patches
-        bool nCyclicPatches_;
+        label nCyclicPatches_;
 
         //- Number of cyclic patches
-        bool nGgiPatches_;
+        label nGgiPatches_;
 
         //- For every cyclic patch two primitivePatches
         PtrList<primitivePatch> cycHalves_;
