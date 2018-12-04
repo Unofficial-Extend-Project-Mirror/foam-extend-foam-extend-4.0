@@ -33,7 +33,7 @@ License
 
 namespace Foam
 {
-    const scalar sampledSet::tol = 1e-6;
+    const scalar sampledSet::tol = 1e-5;
 
     defineTypeNameAndDebug(sampledSet, 0);
     defineRunTimeSelectionTable(sampledSet, word);
