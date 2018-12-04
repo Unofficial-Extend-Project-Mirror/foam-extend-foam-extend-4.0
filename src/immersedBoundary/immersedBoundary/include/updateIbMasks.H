@@ -29,8 +29,7 @@
             "updateIbMasks.H"
         )
             << "Unbounded gamma: max(gamma) = "
-            << maxGamma << ", max(sGamma) = " << 
-            << maxSGamma << endl;
+            << maxGamma << ", max(sGamma) = " << maxSGamma << endl;
     }
 
     forAll (mesh.boundary(), patchI)
