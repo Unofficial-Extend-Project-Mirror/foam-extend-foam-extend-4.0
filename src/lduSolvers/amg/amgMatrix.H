@@ -112,50 +112,49 @@ public:
         {}
 
 
-    // Destructor
+    //- Destructor
+    ~amgMatrix()
+    {
+        deleteDemandDrivenData(addrPtr_);
 
-        ~amgMatrix()
+        // Clear the interface storage by hand.  It is a list of ptrs
+        // not a PtrList for consistency of the interface
+        if (interfacesPtr_)
         {
-            deleteDemandDrivenData(addrPtr_);
+            lduInterfacePtrsList& curLevel = *interfacesPtr_;
 
-            // Clear the interface storage by hand.  It is a list of ptrs
-            // not a PtrList for consistency of the interface
-            if (interfacesPtr_)
+            forAll (curLevel, i)
             {
-                lduInterfacePtrsList& curLevel = *interfacesPtr_;
-
-                forAll (curLevel, i)
+                if (curLevel.set(i))
                 {
-                    if (curLevel.set(i))
-                    {
-                        delete curLevel(i);
-                    }
+                    delete curLevel(i);
                 }
             }
-
-            deleteDemandDrivenData(interfacesPtr_);
-
-            deleteDemandDrivenData(matrixPtr_);
-
-            // Clear the interface field storage by hand.  It is a list of ptrs
-            // not a PtrList for consistency of the interface
-            if (interfaceFieldsPtr_)
-            {
-                lduInterfaceFieldPtrsList& curLevelField = *interfaceFieldsPtr_;
-
-                forAll (curLevelField, i)
-                {
-                    if (curLevelField.set(i))
-                    {
-                        delete curLevelField(i);
-                    }
-                }
-            }
-
-            deleteDemandDrivenData(interfaceFieldsPtr_);
-            deleteDemandDrivenData(coupleBouCoeffsPtr_);
-            deleteDemandDrivenData(coupleIntCoeffsPtr_);
         }
+
+        deleteDemandDrivenData(interfacesPtr_);
+
+        deleteDemandDrivenData(matrixPtr_);
+
+        // Clear the interface field storage by hand.  It is a list of ptrs
+        // not a PtrList for consistency of the interface
+        if (interfaceFieldsPtr_)
+        {
+            lduInterfaceFieldPtrsList& curLevelField = *interfaceFieldsPtr_;
+
+            forAll (curLevelField, i)
+            {
+                if (curLevelField.set(i))
+                {
+                    delete curLevelField(i);
+                }
+            }
+        }
+
+        deleteDemandDrivenData(interfaceFieldsPtr_);
+        deleteDemandDrivenData(coupleBouCoeffsPtr_);
+        deleteDemandDrivenData(coupleIntCoeffsPtr_);
+    }
 
 
     // Member Functions
