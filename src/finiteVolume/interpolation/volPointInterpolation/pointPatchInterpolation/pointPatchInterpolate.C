@@ -169,6 +169,12 @@ void pointPatchInterpolation::interpolate
         {
             pf.boundaryField()[patchi].initAddField();
         }
+        else
+        {
+            // Bugfix: Need to update ordinary boundary conditions.
+            // Dario Zivkovic, 8/Dec/2018.
+            pf.boundaryField()[patchi].initEvaluate();
+        }
     }
 
     forAll(pf.boundaryField(), patchi)
@@ -180,9 +186,15 @@ void pointPatchInterpolation::interpolate
                 pf.internalField()
             );
         }
+        else
+        {
+            // Bugfix: Need to update ordinary boundary conditions.
+            // Dario Zivkovic, 8/Dec/2018.
+            pf.boundaryField()[patchi].evaluate();
+        }
     }
 
-    // Coupled boundaries already updated. Nothing to do. VV, 4/Dec/2017.
+    // All boundaries already updated. Nothing to do. VV, 4/Dec/2017.
 
     if (debug)
     {
