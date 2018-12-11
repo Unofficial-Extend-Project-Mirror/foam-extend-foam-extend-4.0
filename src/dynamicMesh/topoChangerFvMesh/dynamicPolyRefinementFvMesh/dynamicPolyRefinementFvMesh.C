@@ -271,11 +271,15 @@ bool Foam::dynamicPolyRefinementFvMesh::update()
             (
                 refinementSelectionPtr_->refinementCellCandidates()()
             );
-            Pout<< "Selected " << refCandidates.size()
-                << " refinement candidates."
-                << endl;
+
+            if (debug)
+            {
+                Pout<< "Selected " << refCandidates.size()
+                    << " refinement candidates."
+                    << endl;
+            }
         }
-        else
+        else if (debug)
         {
             Pout<< "Skipping refinement for this time-step..." << endl;
         }
@@ -297,11 +301,15 @@ bool Foam::dynamicPolyRefinementFvMesh::update()
             (
                 refinementSelectionPtr_->unrefinementPointCandidates()()
             );
-            Pout<< "Selected " << unrefCandidates.size()
-                << " unrefinement candidates."
-                << endl;
+
+            if (debug)
+            {
+                Pout<< "Selected " << unrefCandidates.size()
+                    << " unrefinement candidates."
+                    << endl;
+            }
         }
-        else
+        else if (debug)
         {
             Pout<< "Skipping unrefinement for this time-step..." << endl;
         }
@@ -344,13 +352,13 @@ bool Foam::dynamicPolyRefinementFvMesh::update()
         // some topo changes
         if (sizeCellMap)
         {
-            Pout<< "Successfully performed polyhedral refinement. "
+            Info<< "Successfully performed polyhedral refinement. "
                 << "Changed from " << nOldCells << " to " << sizeCellMap
                 << " cells." << endl;
         }
         else
         {
-            Pout<< "Refinement/unrefinement not performed in this time step "
+            Info<< "Refinement/unrefinement not performed in this time step "
                 << "since no cells were selected." << endl;
         }
 
@@ -363,7 +371,7 @@ bool Foam::dynamicPolyRefinementFvMesh::update()
         curTimeIndex_ = time().timeIndex();
     }
 
-    Pout<< "No refinement/unrefinement" << endl;
+    Info<< "No refinement/unrefinement" << endl;
 
     // No refinement/unrefinement at this time step. Return false
     return false;
