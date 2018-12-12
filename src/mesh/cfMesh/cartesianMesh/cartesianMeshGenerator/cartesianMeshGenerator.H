@@ -140,6 +140,12 @@ public:
 
         //- write the mesh
         void writeMesh() const;
+
+        //- Access to polyMeshGen member
+        const polyMeshGen& mesh() const
+        {
+            return mesh_;
+        }
 };
 
 
