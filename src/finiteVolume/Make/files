@@ -286,13 +286,14 @@ $(schemes)/cubicUpwindFit/cubicUpwindFit.C
 $(schemes)/quadraticLinearPureUpwindFit/quadraticLinearPureUpwindFit.C
 */
 $(schemes)/linearPureUpwindFit/linearPureUpwindFit.C
+$(schemes)/linearUpwind/linearUpwind.C
+$(schemes)/linearUpwind/linearUpwindV.C
+$(schemes)/LUST/LUST.C
 
 limitedSchemes = $(surfaceInterpolation)/limitedSchemes
 $(limitedSchemes)/limitedSurfaceInterpolationScheme/limitedSurfaceInterpolationSchemes.C
 $(limitedSchemes)/upwind/upwind.C
 $(limitedSchemes)/blended/blended.C
-$(limitedSchemes)/linearUpwind/linearUpwind.C
-$(limitedSchemes)/linearUpwind/linearUpwindV.C
 $(limitedSchemes)/reconCentral/reconCentral.C
 $(limitedSchemes)/Gamma/Gamma.C
 $(limitedSchemes)/SFCD/SFCD.C
