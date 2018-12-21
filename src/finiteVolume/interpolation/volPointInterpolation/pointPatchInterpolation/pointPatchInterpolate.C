@@ -169,12 +169,6 @@ void pointPatchInterpolation::interpolate
         {
             pf.boundaryField()[patchi].initAddField();
         }
-        else
-        {
-            // Bugfix: Need to update ordinary boundary conditions.
-            // Dario Zivkovic, 8/Dec/2018.
-            pf.boundaryField()[patchi].initEvaluate();
-        }
     }
 
     forAll(pf.boundaryField(), patchi)
@@ -186,15 +180,11 @@ void pointPatchInterpolation::interpolate
                 pf.internalField()
             );
         }
-        else
-        {
-            // Bugfix: Need to update ordinary boundary conditions.
-            // Dario Zivkovic, 8/Dec/2018.
-            pf.boundaryField()[patchi].evaluate();
-        }
     }
 
-    // All boundaries already updated. Nothing to do. VV, 4/Dec/2017.
+    // Bugfix: Must update boundary conditions for e.g. fixedValue that changes
+    // within e.g. fvMotion solver. Dario Zivkovic, 21/Dec/2018.
+    pf.correctBoundaryConditions();
 
     if (debug)
     {
