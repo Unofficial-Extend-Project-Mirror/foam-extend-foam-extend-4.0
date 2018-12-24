@@ -126,7 +126,8 @@ void sixDoFRigidBodyDisplacementPointPatchVectorField::autoMap
 
 void sixDoFRigidBodyDisplacementPointPatchVectorField::rmap
 (
-    const pointPatchField<vector>& ptf,
+    const PointPatchField
+        <pointPatchField, pointMesh, pointPatch, DummyMatrix, vector>& ptf,
     const labelList& addr
 )
 {

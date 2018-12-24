@@ -153,7 +153,8 @@ public:
             //- Reverse map the given pointPatchField onto this pointPatchField
             virtual void rmap
             (
-                const pointPatchField<vector>&,
+                const PointPatchField
+                    <pointPatchField, pointMesh, pointPatch, DummyMatrix, vector>&,
                 const labelList&
             );
 
