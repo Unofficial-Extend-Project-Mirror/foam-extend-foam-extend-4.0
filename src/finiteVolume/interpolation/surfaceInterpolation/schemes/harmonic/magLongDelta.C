@@ -70,7 +70,7 @@ void Foam::magLongDelta::makeMagLongDistance() const
             << abort(FatalError);
     }
 
-//     if (debug)
+    if (debug)
     {
         InfoIn("magLongDelta::makeMagLongDistance()")
             << "Constructing magnitude of long cell distance"

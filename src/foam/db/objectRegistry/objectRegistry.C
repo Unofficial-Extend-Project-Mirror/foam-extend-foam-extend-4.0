@@ -212,6 +212,12 @@ const Foam::objectRegistry& Foam::objectRegistry::subRegistry
 }
 
 
+bool Foam::objectRegistry::found(const word& name) const
+{
+    return HashTable<regIOobject*>::found(name);
+}
+
+
 Foam::label Foam::objectRegistry::getEvent() const
 {
     label curEvent = event_++;

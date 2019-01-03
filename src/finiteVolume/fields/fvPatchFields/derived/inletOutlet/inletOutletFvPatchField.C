@@ -129,7 +129,9 @@ void inletOutletFvPatchField<Type>::updateCoeffs()
         return;
     }
 
-    if (!this->db().objectRegistry::found(phiName_))
+    // HR 2.1.19: Allow calls of virtual function in derived object registry
+    // eg. postFixedSubRegistry
+    if (!this->db().found(phiName_))
     {
         // Flux not available, do not update
         InfoIn

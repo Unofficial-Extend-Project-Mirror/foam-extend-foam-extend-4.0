@@ -88,6 +88,9 @@ public:
             //- Return mangled fileName
             virtual fileName mangleFileName (const fileName&) const;
 
+            //- Is the object with name found?
+            virtual bool found(const word& name) const;
+
         // Edit
 
             //- Add an regIOobject to registry
