@@ -411,7 +411,7 @@ inline scalar soaveRedlichKwong::rho
                -(
                    (this->p((this->W()/molarVolumePrevIteration),T) - p)
                    /(this->dpdv((this->W()/molarVolumePrevIteration), T))
-               )/pow(2,i);
+               )/pow(2.0,i);
 
            i++;
            if (i>8)

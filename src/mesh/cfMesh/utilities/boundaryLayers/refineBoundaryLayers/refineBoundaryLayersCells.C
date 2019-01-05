@@ -885,7 +885,7 @@ void refineBoundaryLayers::refineCornerHexCell::generateNewPoints()
         forAll(cellPoints_[i], j)
         {
             cellPoints_[i][j].setSize(nLayersK_+1);
-            cellPoints_[i][j] = -1;
+            cellPoints_[i][j] = label(-1);
         }
     }
 

@@ -1056,7 +1056,7 @@ inline bool doTrianglesOverlap
         x /= (mag(x) + VSMALL);
         vector y = vec ^ x;
 
-        DynList<point2D, 6> poly2D(3);
+        DynList<point2D, 6> poly2D(label(3));
         poly2D[0] = point2D((tri0.a() - origin) & x, (tri0.a() - origin) & y);
         poly2D[1] = point2D((tri0.b() - origin) & x, (tri0.b() - origin) & y);
         poly2D[2] = point2D((tri0.c() - origin) & x, (tri0.c() - origin) & y);

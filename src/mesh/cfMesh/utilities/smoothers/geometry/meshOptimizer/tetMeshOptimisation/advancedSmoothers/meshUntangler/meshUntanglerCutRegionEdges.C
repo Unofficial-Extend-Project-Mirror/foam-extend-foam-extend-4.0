@@ -50,7 +50,7 @@ void meshUntangler::cutRegion::findNewEdges()
     const DynList<edge, 128>& edges = *edgesPtr_;
 
     newEdgeLabel_.setSize(edges.size());
-    newEdgeLabel_ = -1;
+    newEdgeLabel_ = label(-1);
 
     forAll(edges, eI)
     {

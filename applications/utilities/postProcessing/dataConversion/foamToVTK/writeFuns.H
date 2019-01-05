@@ -55,10 +55,11 @@ class writeFuns
 {
     // Private member functions
 
-        // Swap halves of word.
+        //- Swap halves of word
+        static void swapWord(int32_t& word32);
 
-            static void swapWord(label& word32);
-            static void swapWords(const label nWords, label* words32);
+        //- Swap halves of word
+        static void swapWords(const label nWords, int32_t* words32);
 
 
 public:

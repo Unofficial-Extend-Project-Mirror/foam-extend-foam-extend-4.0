@@ -106,7 +106,7 @@ makeCompactCellFaceAddressingAndFaceWeights
 
 Foam::tmp<Foam::labelField> Foam::MGridGenGAMGAgglomeration::agglomerate
 (
-    label& nCoarseCells,
+    int& nCoarseCells,
     const label minSize,
     const label maxSize,
     const lduAddressing& fineAddressing,
@@ -135,7 +135,7 @@ Foam::tmp<Foam::labelField> Foam::MGridGenGAMGAgglomeration::agglomerate
     );
 
     // MGridGen agglomeration options.
-    labelList options(4, 0);
+    List<int> options(4);
     options[0] = 4;                   // globular agglom
     options[1] = 6;                   // objective F3 and F2
     options[2] = 128;                 // debugging output level
@@ -143,7 +143,7 @@ Foam::tmp<Foam::labelField> Foam::MGridGenGAMGAgglomeration::agglomerate
 
 
     // output: cell -> processor addressing
-    List<int> finalAgglom(nFineCells);
+    List<label> finalAgglom(nFineCells);
     int nMoves = -1;
 
 #   ifdef WM_DP

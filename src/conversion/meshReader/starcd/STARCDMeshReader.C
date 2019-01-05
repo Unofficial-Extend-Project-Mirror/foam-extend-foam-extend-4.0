@@ -640,9 +640,9 @@ void Foam::meshReaders::STARCD::readBoundary(const fileName& inputName)
     label lineLabel, starCellId, cellFaceId, starRegion, configNumber;
     word patchType;
 
-    labelList mapToFoamPatchId(1000, -1);
-    labelList nPatchFaces(1000, 0);
-    labelList origRegion(1000, 0);
+    labelList mapToFoamPatchId(1000, label(-1));
+    labelList nPatchFaces(1000, label(0));
+    labelList origRegion(1000, label(0));
     patchTypes_.setSize(1000);
 
     // this is what we seem to need

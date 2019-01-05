@@ -77,6 +77,7 @@ Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
 Patch0:         metis-5.1.0_patch_gcc
+Patch1:         metis-5.1.0_patch_64Bit
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -89,6 +90,10 @@ Patch0:         metis-5.1.0_patch_gcc
 %ifos linux
 %patch0 -p1
 %endif
+
+if [ "$WM_LABEL_SIZE" = "64" ]; then
+%patch1 -p1
+fi
 
 %build
     [ -n "$WM_CC" ]         &&  export CC="$WM_CC"

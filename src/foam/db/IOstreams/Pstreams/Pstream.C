@@ -311,8 +311,13 @@ void Foam::Pstream::allocatePstreamCommunicator
         // Set the number of processes to the actual number
         int numProcs;
         MPI_Comm_size(PstreamGlobals::MPICommunicators_[index], &numProcs);
-        procIDs_[index] = identity(numProcs);
-    }
+        //procIDs_[index] = identity(numProcs);
+        procIDs_[index].setSize(numProcs);
+        forAll(procIDs_[index], i)
+        {
+            procIDs_[index][i] = i;
+        }
+     }
     else
     {
         // Create new group
@@ -905,7 +910,7 @@ Foam::Pstream::treeCommunication_(10);
 
 // Allocate a serial communicator. This gets overwritten in parallel mode
 // (by Pstream::setParRun())
-Foam::Pstream::communicator serialComm(-1, Foam::labelList(1, 0), false);
+Foam::Pstream::communicator serialComm(-1, Foam::labelList(1, Foam::label(0)), false);
 
 // Number of processors at which the reduce algorithm changes from linear to
 // tree

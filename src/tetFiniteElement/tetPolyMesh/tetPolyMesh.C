@@ -116,13 +116,13 @@ tetPolyMesh::~tetPolyMesh()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::label Foam::tetPolyMesh::comm() const
+int Foam::tetPolyMesh::comm() const
 {
     return comm_;
 }
 
 
-Foam::label& Foam::tetPolyMesh::comm()
+int& Foam::tetPolyMesh::comm()
 {
     return comm_;
 }

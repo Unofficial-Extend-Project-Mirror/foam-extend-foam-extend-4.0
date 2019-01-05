@@ -362,7 +362,7 @@ void topoPatchMapper::calcAddressing() const
                 if (isA<processorPolyPatch>(patch_.patch()))
                 {
                     // Artificially map from face[0] of this patch.
-                    addr[faceI] = labelList(1, 0);
+                    addr[faceI] = labelList(1, label(0));
 
                     continue;
                 }

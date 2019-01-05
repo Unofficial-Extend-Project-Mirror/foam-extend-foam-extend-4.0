@@ -53,7 +53,7 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-void Foam::writeFuns::swapWord(label& word32)
+void Foam::writeFuns::swapWord(int32_t& word32)
 {
     char* mem = reinterpret_cast<char*>(&word32);
 
@@ -67,7 +67,7 @@ void Foam::writeFuns::swapWord(label& word32)
 }
 
 
-void Foam::writeFuns::swapWords(const label nWords, label* words32)
+void Foam::writeFuns::swapWords(const label nWords, int32_t* words32)
 {
     for (label i = 0; i < nWords; i++)
     {
@@ -85,9 +85,10 @@ void Foam::writeFuns::write
 {
     if (binary)
     {
-#       ifdef LITTLEENDIAN
-        swapWords(fField.size(), reinterpret_cast<label*>(fField.begin()));
-#       endif
+        #ifdef LITTLEENDIAN
+        swapWords(fField.size(), reinterpret_cast<int32_t*>(fField.begin()));
+        #endif
+
         os.write
         (
             reinterpret_cast<char*>(fField.begin()),
@@ -134,9 +135,13 @@ void Foam::writeFuns::write
 {
     if (binary)
     {
-#       ifdef LITTLEENDIAN
-        swapWords(elems.size(), reinterpret_cast<label*>(elems.begin()));
-#       endif
+        #ifdef LITTLEENDIAN
+        swapWords
+        (
+            (sizeof(label)/4)*elems.size(),
+            reinterpret_cast<int32_t*>(elems.begin())
+        );
+        #endif
         os.write
         (
             reinterpret_cast<char*>(elems.begin()),

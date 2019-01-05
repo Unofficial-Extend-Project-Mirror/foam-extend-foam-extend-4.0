@@ -100,6 +100,11 @@ public:
         //- Construct given size
         explicit inline DynList(const label);
 
+#if WM_LABEL_SIZE == 64
+        //- Construct given size
+        explicit inline DynList(const int);
+#endif
+
         //- Construct from given size and defualt value
         explicit inline DynList(const label, const T&);
 

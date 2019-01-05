@@ -55,9 +55,14 @@ namespace Foam
 
 class writeFuns
 {
-    //- Swap halves of word.
-    static void swapWord(label& word32);
-    static void swapWords(const label nWords, label* words32);
+    // Private member functions
+
+        //- Swap halves of word
+        static void swapWord(int32_t& word32);
+
+        //- Swap halves of word
+        static void swapWords(const label nWords, int32_t* words32);
+
 
 public:
 

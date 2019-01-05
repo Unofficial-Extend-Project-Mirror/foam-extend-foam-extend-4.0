@@ -63,8 +63,8 @@ protected:
         static void calcCSR
         (
             const labelListList& globalCellCells,
-            List<int>& adjncy,
-            List<int>& xadj
+            List<label>& adjncy,
+            List<label>& xadj
         );
 
         //- Helper: convert local connectivity from the mesh
@@ -73,8 +73,8 @@ protected:
         static void calcCSR
         (
             const polyMesh& mesh,
-            List<int>& adjncy,
-            List<int>& xadj
+            List<label>& adjncy,
+            List<label>& xadj
         );
 
         //- Helper: convert mesh connectivity into distributed CSR
@@ -82,8 +82,8 @@ protected:
         static void calcDistributedCSR
         (
             const polyMesh&,
-            List<int>& adjncy,
-            List<int>& xadj
+            List<label>& adjncy,
+            List<label>& xadj
         );
 
         //- Helper: determine (non-parallel) cellCells from mesh

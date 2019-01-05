@@ -589,7 +589,7 @@ void Foam::autoLayerDriver::findIsolatedRegions
         pp.meshPoints(),
         isolatedPoint,
         plusEqOp<label>(),
-        0,       // null value
+        label(0), // null value
         false    // no separation
     );
 
@@ -734,7 +734,7 @@ void Foam::autoLayerDriver::medialAxisSmoothingInfo
             meshPoints,
             nPointFaces,
             plusEqOp<label>(),
-            0,                  // null value
+            label(0),           // null value
             false               // no separation
         );
 

@@ -202,7 +202,7 @@ void Foam::cellMapper::calcAddressing() const
             if (addr[cellI].empty())
             {
                 // Mapped from a dummy cell
-                addr[cellI] = labelList(1, 0);
+                addr[cellI] = labelList(1, label(0));
                 w[cellI] = scalarList(1, 1.0);
 
                 insertedCells[nInsertedCells] = cellI;

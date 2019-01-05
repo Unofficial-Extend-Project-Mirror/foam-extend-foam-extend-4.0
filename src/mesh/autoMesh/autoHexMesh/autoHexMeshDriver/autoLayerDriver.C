@@ -1799,7 +1799,7 @@ void Foam::autoLayerDriver::getPatchDisplacement
             meshPoints,
             nPointFaces,
             plusEqOp<label>(),
-            0,                  // null value
+            label(0),           // null value
             false               // no separation
         );
 
@@ -2292,7 +2292,7 @@ void Foam::autoLayerDriver::setupLayerInfoTruncation
             pp.meshPoints(),
             nPatchPointLayers,
             maxEqOp<label>(),
-            0,                  // null value
+            label(0),           // null value
             false               // no separation
         );
     }

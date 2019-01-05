@@ -687,7 +687,7 @@ Foam::List<Foam::labelPair> Foam::meshRefinement::filterDuplicateFaces
         mesh_,
         nBafflesPerEdge,
         plusEqOp<label>(),  // in-place add
-        0,                  // initial value
+        label(0),           // initial value
         false               // no separation
     );
 
@@ -1830,7 +1830,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::meshRefinement::splitMesh
             mesh_,
             pointBaffle,
             maxEqOp<label>(),
-            -1,                 // null value
+            label(-1),          // null value
             false               // no separation
         );
 

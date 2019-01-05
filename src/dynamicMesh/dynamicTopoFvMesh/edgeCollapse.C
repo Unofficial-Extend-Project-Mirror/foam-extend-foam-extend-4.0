@@ -2471,7 +2471,7 @@ const changeMap dynamicTopoFvMesh::collapseQuadFace
     }
 
     // Ensure proper orientation for the two retained faces
-    FixedList<label,2> cellCheck(0);
+    FixedList<label,2> cellCheck(label(0));
 
     if (owner_[faceToThrow[0]] == c0)
     {
@@ -3142,7 +3142,7 @@ const changeMap dynamicTopoFvMesh::collapseQuadFace
     }
 
     // Fill-in candidate mapping information
-    labelList mC(2, -1);
+    labelList mC(2, label(-1));
     mC[0] = c0, mC[1] = c1;
 
     // Now that all old / new cells possess correct connectivity,
@@ -4781,7 +4781,10 @@ const changeMap dynamicTopoFvMesh::collapseEdge
 
     // Check whether points of the edge lies on a boundary
     const FixedList<bool,2> edgeBoundary = checkEdgeBoundary(eIndex);
-    FixedList<label, 2> nBoundCurves(0), nProcCurves(0), checkPoints(-1);
+    FixedList<label, 2>
+        nBoundCurves(label(0)),
+        nProcCurves(label(0)),
+        checkPoints(label(-1));
 
     // Decide on collapseCase
     label collapseCase = -1;

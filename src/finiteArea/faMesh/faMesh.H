@@ -116,7 +116,7 @@ class faMesh
         // Communication support
 
             //- Communicator used for parallel communication
-            label comm_;
+            int comm_;
 
 
     // Demand-driven data
@@ -380,10 +380,10 @@ public:
             // Communication support
 
                 //- Return communicator used for parallel communication
-                label comm() const;
+                int comm() const;
 
                 //- Return communicator used for parallel communication
-                label& comm();
+                int& comm();
 
 
         // Access

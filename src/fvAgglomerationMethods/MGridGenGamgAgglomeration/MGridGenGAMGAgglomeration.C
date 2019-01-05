@@ -95,7 +95,7 @@ Foam::MGridGenGAMGAgglomeration::MGridGenGAMGAgglomeration
 
     while (nCreatedLevels < maxLevels_ - 1)
     {
-        label nCoarseCells = -1;
+        int nCoarseCells = -1;
 
         tmp<labelField> finalAgglomPtr = agglomerate
         (

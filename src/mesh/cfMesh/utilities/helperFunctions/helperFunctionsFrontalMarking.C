@@ -316,7 +316,7 @@ label groupMarking
     //- ones into a new group
     DynList<label> globalGroupLabel;
     globalGroupLabel.setSize(nGroups);
-    globalGroupLabel = -1;
+    globalGroupLabel = label(-1);
 
     //- reduce the information about the groups
     label counter(0);

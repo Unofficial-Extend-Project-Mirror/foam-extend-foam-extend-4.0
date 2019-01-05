@@ -46,8 +46,8 @@ namespace Foam
 void Foam::decompositionMethod::calcCSR
 (
     const labelListList& cellCells,
-    List<int>& adjncy,
-    List<int>& xadj
+    List<label>& adjncy,
+    List<label>& xadj
 )
 {
     // Count number of internal faces
@@ -88,8 +88,8 @@ void Foam::decompositionMethod::calcCSR
 void Foam::decompositionMethod::calcCSR
 (
     const polyMesh& mesh,
-    List<int>& adjncy,
-    List<int>& xadj
+    List<label>& adjncy,
+    List<label>& xadj
 )
 {
     // Make Metis CSR (Compressed Storage Format) storage
@@ -185,8 +185,8 @@ void Foam::decompositionMethod::calcCSR
 void Foam::decompositionMethod::calcDistributedCSR
 (
     const polyMesh& mesh,
-    List<int>& adjncy,
-    List<int>& xadj
+    List<label>& adjncy,
+    List<label>& xadj
 )
 {
     // Create global cell numbers
@@ -210,7 +210,7 @@ void Foam::decompositionMethod::calcDistributedCSR
     // Get renumbered owner on other side of coupled faces
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    List<int> globalNeighbour(mesh.nFaces()-mesh.nInternalFaces());
+    labelList globalNeighbour(mesh.nFaces()-mesh.nInternalFaces());
 
     forAll(patches, patchI)
     {
@@ -239,7 +239,7 @@ void Foam::decompositionMethod::calcDistributedCSR
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Number of faces per cell
-    List<int> nFacesPerCell(mesh.nCells(), 0);
+    List<label> nFacesPerCell(mesh.nCells(), 0);
 
     // Number of coupled faces
     label nCoupledFaces = 0;
@@ -272,7 +272,7 @@ void Foam::decompositionMethod::calcDistributedCSR
 
     xadj.setSize(mesh.nCells() + 1);
 
-    int freeAdj = 0;
+    label freeAdj = 0;
 
     for (label cellI = 0; cellI < mesh.nCells(); cellI++)
     {

@@ -74,7 +74,7 @@ class MGridGenGAMGAgglomeration
         //- Calculate and return agglomeration
         tmp<labelField> agglomerate
         (
-            label& nCoarseCells,
+            int& nCoarseCells,
             const label minSize,
             const label maxSize,
             const lduAddressing& fineAddressing,

@@ -823,7 +823,7 @@ inline Cmpt det(const TensorN<Cmpt, length>& t)
         }
 
         // Handle +/- sign switch
-        result += pow(-1, i)*t(i, 0)*det(subMatrix);
+        result += pow(label(-1), i)*t(i, 0)*det(subMatrix);
     }
 
     return result;

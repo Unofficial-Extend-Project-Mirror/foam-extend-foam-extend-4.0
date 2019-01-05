@@ -138,7 +138,7 @@ void Foam::pointMapper::calcAddressing() const
             if (addr[pointI].size() == 0)
             {
                 // Mapped from a dummy point. Take point 0 with weight 1.
-                addr[pointI] = labelList(1, 0);
+                addr[pointI] = labelList(1, label(0));
                 w[pointI] = scalarList(1, 1.0);
 
                 insertedPoints[nInsertedPoints] = pointI;

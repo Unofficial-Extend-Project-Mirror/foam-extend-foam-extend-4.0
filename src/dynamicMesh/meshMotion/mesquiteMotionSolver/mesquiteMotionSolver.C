@@ -1248,7 +1248,7 @@ void mesquiteMotionSolver::initArrays()
     label nCellPoints = 0, nFacePoints = 0;
 
     // Construct shape recognizers
-    FixedList<label, 4> nTypes(0);
+    FixedList<label, 4> nTypes(label(0));
     FixedList<autoPtr<cellMatcher>, 4> matcher;
     FixedList<Mesquite::EntityTopology, 4> cellType;
 
@@ -2513,7 +2513,7 @@ void mesquiteMotionSolver::initMesquiteParallelArrays()
         nSharedPoints[pI] = nProcPoints;
 
         // Initialize type sizes
-        FixedList<label, 4> nTypes(0);
+        FixedList<label, 4> nTypes(label(0));
 
         // Set an initial capacity for cell types
         myTypes[pI].setCapacity(50);

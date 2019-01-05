@@ -278,7 +278,7 @@ public:
             //  Updates: start
             const treeLeaf<Type>* findLeafLine
             (
-                const label level,
+                const int level,
                 const Type& shapes,
                 point& start,
                 const point& end
@@ -314,7 +314,7 @@ public:
             void writeOBJ
             (
                 Ostream& os,
-                const label level,
+                const int level,
                 label& vertNo
             ) const;
 

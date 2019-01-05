@@ -1453,7 +1453,7 @@ void Foam::refinement::setRefinement(polyTopoChange& ref) const
         mesh_,
         pointLevel_,
         maxEqOp<label>(),
-        0,   // Null value
+        label(0), // Null value
         true // Apply separation for parallel cyclics
     );
 

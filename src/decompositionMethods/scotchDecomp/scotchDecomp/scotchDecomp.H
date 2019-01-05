@@ -68,10 +68,10 @@ class scotchDecomp
 
         label decompose
         (
-            const List<int>& adjncy,
-            const List<int>& xadj,
+            const List<label>& adjncy,
+            const List<label>& xadj,
             const scalarField& cWeights,
-            List<int>& finalDecomp
+            List<label>& finalDecomp
         );
 
 

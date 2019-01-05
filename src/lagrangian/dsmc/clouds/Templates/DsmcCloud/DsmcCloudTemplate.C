@@ -128,7 +128,7 @@ void Foam::DsmcCloud<ParcelType>::initialise
         // record the vertex labels of each.
         scalarList cTetVFracs(nTets, 0.0);
 
-        List<labelList> tetPtIs(nTets, labelList(3,-1));
+        List<labelList> tetPtIs(nTets, labelList(3, label(-1)));
 
         // Keep track of which tet this is.
         label tet = 0;

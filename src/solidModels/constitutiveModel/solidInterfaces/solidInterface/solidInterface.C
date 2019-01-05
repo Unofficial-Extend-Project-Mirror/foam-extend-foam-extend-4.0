@@ -487,7 +487,7 @@ void solidInterface::makeProcessorPatchFacesMap() const
       new labelListList
       (
        mesh_.boundary().size(),
-       labelList(0,-1)
+       labelList()
        );
     processorPatchMapPtr_  =
       new labelList

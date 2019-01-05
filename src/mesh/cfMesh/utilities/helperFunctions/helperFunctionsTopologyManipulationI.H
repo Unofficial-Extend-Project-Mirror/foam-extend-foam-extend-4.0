@@ -488,7 +488,7 @@ inline void zipOpenChain(DynList<edge>& bEdges)
     }
 
     bool closed(true);
-    DynList<label> openVertices(2);
+    DynList<label> openVertices(label(2));
     forAll(chainVertices, pI)
         if( nAppearances[pI] == 1 )
         {

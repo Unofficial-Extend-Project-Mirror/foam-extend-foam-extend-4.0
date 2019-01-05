@@ -55,7 +55,7 @@ Foam::radiation::wideBandAbsorptionEmission::wideBandAbsorptionEmission
     absorptionEmissionModel(dict, mesh),
     coeffsDict_((dict.subDict(typeName + "Coeffs"))),
     speciesNames_(0),
-    specieIndex_(0),
+    specieIndex_(label(0)),
     lookUpTable_
     (
         fileName(coeffsDict_.lookup("lookUpTableFileName")),

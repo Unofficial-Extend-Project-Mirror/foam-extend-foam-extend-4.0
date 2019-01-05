@@ -72,14 +72,14 @@ class parMetisDecomp
 
         label decompose
         (
-            Field<int>& xadj,
-            Field<int>& adjncy,
+            Field<label>& xadj,
+            Field<label>& adjncy,
             const pointField& cellCentres,
-            Field<int>& cellWeights,
-            Field<int>& faceWeights,
-            const List<int>& options,
+            Field<label>& cellWeights,
+            Field<label>& faceWeights,
+            const List<label>& options,
 
-            List<int>& finalDecomp
+            List<label>& finalDecomp
         );
 
 
