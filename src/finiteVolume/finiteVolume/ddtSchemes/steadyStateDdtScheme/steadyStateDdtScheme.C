@@ -354,7 +354,7 @@ steadyStateDdtScheme<Type>::fvcDdtConsistentPhiCorr
             dimensioned<typename flux<Type>::type>
             (
                 "zero",
-                faceU.dimensions()*dimArea/rAUf.dimensions()/dimTime,
+                faceU.dimensions()*dimArea*rAUf.dimensions()/dimTime,
                 pTraits<typename flux<Type>::type>::zero
             )
         )
