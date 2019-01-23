@@ -81,18 +81,18 @@ inline bool operator==
     const debug::controlSwitches<T>& rhs
 );
 
-template<class T1, class T2>
+template<class T>
 inline bool operator==
 (
-    const T1& lhs,
-    const debug::controlSwitches<T2>& rhs
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
 );
 
-template<class T1, class T2>
+template<class T>
 inline bool operator==
 (
-    const debug::controlSwitches<T1>& lhs,
-    const T2& rhs
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
 );
 
 template<class T>
@@ -102,18 +102,18 @@ inline bool operator!=
     const debug::controlSwitches<T>& rhs
 );
 
-template<class T1, class T2>
+template<class T>
 inline bool operator!=
 (
-    const T1& lhs,
-    const debug::controlSwitches<T2>& rhs
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
 );
 
-template<class T1, class T2>
+template<class T>
 inline bool operator!=
 (
-    const debug::controlSwitches<T1>& lhs,
-    const T2& rhs
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
 );
 
 template<class T>
@@ -123,18 +123,18 @@ inline bool operator>=
     const debug::controlSwitches<T>& rhs
 );
 
-template<class T1, class T2>
+template<class T>
 inline bool operator>=
 (
-    const T1& lhs,
-    const debug::controlSwitches<T2>& rhs
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
 );
 
-template<class T1, class T2>
+template<class T>
 inline bool operator>=
 (
-    const debug::controlSwitches<T1>& lhs,
-    const T2& rhs
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
 );
 
 template<class T>
@@ -144,18 +144,18 @@ inline bool operator>
     const debug::controlSwitches<T>& rhs
 );
 
-template<class T1, class T2>
+template<class T>
 inline bool operator>
 (
-    const T1& lhs,
-    const debug::controlSwitches<T2>& rhs
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
 );
 
-template<class T1, class T2>
+template<class T>
 inline bool operator>
 (
-    const debug::controlSwitches<T1>& lhs,
-    const T2& rhs
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
 );
 
 template<class T>
@@ -165,18 +165,18 @@ inline bool operator<=
     const debug::controlSwitches<T>& rhs
 );
 
-template<class T1, class T2>
+template<class T>
 inline bool operator<=
 (
-    const T1& lhs,
-    const debug::controlSwitches<T2>& rhs
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
 );
 
-template<class T1, class T2>
+template<class T>
 inline bool operator<=
 (
-    const debug::controlSwitches<T1>& lhs,
-    const T2& rhs
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
 );
 
 template<class T>
@@ -186,11 +186,11 @@ inline bool operator<
     const debug::controlSwitches<T>& rhs
 );
 
-template<class T1, class T2>
+template<class T>
 inline bool operator<
 (
-    const T1& lhs,
-    const debug::controlSwitches<T2>& rhs
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
 );
 
 template<class T>

@@ -41,33 +41,33 @@ inline const T Foam::debug::controlSwitches<T>::operator&(const T& rhs)
 
 // * * * * * * * * * * * * * * * Global Operators  * * * * * * * * * * * * * //
 
-template<class T1, class T2>
+template<class T>
 inline bool Foam::operator==
 (
-    const debug::controlSwitches<T1>& lhs,
-    const debug::controlSwitches<T2>& rhs
+    const debug::controlSwitches<T>& lhs,
+    const debug::controlSwitches<T>& rhs
 )
 {
     return lhs() == rhs();
 }
 
 
-template<class T1, class T2>
+template<class T>
 inline bool Foam::operator==
 (
-    const T1& lhs,
-    const debug::controlSwitches<T2>& rhs
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
 )
 {
     return lhs == rhs();
 }
 
 
-template<class T1, class T2>
+template<class T>
 inline bool Foam::operator==
 (
-    const debug::controlSwitches<T1>& lhs,
-    const T2& rhs
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
 )
 {
     return lhs() == rhs;
@@ -85,22 +85,22 @@ inline bool Foam::operator!=
 }
 
 
-template<class T1, class T2>
+template<class T>
 inline bool Foam::operator!=
 (
-    const T1& lhs,
-    const debug::controlSwitches<T2>& rhs
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
 )
 {
     return lhs != rhs();
 }
 
 
-template<class T1, class T2>
+template<class T>
 inline bool Foam::operator!=
 (
-    const debug::controlSwitches<T1>& lhs,
-    const T2& rhs
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
 )
 {
     return lhs() != rhs;
@@ -118,22 +118,22 @@ inline bool Foam::operator>=
 }
 
 
-template<class T1, class T2>
+template<class T>
 inline bool Foam::operator>=
 (
-    const T1& lhs,
-    const debug::controlSwitches<T2>& rhs
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
 )
 {
     return lhs >= rhs();
 }
 
 
-template<class T1, class T2>
+template<class T>
 inline bool Foam::operator>=
 (
-    const debug::controlSwitches<T1>& lhs,
-    const T2& rhs
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
 )
 {
     return lhs() >= rhs;
@@ -151,22 +151,22 @@ inline bool Foam::operator>
 }
 
 
-template<class T1, class T2>
+template<class T>
 inline bool Foam::operator>
 (
-    const T1& lhs,
-    const debug::controlSwitches<T2>& rhs
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
 )
 {
     return lhs > rhs();
 }
 
 
-template<class T1, class T2>
+template<class T>
 inline bool Foam::operator>
 (
-    const debug::controlSwitches<T1>& lhs,
-    const T2& rhs
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
 )
 {
     return lhs() > rhs;
@@ -184,22 +184,22 @@ inline bool Foam::operator<=
 }
 
 
-template<class T1, class T2>
+template<class T>
 inline bool Foam::operator<=
 (
-    const T1& lhs,
-    const debug::controlSwitches<T2>& rhs
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
 )
 {
     return lhs <= rhs();
 }
 
 
-template<class T1, class T2>
+template<class T>
 inline bool Foam::operator<=
 (
-    const debug::controlSwitches<T1>& lhs,
-    const T2& rhs
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
 )
 {
     return lhs() <= rhs;
@@ -217,22 +217,22 @@ inline bool Foam::operator<
 }
 
 
-template<class T1, class T2>
+template<class T>
 inline bool Foam::operator<
 (
-    const T1& lhs,
-    const debug::controlSwitches<T2>& rhs
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
 )
 {
     return lhs < rhs();
 }
 
 
-template<class T1, class T2>
+template<class T>
 inline bool Foam::operator<
 (
-    const debug::controlSwitches<T1>& lhs,
-    const T2& rhs
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
 )
 {
     return lhs() < rhs;

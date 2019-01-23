@@ -89,7 +89,7 @@ inline void Foam::realGasSpecieThermo<thermo>::T
             )
         );
 
-        if (iter++ > maxIter_)
+        if (iter++ > maxIter_())
         {
             FatalErrorIn
             (
