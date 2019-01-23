@@ -71,6 +71,7 @@ Foam::processorMeshesReconstructor::processorMeshesReconstructor
 :
     meshName_(meshName),
     meshes_(),
+    globalPointIndex_(),
     pointProcAddressing_(),
     faceProcAddressing_(),
     cellProcAddressing_(),
@@ -86,6 +87,7 @@ Foam::processorMeshesReconstructor::processorMeshesReconstructor
 :
     meshName_(meshName),
     meshes_(databases.size()),
+    globalPointIndex_(),
     pointProcAddressing_(),
     faceProcAddressing_(),
     cellProcAddressing_(),

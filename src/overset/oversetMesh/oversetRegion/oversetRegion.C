@@ -190,18 +190,9 @@ void Foam::oversetRegion::calcDonorAcceptorCells() const
             // Update global flag
             foundGlobalOverlap &= regionFoundSuitableOverlap;
 
-            // If the overlap has not been found for this region, we need to
-            // reset:
-            //  - holeCells (depend on fringe holes)
-            //  - eligibleDonors (depend on fringe holes and acceptors),
-            //  - cellSearch (depends on eligible donors).
-            if (!regionFoundSuitableOverlap)
-            {
-                deleteDemandDrivenData(curRegion.cellSearchPtr_);
-            }
-
-            deleteDemandDrivenData(curRegion.holeCellsPtr_);
-            deleteDemandDrivenData(curRegion.eligibleDonorCellsPtr_);
+            // Deletion of demand driven data relocated to the end of
+            // updateDonorAcceptors() member function. Makes more sense to have
+            // it there. VV, 13/Jan/2019.
         }
     } while (!foundGlobalOverlap);
 
@@ -1317,6 +1308,20 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
 
     // STAGE 11: Filter possibly multiple remote donors
 
+    // Sanity check before moving on. For each initial acceptor, we must
+    // receive at least 1 corresponding donor (even if it is not found,
+    // indicating an orphan cell) from different processors.
+    if (a.size() > completeDonorAcceptorList.size())
+    {
+        FatalErrorIn("void oversetRegion::updateDonorAcceptors() const")
+            << "Size of initial acceptor set: " << a.size()
+            << " is larger than the size of the distributed "
+            << " donor/acceptor list: " << completeDonorAcceptorList.size()
+            << nl
+            << "This should not have happened..."
+            << abort(FatalError);
+    }
+
     // Create a masking field indicating that a certain acceptor has been
     // visited
     boolList isVisited(a.size(), false);
@@ -1379,35 +1384,16 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
                     curDA.donorPoint(),
                     curDA.withinBB()
                 );
+
+                // Bugfix: also need to reset extended donors since a better
+                // candidate has been found. VV, 1/Jan/2019
+                curDACombined.setExtendedDonors(curDA);
             }
         }
     }
 
-    // Update withinBB flag if the donor is within bounding box of acceptor
-    // (previously we checked whether the acceptor is within bounding box of
-    // donor)
-    forAll (combinedDonorAcceptorList, daI)
-    {
-        donorAcceptor& curDA = combinedDonorAcceptorList[daI];
-
-        // If the acceptor is not within bounding box of donor, set the flag
-        // other way around
-        if (!curDA.withinBB())
-        {
-            curDA.setWithinBB
-            (
-                mesh_.pointInCellBB
-                (
-                    curDA.donorPoint(),
-                    curDA.acceptorCell()
-                )
-            );
-        }
-    }
-
-    // Check whether all acceptors have been visited. Used for testing/debugging
-    // parallel comms
-    if (oversetMesh::debug)
+    // Check whether all acceptors have been visited. Useful check if in
+    // no-debug mode
     {
         bool allVisited = true;
 
@@ -1435,11 +1421,34 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
                     << nl
                     << "Try switching off useLocalBoundingBoxes for all regions"
                     << nl
-                    << "(this optimisation is switched on by default)."
+                    << "(this optimisation is switched off by default)."
                     << abort(FatalError);
             }
         }
     }
+
+    // Update withinBB flag if the donor is within bounding box of acceptor
+    // (previously we checked whether the acceptor is within bounding box of
+    // donor)
+    forAll (combinedDonorAcceptorList, daI)
+    {
+        donorAcceptor& curDA = combinedDonorAcceptorList[daI];
+
+        // If the acceptor is not within bounding box of donor, set the flag
+        // other way around
+        if (!curDA.withinBB())
+        {
+            curDA.setWithinBB
+            (
+                mesh_.pointInCellBB
+                (
+                    curDA.donorPoint(),
+                    curDA.acceptorCell()
+                )
+            );
+        }
+    }
+
 
     // STAGE 12: Finish the iteration by updating the fringe, which will
     // actually hold final and some intermediate steps for donor/acceptor
@@ -1449,6 +1458,13 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
     // algorithm that is used
     bool suitableOverlapFound =
         fringePtr_->updateIteration(combinedDonorAcceptorList);
+
+    // Delete all necessary demand driven data for this region since we have
+    // just updated the iteration. Therefore, cellSearch, eligibleDonors and
+    // holes need to be updated
+    deleteDemandDrivenData(cellSearchPtr_);
+    deleteDemandDrivenData(eligibleDonorCellsPtr_);
+    deleteDemandDrivenData(holeCellsPtr_);
 
     return suitableOverlapFound;
 }

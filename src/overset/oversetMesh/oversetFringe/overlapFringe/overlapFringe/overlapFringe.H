@@ -96,7 +96,7 @@ class overlapFringe
             //- Name of the cell set defining initial holes (empty by default).
             //  Useful when the resolution of the background mesh is much
             //  coarser than the front mesh and no hole is found
-            const word holesSetName_;
+            const word holesZoneName_;
 
             //- Optional list of patches to start the iterative fringe assembly
             //  process (empty list by default). Useful when we actually have

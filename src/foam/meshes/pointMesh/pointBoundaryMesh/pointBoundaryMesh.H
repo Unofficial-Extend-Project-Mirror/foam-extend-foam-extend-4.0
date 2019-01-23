@@ -46,6 +46,7 @@ namespace Foam
 class pointMesh;
 class polyBoundaryMesh;
 class globalPointPatch;
+class polyMesh;
 
 /*---------------------------------------------------------------------------*\
                        Class pointBoundaryMesh Declaration
@@ -105,7 +106,10 @@ public:
         void movePoints();
 
         //- Correct polyBoundaryMesh after topology update
-        void updateMesh();
+        void updateMesh
+        (
+            const polyMesh& pMesh
+        );
 };
 
 

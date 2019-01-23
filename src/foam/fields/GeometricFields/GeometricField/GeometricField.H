@@ -447,6 +447,10 @@ public:
         //- Return reference to GeometricBoundaryField for const field
         inline const GeometricBoundaryField& boundaryField() const;
 
+        //- Return reference to GeometricBoundaryField without storing old
+        //- times
+        GeometricBoundaryField& boundaryFieldNoStoreOldTimes();
+
         //- Return the time index of the field
         inline label timeIndex() const;
 

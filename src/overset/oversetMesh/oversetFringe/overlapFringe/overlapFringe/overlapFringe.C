@@ -188,26 +188,37 @@ void Foam::overlapFringe::calcAddressing() const
     // holes)
     boolList eligibleAcceptors(mesh.nCells(), true);
 
-    // Read user specified holes into allHoles list. Note: if the cell set
-    // is not found, the list will be empty
-    labelList allHoles
-    (
-        cellSet
-        (
-            mesh,
-            holesSetName_,
-            IOobject::READ_IF_PRESENT,
-            IOobject::NO_WRITE
-        ).toc()
-    );
+    // Read user specified holes into allHoles list. Note: use cellZone rather
+    // than cellSet to have correct behaviour on dynamic mesh simulations
+    // We will silently proceed if the zone is not found since this option is
+    // not mandatory but is useful in certain cases
+
+    // Get zone index
+    const label zoneID = mesh.cellZones().findZoneID(holesZoneName_);
+
+    // Create a hash set for allHoles
+    labelHashSet allHoles;
+
+    if (zoneID > -1)
+    {
+        // Get the zone for holes and append them to set
+        const labelList& specifiedHoles = mesh.cellZones()[zoneID];
+
+        allHoles.insert(specifiedHoles);
+    }
+    // else silently proceed without user-specified holes
 
     // Extend allHoles with cutHoles
-    allHoles.append(cutHoles);
+    forAll (cutHoles, chI)
+    {
+        // Note: duplicated are removed because we're using hash set
+        allHoles.insert(cutHoles[chI]);
+    }
 
     // Mark all holes
-    forAll (allHoles, hI)
+    forAllConstIter (labelHashSet, allHoles, iter)
     {
-        const label& holeCellI = allHoles[hI];
+        const label& holeCellI = iter.key();
 
         // Mask eligible acceptors
         eligibleAcceptors[holeCellI] = false;
@@ -225,10 +236,10 @@ void Foam::overlapFringe::calcAddressing() const
     dynamicLabelList candidateAcceptors(mesh.nCells());
 
     // Loop through all holes and find acceptor candidates
-    forAll (allHoles, hI)
+    forAllConstIter (labelHashSet, allHoles, iter)
     {
         // Get neighbours of this hole cell
-        const labelList& hNbrs = cc[allHoles[hI]];
+        const labelList& hNbrs = cc[iter.key()];
 
         // Loop through neighbours of this hole cell
         forAll (hNbrs, nbrI)
@@ -370,7 +381,7 @@ void Foam::overlapFringe::calcAddressing() const
     // Transfer the acceptor list and allocate empty fringeHoles list, which
     // may be populated in updateIteration member function
     acceptorsPtr_ = new labelList(candidateAcceptors.xfer());
-    fringeHolesPtr_ = new labelList(cutHoles);
+    fringeHolesPtr_ = new labelList(allHoles.toc().xfer());
 }
 
 
@@ -398,7 +409,7 @@ Foam::overlapFringe::overlapFringe
     acceptorsPtr_(NULL),
     finalDonorAcceptorsPtr_(NULL),
 
-    holesSetName_(dict.lookupOrDefault<word>("holes", word())),
+    holesZoneName_(dict.lookupOrDefault<word>("holes", word())),
     initPatchNames_
     (
         dict.lookupOrDefault<wordList>("initPatchNames", wordList())
@@ -687,8 +698,15 @@ bool Foam::overlapFringe::updateIteration
             }
         }
 
-        // Tranfer back the allFringeHoles dynamic list into member data
-        fringeHolesPtr_->transfer(allFringeHoles);
+        // Bugfix: Although we have found suitable overlap, we need to update
+        // acceptors as well because eligible donors for acceptors of other
+        // regions are calculated based on these acceptors (and holes)
+        labelList& acceptors = *acceptorsPtr_;
+        acceptors.setSize(finalDAPairs.size());
+        forAll (acceptors, aI)
+        {
+            acceptors[aI] = finalDAPairs[aI].acceptorCell();
+        }
 
         // Transfer ownership of the final donor/acceptor list to the
         // finalDonorAcceptorsPtr_
@@ -696,6 +714,9 @@ bool Foam::overlapFringe::updateIteration
         (
             finalDAPairs.xfer()
         );
+
+        // Tranfer back the allFringeHoles dynamic list into member data
+        fringeHolesPtr_->transfer(allFringeHoles);
 
         // At least 100*minGlobalFraction_ % of suitable donor/acceptor pairs
         // have been found.

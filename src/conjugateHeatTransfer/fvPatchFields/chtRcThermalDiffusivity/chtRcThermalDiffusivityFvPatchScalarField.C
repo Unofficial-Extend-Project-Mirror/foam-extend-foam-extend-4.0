@@ -261,7 +261,7 @@ Foam::chtRcThermalDiffusivityFvPatchScalarField::calcThermalDiffusivity
 
     const scalarField kOwn = fOwn/(1.0 - p.weights())/mld.magDelta(p.index());
     const scalarField kNei = fNei/p.weights()/mld.magDelta(p.index());
- 
+
     tmp<scalarField> kTmp(new scalarField(p.size()));
     scalarField& k = kTmp();
 

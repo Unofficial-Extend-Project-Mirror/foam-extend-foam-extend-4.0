@@ -652,10 +652,30 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
     reconPatchSizes = 0;
 
-    // Prepare handling for globally shared points.  This is equivalent
-    // to parallel processor points, but working on a PtrList of meshes
-    // on the same processor
-    sharedPoints sharedData(meshes_);
+    // HR 21.12.18 : A bit of a hack for the moment in order to support the new
+    // method (using global point addressing) and old method (syncing across
+    // processor BCs) of constructing the shared points. The old method is still
+    // needed since global point addressing does not exist when the sharedPoint
+    // object is constructed from reconstructParMesh.
+    //
+    // TODO: Unify the methods by constructing global point addressing from the
+    // mesh pieces when. Or even better, calculate procPointAddressing directly
+    // which will simplify the mesh merging immensely.
+    autoPtr<sharedPoints> sharedDataPtr;
+    if(globalPointIndex_.size())
+    {
+        // Determine globally shared points using global point
+        // adressing
+        sharedDataPtr.set(new sharedPoints(meshes_, globalPointIndex_));
+    }
+    else
+    {
+        // Prepare handling for globally shared points.  This is equivalent
+        // to parallel processor points, but working on a PtrList of meshes
+        // on the same processor
+        sharedDataPtr.set(new sharedPoints(meshes_));
+    }
+    sharedPoints& sharedData = sharedDataPtr();
 
     // Record global point index for shared points
     labelList globalPointMapping(sharedData.nGlobalPoints(), -1);

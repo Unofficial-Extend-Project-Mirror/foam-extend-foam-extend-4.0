@@ -55,17 +55,32 @@ void Foam::oversetMesh::calcCellClassification() const
         nHoleCells += regions_[regionI].holes().size();
     }
 
-    Pout<< "Number of acceptor cells: " << nAcceptorCells << endl;
     acceptorCellsPtr_ = new labelList(nAcceptorCells);
     labelList& acceptor = *acceptorCellsPtr_;
 
-    Pout<< "Number of donor cells: " << nDonorCells << endl;
     donorCellsPtr_ = new labelList(nDonorCells);
     labelList& donor = *donorCellsPtr_;
 
-    Pout<< "Number of hole cells: " << nHoleCells << endl;
     holeCellsPtr_ = new labelList(nHoleCells);
     labelList& hole = *holeCellsPtr_;
+
+    // Print out processor specific information in debug
+    if (oversetMesh::debug)
+    {
+        Pout<< "Number of acceptor cells: " << nAcceptorCells << endl;
+        Pout<< "Number of donor cells: " << nDonorCells << endl;
+        Pout<< "Number of hole cells: " << nHoleCells << endl;
+    }
+    // Else print global information
+    else
+    {
+        Info<< "Number of acceptor cells: "
+            << returnReduce(nAcceptorCells, sumOp<label>()) << endl;
+        Info<< "Number of donor cells: "
+            << returnReduce(nDonorCells, sumOp<label>()) << endl;
+        Info<< "Number of hole cells: "
+            << returnReduce(nHoleCells, sumOp<label>()) << endl;
+    }
 
     // Reset counters
     nAcceptorCells = 0;

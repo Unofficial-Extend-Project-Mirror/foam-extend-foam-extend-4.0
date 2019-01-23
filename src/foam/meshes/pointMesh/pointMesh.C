@@ -122,7 +122,10 @@ bool Foam::pointMesh::updateMesh(const mapPolyMesh& mpm) const
 {
     // Casting const-ness to answer the interface of meshObject
     // HJ, 30/Aug/2010
-    const_cast<pointBoundaryMesh&>(boundary_).updateMesh();
+    const_cast<pointBoundaryMesh&>(boundary_).updateMesh
+    (
+        GeoMesh<polyMesh>::mesh_
+    );
 
     // Map all registered point fields
     mapFields(mpm);

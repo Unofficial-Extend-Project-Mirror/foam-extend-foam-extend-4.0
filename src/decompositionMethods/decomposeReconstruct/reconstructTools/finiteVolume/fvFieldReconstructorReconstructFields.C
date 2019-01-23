@@ -44,10 +44,10 @@ void Foam::fvFieldReconstructor::reconstructField
 ) const
 {
     // Get references to internal and boundary field
-    Field<Type>& iField = reconField.internalField();
+    Field<Type>& iField = reconField;
 
     typename GeometricField<Type, fvPatchField, volMesh>::
-        GeometricBoundaryField& bouField = reconField.boundaryField();
+        GeometricBoundaryField& bouField = reconField.boundaryFieldNoStoreOldTimes();
 
     forAll (procFields, procI)
     {
@@ -143,10 +143,10 @@ void Foam::fvFieldReconstructor::reconstructField
 ) const
 {
     // Create the internalField
-    Field<Type>& iField = reconField.internalField();
+    Field<Type>& iField = reconField;
 
     typename GeometricField<Type, fvsPatchField, surfaceMesh>::
-        GeometricBoundaryField& bouField = reconField.boundaryField();
+        GeometricBoundaryField& bouField = reconField.boundaryFieldNoStoreOldTimes();
 
     forAll (procFields, procI)
     {

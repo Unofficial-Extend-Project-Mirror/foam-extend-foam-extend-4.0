@@ -96,7 +96,7 @@ bool Foam::uniformSet::trackToBoundary
 {
     // distance vector between sampling points
     const vector offset = (end_ - start_)/(nPoints_ - 1);
-    const vector smallVec = tol*offset;
+    const vector smallVec = tol_()*offset;
     const scalar smallDist = mag(smallVec);
 
     // Alias
@@ -233,7 +233,7 @@ void Foam::uniformSet::calcSamples
 
     const vector offset = (end_ - start_)/(nPoints_ - 1);
     const vector normOffset = offset/mag(offset);
-    const vector smallVec = tol*offset;
+    const vector smallVec = tol_()*offset;
     const scalar smallDist = mag(smallVec);
 
     // Get all boundary intersections

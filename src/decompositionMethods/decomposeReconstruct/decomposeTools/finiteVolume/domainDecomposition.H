@@ -43,6 +43,7 @@ SourceFiles
 #include "PtrList.H"
 #include "point.H"
 #include "globalProcFaceIndex.H"
+#include "globalProcPointIndex.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -71,6 +72,9 @@ class domainDecomposition
 
         //- Global face index
         globalProcFaceIndex gfIndex_;
+
+        //- Global face index
+        globalProcPointIndex gpIndex_;
 
         //- Processor label for each cell
         labelList cellToProc_;
@@ -204,6 +208,9 @@ public:
                 const word& regionName,
                 const bool createPassiveProcPatches = false
             ) const;
+
+            //- Create and return global point index
+            labelList globalPointIndex(const label procI) const;
 
             //- Return processor point addressing
             const labelListList& procPointAddressing() const

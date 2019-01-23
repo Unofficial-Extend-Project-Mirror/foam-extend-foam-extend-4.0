@@ -33,11 +33,27 @@ License
 
 namespace Foam
 {
-    const scalar sampledSet::tol = 1e-6;
-
     defineTypeNameAndDebug(sampledSet, 0);
     defineRunTimeSelectionTable(sampledSet, word);
 }
+
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+const Foam::debug::tolerancesSwitch
+Foam::sampledSet::tol_
+(
+    "sampleSetTolerance",
+    1e-5
+);
+
+
+const Foam::debug::tolerancesSwitch
+Foam::sampledSet::pushTol_
+(
+    "sampleSetPushTolerance",
+    0.1
+);
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -189,7 +205,7 @@ Foam::point Foam::sampledSet::pushIn
     const point& cellCtr = mesh().cellCentres()[cellI];
 
     point newSample =
-        facePt + tol*(cellCtr - facePt);
+        facePt + pushTol_()*(cellCtr - facePt);
 
     if (!searchEngine().pointInCell(newSample, cellI))
     {
@@ -221,7 +237,7 @@ bool Foam::sampledSet::getTrackingPoint
     label& trackFaceI
 ) const
 {
-    const scalar smallDist = mag(tol*offset);
+    const scalar smallDist = mag(tol_()*offset);
 
     bool isGoodSample = false;
 

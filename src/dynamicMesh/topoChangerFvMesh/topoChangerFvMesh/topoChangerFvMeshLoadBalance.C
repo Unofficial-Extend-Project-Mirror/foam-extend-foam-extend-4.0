@@ -33,6 +33,7 @@ License
 #include "addToRunTimeSelectionTable.H"
 #include "cloud.H"
 #include "cloudDistribute.H"
+#include "meshObjectBase.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -138,10 +139,14 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
     // Prepare receiving side
 
     // Create the reconstructor
-    processorMeshesReconstructor meshRecon("reconstructed");
+    //
+    // HR 21.12.18 : Use empty domainname to avoid auto-created of
+    // fvSchemes/fvSolution
+    processorMeshesReconstructor meshRecon("");
 
     PtrList<fvMesh>& procMeshes = meshRecon.meshes();
     procMeshes.setSize(meshDecomp.nProcs());
+    meshRecon.globalPointIndex().setSize(meshDecomp.nProcs());
 
     // Collect local fields for decomposition
     clearOut();
@@ -242,6 +247,29 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         }
     }
 
+    // HR 14.12.18: Create dummy database pointing into the non-parallel case
+    // directory and disable the runTimeModifiable switch.  dummyTime is used
+    // for decomposed, received and reconstructed fvMeshes (ie. before its data
+    // is moved into *this).
+    //
+    // The pointing into the non-parallel case directory is somewhat a hack to
+    // prevent auto-creation of fvSchemes and fvSolution (they exist in the root
+    // case). This is potentially dangerous if we write anything, but fvMeshes
+    // derived from this database are NO_WRITE so we should be fine. Making if
+    // non-runTimeModifiable prevents registration of fvSolution with the
+    // fileMonitor (addWatch). Not all processors will necessarily receive a
+    // mesh and watches will then cause dead-locks!
+    Time dummyTime
+    (
+        time().rootPath(),
+        time().globalCaseName(),
+        "system",
+        "constant",
+        false
+    );
+
+    const_cast<Switch&>(dummyTime.runTimeModifiable()) = false;
+
     for (label procI = 0; procI < meshDecomp.nProcs(); procI++)
     {
         // Check if there is a mesh to send
@@ -253,8 +281,9 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
             autoPtr<fvMesh> procMeshPtr = meshDecomp.processorMesh
             (
                 procI,
-                time(),
-                "processorPart" + Foam::name(procI),
+                dummyTime,
+                "",     // HR 21.12.18 : Use empty domainname to avoid
+                        // auto-created offvSchemes/fvSolution
                 true    // Create passive processor patches
             );
             fvMesh& procMesh = procMeshPtr();
@@ -286,6 +315,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
 
                 // Send the mesh and fields to target processor
                 toProc << procMesh << nl;
+                toProc << meshDecomp.globalPointIndex(procI) << nl;
 
                 // Send fields
                 sendFields(volScalarFields, fieldDecomposer, toProc);
@@ -341,6 +371,9 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                     procI,
                     procMeshPtr
                 );
+
+                meshRecon.globalPointIndex()[procI] =
+                    meshDecomp.globalPointIndex(procI);
 
                 // Set local fields
                 // Note: first index is field index and second index is procI
@@ -411,6 +444,10 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                 }
 
                 //HJ Insert clouds missing.  HJ, 12/Oct/2018
+                //
+                // HR 18.11.18 - Not missing. Step is trivial and is treated in
+                // Cloud<ParticleType>::split which is called in the constructor
+                // of CloudDistibute
             }
         }
     }
@@ -445,9 +482,9 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                     (
                         IOobject
                         (
-                            "processorPart" + Foam::name(procI),
-                            time().timeName(),
-                            time(),
+                            "", // "processorPart" + Foam::name(procI),
+                            dummyTime.timeName(),
+                            dummyTime,
                             IOobject::NO_READ,
                             IOobject::NO_WRITE
                         ),
@@ -455,6 +492,10 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                         false             // Do not sync
                     )
                 );
+
+                // Receive the global points addr
+                labelList gppi(fromProc);
+                meshRecon.globalPointIndex()[procI] = gppi;
 
                 // Receive fields
                 // Note: first index is field index and second index is procI
@@ -535,7 +576,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
 
     // Create the reconstructed mesh
     autoPtr<fvMesh> reconstructedMeshPtr =
-        meshRecon.reconstructMesh(time());
+        meshRecon.reconstructMesh(dummyTime);
     fvMesh& reconMesh = reconstructedMeshPtr();
 
     Pout<< "Reconstructed mesh stats: "
@@ -914,6 +955,9 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
             meshRecon.faceProcAddressing()
         );
     }
+
+    // HR 13.12.18: Update the mesh objects
+    meshObjectBase::allUpdateTopology<polyMesh>(*this, meshMap);
 
     // Debug: remove?  HJ, 22/Oct/2018
     // checkMesh(true);

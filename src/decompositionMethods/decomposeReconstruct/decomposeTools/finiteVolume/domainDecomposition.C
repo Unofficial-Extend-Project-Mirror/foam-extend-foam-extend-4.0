@@ -34,6 +34,7 @@ License
 #include "OSspecific.H"
 #include "Map.H"
 #include "DynamicList.H"
+#include "globalMeshData.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -53,6 +54,7 @@ Foam::domainDecomposition::domainDecomposition
     nProcs_(readInt(decompositionDict_.lookup("numberOfSubdomains"))),
     distributed_(false),
     gfIndex_(mesh_),
+    gpIndex_(mesh_),
     cellToProc_(mesh_.nCells()),
     patchNbrCellToProc_(mesh_.boundaryMesh().size()),
     procPointAddressing_(nProcs_),
@@ -500,6 +502,24 @@ Foam::autoPtr<Foam::fvMesh> Foam::domainDecomposition::processorMesh
 
     // Return mesh
     return procMeshPtr;
+}
+
+
+Foam::labelList Foam::domainDecomposition::globalPointIndex
+(
+    const label procI
+) const
+{
+    const labelList& gppi = gpIndex_.globalLabel();
+    const labelList& ppAddr = procPointAddressing_[procI];
+    labelList globalPointIndex(ppAddr.size());
+
+    forAll (globalPointIndex, gpI)
+    {
+        globalPointIndex[gpI] = gppi[ppAddr[gpI]];
+    }
+
+    return globalPointIndex;
 }
 
 

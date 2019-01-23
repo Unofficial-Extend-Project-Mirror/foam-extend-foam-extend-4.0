@@ -66,7 +66,7 @@ immersedBoundaryOmegaWallFunctionFvPatchScalarField
         p,
         Switch(dict.lookup("setDeadValue")),
         readScalar(dict.lookup("deadValue"))
-    )    
+    )
 {}
 
 

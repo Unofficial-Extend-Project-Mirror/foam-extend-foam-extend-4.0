@@ -33,7 +33,7 @@ scalar CoNum = 0.0;
 scalar meanCoNum = 0.0;
 scalar velMag = 0.0;
 
-// HR 26.06.28: A parallel run has at least two cells and therefore at least
+// HR 26.06.18: A parallel run has at least two cells and therefore at least
 // one internal face in the global mesh. It may be a processor boundary, but
 // this is captured by max(mag(phi)).
 // Old formulation hangs on parallel cases where one partition is degenerated

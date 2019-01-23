@@ -126,7 +126,7 @@ void Foam::topoChangerFvMesh::receiveFields
     receivedFields.setSize(nScalarFields);
 
     fromProc.readBegin("topoChangerFvMeshReceiveFields");
-    
+
     forAll (receivedFields, fI)
     {
         word fieldName(fromProc);
@@ -263,12 +263,12 @@ void Foam::topoChangerFvMesh::rebuildFields
         // Resize internal field
         if
         (
-            masterField.internalField().size()
+            masterField.size()
          != GeoField::GeoMeshType::size(masterField.mesh())
         )
         {
             Pout<< "Resizing internal field: old size = "
-                << masterField.internalField().size()
+                << masterField.size()
                 << " new size = "
                 << GeoField::GeoMeshType::size(masterField.mesh())
                 << endl;
@@ -280,7 +280,7 @@ void Foam::topoChangerFvMesh::rebuildFields
 
         // Resize boundary (number of patches)
         typename GeoField::GeometricBoundaryField& patchFields =
-                masterField.boundaryField();
+            masterField.boundaryFieldNoStoreOldTimes();
 
         if (patchFields.size() != masterField.mesh().boundary().size())
         {
@@ -351,6 +351,22 @@ void Foam::topoChangerFvMesh::rebuildFields
         // Increment field counter
         fieldI++;
         Pout<< "... done" << endl;
+    }
+
+    // HR 14.12.18: We create new processor boundary faces from internal
+    // faces. The values on these faces could be initialised by interpolation.
+    // Instead we choose to fix the values by evaluating the boundaries.
+    // I tried to execute evaluateCoupled() at the end of
+    // fvFieldReconstructor::reconstructField, but this fails in a strange way.
+    forAllConstIter
+    (
+        typename HashTable<const GeoField*>,
+        geoFields,
+        iter
+    )
+    {
+        GeoField& masterField = const_cast<GeoField&>(*iter());
+        masterField.boundaryField().evaluateCoupled();
     }
 }
 

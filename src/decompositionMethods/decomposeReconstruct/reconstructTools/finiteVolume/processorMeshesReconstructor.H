@@ -72,6 +72,9 @@ class processorMeshesReconstructor
         //- List of processor meshes
         PtrList<fvMesh> meshes_;
 
+        //- global point index per sub-mesh
+        labelListList globalPointIndex_;
+
         //- List of processor point addressing lists
         PtrList<labelIOList> pointProcAddressing_;
 
@@ -159,6 +162,12 @@ public:
         PtrList<fvMesh>& meshes()
         {
             return meshes_;
+        }
+
+        //- Return access to meshes
+        labelListList& globalPointIndex()
+        {
+            return globalPointIndex_;
         }
 
         //- Return point-processor addressing arrays
