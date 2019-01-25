@@ -181,8 +181,32 @@ void Foam::immersedBoundaryFvPatch::updatePhi
     scalarField sGamma =
         mag(ibPolyPatch_.correctedFaceAreas())/mag(mesh.faceAreas());
 
+    // Scaling of internal mesh flux field should be done only for the current
+    // ib patch to avoid scaling multiple times in case of multiple Ib patches
+    // present. (IG 3/Dec/2018)
+
     // Scale internalField
-    phi.internalField() *= scalarField::subField(sGamma, mesh.nInternalFaces());
+    scalarField& phiIn = phi.internalField();
+
+    const labelList& deadFaces = ibPolyPatch_.deadFaces();
+    forAll(deadFaces, dfI)
+    {
+        const label faceI = deadFaces[dfI];
+        if (mesh.isInternalFace(faceI))
+        {
+            phiIn[faceI] *= sGamma[faceI];
+        }
+    }
+ 
+    const labelList& cutFaces = ibPolyPatch_.ibFaces();
+    forAll(cutFaces, cfI)
+    {
+        const label faceI = cutFaces[cfI];
+        if (mesh.isInternalFace(faceI))
+        {
+            phiIn[faceI] *= sGamma[faceI];
+        }
+    }
 
     // Scale all other patches
     forAll (mesh.boundary(), patchI)
@@ -216,7 +240,6 @@ void Foam::immersedBoundaryFvPatch::updatePhi
     const unallocLabelList& owner = mesh.owner();
     const unallocLabelList& neighbour = mesh.neighbour();
 
-    const scalarField& phiIn = phi.internalField();
     forAll(owner, faceI)
     {
         divPhi[owner[faceI]] += phiIn[faceI];

@@ -79,18 +79,75 @@ void Foam::immersedBoundaryFieldBase<Type>::writeField
     const fvPatchField<Type>& f
 ) const
 {
-    // Write VTK on master only
-//    if (Pstream::master())
+    // Write immersed boundary data as a vtk file
+    autoPtr<surfaceWriter> writerPtr = surfaceWriter::New("vtk");
+
+    // Get the intersected patch
+    const standAlonePatch& ts = ibPatch_.ibPolyPatch().ibPatch();
+
+    if (Pstream::parRun())
     {
-        // Add parallel reduction of all faces and data to proc 0
-        // and write the whole patch together.  To Do: HJ, 4/Dec/2018
+        // Gather points, fields and faces
 
-        // Write immersed boundary data as a vtk file
-        autoPtr<surfaceWriter> writerPtr = surfaceWriter::New("vtk");
+        // Points
+        List<pointField> procPoints(Pstream::nProcs());
+        procPoints[Pstream::myProcNo()] = ts.points();
+        Pstream::gatherList(procPoints);
 
-        // Get the intersected patch
-        const standAlonePatch& ts = ibPatch_.ibPolyPatch().ibPatch();
+        // Fields
+        List<Field<Type> > procFields(Pstream::nProcs());
+        procFields[Pstream::myProcNo()] = f;
+        Pstream::gatherList(procFields);
 
+        // Faces
+        List<faceList> procFaces(Pstream::nProcs());
+        procFaces[Pstream::myProcNo()] = ts;
+        Pstream::gatherList(procFaces);
+
+        if (Pstream::master())
+        {
+            // Assemble unique lists to correspond to a single surface
+            pointField allPoints(0);
+            Field<Type> completeField(0);
+            faceList allFaces(0);
+            label prevProcPatchSize = 0;
+
+            forAll(procPoints, procI)
+            {
+                allPoints.append(procPoints[procI]);
+                completeField.append(procFields[procI]);
+
+                // Point labels in faces need to be incremented with respect to
+                // the size of the size of the previous processore patch
+                forAll(procFaces[procI], faceI)
+                {
+                    face curFace = procFaces[procI][faceI];
+                    forAll(curFace, pointI)
+                    {
+                        curFace[pointI] += prevProcPatchSize;
+                    }
+                    allFaces.append(curFace);
+                }
+
+                // Increment the total number of points
+                prevProcPatchSize += procPoints[procI].size();
+            }
+
+            writerPtr->write
+            (
+                f.dimensionedInternalField().path(),
+                ibPatch_.name(),
+                allPoints,
+                allFaces,
+                f.dimensionedInternalField().name(),
+                completeField,
+                false, // FACE_DATA
+                false  // verbose
+            );
+        }
+    }
+    else
+    {
         writerPtr->write
         (
             f.dimensionedInternalField().path(),

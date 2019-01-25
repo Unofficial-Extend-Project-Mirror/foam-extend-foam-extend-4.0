@@ -1282,6 +1282,8 @@ void Foam::immersedBoundaryPolyPatch::calcCorrectedGeometry() const
         if
         (
             mag(sumSf[ccc]) > 1e-12
+            // The below criteria is still not firmly established, potential
+            // place for cutting errors (IG 19/Dec/2018)
          && mag(sumSf[ccc] + ibSf[cutCellI])/cutCellVolumes[cutCellI] > 1e-6
         )
         {
