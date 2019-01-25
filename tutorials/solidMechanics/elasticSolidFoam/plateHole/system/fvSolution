@@ -43,7 +43,6 @@ solidMechanics
 
 relaxationFactors
 {
-  //U   0.9;
 }
 
 
