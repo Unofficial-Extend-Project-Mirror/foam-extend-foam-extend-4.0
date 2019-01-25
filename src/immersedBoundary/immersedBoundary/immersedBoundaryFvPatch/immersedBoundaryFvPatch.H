@@ -153,6 +153,9 @@ public:
         // Access
 
             //- Return size equal to number of intersected cells
+            //  Note: if the ibPolyPatch is not initialised, return zero size
+            // to avoid triggering cutting (with parallel communications).
+            //  HJ, 12/Dec/2018
             virtual label size() const;
 
             //- Return patch slice size
@@ -165,17 +168,6 @@ public:
 
             //- Return faceCells next to the IB surface
             virtual const unallocLabelList& faceCells() const;
-
-
-        // Access functions for geometrical data
-
-            // //- Return face normals
-            // //  Reconsider. HJ, 11/Dec/2017
-            // tmp<vectorField> nf() const;
-
-            // //- Return cell-centre to face-centre vector
-            // //  Reconsider. HJ, 11/Dec/2017
-            // virtual tmp<vectorField> delta() const;
 
 
         // Access to immersed boundary components

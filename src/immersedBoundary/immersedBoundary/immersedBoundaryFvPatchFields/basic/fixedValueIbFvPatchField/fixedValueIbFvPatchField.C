@@ -66,7 +66,7 @@ fixedValueIbFvPatchField<Type>::fixedValueIbFvPatchField
     const dictionary& dict
 )
 :
-    fixedValueFvPatchField<Type>(p, iF),   // Do not read mixed data
+    fixedValueFvPatchField<Type>(p, iF, dict),
     immersedBoundaryFieldBase<Type>
     (
         p,
@@ -115,7 +115,7 @@ fixedValueIbFvPatchField<Type>::fixedValueIbFvPatchField
     const fvPatchFieldMapper& mapper
 )
 :
-    fixedValueFvPatchField<Type>(p, iF),  // Do not map mixed data
+    fixedValueFvPatchField<Type>(p, iF),  // Do not map fixed data
     immersedBoundaryFieldBase<Type>
     (
         p,

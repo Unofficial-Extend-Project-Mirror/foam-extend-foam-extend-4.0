@@ -360,6 +360,18 @@ Foam::label Foam::immersedBoundaryFvPatch::size() const
 {
     // Immersed boundary patch size equals to the number of intersected cells
     // HJ, 28/Nov/2017
+
+    // Note: asking for patch size triggers the cutting which involves
+    // parallel communication.  This should be avoided under read/write, ie
+    // when the ibPolyPatch_ is not initialised.
+    // Initialisation happens when the fvMesh is initialised, which should be
+    // sufficient
+    //  HJ, 12/Dec/2018
+    if (!ibPolyPatch_.active())
+    {
+        return 0;
+    }
+
     return ibPolyPatch_.ibCells().size();
 }
 
@@ -369,18 +381,6 @@ Foam::immersedBoundaryFvPatch::faceCells() const
 {
     return ibPolyPatch_.ibCells();
 }
-
-
-// Foam::tmp<Foam::vectorField> Foam::immersedBoundaryFvPatch::nf() const
-// {
-//     return ibPolyPatch_.ibPatch().faceNormals();
-// }
-
-
-// Foam::tmp<Foam::vectorField> Foam::immersedBoundaryFvPatch::delta() const
-// {
-//     return ibPolyPatch_.ibPatch().faceCentres() - ibPolyPatch_.ibCellCentres();
-// }
 
 
 // ************************************************************************* //

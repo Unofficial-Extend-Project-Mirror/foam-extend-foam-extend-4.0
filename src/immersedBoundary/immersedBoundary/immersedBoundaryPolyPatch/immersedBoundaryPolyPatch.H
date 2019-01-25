@@ -308,6 +308,13 @@ public:
 
         // Immersed boundary patch data
 
+            //- Is the immersed boundary patch active?
+            //  (is the intersection patch calculated?)
+            bool active() const
+            {
+                return ibPatchPtr_ != NULL;
+            }
+
             //- Return primitivePatch of cell-intersected faces
             //  Faces are calculated as intesection between the volume mesh
             //  and the ibMesh

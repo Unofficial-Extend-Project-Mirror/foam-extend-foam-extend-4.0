@@ -66,11 +66,9 @@ immersedBoundaryFvsPatchField<Type>::immersedBoundaryFvsPatchField
     const dictionary& dict
 )
 :
-    fvsPatchField<Type>(p, iF),   // Do not read base data
+    fvsPatchField<Type>(p, iF, dict),
     ibPatch_(refCast<const immersedBoundaryFvPatch>(p))
-{
-    operator=(pTraits<Type>::zero);
-}
+{}
 
 
 template<class Type>

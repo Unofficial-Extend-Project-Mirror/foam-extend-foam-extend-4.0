@@ -65,7 +65,7 @@ movingImmersedBoundaryVelocityFvPatchVectorField
     const dictionary& dict
 )
 :
-    fixedValueFvPatchVectorField(p, iF),   // Do not read data
+    fixedValueFvPatchVectorField(p, iF, dict),
     immersedBoundaryFieldBase<vector>
     (
         p,

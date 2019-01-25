@@ -70,7 +70,7 @@ mixedIbFvPatchField<Type>::mixedIbFvPatchField
     const dictionary& dict
 )
 :
-    mixedFvPatchField<Type>(p, iF),   // Do not read mixed data
+    mixedFvPatchField<Type>(p, iF),
     immersedBoundaryFieldBase<Type>
     (
         p,
@@ -105,15 +105,17 @@ mixedIbFvPatchField<Type>::mixedIbFvPatchField
             << exit(FatalIOError);
     }
 
-    // Re-interpolate the data related to immersed boundary
-    this->updateIbValues();
-
-    // mixedFvPatchField<Type>::evaluate();
-
-    // On creation of the field, intersection cannot be called.
+    // On creation of the field, intersection cannot be called unless
+    // the patch is active
     // Initialise the value to avoid errors
     // HJ, 1/Dec/2017
-    Field<Type>::operator=(pTraits<Type>::zero);
+    if (this->ibPatch().ibPolyPatch().active())
+    {
+        // Re-interpolate the data related to immersed boundary
+        this->updateIbValues();
+
+        mixedFvPatchField<Type>::evaluate();
+    }
 }
 
 
