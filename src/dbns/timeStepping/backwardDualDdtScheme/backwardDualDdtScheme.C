@@ -861,7 +861,7 @@ backwardDualDdtScheme<Type>::fvcDdtConsistentPhiCorr
     );
 
     // Dummy return
-    return tmp<fluxFieldType>(NULL);
+    return tmp<fluxFieldType>(nullptr);
 }
 
 
