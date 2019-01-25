@@ -22,9 +22,7 @@ d2dt2Schemes
 
 gradSchemes
 {
-    default         Gauss linear;
-    grad(U)         leastSquares;
-    grad(T)         leastSquares;
+    default         leastSquares;
 }
 
 divSchemes
