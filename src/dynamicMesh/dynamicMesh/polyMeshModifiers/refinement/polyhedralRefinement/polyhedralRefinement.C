@@ -2086,6 +2086,11 @@ void Foam::polyhedralRefinement::setCellsToRefine
         ++nIters;
         nTotalAddCells += nAddCells;
 
+	if (debug)
+        {
+            Info<< "Added " << nAddCells << " in iteration " << nIters << nl;
+        }
+
     } while (nAddCells > 0);
 
     Info<< "Added " << nTotalAddCells // nTotalAddCells already reduced
@@ -2367,6 +2372,11 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
         // Increment number of iterations and number of total removed cells
         ++nIters;
         nTotalRemCells += nRemCells;
+
+        if (debug)
+        {
+            Info<< "Removed " << nRemCells << " in iteration " << nIters << nl;
+        }
 
     } while (nRemCells > 0);
 

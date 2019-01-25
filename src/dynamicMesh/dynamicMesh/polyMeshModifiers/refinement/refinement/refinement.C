@@ -797,7 +797,14 @@ Foam::label Foam::refinement::faceConsistentRefinement
         // Note: we are using more stringent 1:1 consistency across coupled
         // boundaries in order to simplify handling of edge based consistency
         // checks for parallel runs
-        if (neiLevel[i] > curOwnLevel)
+        // Bugfix related to PLB: Check whether owner is already marked for
+        // refinement. Will allow 2:1 consistency across certain processor faces
+        // where we have a new processor boundary. VV, 23/Jan/2019.
+        if
+        (
+            (neiLevel[i] > curOwnLevel)
+         && !cellsToRefine[own]
+        )
         {
             // Neighbour level is higher than owner level, owner must be
             // marked for refinement
