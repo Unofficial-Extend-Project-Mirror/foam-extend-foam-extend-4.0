@@ -64,7 +64,7 @@ Foam::bubbleHistory::bubbleHistory
     time_(t),
     regionName_(polyMesh::defaultRegion),
     V0_(SMALL),
-    historyFilePtr_(NULL)
+    historyFilePtr_(nullptr)
 {
     if (dict.found("region"))
     {

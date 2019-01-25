@@ -51,7 +51,7 @@ bool rwMutex::debug = false;
 multiThreader::multiThreader(int numThreads)
 :
     maxQueueSize_(10),
-    poolInfo_(NULL)
+    poolInfo_(nullptr)
 {
     if (numThreads > 0)
     {
@@ -133,7 +133,7 @@ rwMutex::rwMutex()
 
 Conditional::Conditional()
 {
-    if (pthread_cond_init(&condition_, NULL))
+    if (pthread_cond_init(&condition_, nullptr))
     {
         FatalErrorIn("multiThreader::Conditional::Conditional()")
             << "Unable to initialize condition"
@@ -197,8 +197,8 @@ void multiThreader::initializeThreadPool()
         poolInfo_->numThreads = numThreads_;
         poolInfo_->queueSize = 0;
         poolInfo_->threads = new pthread_t[numThreads_];
-        poolInfo_->head = NULL;
-        poolInfo_->tail = NULL;
+        poolInfo_->head = nullptr;
+        poolInfo_->tail = nullptr;
 
         // Initialize flags
         poolInfo_->queueClosed = false;
@@ -272,7 +272,7 @@ threadReturnType multiThreader::poolThread(void *arg)
         if (poolInfo->shutDown)
         {
             poolInfo->queueLock.unlock();
-            pthread_exit(NULL);
+            pthread_exit(nullptr);
         }
 
         // Pick an item off the queue, and get to work
@@ -280,7 +280,7 @@ threadReturnType multiThreader::poolThread(void *arg)
         poolInfo->queueSize--;
         if (poolInfo->queueSize == 0)
         {
-            poolInfo->head = poolInfo->tail = NULL;
+            poolInfo->head = poolInfo->tail = nullptr;
         }
         else
         {
@@ -362,7 +362,7 @@ void multiThreader::addToWorkQueue
     workQueueItem *newWorkItem = new workQueueItem;
     newWorkItem->function = tFunction;
     newWorkItem->arg = arg;
-    newWorkItem->next = NULL;
+    newWorkItem->next = nullptr;
 
     // Add new work structure to the queue
     if (poolInfo_->queueSize == 0)
@@ -419,7 +419,7 @@ void multiThreader::destroyThreadPool()
         // Wait for all workers to exit
         for(int i=0; i < numThreads_; i++)
         {
-            if (pthread_join(poolInfo_->threads[i],NULL))
+            if (pthread_join(poolInfo_->threads[i],nullptr))
             {
                 FatalErrorIn("multiThreader::destroyThreadPool()")
                     << "pthread_join failed."
@@ -434,7 +434,7 @@ void multiThreader::destroyThreadPool()
         delete [] poolInfo_->threads;
 
         workQueueItem *currentNode;
-        while(poolInfo_->head != NULL)
+        while(poolInfo_->head != nullptr)
         {
             currentNode = poolInfo_->head->next;
             poolInfo_->head = poolInfo_->head->next;

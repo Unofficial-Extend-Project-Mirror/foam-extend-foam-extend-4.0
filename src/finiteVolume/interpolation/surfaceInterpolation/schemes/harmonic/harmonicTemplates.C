@@ -79,22 +79,22 @@ Foam::tmp<Foam::surfaceScalarField> Foam::harmonic<Type>::weights
     // Calculate internal weights using field magnitude
     forAll (owner, faceI)
     {
-        label own = owner[faceI];
-        label nei = neighbour[faceI];
+        const label own = owner[faceI];
+        const label nei = neighbour[faceI];
 
-        scalar mOwn = magPhi[own]/(1 - weights[faceI]);
-        scalar mNei = magPhi[nei]/weights[faceI];
+        const scalar mOwn = magPhi[own]/(1 - weights[faceI]);
+        const scalar mNei = magPhi[nei]/weights[faceI];
 
-        scalar den = magPhi[nei] - magPhi[own];
-
-        scalar mean = mOwn*mNei/
-            ((mOwn + mNei)*longDelta[faceI]*deltaCoeffs[faceI]);
+        const scalar den = magPhi[nei] - magPhi[own];
 
         // Note: complex arithmetic requires extra accuracy
         // This is a division of two close subtractions
         // HJ, 28/Sep/2011
-        if (mag(den) > kSmall)
+        if (mOwn > VSMALL && mNei > VSMALL && mag(den) > kSmall)
         {
+            const scalar mean = mOwn*mNei/
+                ((mOwn + mNei)*longDelta[faceI]*deltaCoeffs[faceI]);
+
             // Limit weights for round-off safety
             wIn[faceI] =
                 Foam::max(0, Foam::min((magPhi[nei] - mean)/den, 1));
@@ -174,7 +174,7 @@ Foam::tmp<Foam::scalarField> Foam::harmonic<Type>::weights
         // Note: complex arithmetic requires extra accuracy
         // This is a division of two close subtractions
         // HJ, 28/Sep/2011
-        if (mag(den) > kSmall)
+        if (mOwn > VSMALL && mNei > VSMALL && mag(den) > kSmall)
         {
             scalar mean = mOwn*mNei/
                 (

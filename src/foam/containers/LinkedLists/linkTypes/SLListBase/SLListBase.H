@@ -179,7 +179,7 @@ public:
 
             // Private Member Functions
 
-            //- Construct for a given SLListBase with NULL element and link.
+            //- Construct for a given SLListBase with nullptr element and link.
             //  Only used to create endIter
             inline iterator(SLListBase&);
 

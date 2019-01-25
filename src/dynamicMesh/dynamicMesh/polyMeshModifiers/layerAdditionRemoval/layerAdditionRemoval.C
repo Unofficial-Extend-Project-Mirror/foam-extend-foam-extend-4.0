@@ -186,8 +186,8 @@ Foam::layerAdditionRemoval::layerAdditionRemoval
     minLayerThickness_(minThickness),
     maxLayerThickness_(maxThickness),
     oldLayerThickness_(-1.0),
-    pointsPairingPtr_(NULL),
-    facesPairingPtr_(NULL),
+    pointsPairingPtr_(nullptr),
+    facesPairingPtr_(nullptr),
     triggerRemoval_(-1),
     triggerAddition_(-1),
     cellZone_(cellZone)
@@ -210,8 +210,8 @@ Foam::layerAdditionRemoval::layerAdditionRemoval
     minLayerThickness_(readScalar(dict.lookup("minLayerThickness"))),
     maxLayerThickness_(readScalar(dict.lookup("maxLayerThickness"))),
     oldLayerThickness_(readOldThickness(dict)),
-    pointsPairingPtr_(NULL),
-    facesPairingPtr_(NULL),
+    pointsPairingPtr_(nullptr),
+    facesPairingPtr_(nullptr),
     triggerRemoval_(-1),
     triggerAddition_(-1),
     cellZone_(-1)

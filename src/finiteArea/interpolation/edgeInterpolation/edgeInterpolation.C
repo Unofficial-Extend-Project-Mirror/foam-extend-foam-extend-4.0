@@ -63,15 +63,15 @@ edgeInterpolation::edgeInterpolation(const faMesh& fam)
     faMesh_(fam),
     schemesDict_(fam()),
     solutionDict_(fam()),
-    lPN_(NULL),
-    weightingFactors_(NULL),
-    differenceFactors_(NULL),
+    lPN_(nullptr),
+    weightingFactors_(nullptr),
+    differenceFactors_(nullptr),
     orthogonal_(false),
-    correctionVectors_(NULL),
+    correctionVectors_(nullptr),
     skew_(true),
-    skewCorrectionVectors_(NULL)
-//     leastSquarePvectors_(NULL),
-//     leastSquareNvectors_(NULL)
+    skewCorrectionVectors_(nullptr)
+//     leastSquarePvectors_(nullptr),
+//     leastSquareNvectors_(nullptr)
 {}
 
 

@@ -294,12 +294,12 @@ Foam::faAreaMapper::faAreaMapper
     insertedFaces_(false),
     direct_(false),
     sizeBeforeMapping_(mesh.nFaces()),
-    newFaceLabelsPtr_(NULL),
-    newFaceLabelsMapPtr_(NULL),
-    directAddrPtr_(NULL),
-    interpolationAddrPtr_(NULL),
-    weightsPtr_(NULL),
-    insertedObjectLabelsPtr_(NULL)
+    newFaceLabelsPtr_(nullptr),
+    newFaceLabelsMapPtr_(nullptr),
+    directAddrPtr_(nullptr),
+    interpolationAddrPtr_(nullptr),
+    weightsPtr_(nullptr),
+    insertedObjectLabelsPtr_(nullptr)
 {
     // Check for possibility of direct mapping
     if

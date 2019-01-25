@@ -40,7 +40,7 @@ Foam::particleForces::particleForces
     mesh_(mesh),
     dict_(dict.subDict("particleForces")),
     g_(g),
-    gradUPtr_(NULL),
+    gradUPtr_(nullptr),
     gravity_(dict_.lookup("gravity")),
     virtualMass_(dict_.lookup("virtualMass")),
     Cvm_(0.0),
@@ -126,7 +126,7 @@ void Foam::particleForces::cacheFields(const bool store)
         if (gradUPtr_)
         {
             delete gradUPtr_;
-            gradUPtr_ = NULL;
+            gradUPtr_ = nullptr;
         }
     }
 }

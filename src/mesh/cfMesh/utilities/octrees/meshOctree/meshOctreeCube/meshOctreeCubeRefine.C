@@ -118,7 +118,7 @@ void meshOctreeCube::refineCube2D
     //- create subCubes
     FixedList<meshOctreeCube*, 8> subCubes;
     forAll(subCubes, scI)
-        subCubes[scI] = NULL;
+        subCubes[scI] = nullptr;
 
     //- create new cubes in the Z-order fashion
     for(label scI=0;scI<4;++scI)
@@ -351,7 +351,7 @@ void meshOctreeCube::refineMissingCube
     {
         FixedList<meshOctreeCube*, 8> sCubes;
         forAll(sCubes, i)
-            sCubes[i] = NULL;
+            sCubes[i] = nullptr;
 
         const label subCubesLabel = slotPtr->childCubes_.size();
 
@@ -423,7 +423,7 @@ void meshOctreeCube::refineMissingCube
     {
         FixedList<meshOctreeCube*, 8> sCubes;
         forAll(sCubes, i)
-            sCubes[i] = NULL;
+            sCubes[i] = nullptr;
 
         const label subCubesLabel = slotPtr->childCubes_.size();
         slotPtr->childCubes_.appendFixedList(sCubes);

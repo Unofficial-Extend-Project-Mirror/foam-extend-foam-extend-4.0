@@ -46,10 +46,10 @@ Foam::extendedLeastSquaresVectors::extendedLeastSquaresVectors
 :
     MeshObject<fvMesh, extendedLeastSquaresVectors>(mesh),
     minDet_(minDet),
-    pVectorsPtr_(NULL),
-    nVectorsPtr_(NULL),
-    additionalCellsPtr_(NULL),
-    additionalVectorsPtr_(NULL)
+    pVectorsPtr_(nullptr),
+    nVectorsPtr_(nullptr),
+    additionalCellsPtr_(nullptr),
+    additionalVectorsPtr_(nullptr)
 {}
 
 

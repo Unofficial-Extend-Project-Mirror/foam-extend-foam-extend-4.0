@@ -84,9 +84,9 @@ coupleMap::coupleMap
     masterIndex_(masterIndex),
     slaveIndex_(slaveIndex),
     nEntities_(-1),
-    edgesPtr_(NULL),
-    facesPtr_(NULL),
-    faceEdgesPtr_(NULL)
+    edgesPtr_(nullptr),
+    facesPtr_(nullptr),
+    faceEdgesPtr_(nullptr)
 {
     if
     (
@@ -112,9 +112,9 @@ coupleMap::coupleMap(const coupleMap& cm)
     masterIndex_(cm.masterIndex_),
     slaveIndex_(cm.slaveIndex_),
     nEntities_(cm.nEntities_),
-    edgesPtr_(NULL),
-    facesPtr_(NULL),
-    faceEdgesPtr_(NULL)
+    edgesPtr_(nullptr),
+    facesPtr_(nullptr),
+    faceEdgesPtr_(nullptr)
 {
     if
     (

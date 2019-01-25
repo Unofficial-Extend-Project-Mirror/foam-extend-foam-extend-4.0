@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 
 
     // Load set to work
-    autoPtr<topoSet> currentSetPtr(NULL);
+    autoPtr<topoSet> currentSetPtr(nullptr);
     IOobject::readOption r;
 
     if ((action == topoSetSource::NEW) || (action == topoSetSource::CLEAR))

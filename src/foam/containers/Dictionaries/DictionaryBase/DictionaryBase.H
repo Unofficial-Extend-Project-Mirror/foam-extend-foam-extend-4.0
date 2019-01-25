@@ -111,10 +111,10 @@ public:
             //- Search DictionaryBase for given keyword
             bool found(const word&) const;
 
-            //- Find and return an entry if present, otherwise return NULL
+            //- Find and return an entry if present, otherwise return nullptr
             const T* lookupPtr(const word&) const;
 
-            //- Find and return an entry if present, otherwise return NULL
+            //- Find and return an entry if present, otherwise return nullptr
             T* lookupPtr(const word&);
 
             //- Find and return entry
@@ -136,7 +136,7 @@ public:
             void append(const word&, T*);
 
             //- Remove and return entry specified by keyword.
-            //  Return NULL if the keyword was not found.
+            //  Return nullptr if the keyword was not found.
             T* remove(const word&);
 
             //- Clear the dictionary

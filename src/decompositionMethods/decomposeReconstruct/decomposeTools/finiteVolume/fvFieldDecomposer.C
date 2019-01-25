@@ -143,17 +143,17 @@ fvFieldDecomposer::fvFieldDecomposer
     patchFieldDecomposerPtrs_
     (
         procMesh_.boundary().size(),
-        static_cast<patchFieldDecomposer*>(NULL)
+        static_cast<patchFieldDecomposer*>(nullptr)
     ),
     processorVolPatchFieldDecomposerPtrs_
     (
         procMesh_.boundary().size(),
-        static_cast<processorVolPatchFieldDecomposer*>(NULL)
+        static_cast<processorVolPatchFieldDecomposer*>(nullptr)
     ),
     processorSurfacePatchFieldDecomposerPtrs_
     (
         procMesh_.boundary().size(),
-        static_cast<processorSurfacePatchFieldDecomposer*>(NULL)
+        static_cast<processorSurfacePatchFieldDecomposer*>(nullptr)
     )
 {
     // HR 25.06.18: Weights cannot be used for mappings

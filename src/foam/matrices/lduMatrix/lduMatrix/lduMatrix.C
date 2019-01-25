@@ -42,18 +42,18 @@ const Foam::scalar Foam::lduMatrix::small_ = 1.0e-20;
 Foam::lduMatrix::lduMatrix(const lduMesh& mesh)
 :
     lduMesh_(mesh),
-    lowerPtr_(NULL),
-    diagPtr_(NULL),
-    upperPtr_(NULL)
+    lowerPtr_(nullptr),
+    diagPtr_(nullptr),
+    upperPtr_(nullptr)
 {}
 
 
 Foam::lduMatrix::lduMatrix(const lduMatrix& A)
 :
     lduMesh_(A.lduMesh_),
-    lowerPtr_(NULL),
-    diagPtr_(NULL),
-    upperPtr_(NULL)
+    lowerPtr_(nullptr),
+    diagPtr_(nullptr),
+    upperPtr_(nullptr)
 {
     if (A.lowerPtr_)
     {
@@ -75,28 +75,28 @@ Foam::lduMatrix::lduMatrix(const lduMatrix& A)
 Foam::lduMatrix::lduMatrix(lduMatrix& A, bool reUse)
 :
     lduMesh_(A.lduMesh_),
-    lowerPtr_(NULL),
-    diagPtr_(NULL),
-    upperPtr_(NULL)
+    lowerPtr_(nullptr),
+    diagPtr_(nullptr),
+    upperPtr_(nullptr)
 {
     if (reUse)
     {
         if (A.lowerPtr_)
         {
             lowerPtr_ = A.lowerPtr_;
-            A.lowerPtr_ = NULL;
+            A.lowerPtr_ = nullptr;
         }
 
         if (A.diagPtr_)
         {
             diagPtr_ = A.diagPtr_;
-            A.diagPtr_ = NULL;
+            A.diagPtr_ = nullptr;
         }
 
         if (A.upperPtr_)
         {
             upperPtr_ = A.upperPtr_;
-            A.upperPtr_ = NULL;
+            A.upperPtr_ = nullptr;
         }
     }
     else

@@ -133,8 +133,8 @@ void inletOutletFaPatchField<Type>::updateCoeffs()
     const Field<scalar>& phip = this->lookupPatchField
     (
         phiName_,
-        reinterpret_cast<const edgeScalarField*>(NULL),
-        reinterpret_cast<const scalar*>(NULL)
+        reinterpret_cast<const edgeScalarField*>(0),
+        reinterpret_cast<const scalar*>(0)
     );
 
     this->valueFraction() = 1.0 - pos(phip);

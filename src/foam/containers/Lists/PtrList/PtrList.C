@@ -86,7 +86,7 @@ Foam::PtrList<T>::PtrList(PtrList<T>& a, bool reUse)
         forAll(*this, i)
         {
             ptrs_[i] = a.ptrs_[i];
-            a.ptrs_[i] = NULL;
+            a.ptrs_[i] = nullptr;
         }
         a.setSize(0);
     }
@@ -174,7 +174,7 @@ void Foam::PtrList<T>::setSize(const label newSize)
         register label i;
         for (i=oldSize; i<newSize; i++)
         {
-            ptrs_[i] = NULL;
+            ptrs_[i] = nullptr;
         }
     }
 }

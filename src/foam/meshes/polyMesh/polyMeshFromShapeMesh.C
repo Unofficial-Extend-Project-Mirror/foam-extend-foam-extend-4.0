@@ -549,12 +549,12 @@ Foam::polyMesh::polyMesh
         *this,
         0
     ),
-    globalMeshDataPtr_(NULL),
+    globalMeshDataPtr_(nullptr),
     moving_(false),
     changing_(false),
     curMotionTimeIndex_(time().timeIndex()),
-    oldAllPointsPtr_(NULL),
-    oldPointsPtr_(NULL)
+    oldAllPointsPtr_(nullptr),
+    oldPointsPtr_(nullptr)
 {
     if (debug)
     {
@@ -834,12 +834,12 @@ Foam::polyMesh::polyMesh
         *this,
         0
     ),
-    globalMeshDataPtr_(NULL),
+    globalMeshDataPtr_(nullptr),
     moving_(false),
     changing_(false),
     curMotionTimeIndex_(time().timeIndex()),
-    oldAllPointsPtr_(NULL),
-    oldPointsPtr_(NULL)
+    oldAllPointsPtr_(nullptr),
+    oldPointsPtr_(nullptr)
 {
     if (debug)
     {

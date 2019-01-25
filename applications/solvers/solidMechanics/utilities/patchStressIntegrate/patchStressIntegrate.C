@@ -95,8 +95,8 @@ int main(int argc, char *argv[])
           Info<< nl;
 
           // gradU needed for nonLinear
-          volTensorField* gradUPtr = NULL;
-          volSymmTensorField* sigmaCauchyPtr = NULL;
+          volTensorField* gradUPtr = nullptr;
+          volSymmTensorField* sigmaCauchyPtr = nullptr;
           if (nonLinear)
           {
               gradUPtr = new volTensorField

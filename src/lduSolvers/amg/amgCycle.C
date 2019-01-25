@@ -56,7 +56,7 @@ Foam::amgCycle::cycleNames_;
 Foam::amgCycle::amgCycle(autoPtr<amgLevel> levelPtr)
 :
     levelPtr_(levelPtr),
-    coarseLevelPtr_(NULL),
+    coarseLevelPtr_(nullptr),
     nLevels_(0)
 {}
 

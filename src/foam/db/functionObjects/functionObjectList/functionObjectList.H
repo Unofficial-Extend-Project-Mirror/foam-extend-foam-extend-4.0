@@ -85,7 +85,7 @@ class functionObjectList
 
         //- Remove and return the function object pointer by name,
         //  and returns the old index via the parameter.
-        //  Returns a NULL pointer (and index -1) if it didn't exist.
+        //  Returns a nullptr pointer (and index -1) if it didn't exist.
         functionObject* remove(const word&, label& oldIndex);
 
         //- Disallow default bitwise copy construct

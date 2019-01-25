@@ -27,7 +27,7 @@ License
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-Foam::profilingPool* Foam::profilingPool::thePool_(NULL);
+Foam::profilingPool* Foam::profilingPool::thePool_(nullptr);
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -84,7 +84,7 @@ void Foam::profilingPool::stopProfiling(
     if (thePool_ && (&owner)==&(thePool_->owner()))
     {
         delete thePool_;
-        thePool_=NULL;
+        thePool_=nullptr;
     }
 }
 
@@ -100,7 +100,7 @@ Foam::profilingInfo &Foam::profilingPool::getInfo(const string& name)
     profilingStack& stack = thePool_->stack();
     mapType& map = thePool_->map();
 
-    profilingInfo* found = NULL;
+    profilingInfo* found = nullptr;
 
     for
     (

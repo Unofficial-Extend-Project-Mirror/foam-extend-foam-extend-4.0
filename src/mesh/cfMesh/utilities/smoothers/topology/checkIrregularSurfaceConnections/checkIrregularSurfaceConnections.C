@@ -43,7 +43,7 @@ checkIrregularSurfaceConnections::checkIrregularSurfaceConnections
 )
 :
     mesh_(mesh),
-    meshSurfacePtr_(NULL)
+    meshSurfacePtr_(nullptr)
 {
 }
 

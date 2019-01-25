@@ -384,7 +384,7 @@ int main(int argc, char *argv[])
 
     // Construct the tetPoint fields
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~
-    tetPolyMesh* tetMeshPtr = NULL;
+    tetPolyMesh* tetMeshPtr = nullptr;
 
     PtrList<tetPointScalarField> tetPointScalarFields;
     PtrList<tetPointVectorField> tetPointVectorFields;
@@ -491,7 +491,7 @@ int main(int argc, char *argv[])
                 new List<SLList<indexedParticle*>*>
                 (
                     mesh.nCells(),
-                    static_cast<SLList<indexedParticle*>*>(NULL)
+                    static_cast<SLList<indexedParticle*>*>(nullptr)
                 )
             );
 
@@ -895,7 +895,7 @@ int main(int argc, char *argv[])
     if (tetMeshPtr)
     {
         delete tetMeshPtr;
-        tetMeshPtr = NULL;
+        tetMeshPtr = nullptr;
     }
 
 

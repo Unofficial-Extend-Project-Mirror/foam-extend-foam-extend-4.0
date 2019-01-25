@@ -77,7 +77,7 @@ void boundaryLayerOptimisation::calculateNormalVectors
         const label bpI = bp[hairEdges_[hairEdgeI][0]];
 
         //- create an entry in a map
-        patchNormalType* patchNormalPtr(NULL);
+        patchNormalType* patchNormalPtr(nullptr);
         # ifdef USE_OMP
         # pragma omp critical
             patchNormalPtr = &pointPatchNormal[bpI];
@@ -227,7 +227,7 @@ void boundaryLayerOptimisation::calculateNormalVectorsSmother
         const label triPointI = triPointLabel[bpI];
 
         //- create an entry in a map
-        patchNormalType* patchNormalPtr(NULL);
+        patchNormalType* patchNormalPtr(nullptr);
         # ifdef USE_OMP
         # pragma omp critical
             patchNormalPtr = &pointPatchNormal[bpI];

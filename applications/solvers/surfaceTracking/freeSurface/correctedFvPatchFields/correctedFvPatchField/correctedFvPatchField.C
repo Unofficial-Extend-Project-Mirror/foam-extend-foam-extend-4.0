@@ -56,7 +56,7 @@ correctedFvPatchField<Type>::correctedFvPatchField
     correctionVectors_(p.size(), vector::zero),
     corrVecGrad_(p.size(), pTraits<Type>::zero),
     nGradInternal_(p.size(), pTraits<Type>::zero),
-    patchSubMeshPtr_(NULL),
+    patchSubMeshPtr_(nullptr),
     subMeshPatchID_(-1)
 {
     updateCorrectionVectors();
@@ -75,7 +75,7 @@ correctedFvPatchField<Type>::correctedFvPatchField
     correctionVectors_(p.size(), vector::zero),
     corrVecGrad_(p.size(), pTraits<Type>::zero),
     nGradInternal_(p.size(), pTraits<Type>::zero),
-    patchSubMeshPtr_(NULL),
+    patchSubMeshPtr_(nullptr),
     subMeshPatchID_(-1)
 
 {
@@ -95,7 +95,7 @@ correctedFvPatchField<Type>::correctedFvPatchField
     correctionVectors_(p.size(), vector::zero),
     corrVecGrad_(p.size(), pTraits<Type>::zero),
     nGradInternal_(p.size(), pTraits<Type>::zero),
-    patchSubMeshPtr_(NULL),
+    patchSubMeshPtr_(nullptr),
     subMeshPatchID_(-1)
 {
     updateCorrectionVectors();
@@ -121,7 +121,7 @@ correctedFvPatchField<Type>::correctedFvPatchField
     correctionVectors_(ptf.correctionVectors_, mapper),
     corrVecGrad_(ptf.corrVecGrad_, mapper),
     nGradInternal_(ptf.nGradInternal_, mapper),
-    patchSubMeshPtr_(NULL),
+    patchSubMeshPtr_(nullptr),
     subMeshPatchID_(-1)
 {
     updateCorrectionVectors();
@@ -139,7 +139,7 @@ correctedFvPatchField<Type>::correctedFvPatchField
     correctionVectors_(ptf.correctionVectors_),
     corrVecGrad_(ptf.corrVecGrad_),
     nGradInternal_(ptf.nGradInternal_),
-    patchSubMeshPtr_(NULL),
+    patchSubMeshPtr_(nullptr),
     subMeshPatchID_(-1)
 {
     updateCorrectionVectors();

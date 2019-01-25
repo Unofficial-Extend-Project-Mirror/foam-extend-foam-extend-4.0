@@ -52,7 +52,7 @@ chemPoint::chemPoint
     const scalar& deltaT
 )
 :
-    node_(NULL),
+    node_(nullptr),
     nUsed_(0),
     v0_(v0),
     r_(r),
@@ -167,7 +167,7 @@ chemPoint::chemPoint
     const chemPoint& p
 )
 :
-    node_(NULL),
+    node_(nullptr),
     nUsed_(0),
     v0_(p.v0()),
     r_(p.r()),
@@ -354,7 +354,7 @@ bool chemPoint::checkSolution
 
 void chemPoint::setFree()
 {
-    node_ = NULL;
+    node_ = nullptr;
     nUsed_ = 0;
     /*
         v0_.clear();
@@ -387,7 +387,7 @@ void chemPoint::clearData()
         deltaT_ = 0;
 //        Info << "deltaT_ = 0;" << endl;
         timeEOA_ = 0;
-//        node_ = NULL;
+//        node_ = nullptr;
 //        Info << "chemPoint::clearData():: ENDDDDDD!" << endl;
 
 }

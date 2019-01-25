@@ -65,8 +65,8 @@ polyMeshGenFaces::polyMeshGenFaces(const Time& runTime)
     boundaries_(),
     faceSubsets_(),
     nIntFaces_(0),
-    ownerPtr_(NULL),
-    neighbourPtr_(NULL)
+    ownerPtr_(nullptr),
+    neighbourPtr_(nullptr)
 {}
 
 //- Construct from components without the boundary
@@ -93,8 +93,8 @@ polyMeshGenFaces::polyMeshGenFaces
     boundaries_(),
     faceSubsets_(),
     nIntFaces_(0),
-    ownerPtr_(NULL),
-    neighbourPtr_(NULL)
+    ownerPtr_(nullptr),
+    neighbourPtr_(nullptr)
 {}
 
 //- Construct from components with the boundary
@@ -124,8 +124,8 @@ polyMeshGenFaces::polyMeshGenFaces
     boundaries_(),
     faceSubsets_(),
     nIntFaces_(0),
-    ownerPtr_(NULL),
-    neighbourPtr_(NULL)
+    ownerPtr_(nullptr),
+    neighbourPtr_(nullptr)
 {
     if( Pstream::parRun() )
         FatalErrorIn

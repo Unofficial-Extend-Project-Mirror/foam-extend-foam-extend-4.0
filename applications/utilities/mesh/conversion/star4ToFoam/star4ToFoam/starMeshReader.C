@@ -399,7 +399,7 @@ void starMeshReader::readCells
             }
 
             // determine the foam cell shape
-            const cellModel* curModelPtr = NULL;
+            const cellModel* curModelPtr = nullptr;
 
             // fluid/solid cells
             switch (shapeId)

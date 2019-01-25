@@ -132,7 +132,7 @@ void Foam::fvMeshAdder::MapVolField
             newPatchI++
         )
         {
-            fld.boundaryField().set(newPatchI, NULL);
+            fld.boundaryField().set(newPatchI, nullptr);
         }
 
 
@@ -457,7 +457,7 @@ void Foam::fvMeshAdder::MapSurfaceField
             newPatchI++
         )
         {
-            fld.boundaryField().set(newPatchI, NULL);
+            fld.boundaryField().set(newPatchI, nullptr);
         }
 
 

@@ -152,27 +152,27 @@ public:
 
         // Access
 
-            virtual const vectorField& traction() const
+            const vectorField& traction() const
             {
                 return traction_;
             }
 
-            virtual vectorField& traction()
+            vectorField& traction()
             {
                 return traction_;
             }
 
-            virtual const scalarField& pressure() const
+            const scalarField& pressure() const
             {
                 return pressure_;
             }
 
-            virtual scalarField& pressure()
+            scalarField& pressure()
             {
                 return pressure_;
             }
 
-            virtual word& fieldName()
+            word& fieldName()
             {
                 return fieldName_;
             }

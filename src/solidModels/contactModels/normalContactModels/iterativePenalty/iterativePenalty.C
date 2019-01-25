@@ -82,9 +82,9 @@ iterativePenalty::iterativePenalty
   (readScalar(normalContactModelDict_.lookup("penetrationLimit"))),
   correctMissedVertices_
   (normalContactModelDict_.lookup("correctMissedVertices")),
-  slavePointPointsPtr_(NULL),
-  penaltyFactorPtr_(NULL),
-  returnPenaltyFactorPtr_(NULL),
+  slavePointPointsPtr_(nullptr),
+  penaltyFactorPtr_(nullptr),
+  returnPenaltyFactorPtr_(nullptr),
   penaltyScale_(readScalar(normalContactModelDict_.lookup("penaltyScale"))),
   returnScale_(readScalar(normalContactModelDict_.lookup("returnScale"))),
   totalSlavePointTrac_
@@ -104,7 +104,7 @@ iterativePenalty::iterativePenalty
   oscillationCorr_(normalContactModelDict_.lookup("oscillationCorrection")),
   oscillationCorrFac_
   (readScalar(normalContactModelDict_.lookup("oscillationCorrectionFactor"))),
-  contactFilePtr_(NULL)
+  contactFilePtr_(nullptr)
 {
   // master proc open contact info file
   if (Pstream::master())

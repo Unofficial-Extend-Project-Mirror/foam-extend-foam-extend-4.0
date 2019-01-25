@@ -162,20 +162,20 @@ freeSurface::freeSurface
         readInt(this->lookup("nFreeSurfaceCorrectors"))
     ),
     smoothing_(false),
-    interpolatorABPtr_(NULL),
-    interpolatorBAPtr_(NULL),
-    controlPointsPtr_(NULL),
-    motionPointsMaskPtr_(NULL),
-    pointsDisplacementDirPtr_(NULL),
-    facesDisplacementDirPtr_(NULL),
-    totalDisplacementPtr_(NULL),
-    aMeshPtr_(NULL),
-    UsPtr_(NULL),
-    phisPtr_(NULL),
-    surfactConcPtr_(NULL),
-    surfaceTensionPtr_(NULL),
-    surfactantPtr_(NULL),
-    fluidIndicatorPtr_(NULL)
+    interpolatorABPtr_(nullptr),
+    interpolatorBAPtr_(nullptr),
+    controlPointsPtr_(nullptr),
+    motionPointsMaskPtr_(nullptr),
+    pointsDisplacementDirPtr_(nullptr),
+    facesDisplacementDirPtr_(nullptr),
+    totalDisplacementPtr_(nullptr),
+    aMeshPtr_(nullptr),
+    UsPtr_(nullptr),
+    phisPtr_(nullptr),
+    surfactConcPtr_(nullptr),
+    surfaceTensionPtr_(nullptr),
+    surfactantPtr_(nullptr),
+    fluidIndicatorPtr_(nullptr)
 {
     //Read motion direction
     if (!normalMotionDir_)

@@ -58,7 +58,7 @@ Foam::polyBoundaryMesh::polyBoundaryMesh
     polyPatchList(),
     regIOobject(io),
     mesh_(mesh),
-    neighbourEdgesPtr_(NULL)
+    neighbourEdgesPtr_(nullptr)
 {
     if (readOpt() == IOobject::MUST_READ)
     {
@@ -107,7 +107,7 @@ Foam::polyBoundaryMesh::polyBoundaryMesh
     polyPatchList(size),
     regIOobject(io),
     mesh_(pm),
-    neighbourEdgesPtr_(NULL)
+    neighbourEdgesPtr_(nullptr)
 {}
 
 
@@ -121,7 +121,7 @@ Foam::polyBoundaryMesh::polyBoundaryMesh
     polyPatchList(),
     regIOobject(io),
     mesh_(mesh),
-    neighbourEdgesPtr_(NULL)
+    neighbourEdgesPtr_(nullptr)
 {
     polyPatchList& patches = *this;
     token firstToken(is);

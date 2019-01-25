@@ -312,7 +312,7 @@ public:
             //  (is the intersection patch calculated?)
             bool active() const
             {
-                return ibPatchPtr_ != NULL;
+                return ibPatchPtr_ != nullptr;
             }
 
             //- Return primitivePatch of cell-intersected faces

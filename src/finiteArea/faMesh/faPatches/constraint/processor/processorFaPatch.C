@@ -355,7 +355,7 @@ void processorFaPatch::updateMesh()
         {
             // Differing number of points. Probably patch includes
             // part of a cyclic.
-            neighbPointsPtr_ = NULL;
+            neighbPointsPtr_ = nullptr;
         }
     }
 }

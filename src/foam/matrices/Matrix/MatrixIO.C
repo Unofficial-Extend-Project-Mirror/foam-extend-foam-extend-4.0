@@ -34,7 +34,7 @@ License
 template<class Form, class Type>
 Foam::Matrix<Form, Type>::Matrix(Istream& is)
 :
-    v_(NULL),
+    v_(nullptr),
     n_(0),
     m_(0)
 {

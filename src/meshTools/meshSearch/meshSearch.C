@@ -436,9 +436,9 @@ Foam::meshSearch::meshSearch(const polyMesh& mesh, const bool faceDecomp)
     mesh_(mesh),
     faceDecomp_(faceDecomp),
     cloud_(mesh_, IDLList<passiveParticle>()),
-    boundaryTreePtr_(NULL),
-    cellTreePtr_(NULL),
-    cellCentreTreePtr_(NULL)
+    boundaryTreePtr_(nullptr),
+    cellTreePtr_(nullptr),
+    cellCentreTreePtr_(nullptr)
 {
     // HR 29.11.17: Might register multiple times. Therefore do not register.
     cloud_.regIOobject::checkOut();

@@ -249,7 +249,7 @@ starMesh::starMesh
     cellPolys_(0),
     nInternalFaces_(0),
     polyBoundaryPatchStartIndices_(0),
-    pointCellsPtr_(NULL),
+    pointCellsPtr_(nullptr),
     couples_(0),
     isShapeMesh_(true)
 {

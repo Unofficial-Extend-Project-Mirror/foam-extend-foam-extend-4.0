@@ -139,7 +139,7 @@ public:
         (
             const polyMesh& mesh,
             const dictionary& dict,
-            const twoDPointCorrector* correct2DPtr = NULL
+            const twoDPointCorrector* correct2DPtr = nullptr
         );
 
 };

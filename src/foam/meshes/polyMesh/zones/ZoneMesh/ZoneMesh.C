@@ -86,7 +86,7 @@ ZoneMesh<ZoneType, MeshType>::ZoneMesh
     PtrList<ZoneType>(),
     regIOobject(io),
     mesh_(mesh),
-    zoneMapPtr_(NULL)
+    zoneMapPtr_(nullptr)
 {
     if
     (
@@ -146,7 +146,7 @@ ZoneMesh<ZoneType, MeshType>::ZoneMesh
     PtrList<ZoneType>(size),
     regIOobject(io),
     mesh_(mesh),
-    zoneMapPtr_(NULL)
+    zoneMapPtr_(nullptr)
 {}
 
 
@@ -162,7 +162,7 @@ ZoneMesh<ZoneType, MeshType>::ZoneMesh
     PtrList<ZoneType>(),
     regIOobject(io),
     mesh_(mesh),
-    zoneMapPtr_(NULL)
+    zoneMapPtr_(nullptr)
 {
     PtrList<entry> zoneEntries(is);
 

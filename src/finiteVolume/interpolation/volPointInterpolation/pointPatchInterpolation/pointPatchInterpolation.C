@@ -330,10 +330,10 @@ pointPatchInterpolation::pointPatchInterpolation(const fvMesh& vm)
 :
     fvMesh_(vm),
     patchInterpolators_(),
-    patchPatchPointsPtr_(NULL),
-    patchPatchPointConstraintPointsPtr_(NULL),
-    patchPatchPointConstraintTensorsPtr_(NULL),
-    patchPatchPointWeightsPtr_(NULL)
+    patchPatchPointsPtr_(nullptr),
+    patchPatchPointConstraintPointsPtr_(nullptr),
+    patchPatchPointConstraintTensorsPtr_(nullptr),
+    patchPatchPointWeightsPtr_(nullptr)
 {}
 
 

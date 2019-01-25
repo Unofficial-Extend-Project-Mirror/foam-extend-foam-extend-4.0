@@ -231,10 +231,10 @@ Foam::tetPolyPatchMapper::tetPolyPatchMapper
     mpm_(meshMap),
     pMapper_(pMapper),
     fMapper_(fMapper),
-    directPtr_(NULL),
-    directAddrPtr_(NULL),
-    interpolationAddrPtr_(NULL),
-    weightsPtr_(NULL)
+    directPtr_(nullptr),
+    directAddrPtr_(nullptr),
+    interpolationAddrPtr_(nullptr),
+    weightsPtr_(nullptr)
 {}
 
 

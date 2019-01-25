@@ -67,7 +67,7 @@ namespace debug
 {
 
 //! @cond ignoreDocumentation - local scope
-dictionary* controlDictPtr_(NULL);
+dictionary* controlDictPtr_(nullptr);
 
 // to ensure controlDictPtr_ is deleted at the end of the run
 class deleteControlDictPtr
@@ -82,7 +82,7 @@ public:
         if (controlDictPtr_)
         {
             delete controlDictPtr_;
-            controlDictPtr_ = NULL;
+            controlDictPtr_ = nullptr;
         }
     }
 };

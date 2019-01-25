@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    while(runTime.loop())
+    while (runTime.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
@@ -147,7 +147,6 @@ int main(int argc, char *argv[])
             ||
             (
                 solverPerf.initialResidual() > convergenceTolerance
-                //relativeResidual > convergenceTolerance
              && iCorr < nCorr
             )
         );

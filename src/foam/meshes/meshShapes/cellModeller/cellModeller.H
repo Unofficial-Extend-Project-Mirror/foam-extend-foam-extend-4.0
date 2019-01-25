@@ -78,10 +78,10 @@ public:
 
     // Member functions
 
-        //- Look up a model by name and return a pointer to the model or NULL
+        //- Look up a model by name and return a pointer to the model or nullptr
         static const cellModel* lookup(const word&);
 
-        //- Look up a model by index and return a pointer to the model or NULL
+        //- Look up a model by index and return a pointer to the model or nullptr
         static const cellModel* lookup(const label i)
         {
             return modelPtrs_[i];

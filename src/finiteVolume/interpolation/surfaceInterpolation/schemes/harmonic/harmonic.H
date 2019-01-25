@@ -30,6 +30,10 @@ Description
     This scheme interpolates 1/field using a scheme specified at run-time
     and return the reciprocal of the interpolate.
 
+Note:
+    Harmonic mean is strictly valid only for positive scalars.
+    For vectors and tensors, the norm/magnitude is used.
+
 SourceFiles
     harmonic.C
 

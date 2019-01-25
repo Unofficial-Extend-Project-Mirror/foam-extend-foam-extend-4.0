@@ -102,7 +102,7 @@ void Foam::lduMatrix::operator=(const lduMatrix& A)
     else if (lowerPtr_)
     {
         delete lowerPtr_;
-        lowerPtr_ = NULL;
+        lowerPtr_ = nullptr;
     }
 
     if (A.upperPtr_)
@@ -112,7 +112,7 @@ void Foam::lduMatrix::operator=(const lduMatrix& A)
     else if (upperPtr_)
     {
         delete upperPtr_;
-        upperPtr_ = NULL;
+        upperPtr_ = nullptr;
     }
 
     if (A.diagPtr_)

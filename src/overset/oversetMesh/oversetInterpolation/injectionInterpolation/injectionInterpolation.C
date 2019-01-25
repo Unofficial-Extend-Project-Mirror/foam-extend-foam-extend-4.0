@@ -110,7 +110,7 @@ Foam::injectionInterpolation::injectionInterpolation
 )
 :
     oversetInterpolation(overset, name),
-    weightsPtr_(NULL)
+    weightsPtr_(nullptr)
 {}
 
 

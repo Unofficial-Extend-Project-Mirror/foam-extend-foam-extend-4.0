@@ -105,7 +105,7 @@ Foam::BlockSolverPerformance<Type> Foam::SegregatedSolver<Type>::solve
 
     // Decouple quadratic coupling by multiplying out the square coefficient
     // coupling
-    Field<Type>* dBPtr = NULL;
+    Field<Type>* dBPtr = nullptr;
 
     if (blockMatrix.componentCoupled())
     {
@@ -209,7 +209,7 @@ Foam::BlockSolverPerformance<Type> Foam::SegregatedSolver<Type>::solve
     if (dBPtr)
     {
         delete dBPtr;
-        dBPtr = NULL;
+        dBPtr = nullptr;
     }
 
     return solverPerf;

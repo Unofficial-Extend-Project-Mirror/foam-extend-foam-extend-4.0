@@ -768,7 +768,7 @@ int main(int argc, char *argv[])
 
 
 
-    std::ifstream* fileStreamPtr(NULL);
+    std::ifstream* fileStreamPtr(nullptr);
 
     if (args.optionFound("batch"))
     {

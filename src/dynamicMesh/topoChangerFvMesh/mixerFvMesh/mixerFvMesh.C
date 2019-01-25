@@ -390,7 +390,7 @@ Foam::mixerFvMesh::mixerFvMesh
         dict_.lookupOrDefault<point>("rotatingRegionMarker", cs_.origin())
     ),
     attachDetach_(dict_.lookupOrDefault<bool>("attachDetach", false)),
-    movingPointsMaskPtr_(NULL)
+    movingPointsMaskPtr_(nullptr)
 {
     // Make sure the coordinate system does not operate in degrees
     // Bug fix, HJ, 3/Oct/2011

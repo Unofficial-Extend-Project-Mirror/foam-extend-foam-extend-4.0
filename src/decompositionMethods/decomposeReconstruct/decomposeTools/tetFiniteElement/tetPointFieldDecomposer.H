@@ -115,7 +115,7 @@ public:
                     ),
                     sizeBeforeMapping_(sourcePatch.size()),
                     directAddressing_(directAddr),
-                    directPatchAddressingPtr_(NULL)
+                    directPatchAddressingPtr_(nullptr)
                 {}
 
 

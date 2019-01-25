@@ -167,7 +167,7 @@ public:
         autoPtr<MRFZone> clone() const
         {
             notImplemented("autoPtr<MRFZone> clone() const");
-            return autoPtr<MRFZone>(NULL);
+            return autoPtr<MRFZone>(nullptr);
         }
 
         //- Return a pointer to a new MRFZone created on freestore

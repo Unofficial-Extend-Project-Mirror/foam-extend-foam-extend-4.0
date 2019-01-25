@@ -1844,7 +1844,7 @@ Foam::isoSurface::isoSurface
             bType& bfld = const_cast<bType&>(meshC.boundaryField());
 
             // Clear old value. Cannot resize it since is a slice.
-            bfld.set(patchI, NULL);
+            bfld.set(patchI, nullptr);
 
             // Set new value we can change
             bfld.set

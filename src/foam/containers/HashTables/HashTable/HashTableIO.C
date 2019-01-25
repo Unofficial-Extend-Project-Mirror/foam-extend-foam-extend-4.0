@@ -35,7 +35,7 @@ Foam::HashTable<T, Key, Hash>::HashTable(Istream& is, const label size)
     HashTableCore(),
     nElmts_(0),
     tableSize_(HashTableCore::canonicalSize(size)),
-    table_(NULL)
+    table_(nullptr)
 {
     if (tableSize_)
     {

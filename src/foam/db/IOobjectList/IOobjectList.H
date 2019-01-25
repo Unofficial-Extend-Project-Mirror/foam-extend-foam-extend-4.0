@@ -93,7 +93,7 @@ public:
         //- Remove an IOobject from the list
         bool remove(IOobject&);
 
-        //- Lookup a given name and return IOobject ptr if found else NULL
+        //- Lookup a given name and return IOobject ptr if found else nullptr
         IOobject* lookup(const word& name) const;
 
         //- Return the list for all IOobects whose name matches name

@@ -41,10 +41,10 @@ Foam::immersedBoundaryCorrectedMeshFields::immersedBoundaryCorrectedMeshFields
 )
 :
     MeshObject<polyMesh, immersedBoundaryCorrectedMeshFields>(mesh),
-    correctedCellCentresPtr_(NULL),
-    correctedFaceCentresPtr_(NULL),
-    correctedCellVolumesPtr_(NULL),
-    correctedFaceAreasPtr_(NULL),
+    correctedCellCentresPtr_(nullptr),
+    correctedFaceCentresPtr_(nullptr),
+    correctedCellVolumesPtr_(nullptr),
+    correctedFaceAreasPtr_(nullptr),
     curTopoIndex_(-1)
 {}
 

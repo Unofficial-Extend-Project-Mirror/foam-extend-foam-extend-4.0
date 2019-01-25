@@ -161,7 +161,7 @@ meshReader::meshReader
     cellFaces_(0),
     baffleFaces_(0),
     cellTableId_(0),
-    pointCellsPtr_(NULL)
+    pointCellsPtr_(nullptr)
 {}
 
 

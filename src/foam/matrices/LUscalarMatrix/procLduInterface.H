@@ -83,7 +83,7 @@ public:
         autoPtr<procLduInterface> clone()
         {
             notImplemented("procLduInterface::clone()");
-            return autoPtr<procLduInterface>(NULL);
+            return autoPtr<procLduInterface>(nullptr);
         }
 
         static autoPtr<procLduInterface> New(Istream& is)

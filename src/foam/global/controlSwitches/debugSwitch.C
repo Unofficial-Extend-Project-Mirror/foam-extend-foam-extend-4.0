@@ -40,7 +40,7 @@ namespace debug
     // runtime debug values.
     // This needs to go on the heap so the destructor will not get
     //  called before the objects' destructor it is overseeing
-    ListDebugControlSwitches* debugSwitchValues_(NULL);
+    ListDebugControlSwitches* debugSwitchValues_(nullptr);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

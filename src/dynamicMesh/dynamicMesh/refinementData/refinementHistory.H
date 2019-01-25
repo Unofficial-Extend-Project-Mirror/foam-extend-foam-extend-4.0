@@ -139,7 +139,7 @@ public:
             (
                 s.addedCellsPtr_.valid()
               ? new FixedList<label, 8>(s.addedCellsPtr_())
-              : NULL
+              : nullptr
             );
         }
 

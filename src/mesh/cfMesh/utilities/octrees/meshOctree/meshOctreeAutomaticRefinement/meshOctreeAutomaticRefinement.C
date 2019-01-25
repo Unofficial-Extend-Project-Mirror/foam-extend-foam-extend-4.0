@@ -168,9 +168,9 @@ meshOctreeAutomaticRefinement::meshOctreeAutomaticRefinement
     meshDict_(dict),
     useDATABoxes_(useDATABoxes),
     hexRefinement_(false),
-    octreeAddressingPtr_(NULL),
-    partitionerPtr_(NULL),
-    curvaturePtr_(NULL),
+    octreeAddressingPtr_(nullptr),
+    partitionerPtr_(nullptr),
+    curvaturePtr_(nullptr),
     maxRefLevel_(0)
 {
     if( !useDATABoxes_ && dict.found("keepCellsIntersectingBoundary") )

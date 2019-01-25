@@ -402,11 +402,11 @@ faceTetPolyPatch::faceTetPolyPatch
     tetPolyPatch(bm),
     boundaryIndex_(p.index()),
     size_(p.meshPoints().size() + p.size()),
-    meshPointsPtr_(NULL),
-    localPointsPtr_(NULL),
-    pointNormalsPtr_(NULL),
-    localEdgeIndicesPtr_(NULL),
-    cutEdgeIndicesPtr_(NULL)
+    meshPointsPtr_(nullptr),
+    localPointsPtr_(nullptr),
+    pointNormalsPtr_(nullptr),
+    localEdgeIndicesPtr_(nullptr),
+    cutEdgeIndicesPtr_(nullptr)
 {}
 
 

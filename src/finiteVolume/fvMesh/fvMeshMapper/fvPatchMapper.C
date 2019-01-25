@@ -216,10 +216,10 @@ Foam::fvPatchMapper::fvPatchMapper
     patch_(patch),
     faceMap_(faceMap),
     sizeBeforeMapping_(faceMap.oldPatchSizes()[patch_.index()]),
-    directPtr_(NULL),
-    directAddrPtr_(NULL),
-    interpolationAddrPtr_(NULL),
-    weightsPtr_(NULL)
+    directPtr_(nullptr),
+    directAddrPtr_(nullptr),
+    interpolationAddrPtr_(nullptr),
+    weightsPtr_(nullptr)
 {}
 
 

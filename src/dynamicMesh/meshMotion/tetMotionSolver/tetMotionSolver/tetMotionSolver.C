@@ -73,7 +73,7 @@ Foam::tetMotionSolver::tetMotionSolver
     ),
     fixedPoints_(),
     fixedVelocity_(),
-    totDisplacementPtr_(NULL)
+    totDisplacementPtr_(nullptr)
 {}
 
 

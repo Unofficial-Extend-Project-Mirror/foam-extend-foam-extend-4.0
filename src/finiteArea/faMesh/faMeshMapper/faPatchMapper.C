@@ -100,7 +100,7 @@ Foam::faPatchMapper::faPatchMapper
     mpm_(mpm),
     sizeBeforeMapping_(patch.size()),
     oldEdgeFaces_(patch.edgeFaces()),
-    directAddrPtr_(NULL)
+    directAddrPtr_(nullptr)
 {}
 
 

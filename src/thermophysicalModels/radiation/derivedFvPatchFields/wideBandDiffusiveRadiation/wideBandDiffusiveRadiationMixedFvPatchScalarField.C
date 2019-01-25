@@ -96,7 +96,7 @@ wideBandDiffusiveRadiationMixedFvPatchScalarField
     mixedFvPatchScalarField(p, iF),
     TName_("undefinedT"),
     emissivity_(0.0),
-    sumOutgoingAnglesPtr_(NULL)
+    sumOutgoingAnglesPtr_(nullptr)
 {
     refValue() = 0.0;
     refGrad() = 0.0;
@@ -116,7 +116,7 @@ wideBandDiffusiveRadiationMixedFvPatchScalarField
     mixedFvPatchScalarField(ptf, p, iF, mapper),
     TName_(ptf.TName_),
     emissivity_(ptf.emissivity_),
-    sumOutgoingAnglesPtr_(NULL)
+    sumOutgoingAnglesPtr_(nullptr)
 {}
 
 
@@ -131,7 +131,7 @@ wideBandDiffusiveRadiationMixedFvPatchScalarField
     mixedFvPatchScalarField(p, iF),
     TName_(dict.lookup("T")),
     emissivity_(readScalar(dict.lookup("emissivity"))),
-    sumOutgoingAnglesPtr_(NULL)
+    sumOutgoingAnglesPtr_(nullptr)
 {
     if (dict.found("value"))
     {
@@ -172,7 +172,7 @@ wideBandDiffusiveRadiationMixedFvPatchScalarField
     mixedFvPatchScalarField(ptf),
     TName_(ptf.TName_),
     emissivity_(ptf.emissivity_),
-    sumOutgoingAnglesPtr_(NULL)
+    sumOutgoingAnglesPtr_(nullptr)
 {}
 
 
@@ -186,7 +186,7 @@ wideBandDiffusiveRadiationMixedFvPatchScalarField
     mixedFvPatchScalarField(ptf, iF),
     TName_(ptf.TName_),
     emissivity_(ptf.emissivity_),
-    sumOutgoingAnglesPtr_(NULL)
+    sumOutgoingAnglesPtr_(nullptr)
 {}
 
 

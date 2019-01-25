@@ -117,7 +117,7 @@ void edgeExtractor::faceEvaluator::calculateNeiPatchesParallelNewPatches()
         (
             "void edgeExtractor::faceEvaluator::"
             "calculateNeiPatchesParallelNewPatches()"
-        ) << "newBoundaryPatchesPtr_ are NULL" << exit(FatalError);
+        ) << "newBoundaryPatchesPtr_ are nullptr" << exit(FatalError);
 
     newOtherFacePatchPtr_ = new Map<label>();
     Map<label>& otherFacePatch = *newOtherFacePatchPtr_;
@@ -333,8 +333,8 @@ edgeExtractor::faceEvaluator::faceEvaluator(const edgeExtractor& ee)
 :
     extractor_(ee),
     otherFacePatch_(),
-    newBoundaryPatchesPtr_(NULL),
-    newOtherFacePatchPtr_(NULL)
+    newBoundaryPatchesPtr_(nullptr),
+    newOtherFacePatchPtr_(nullptr)
 {
     if( Pstream::parRun() )
         calculateNeiPatchesParallel();

@@ -49,8 +49,8 @@ Foam::leastSquaresVectors::smallDotProdTol_
 Foam::leastSquaresVectors::leastSquaresVectors(const fvMesh& mesh)
 :
     MeshObject<fvMesh, leastSquaresVectors>(mesh),
-    pVectorsPtr_(NULL),
-    nVectorsPtr_(NULL)
+    pVectorsPtr_(nullptr),
+    nVectorsPtr_(nullptr)
 {}
 
 

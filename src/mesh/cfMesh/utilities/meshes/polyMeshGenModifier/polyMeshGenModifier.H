@@ -92,7 +92,7 @@ public:
         polyMeshGenModifier(polyMeshGen& mesh)
         :
             mesh_(mesh),
-            pointFacesPtr_(NULL)
+            pointFacesPtr_(nullptr)
         {
             //mesh_.clearOut();
         };

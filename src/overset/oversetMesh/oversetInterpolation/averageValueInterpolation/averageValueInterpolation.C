@@ -107,7 +107,7 @@ Foam::averageValueInterpolation::averageValueInterpolation
 )
 :
     oversetInterpolation(overset, name),
-    weightsPtr_(NULL)
+    weightsPtr_(nullptr)
 {}
 
 

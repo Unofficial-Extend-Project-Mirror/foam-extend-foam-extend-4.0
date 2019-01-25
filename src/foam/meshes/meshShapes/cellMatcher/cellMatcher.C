@@ -67,7 +67,7 @@ Foam::cellMatcher::cellMatcher
     vertLabels_(vertPerCell),
     faceLabels_(facePerCell),
     cellModelName_(cellModelName),
-    cellModelPtr_(NULL)
+    cellModelPtr_(nullptr)
 {
     forAll(localFaces_, faceI)
     {

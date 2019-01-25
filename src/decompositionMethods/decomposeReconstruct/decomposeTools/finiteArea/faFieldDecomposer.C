@@ -145,17 +145,17 @@ faFieldDecomposer::faFieldDecomposer
     patchFieldDecomposerPtrs_
     (
         procMesh_.boundary().size(),
-        static_cast<patchFieldDecomposer*>(NULL)
+        static_cast<patchFieldDecomposer*>(nullptr)
     ),
     processorAreaPatchFieldDecomposerPtrs_
     (
         procMesh_.boundary().size(),
-        static_cast<processorAreaPatchFieldDecomposer*>(NULL)
+        static_cast<processorAreaPatchFieldDecomposer*>(nullptr)
     ),
     processorEdgePatchFieldDecomposerPtrs_
     (
         procMesh_.boundary().size(),
-        static_cast<processorEdgePatchFieldDecomposer*>(NULL)
+        static_cast<processorEdgePatchFieldDecomposer*>(nullptr)
     )
 {
     forAll (boundaryAddressing_, patchi)

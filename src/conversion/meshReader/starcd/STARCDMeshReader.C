@@ -412,7 +412,7 @@ void Foam::meshReaders::STARCD::readCells(const fileName& inputName)
             }
 
             // determine the foam cell shape
-            const cellModel* curModelPtr = NULL;
+            const cellModel* curModelPtr = nullptr;
 
             // fluid/solid cells
             switch (shapeId)

@@ -121,9 +121,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~constitutiveModel();
+    //- Destructor
+    virtual ~constitutiveModel();
 
 
     // Member Functions

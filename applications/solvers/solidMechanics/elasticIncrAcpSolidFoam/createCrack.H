@@ -1,7 +1,7 @@
     label cohesivePatchID = -1;
 
-    solidCohesiveFvPatchVectorField* cohesivePatchDUPtr = NULL;
-    solidCohesiveFixedModeMixFvPatchVectorField* cohesivePatchDUFixedModePtr = NULL;
+    solidCohesiveFvPatchVectorField* cohesivePatchDUPtr = nullptr;
+    solidCohesiveFixedModeMixFvPatchVectorField* cohesivePatchDUFixedModePtr = nullptr;
 
     forAll (DU.boundaryField(), patchI)
     {

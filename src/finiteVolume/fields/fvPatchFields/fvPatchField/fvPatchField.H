@@ -297,8 +297,8 @@ public:
             const typename GeometricField::PatchFieldType& lookupPatchField
             (
                 const word& name,
-                const GeometricField* = NULL,
-                const Type2* = NULL
+                const GeometricField* = nullptr,
+                const Type2* = nullptr
             ) const;
 
             //- Return patch

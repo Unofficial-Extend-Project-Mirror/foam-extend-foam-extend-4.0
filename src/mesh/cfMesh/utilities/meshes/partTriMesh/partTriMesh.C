@@ -54,12 +54,12 @@ partTriMesh::partTriMesh(const meshSurfacePartitioner& mPart)
     pointLabelInMeshSurface_(),
     meshSurfacePointLabelInTriMesh_(),
     pointType_(),
-    globalPointLabelPtr_(NULL),
-    pAtProcsPtr_(NULL),
-    globalToLocalPointAddressingPtr_(NULL),
-    neiProcsPtr_(NULL),
-    pAtParallelBoundariesPtr_(NULL),
-    pAtBufferLayersPtr_(NULL)
+    globalPointLabelPtr_(nullptr),
+    pAtProcsPtr_(nullptr),
+    globalToLocalPointAddressingPtr_(nullptr),
+    neiProcsPtr_(nullptr),
+    pAtParallelBoundariesPtr_(nullptr),
+    pAtBufferLayersPtr_(nullptr)
 {
     const meshSurfaceEngine& meshSurface = mPart.surfaceEngine();
     List<direction> useFace(meshSurface.boundaryFaces().size(), direction(1));
@@ -79,12 +79,12 @@ partTriMesh::partTriMesh
     pointLabelInMeshSurface_(),
     meshSurfacePointLabelInTriMesh_(),
     pointType_(),
-    globalPointLabelPtr_(NULL),
-    pAtProcsPtr_(NULL),
-    globalToLocalPointAddressingPtr_(NULL),
-    neiProcsPtr_(NULL),
-    pAtParallelBoundariesPtr_(NULL),
-    pAtBufferLayersPtr_(NULL)
+    globalPointLabelPtr_(nullptr),
+    pAtProcsPtr_(nullptr),
+    globalToLocalPointAddressingPtr_(nullptr),
+    neiProcsPtr_(nullptr),
+    pAtParallelBoundariesPtr_(nullptr),
+    pAtBufferLayersPtr_(nullptr)
 {
     const meshSurfaceEngine& meshSurface = mPart.surfaceEngine();
     const VRWGraph& pointFaces = meshSurface.pointFaces();

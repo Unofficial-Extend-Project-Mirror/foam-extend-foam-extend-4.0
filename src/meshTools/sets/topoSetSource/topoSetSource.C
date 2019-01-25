@@ -97,7 +97,7 @@ autoPtr<topoSetSource> topoSetSource::New
 } // End namespace Foam
 
 
-Foam::HashTable<Foam::string>* Foam::topoSetSource::usageTablePtr_ = NULL;
+Foam::HashTable<Foam::string>* Foam::topoSetSource::usageTablePtr_ = nullptr;
 
 template<>
 const char* Foam::NamedEnum<Foam::topoSetSource::setAction, 8>::names[] =

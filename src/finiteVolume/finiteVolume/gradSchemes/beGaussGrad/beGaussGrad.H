@@ -93,7 +93,7 @@ public:
         beGaussGrad(const fvMesh& mesh, Istream& is)
         :
             gradScheme<Type>(mesh),
-            tinterpScheme_(NULL)
+            tinterpScheme_(nullptr)
         {
             if (is.eof())
             {

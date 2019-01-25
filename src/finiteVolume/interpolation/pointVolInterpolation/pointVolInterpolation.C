@@ -177,8 +177,8 @@ Foam::pointVolInterpolation::pointVolInterpolation
 :
     pointMesh_(pm),
     fvMesh_(vm),
-    volWeightsPtr_(NULL),
-    patchInterpolatorsPtr_(NULL)
+    volWeightsPtr_(nullptr),
+    patchInterpolatorsPtr_(nullptr)
 {}
 
 

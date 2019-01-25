@@ -111,7 +111,7 @@ Foam::movingOversetRegion::movingOversetRegion
     mesh_(mesh),
     sbmfPtr_(solidBodyMotionFunction::New(dict, mesh_.time())),
     movingZoneNames_(dict.lookup("movingZones")),
-    motionMaskPtr_(NULL)
+    motionMaskPtr_(nullptr)
 {}
 
 

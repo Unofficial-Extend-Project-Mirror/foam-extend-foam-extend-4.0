@@ -59,7 +59,7 @@ Foam::phase::phase
 Foam::autoPtr<Foam::phase> Foam::phase::clone() const
 {
     notImplemented("phase::clone() const");
-    return autoPtr<phase>(NULL);
+    return autoPtr<phase>(nullptr);
 }
 
 

@@ -44,7 +44,7 @@ cohesiveLawFvPatchVectorField::cohesiveLawFvPatchVectorField
 )
 :
     fixedGradientFvPatchVectorField(p, iF),
-    cohesiveLawPtr_(NULL),
+    cohesiveLawPtr_(nullptr),
     relaxationFactor_(1.0),
     traction_(p.size(), vector::zero)
 {}
@@ -131,10 +131,10 @@ void cohesiveLawFvPatchVectorField::autoMap
     const fvPatchFieldMapper& m
 )
 {
-    if (cohesiveLawPtr_ == NULL)
+    if (cohesiveLawPtr_ == nullptr)
     {
         FatalErrorIn("cohesiveFvPatchVectorField::autoMap")
-            << "NULL cohesive law"
+            << "nullptr cohesive law"
             << abort(FatalError);
     }
 

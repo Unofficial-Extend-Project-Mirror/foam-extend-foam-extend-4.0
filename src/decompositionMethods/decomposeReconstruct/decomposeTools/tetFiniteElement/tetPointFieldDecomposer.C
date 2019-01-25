@@ -172,9 +172,9 @@ tetPointFieldDecomposer::tetPointFieldDecomposer
     patchFieldDecompPtrs_
     (
         processorMesh_.boundary().size(),
-        reinterpret_cast<tetPolyPatchFieldDecomposer*>(NULL)
+        reinterpret_cast<tetPolyPatchFieldDecomposer*>(0)
     ),
-    directAddressingPtr_(NULL)
+    directAddressingPtr_(nullptr)
 {
     // Set the patch field decomposers for all non-processor patch fields
     forAll (boundaryAddressing_, patchI)
@@ -200,10 +200,10 @@ tetPointFieldDecomposer::~tetPointFieldDecomposer()
 {
     forAll (patchFieldDecompPtrs_, patchI)
     {
-        if (patchFieldDecompPtrs_[patchI] != NULL)
+        if (patchFieldDecompPtrs_[patchI] != nullptr)
         {
             delete(patchFieldDecompPtrs_[patchI]);
-            patchFieldDecompPtrs_[patchI] = NULL;
+            patchFieldDecompPtrs_[patchI] = nullptr;
         }
     }
 }

@@ -286,12 +286,12 @@ Foam::tetPointMapper::tetPointMapper
     faceMap_(fMapper),
     cellMap_(cMapper),
     size_(mesh().nPoints() + mesh().nFaces() + mesh().nCells()),
-    directPtr_(NULL),
-    directAddrPtr_(NULL),
-    interpolationAddrPtr_(NULL),
-    weightsPtr_(NULL),
-    insertedObjectsPtr_(NULL),
-    insertedObjectLabelsPtr_(NULL)
+    directPtr_(nullptr),
+    directAddrPtr_(nullptr),
+    interpolationAddrPtr_(nullptr),
+    weightsPtr_(nullptr),
+    insertedObjectsPtr_(nullptr),
+    insertedObjectLabelsPtr_(nullptr)
 {}
 
 

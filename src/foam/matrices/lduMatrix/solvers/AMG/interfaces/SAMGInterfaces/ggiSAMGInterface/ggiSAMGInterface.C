@@ -240,7 +240,7 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
     procMasterFaces_(),
     comm_(fineGgiInterface_.comm()),
     tag_(fineGgiInterface_.tag()),
-    mapPtr_(NULL),
+    mapPtr_(nullptr),
     lTime_()
 {
     // New algorithm will assemble local clusters on the master side and
@@ -453,8 +453,8 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
     label nAgglomPairs = 0;
 
     // Switching prolongation matrices
-    const crMatrix* masterP = NULL;
-    const crMatrix* neighbourP = NULL;
+    const crMatrix* masterP = nullptr;
+    const crMatrix* neighbourP = nullptr;
 
     if (fineGgiInterface_.master())
     {

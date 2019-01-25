@@ -298,7 +298,7 @@ findCellsIntersectingSurface::findCellsIntersectingSurface
 )
 :
     mesh_(mesh),
-    octreePtr_(NULL),
+    octreePtr_(nullptr),
     octreeGenerated_(true),
     intersectedCells_(),
     facetsIntersectingCell_()

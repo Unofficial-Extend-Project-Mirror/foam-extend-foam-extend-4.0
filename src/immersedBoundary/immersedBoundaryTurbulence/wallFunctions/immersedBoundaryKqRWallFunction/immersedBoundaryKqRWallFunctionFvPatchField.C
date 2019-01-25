@@ -82,7 +82,7 @@ immersedBoundaryKqRWallFunctionFvPatchField
     const dictionary& dict
 )
 :
-    kqRWallFunctionFvPatchField<Type>(p, iF),
+    kqRWallFunctionFvPatchField<Type>(p, iF, dict),
     immersedBoundaryFieldBase<Type>
     (
         p,

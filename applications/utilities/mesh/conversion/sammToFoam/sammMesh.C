@@ -172,7 +172,7 @@ sammMesh::sammMesh
     cellPolys_(0),
     nInternalFaces_(0),
     polyBoundaryPatchStartIndices_(0),
-    pointCellsPtr_(NULL),
+    pointCellsPtr_(nullptr),
     isShapeMesh_(true)
 {
     // Fill in the lookup tables

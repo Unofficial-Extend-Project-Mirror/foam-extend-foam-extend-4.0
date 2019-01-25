@@ -179,7 +179,7 @@ skewCorrectedSnGrad<scalar>::correction
         }
     }
 
-    const volVectorField* gradVfPtr(NULL);
+    const volVectorField* gradVfPtr(nullptr);
 
     bool calcGradient = false;
 
@@ -422,7 +422,7 @@ skewCorrectedSnGrad<vector>::correction
         }
     }
 
-    const volTensorField* gradVfPtr(NULL);
+    const volTensorField* gradVfPtr(nullptr);
 
     bool calcGradient = false;
 

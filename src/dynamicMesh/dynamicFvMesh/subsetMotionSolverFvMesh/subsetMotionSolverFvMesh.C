@@ -75,7 +75,7 @@ Foam::subsetMotionSolverFvMesh::subsetMotionSolverFvMesh(const IOobject& io)
         ),
         *this
     ),
-    motionPtr_(NULL),
+    motionPtr_(nullptr),
     alpha_(readScalar(movingMeshCoeffs_.lookup("alpha")))
 {
     // Create subset

@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTimeExtruded.H"
 
-    autoPtr<extrudedMesh> meshPtr(NULL);
+    autoPtr<extrudedMesh> meshPtr(nullptr);
 
     IOdictionary dict
     (

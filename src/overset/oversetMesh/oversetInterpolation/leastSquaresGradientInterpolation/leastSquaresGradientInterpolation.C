@@ -251,8 +251,8 @@ Foam::leastSquaresGradientInterpolation::leastSquaresGradientInterpolation
 )
 :
     oversetInterpolation(overset, dict),
-    localWeightsPtr_(NULL),
-    remoteWeightsPtr_(NULL)
+    localWeightsPtr_(nullptr),
+    remoteWeightsPtr_(nullptr)
 {}
 
 

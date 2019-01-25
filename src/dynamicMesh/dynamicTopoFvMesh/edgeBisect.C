@@ -388,7 +388,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
 
         label sIndex = slaveMap.index();
         label pI = slaveMap.patchIndex();
-        const coupleMap* cMapPtr = NULL;
+        const coupleMap* cMapPtr = nullptr;
 
         // Temporarily turn off coupledModification
         unsetCoupledModification();
@@ -1991,7 +1991,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
         const label pI = slaveMap.patchIndex();
 
         // Fetch the appropriate coupleMap
-        const coupleMap* cMapPtr = NULL;
+        const coupleMap* cMapPtr = nullptr;
 
         if (localCouple && !procCouple)
         {
@@ -2092,7 +2092,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
 
             forAll(afList, sfI)
             {
-                const face* facePtr = NULL;
+                const face* facePtr = nullptr;
 
                 if (localCouple && !procCouple)
                 {
@@ -3595,8 +3595,8 @@ const changeMap dynamicTopoFvMesh::bisectEdge
             const label pI = slaveMap.patchIndex();
 
             // Fetch the appropriate coupleMap / mesh
-            const coupleMap* cMapPtr = NULL;
-            const dynamicTopoFvMesh* sMeshPtr = NULL;
+            const coupleMap* cMapPtr = nullptr;
+            const dynamicTopoFvMesh* sMeshPtr = nullptr;
 
             if (localCouple && !procCouple)
             {

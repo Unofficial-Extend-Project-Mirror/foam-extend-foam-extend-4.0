@@ -1,4 +1,4 @@
-OFstream * filePtr(NULL);
+OFstream * filePtr(nullptr);
 
 if(Pstream::master())
   {

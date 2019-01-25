@@ -187,7 +187,7 @@ Foam::topoBody::topoBody
     (
         dict.lookupOrDefault<bool>("invertMotionMask", false)
     ),
-    movingPointsMaskPtr_(NULL)
+    movingPointsMaskPtr_(nullptr)
 {
     Info<< "Moving body " << name << ":" << nl
         << "    moving cells: " << movingCellsName_ << nl

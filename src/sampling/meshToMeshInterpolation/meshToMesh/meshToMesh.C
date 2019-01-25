@@ -59,7 +59,7 @@ meshToMesh::meshToMesh
     patchMap_(patchMap),
     cellAddressing_(toMesh_.nCells()),
     boundaryAddressing_(toMesh_.boundaryMesh().size()),
-    inverseDistanceWeightsPtr_(NULL)
+    inverseDistanceWeightsPtr_(nullptr)
 {
     forAll (fromMesh_.boundaryMesh(), patchi)
     {
@@ -129,7 +129,7 @@ meshToMesh::meshToMesh
     toMesh_(meshTo),
     cellAddressing_(toMesh_.nCells()),
     boundaryAddressing_(toMesh_.boundaryMesh().size()),
-    inverseDistanceWeightsPtr_(NULL)
+    inverseDistanceWeightsPtr_(nullptr)
 {
     // check whether both meshes have got the same number
     // of boundary patches

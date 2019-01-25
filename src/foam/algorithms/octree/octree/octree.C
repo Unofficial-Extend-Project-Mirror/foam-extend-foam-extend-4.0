@@ -527,7 +527,7 @@ const Foam::treeLeaf<Type>* Foam::octree<Type>::findLeafLine
                     << " not intersect : start:"
                     << start << endl;
             }
-            return NULL;
+            return nullptr;
         }
 
         if (debug & 2)

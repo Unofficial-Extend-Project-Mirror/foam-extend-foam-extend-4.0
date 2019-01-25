@@ -13,7 +13,7 @@
     );
 
 
-    volScalarField* Tptr = NULL;
+    volScalarField* Tptr = nullptr;
 
     if (thermalStress)
     {

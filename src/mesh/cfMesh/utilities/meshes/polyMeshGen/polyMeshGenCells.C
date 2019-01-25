@@ -265,7 +265,7 @@ polyMeshGenCells::polyMeshGenCells(const Time& runTime)
     polyMeshGenFaces(runTime),
     cells_(),
     cellSubsets_(),
-    addressingDataPtr_(NULL)
+    addressingDataPtr_(nullptr)
 {
 }
 
@@ -281,7 +281,7 @@ polyMeshGenCells::polyMeshGenCells
     polyMeshGenFaces(runTime, points, faces),
     cells_(),
     cellSubsets_(),
-    addressingDataPtr_(NULL)
+    addressingDataPtr_(nullptr)
 {
     cells_ = cells;
 }
@@ -309,7 +309,7 @@ polyMeshGenCells::polyMeshGenCells
     ),
     cells_(),
     cellSubsets_(),
-    addressingDataPtr_(NULL)
+    addressingDataPtr_(nullptr)
 {
     cells_ = cells;
 }

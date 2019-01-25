@@ -424,7 +424,7 @@ Foam::MRFZone::MRFZone(const fvMesh& mesh, Istream& is)
     axis_(dict_.lookup("axis")),
     omega_(dict_.lookup("omega")),
     rampTime_(dict_.lookupOrDefault<scalar>("rampTime", 0)),
-    meshVelocityPtr_(NULL),
+    meshVelocityPtr_(nullptr),
     meshVelTime_(-1)
 {
     if (dict_.found("patches"))

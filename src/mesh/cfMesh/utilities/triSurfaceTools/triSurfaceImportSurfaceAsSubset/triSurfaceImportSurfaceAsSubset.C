@@ -51,7 +51,7 @@ void triSurfaceImportSurfaceAsSubset::createOctree
 triSurfaceImportSurfaceAsSubset::triSurfaceImportSurfaceAsSubset(triSurf& surface)
 :
     surf_(surface),
-    octreePtr_(NULL)
+    octreePtr_(nullptr)
 {}
 
 triSurfaceImportSurfaceAsSubset::~triSurfaceImportSurfaceAsSubset()

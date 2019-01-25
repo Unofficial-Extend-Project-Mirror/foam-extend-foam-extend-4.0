@@ -96,11 +96,11 @@ std::string MSwindows::getLastError()
         FORMAT_MESSAGE_ALLOCATE_BUFFER |
         FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
+        nullptr,
         dw,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
         (LPTSTR) &lpMsgBuf,
-        0, NULL );
+        0, nullptr );
 
     lpDisplayBuf = LocalAlloc(LMEM_ZEROINIT,
         (lstrlen(static_cast<LPCTSTR>(lpMsgBuf))+40)*sizeof(TCHAR));
@@ -343,7 +343,7 @@ std::string toUnixPath(const std::string & path)
 bool env(const word& envName)
 {
     const DWORD actualBufferSize =
-      ::GetEnvironmentVariable(envName.c_str(), NULL, 0);
+      ::GetEnvironmentVariable(envName.c_str(), nullptr, 0);
 
     const bool envExists = (0 < actualBufferSize);
     return envExists;
@@ -355,7 +355,7 @@ string getEnv(const word& envName)
     std::string envAsString;
 
     const DWORD actualBufferSize =
-      ::GetEnvironmentVariable(envName.c_str(), NULL, 0);
+      ::GetEnvironmentVariable(envName.c_str(), nullptr, 0);
 
     if (0 < actualBufferSize)
     {
@@ -461,7 +461,7 @@ fileName cwd()
     string currentDirectory;
 
     const DWORD actualBufferSize =
-      ::GetCurrentDirectory(0, NULL);
+      ::GetCurrentDirectory(0, nullptr);
 
     if (0 < actualBufferSize)
     {
@@ -704,7 +704,7 @@ bool mkDir(const fileName& pathName, const mode_t mode)
     }
 
 
-    bool success = ::CreateDirectory(pathName.c_str(), NULL);
+    bool success = ::CreateDirectory(pathName.c_str(), nullptr);
 
     if (success)
     {
@@ -1294,7 +1294,7 @@ void* dlOpen(const fileName& libName, const bool check)
 
     void* handle = ::LoadLibrary(winLibName.c_str());
 
-    if (NULL == handle)
+    if (nullptr == handle)
     {
         // Assumes libName = name
         winLibName = "lib";
@@ -1304,7 +1304,7 @@ void* dlOpen(const fileName& libName, const bool check)
         handle = ::LoadLibrary(winLibName.c_str());
     }
 
-    if (NULL != handle)
+    if (nullptr != handle)
     {
         getLoadedLibs()[handle] = libName;
     }
@@ -1357,7 +1357,7 @@ void* dlSym(void* handle, const std::string& symbol)
     // get address of symbol
     void* fun = (void*) ::GetProcAddress(static_cast<HMODULE>(handle), symbol.c_str());
 
-    if (NULL == fun)
+    if (nullptr == fun)
     {
         WarningIn("dlSym(void*, const std::string&)")
             << "Cannot lookup symbol " << symbol << " : " << MSwindows::getLastError()
@@ -1381,7 +1381,7 @@ bool dlSymFound(void* handle, const std::string& symbol)
         // get address of symbol
         void* fun = (void*) ::GetProcAddress(static_cast<HMODULE>(handle), symbol.c_str());
 
-        return (NULL != fun);
+        return (nullptr != fun);
     }
     else
     {

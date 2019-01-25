@@ -54,7 +54,7 @@ void boundaryLayers::createNewFacesAndCells(const boolList& treatPatches)
     const labelList& faceOwners = mse.faceOwners();
 
     //- this is used for parallel runs
-    const Map<label>* otherProcPatchPtr(NULL);
+    const Map<label>* otherProcPatchPtr(nullptr);
 
     if( Pstream::parRun() )
     {

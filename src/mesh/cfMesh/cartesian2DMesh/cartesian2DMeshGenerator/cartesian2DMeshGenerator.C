@@ -266,8 +266,8 @@ void cartesian2DMeshGenerator::generateMesh()
 cartesian2DMeshGenerator::cartesian2DMeshGenerator(const Time& time)
 :
     db_(time),
-    surfacePtr_(NULL),
-    modSurfacePtr_(NULL),
+    surfacePtr_(nullptr),
+    modSurfacePtr_(nullptr),
     meshDict_
     (
         IOobject
@@ -279,7 +279,7 @@ cartesian2DMeshGenerator::cartesian2DMeshGenerator(const Time& time)
             IOobject::NO_WRITE
         )
     ),
-    octreePtr_(NULL),
+    octreePtr_(nullptr),
     mesh_(time),
     controller_(mesh_)
 {

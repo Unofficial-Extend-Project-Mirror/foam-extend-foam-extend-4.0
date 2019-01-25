@@ -54,10 +54,10 @@ Foam::surfaceInterpolation::surfaceInterpolation(const fvMesh& fvm)
     mesh_(fvm),
     schemesDict_(fvm),
     solutionDict_(fvm),
-    weightingFactors_(NULL),
-    deltaCoeffs_(NULL),
+    weightingFactors_(nullptr),
+    deltaCoeffs_(nullptr),
     orthogonal_(false),
-    correctionVectors_(NULL)
+    correctionVectors_(nullptr)
 {}
 
 

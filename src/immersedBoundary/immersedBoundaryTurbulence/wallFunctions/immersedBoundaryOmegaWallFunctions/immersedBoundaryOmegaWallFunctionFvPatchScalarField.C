@@ -60,7 +60,7 @@ immersedBoundaryOmegaWallFunctionFvPatchScalarField
     const dictionary& dict
 )
 :
-    omegaWallFunctionFvPatchScalarField(p, iF), // Do not read size
+    omegaWallFunctionFvPatchScalarField(p, iF, dict),
     immersedBoundaryFieldBase<scalar>
     (
         p,

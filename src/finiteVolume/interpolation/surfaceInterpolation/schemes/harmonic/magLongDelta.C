@@ -41,7 +41,7 @@ namespace Foam
 Foam::magLongDelta::magLongDelta(const fvMesh& mesh)
 :
     MeshObject<fvMesh, magLongDelta>(mesh),
-    magLongDeltaPtr_(NULL)
+    magLongDeltaPtr_(nullptr)
 {}
 
 

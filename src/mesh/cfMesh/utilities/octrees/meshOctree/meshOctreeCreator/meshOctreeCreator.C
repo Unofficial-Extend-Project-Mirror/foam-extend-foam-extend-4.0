@@ -44,7 +44,7 @@ meshOctreeCreator::meshOctreeCreator(meshOctree& mo)
 :
     octree_(mo),
     scalingFactor_(1.0),
-    meshDictPtr_(NULL),
+    meshDictPtr_(nullptr),
     hexRefinement_(false),
     globalRefLevel_(0),
     surfRefLevel_(mo.surface().size())

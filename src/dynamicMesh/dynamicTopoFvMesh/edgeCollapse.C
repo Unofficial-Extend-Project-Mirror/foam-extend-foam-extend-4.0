@@ -483,7 +483,7 @@ const changeMap dynamicTopoFvMesh::collapseQuadFace
             label slaveOverRide = -1;
             label sIndex = slaveMap.index();
             label pI = slaveMap.patchIndex();
-            const coupleMap* cMapPtr = NULL;
+            const coupleMap* cMapPtr = nullptr;
 
             if (localCouple)
             {
@@ -3352,7 +3352,7 @@ const changeMap dynamicTopoFvMesh::collapseQuadFace
             label pI = slaveMap.patchIndex();
 
             // Fetch the appropriate coupleMap
-            const coupleMap* cMapPtr = NULL;
+            const coupleMap* cMapPtr = nullptr;
 
             if (localCouple && !procCouple)
             {
@@ -3519,10 +3519,10 @@ const changeMap dynamicTopoFvMesh::collapseQuadFace
                 const face& mFace = faces_[mfIndex];
 
                 // Select appropriate mesh
-                const dynamicTopoFvMesh* meshPtr = NULL;
+                const dynamicTopoFvMesh* meshPtr = nullptr;
 
                 // Fetch the appropriate coupleMap
-                const coupleMap* crMapPtr = NULL;
+                const coupleMap* crMapPtr = nullptr;
 
                 // Fetch patch info
                 label ofPatch = whichPatch(fIndex);
@@ -3688,7 +3688,7 @@ const changeMap dynamicTopoFvMesh::collapseQuadFace
                 label sfIndex = sadF[faceI].index();
 
                 // Select appropriate mesh
-                const dynamicTopoFvMesh* meshPtr = NULL;
+                const dynamicTopoFvMesh* meshPtr = nullptr;
 
                 if (localCouple && !procCouple)
                 {
@@ -4317,7 +4317,7 @@ const changeMap dynamicTopoFvMesh::collapseEdge
                 continue;
             }
 
-            const coupleMap* cMapPtr = NULL;
+            const coupleMap* cMapPtr = nullptr;
 
             edge mEdge(eCheck), sEdge(-1, -1);
 
@@ -6566,7 +6566,7 @@ const changeMap dynamicTopoFvMesh::collapseEdge
                 Map<label>& pointMap = cMap.entityMap(coupleMap::POINT);
                 Map<label>& rPointMap = cMap.reverseEntityMap(coupleMap::POINT);
 
-                const changeMap* slaveMapPtr = NULL;
+                const changeMap* slaveMapPtr = nullptr;
                 const label pointEnum = coupleMap::POINT;
 
                 forAll(slaveMaps, slaveI)
@@ -6718,7 +6718,7 @@ const changeMap dynamicTopoFvMesh::collapseEdge
                 Map<label>& faceMap = cMap.entityMap(faceEnum);
                 Map<label>& rFaceMap = cMap.reverseEntityMap(faceEnum);
 
-                const changeMap* slaveMapPtr = NULL;
+                const changeMap* slaveMapPtr = nullptr;
 
                 forAll(slaveMaps, slaveI)
                 {
@@ -7033,7 +7033,7 @@ const changeMap dynamicTopoFvMesh::collapseEdge
                 Map<label>& edgeMap = cMap.entityMap(edgeEnum);
                 Map<label>& rEdgeMap = cMap.reverseEntityMap(edgeEnum);
 
-                const changeMap* slaveMapPtr = NULL;
+                const changeMap* slaveMapPtr = nullptr;
 
                 forAll(slaveMaps, slaveI)
                 {

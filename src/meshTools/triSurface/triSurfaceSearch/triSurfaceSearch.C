@@ -47,7 +47,7 @@ const point triSurfaceSearch::greatPoint(GREAT, GREAT, GREAT);
 triSurfaceSearch::triSurfaceSearch(const triSurface& surface)
 :
     surface_(surface),
-    treePtr_(NULL)
+    treePtr_(nullptr)
 {
     // Random number generator. Bit dodgy since not exactly random ;-)
     Random rndGen(65431);

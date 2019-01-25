@@ -132,9 +132,9 @@ Foam::manualFringe::manualFringe
     oversetFringe(mesh, region, dict),
     holesSetName_(dict.lookup("holes")),
     acceptorsSetName_(dict.lookup("acceptors")),
-    fringeHolesPtr_(NULL),
-    acceptorsPtr_(NULL),
-    finalDonorAcceptorsPtr_(NULL),
+    fringeHolesPtr_(nullptr),
+    acceptorsPtr_(nullptr),
+    finalDonorAcceptorsPtr_(nullptr),
     updateFringe_
     (
         dict.lookupOrDefault<Switch>("updateAcceptors", false)

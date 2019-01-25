@@ -316,8 +316,8 @@ Foam::polyPatch::polyPatch
     ),
     start_(start),
     boundaryMesh_(bm),
-    faceCellsPtr_(NULL),
-    mePtr_(NULL)
+    faceCellsPtr_(nullptr),
+    mePtr_(nullptr)
 {}
 
 
@@ -342,8 +342,8 @@ Foam::polyPatch::polyPatch
     ),
     start_(readLabel(dict.lookup("startFace"))),
     boundaryMesh_(bm),
-    faceCellsPtr_(NULL),
-    mePtr_(NULL)
+    faceCellsPtr_(nullptr),
+    mePtr_(nullptr)
 {}
 
 
@@ -369,8 +369,8 @@ Foam::polyPatch::polyPatch
     ),
     start_(newStart),
     boundaryMesh_(bm),
-    faceCellsPtr_(NULL),
-    mePtr_(NULL)
+    faceCellsPtr_(nullptr),
+    mePtr_(nullptr)
 {}
 
 
@@ -380,8 +380,8 @@ Foam::polyPatch::polyPatch(const polyPatch& p)
     primitivePatch(p),
     start_(p.start_),
     boundaryMesh_(p.boundaryMesh_),
-    faceCellsPtr_(NULL),
-    mePtr_(NULL)
+    faceCellsPtr_(nullptr),
+    mePtr_(nullptr)
 {}
 
 
@@ -404,8 +404,8 @@ Foam::polyPatch::polyPatch
     ),
     start_(pp.start()),
     boundaryMesh_(bm),
-    faceCellsPtr_(NULL),
-    mePtr_(NULL)
+    faceCellsPtr_(nullptr),
+    mePtr_(nullptr)
 {}
 
 

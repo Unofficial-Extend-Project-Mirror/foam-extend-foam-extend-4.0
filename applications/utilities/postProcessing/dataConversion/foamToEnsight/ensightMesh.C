@@ -966,7 +966,7 @@ void Foam::ensightMesh::writeAllFacePrims
         {
             ensightGeometryFile << key << nl << setw(10) << nPrims << nl;
 
-            if (&prims != NULL)
+            if (&prims != nullptr)
             {
                 writeFacePrims
                 (
@@ -993,7 +993,7 @@ void Foam::ensightMesh::writeAllFacePrims
                 }
             }
         }
-        else if (&prims != NULL)
+        else if (&prims != nullptr)
         {
             OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
             toMaster<< ensMap(patchFaces, prims);
@@ -1053,7 +1053,7 @@ void Foam::ensightMesh::writeAllNSided
         // Number of points for each face
         if (Pstream::master())
         {
-            if (&prims != NULL)
+            if (&prims != nullptr)
             {
                 writeNSidedNPointsPerFace
                 (
@@ -1078,7 +1078,7 @@ void Foam::ensightMesh::writeAllNSided
                 }
             }
         }
-        else if (&prims != NULL)
+        else if (&prims != nullptr)
         {
             OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
             toMaster<< ensMap(patchFaces, prims);
@@ -1087,7 +1087,7 @@ void Foam::ensightMesh::writeAllNSided
         // List of points id for each face
         if (Pstream::master())
         {
-            if (&prims != NULL)
+            if (&prims != nullptr)
             {
                 writeNSidedPoints
                 (
@@ -1114,7 +1114,7 @@ void Foam::ensightMesh::writeAllNSided
                 }
             }
         }
-        else if (&prims != NULL)
+        else if (&prims != nullptr)
         {
             OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
             toMaster<< ensMap(patchFaces, prims);
@@ -1177,7 +1177,7 @@ void Foam::ensightMesh::writeAllNSidedBinary
         // Number of points for each face
         if (Pstream::master())
         {
-            if (&prims != NULL)
+            if (&prims != nullptr)
             {
                 writeNSidedNPointsPerFaceBinary
                 (
@@ -1202,7 +1202,7 @@ void Foam::ensightMesh::writeAllNSidedBinary
                 }
             }
         }
-        else if (&prims != NULL)
+        else if (&prims != nullptr)
         {
             OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
             toMaster<< ensMap(patchFaces, prims);
@@ -1211,7 +1211,7 @@ void Foam::ensightMesh::writeAllNSidedBinary
         // List of points id for each face
         if (Pstream::master())
         {
-            if (&prims != NULL)
+            if (&prims != nullptr)
             {
                 writeNSidedPointsBinary
                 (
@@ -1238,7 +1238,7 @@ void Foam::ensightMesh::writeAllNSidedBinary
                 }
             }
         }
-        else if (&prims != NULL)
+        else if (&prims != nullptr)
         {
             OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
             toMaster<< ensMap(patchFaces, prims);
@@ -1265,7 +1265,7 @@ void Foam::ensightMesh::writeAllFacePrimsBinary
             writeEnsDataBinary(key,ensightGeometryFile);
             writeEnsDataBinary(nPrims,ensightGeometryFile);
 
-            if (&prims != NULL)
+            if (&prims != nullptr)
             {
                 writeFacePrimsBinary
                 (
@@ -1292,7 +1292,7 @@ void Foam::ensightMesh::writeAllFacePrimsBinary
                 }
             }
         }
-        else if (&prims != NULL)
+        else if (&prims != nullptr)
         {
             OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
             toMaster<< ensMap(patchFaces, prims);
@@ -1346,7 +1346,7 @@ void Foam::ensightMesh::writeAscii
     // set the filename of the ensight file
     fileName ensightGeometryFileName = timeFile + "mesh";
 
-    OFstream *ensightGeometryFilePtr = NULL;
+    OFstream *ensightGeometryFilePtr = nullptr;
     if (Pstream::master())
     {
         ensightGeometryFilePtr = new OFstream
@@ -1475,12 +1475,12 @@ void Foam::ensightMesh::writeAscii
         {
             const nFacePrimitives& nfp = nPatchPrims_.find(patchName)();
 
-            const labelList *trisPtr  = NULL;
-            const labelList *quadsPtr = NULL;
-            const labelList *polysPtr = NULL;
+            const labelList *trisPtr  = nullptr;
+            const labelList *quadsPtr = nullptr;
+            const labelList *polysPtr = nullptr;
 
-            const pointField *patchPointsPtr = NULL;
-            const faceList *patchFacesPtr = NULL;
+            const pointField *patchPointsPtr = nullptr;
+            const faceList *patchFacesPtr = nullptr;
 
             if (mesh_.boundary()[patchi].size())
             {
@@ -1641,7 +1641,7 @@ void Foam::ensightMesh::writeBinary
     // set the filename of the ensight file
     fileName ensightGeometryFileName = timeFile + "mesh";
 
-    std::ofstream *ensightGeometryFilePtr = NULL;
+    std::ofstream *ensightGeometryFilePtr = nullptr;
 
     if (Pstream::master())
     {
@@ -1763,12 +1763,12 @@ void Foam::ensightMesh::writeBinary
         {
             const nFacePrimitives& nfp = nPatchPrims_.find(patchName)();
 
-            const labelList *trisPtr = NULL;
-            const labelList *quadsPtr = NULL;
-            const labelList *polysPtr = NULL;
+            const labelList *trisPtr = nullptr;
+            const labelList *quadsPtr = nullptr;
+            const labelList *polysPtr = nullptr;
 
-            const pointField *patchPointsPtr = NULL;
-            const faceList *patchFacesPtr = NULL;
+            const pointField *patchPointsPtr = nullptr;
+            const faceList *patchFacesPtr = nullptr;
 
             if (mesh_.boundary()[patchi].size())
             {

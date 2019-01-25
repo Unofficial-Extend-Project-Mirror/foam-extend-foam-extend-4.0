@@ -61,7 +61,7 @@ immersedBoundaryNutWallFunctionFvPatchScalarField
     const dictionary& dict
 )
 :
-    nutkWallFunctionFvPatchScalarField(p, iF),  // Do not read size
+    nutkWallFunctionFvPatchScalarField(p, iF, dict),
     immersedBoundaryFieldBase<scalar>(p, true, 1e-6)
 {
     this->readPatchType(dict);

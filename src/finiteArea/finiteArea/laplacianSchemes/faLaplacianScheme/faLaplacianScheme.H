@@ -115,8 +115,8 @@ public:
         laplacianScheme(const faMesh& mesh, Istream& is)
         :
             mesh_(mesh),
-            tinterpGammaScheme_(NULL),
-            tlnGradScheme_(NULL)
+            tinterpGammaScheme_(nullptr),
+            tlnGradScheme_(nullptr)
         {
             if (is.eof())
             {

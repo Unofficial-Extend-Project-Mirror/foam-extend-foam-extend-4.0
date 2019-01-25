@@ -378,7 +378,7 @@ public:
                 if (!stickSlipFieldPtr_)
                 {
                     FatalError << "solidContact::stickSlipField() pointer"
-                               << " is NULL" << exit(FatalError);
+                               << " is nullptr" << exit(FatalError);
                 }
 
                 return stickSlipFieldPtr_->boundaryField()[patch().index()];

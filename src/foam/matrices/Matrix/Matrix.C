@@ -67,7 +67,7 @@ Foam::Matrix<Form, Type>::~Matrix()
 template<class Form, class Type>
 Foam::Matrix<Form, Type>::Matrix(const label n, const label m)
 :
-    v_(NULL),
+    v_(nullptr),
     n_(n),
     m_(m)
 {
@@ -87,7 +87,7 @@ Foam::Matrix<Form, Type>::Matrix(const label n, const label m)
 template<class Form, class Type>
 Foam::Matrix<Form, Type>::Matrix(const label n, const label m, const Type& a)
 :
-    v_(NULL),
+    v_(nullptr),
     n_(n),
     m_(m)
 {
@@ -120,7 +120,7 @@ Foam::Matrix<Form, Type>::Matrix(const label n, const label m, const Type& a)
 template<class Form, class Type>
 Foam::Matrix<Form, Type>::Matrix(const Matrix<Form, Type>& a)
 :
-    v_(NULL),
+    v_(nullptr),
     n_(a.n_),
     m_(a.m_)
 {
@@ -149,7 +149,7 @@ void Foam::Matrix<Form, Type>::clear()
     }
     n_ = 0;
     m_ = 0;
-    v_ = NULL;
+    v_ = nullptr;
 }
 
 
@@ -165,7 +165,7 @@ void Foam::Matrix<Form, Type>::transfer(Matrix<Form, Type>& a)
     a.m_ = 0;
 
     v_ = a.v_;
-    a.v_ = NULL;
+    a.v_ = nullptr;
 }
 
 

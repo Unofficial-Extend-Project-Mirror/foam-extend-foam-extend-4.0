@@ -77,8 +77,8 @@ void boundaryLayers::createLayerCells(const labelList& patchLabels)
     }
 
     //- create new faces at parallel boundaries
-    const Map<label>* otherProcPatchPtr(NULL);
-    const Map<label>* otherFaceProcPtr(NULL);
+    const Map<label>* otherProcPatchPtr(nullptr);
+    const Map<label>* otherFaceProcPtr(nullptr);
 
     if( Pstream::parRun() )
     {

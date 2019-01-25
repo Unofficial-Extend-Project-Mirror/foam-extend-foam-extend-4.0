@@ -1588,7 +1588,9 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
             xferCopy(reconPoints),
             xferCopy(reconFaces),
             xferCopy(reconOwner),
-            xferCopy(reconNeighbour)
+            xferCopy(reconNeighbour),
+            true
+            // false                       // Do not sync par
         )
     );
     fvMesh& globalMesh = globalMeshPtr();
@@ -1597,7 +1599,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
     // patches, it is sufficient to rebuilt the patches only from the first
     // valid processor
     // Note:
-    List<polyPatch*> reconPatches(nReconPatches, NULL);
+    List<polyPatch*> reconPatches(nReconPatches, nullptr);
 
     forAll (meshes_, procI)
     {
@@ -1617,7 +1619,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                     )();
 
                     // Check if the patch has already been set
-                    if (reconPatches[pnIndex] == NULL)
+                    if (reconPatches[pnIndex] == nullptr)
                     {
                         // Patch not set: clone it
                         // Note: watch indices: setting pnIndex from patchI
@@ -1664,7 +1666,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
     // Check the list and fill in the missing slots
     forAll (reconPatches, patchI)
     {
-        if (reconPatches[patchI] == NULL)
+        if (reconPatches[patchI] == nullptr)
         {
             // Patch not set.  Check its type
             FatalErrorIn

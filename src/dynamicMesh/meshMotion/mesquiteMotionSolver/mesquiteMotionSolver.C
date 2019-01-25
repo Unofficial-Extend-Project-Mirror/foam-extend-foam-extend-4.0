@@ -1281,9 +1281,9 @@ void mesquiteMotionSolver::initArrays()
         matcher[0].set(new tetMatcher());
         cellType[0] = Mesquite::TETRAHEDRON;
 
-        matcher[1].set(NULL);
-        matcher[2].set(NULL);
-        matcher[3].set(NULL);
+        matcher[1].set(nullptr);
+        matcher[2].set(nullptr);
+        matcher[3].set(nullptr);
     }
 
     const faceList& meshFaces = mesh().faces();
@@ -2440,9 +2440,9 @@ void mesquiteMotionSolver::initMesquiteParallelArrays()
         matcher[0].set(new tetMatcher());
         cellType[0] = Mesquite::TETRAHEDRON;
 
-        matcher[1].set(NULL);
-        matcher[2].set(NULL);
-        matcher[3].set(NULL);
+        matcher[1].set(nullptr);
+        matcher[2].set(nullptr);
+        matcher[3].set(nullptr);
     }
 
     const cellList& cells = mesh().cells();
@@ -3444,7 +3444,7 @@ void mesquiteMotionSolver::applyBCs
     {
         if (Foam::min(bdy_) > vector(0.5,0.5,0.5))
         {
-            Random randomizer(std::time(NULL));
+            Random randomizer(std::time(nullptr));
 
             label nFix = 0; //(field.size()*5)/100;
 
@@ -4707,7 +4707,7 @@ void mesquiteMotionSolver::solve()
         nCells_,                   // Number of elements
         mixedTypes_.begin(),       // Array with all Element types
         cellToNode_.begin(),       // Connectivity
-        NULL,                      // Element offset connectivity
+        nullptr,                      // Element offset connectivity
         false                      // Fortran-style array indexing
     );
 

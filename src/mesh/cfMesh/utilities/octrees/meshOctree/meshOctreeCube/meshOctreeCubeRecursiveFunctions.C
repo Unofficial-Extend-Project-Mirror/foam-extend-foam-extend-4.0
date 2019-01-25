@@ -273,14 +273,14 @@ bool meshOctreeCube::purgeProcessorCubes(const short procNo)
 
             if( subCubesPtr_[scI]->purgeProcessorCubes(procNo) )
             {
-                subCubesPtr_[scI] = NULL;
+                subCubesPtr_[scI] = nullptr;
                 mergedSubcubes |= 1 << scI;
             }
         }
 
         if( mergedSubcubes == 255 )
         {
-            subCubesPtr_ = NULL;
+            subCubesPtr_ = nullptr;
 
             return true;
         }

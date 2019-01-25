@@ -311,7 +311,7 @@ void printControlSwitches
 (
     const std::string&,
     const std::map<std::string, std::list<debug::controlSwitches<T> *> >*,
-    const char* commsTypesNames[] = NULL
+    const char* commsTypesNames[] = nullptr
 
 );
 

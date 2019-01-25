@@ -37,7 +37,7 @@ struct sigaction Foam::sigSegv::oldAction_;
 void Foam::sigSegv::sigHandler(int)
 {
     // Reset old handling
-    if (sigaction(SIGSEGV, &oldAction_, NULL) < 0)
+    if (sigaction(SIGSEGV, &oldAction_, nullptr) < 0)
     {
         FatalErrorIn
         (
@@ -60,7 +60,7 @@ void Foam::sigSegv::sigHandler(int)
 
 Foam::sigSegv::sigSegv()
 {
-    oldAction_.sa_handler = NULL;
+    oldAction_.sa_handler = nullptr;
 }
 
 
@@ -69,7 +69,7 @@ Foam::sigSegv::sigSegv()
 Foam::sigSegv::~sigSegv()
 {
     // Reset old handling
-    if (sigaction(SIGSEGV, &oldAction_, NULL) < 0)
+    if (sigaction(SIGSEGV, &oldAction_, nullptr) < 0)
     {
         FatalErrorIn
         (

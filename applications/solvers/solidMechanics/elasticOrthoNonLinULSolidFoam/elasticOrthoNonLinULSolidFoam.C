@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 
         //- div(sigmaOld) should be zero but I will include
         //- it to make sure errors don't accumulate
-        volVectorField* oldErrorPtr = NULL;
+        volVectorField* oldErrorPtr = nullptr;
         if (ensureTotalEquilibrium)
         {
             oldErrorPtr = new volVectorField

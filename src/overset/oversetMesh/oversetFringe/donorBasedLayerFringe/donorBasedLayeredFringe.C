@@ -80,9 +80,9 @@ Foam::donorBasedLayeredFringe::donorBasedLayeredFringe
 )
 :
     oversetFringe(mesh, region, dict),
-    fringeHolesPtr_(NULL),
-    acceptorsPtr_(NULL),
-    finalDonorAcceptorsPtr_(NULL),
+    fringeHolesPtr_(nullptr),
+    acceptorsPtr_(nullptr),
+    finalDonorAcceptorsPtr_(nullptr),
     nLayers_(readLabel(dict.lookup("nLayers")))
 {
     // Sanity check for number of layers

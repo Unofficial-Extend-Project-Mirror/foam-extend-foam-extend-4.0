@@ -477,7 +477,7 @@ meshOctreeCube* meshOctree::findCubeForPosition
         (isQuadtree_ && (cpz != initialCubePtr_->posZ()))
     )
     {
-        return NULL;
+        return nullptr;
     }
 
     meshOctreeCube* neiPtr(initialCubePtr_);

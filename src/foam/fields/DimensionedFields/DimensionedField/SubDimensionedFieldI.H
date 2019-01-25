@@ -82,7 +82,7 @@ SubDimensionedField<Type, GeoMesh>::null()
 {
     // Dangerous, but no null constructor.  Reconsider.  HJ, 10/Apr/2013
     SubDimensionedField<Type, GeoMesh>* nullPtr
-        = reinterpret_cast<SubDimensionedField<Type, GeoMesh>*>(NULL);
+        = reinterpret_cast<SubDimensionedField<Type, GeoMesh>*>(nullptr);
 
     return *nullPtr;
 }

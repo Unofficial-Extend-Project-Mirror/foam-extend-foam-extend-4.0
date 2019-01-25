@@ -142,7 +142,7 @@ Foam::BlockLduSolver<Type>::New
                "no diagonal or off-diagonal coefficient"
             << exit(FatalError);
 
-        return autoPtr<BlockLduSolver<Type> >(NULL);
+        return autoPtr<BlockLduSolver<Type> >(nullptr);
     }
 }
 
@@ -274,7 +274,7 @@ Foam::BlockLduSolver<Type>::New
                "no diagonal or off-diagonal coefficient"
             << exit(FatalError);
 
-        return autoPtr<BlockLduSolver<Type> >(NULL);
+        return autoPtr<BlockLduSolver<Type> >(nullptr);
     }
 }
 

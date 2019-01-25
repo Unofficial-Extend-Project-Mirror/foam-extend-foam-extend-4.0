@@ -134,7 +134,7 @@ coupledSolverPerformance coupledFvMatrix<scalar>::solve
     // HR 17.2.2013
     forAll (matrices, rowI)
     {
-        psi.set(rowI, NULL).ptr();
+        psi.set(rowI, nullptr).ptr();
     }
 
     return solverPerf;

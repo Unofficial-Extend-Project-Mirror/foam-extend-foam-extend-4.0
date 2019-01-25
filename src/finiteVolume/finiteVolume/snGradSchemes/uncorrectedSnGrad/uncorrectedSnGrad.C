@@ -61,7 +61,7 @@ uncorrectedSnGrad<Type>::correction
         "uncorrectedSnGrad<Type>::correction"
         "(const GeometricField<Type, fvPatchField, volMesh>&)"
     );
-    return tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >(NULL);
+    return tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >(nullptr);
 }
 
 

@@ -151,8 +151,8 @@ Foam::leastSquareInterpolation::leastSquareInterpolation
 )
 :
     oversetInterpolation(overset, dict),
-    addressingPtr_(NULL),
-    weightsPtr_(NULL)
+    addressingPtr_(nullptr),
+    weightsPtr_(nullptr)
 {}
 
 

@@ -57,7 +57,7 @@ threadHandler<T>::~threadHandler()
     // to avoid multiple deallocations.
     forAll(argList_, indexI)
     {
-        argList_[indexI] = NULL;
+        argList_[indexI] = nullptr;
     }
 }
 
@@ -79,7 +79,7 @@ inline void threadHandler<T>::setSize
     const label size
 )
 {
-    argList_.setSize(size, NULL);
+    argList_.setSize(size, nullptr);
 }
 
 

@@ -52,9 +52,9 @@ template<class Type>
 Foam::BlockLduMatrix<Type>::BlockLduMatrix(const lduMesh& ldu)
 :
     lduMesh_(ldu),
-    diagPtr_(NULL),
-    upperPtr_(NULL),
-    lowerPtr_(NULL),
+    diagPtr_(nullptr),
+    upperPtr_(nullptr),
+    lowerPtr_(nullptr),
     interfaces_(ldu.interfaces().size()),
     coupleUpper_(ldu.lduAddr().nPatches()),
     coupleLower_(ldu.lduAddr().nPatches()),
@@ -75,9 +75,9 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(const BlockLduMatrix<Type>& A)
 :
     refCount(),
     lduMesh_(A.lduMesh_),
-    diagPtr_(NULL),
-    upperPtr_(NULL),
-    lowerPtr_(NULL),
+    diagPtr_(nullptr),
+    upperPtr_(nullptr),
+    lowerPtr_(nullptr),
     interfaces_(A.interfaces_),
     coupleUpper_(A.coupleUpper_),
     coupleLower_(A.coupleLower_),
@@ -107,9 +107,9 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(BlockLduMatrix<Type>& A, bool reUse)
 :
     refCount(),
     lduMesh_(A.lduMesh_),
-    diagPtr_(NULL),
-    upperPtr_(NULL),
-    lowerPtr_(NULL),
+    diagPtr_(nullptr),
+    upperPtr_(nullptr),
+    lowerPtr_(nullptr),
     interfaces_(A.interfaces_, reUse),
     coupleUpper_(A.coupleUpper_, reUse),
     coupleLower_(A.coupleLower_, reUse),
@@ -120,19 +120,19 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(BlockLduMatrix<Type>& A, bool reUse)
         if (A.lowerPtr_)
         {
             lowerPtr_ = A.lowerPtr_;
-            A.lowerPtr_ = NULL;
+            A.lowerPtr_ = nullptr;
         }
 
         if (A.diagPtr_)
         {
             diagPtr_ = A.diagPtr_;
-            A.diagPtr_ = NULL;
+            A.diagPtr_ = nullptr;
         }
 
         if (A.upperPtr_)
         {
             upperPtr_ = A.upperPtr_;
-            A.upperPtr_ = NULL;
+            A.upperPtr_ = nullptr;
         }
     }
     else

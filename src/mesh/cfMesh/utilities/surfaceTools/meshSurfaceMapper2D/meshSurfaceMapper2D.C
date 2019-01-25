@@ -136,9 +136,9 @@ meshSurfaceMapper2D::meshSurfaceMapper2D
 :
     surfaceEngine_(mse),
     meshOctree_(octree),
-    mesh2DEnginePtr_(NULL),
-    surfPartitionerPtr_(NULL),
-    meshPartitionerPtr_(NULL)
+    mesh2DEnginePtr_(nullptr),
+    surfPartitionerPtr_(nullptr),
+    meshPartitionerPtr_(nullptr)
 {
     if( Pstream::parRun() )
     {

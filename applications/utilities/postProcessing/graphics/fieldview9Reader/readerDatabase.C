@@ -84,8 +84,8 @@ void Foam::readerDatabase::getPolyHedra()
 Foam::readerDatabase::readerDatabase()
 :
     fieldviewNames_(10),
-    runTimePtr_(NULL),
-    meshPtr_(NULL),
+    runTimePtr_(nullptr),
+    meshPtr_(nullptr),
     setName_(""),
     polys_(),
     volScalarNames_(),

@@ -604,7 +604,7 @@ void dynamicTopoFvMesh::initProcessorPriority()
 
             case RANDOM:
             {
-                Random randomizer(std::time(NULL));
+                Random randomizer(std::time(nullptr));
 
                 // Initialize to identity map
                 procPriority_ = identity(Pstream::nProcs());
@@ -8274,7 +8274,7 @@ void dynamicTopoFvMesh::initFieldTransfers
         }
 
         // Clear the stream
-        fieldNameStream.set(0, NULL);
+        fieldNameStream.set(0, nullptr);
 
         if (debug > 4)
         {
@@ -8360,7 +8360,7 @@ void dynamicTopoFvMesh::initFieldTransfers
         }
 
         // Clear the stream
-        stream.set(pI, NULL);
+        stream.set(pI, nullptr);
 
         // Send buffer to processor
         meshOps::pWrite(proc, sendBuffer[pI].size());

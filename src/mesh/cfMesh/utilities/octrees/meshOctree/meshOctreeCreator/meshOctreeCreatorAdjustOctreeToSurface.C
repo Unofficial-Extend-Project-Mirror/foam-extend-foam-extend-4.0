@@ -250,7 +250,7 @@ void meshOctreeCreator::refineBoxesContainedInObjects()
         objectEntries.clear();
     }
 
-    coordinateModifier* cModPtr = NULL;
+    coordinateModifier* cModPtr = nullptr;
 
     if( meshDictPtr_->found("anisotropicSources") )
     {

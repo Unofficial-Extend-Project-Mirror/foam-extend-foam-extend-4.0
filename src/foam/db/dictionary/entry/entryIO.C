@@ -260,7 +260,7 @@ Foam::autoPtr<Foam::entry> Foam::entry::New(Istream& is)
     // Get the next keyword and if invalid return false
     if (!getKeyword(keyword, is))
     {
-        return autoPtr<entry>(NULL);
+        return autoPtr<entry>(nullptr);
     }
     else // Keyword starts entry ...
     {

@@ -322,15 +322,15 @@ triSurfAddressing::triSurfAddressing
 :
     points_(points),
     facets_(triangles),
-    pointFacetsPtr_(NULL),
-    edgesPtr_(NULL),
-    facetEdgesPtr_(NULL),
-    edgeFacetsPtr_(NULL),
-    pointEdgesPtr_(NULL),
-    facetFacetsEdgesPtr_(NULL),
-    pointNormalsPtr_(NULL),
-    facetNormalsPtr_(NULL),
-    facetCentresPtr_(NULL)
+    pointFacetsPtr_(nullptr),
+    edgesPtr_(nullptr),
+    facetEdgesPtr_(nullptr),
+    edgeFacetsPtr_(nullptr),
+    pointEdgesPtr_(nullptr),
+    facetFacetsEdgesPtr_(nullptr),
+    pointNormalsPtr_(nullptr),
+    facetNormalsPtr_(nullptr),
+    facetCentresPtr_(nullptr)
 
 {}
 

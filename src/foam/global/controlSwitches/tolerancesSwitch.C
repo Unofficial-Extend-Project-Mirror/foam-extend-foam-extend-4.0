@@ -39,7 +39,7 @@ namespace debug
     // runtime tolerancesSwitch values.
     // This needs to go on the heap so the destructor will not get
     //  called before the objects' destructor it is overseeing
-    ListTolerancesControlSwitches* tolerancesSwitchValues_(NULL);
+    ListTolerancesControlSwitches* tolerancesSwitchValues_(nullptr);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

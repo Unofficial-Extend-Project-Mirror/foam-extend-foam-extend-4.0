@@ -112,8 +112,8 @@ Foam::processorSAMGInterface::processorSAMGInterface
     label nAgglomPairs = 0;
 
     // Switching prolongation matrices
-    const crMatrix* masterP = NULL;
-    const crMatrix* neighbourP = NULL;
+    const crMatrix* masterP = nullptr;
+    const crMatrix* neighbourP = nullptr;
 
     if (myProcNo() < neighbProcNo())
     {

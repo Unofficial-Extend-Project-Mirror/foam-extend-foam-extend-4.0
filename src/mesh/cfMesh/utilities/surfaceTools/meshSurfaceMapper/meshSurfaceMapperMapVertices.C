@@ -217,7 +217,7 @@ void meshSurfaceMapper::mapVerticesOntoSurface(const labelLongList& nodesToMap)
     const labelList& boundaryPoints = surfaceEngine_.boundaryPoints();
     const pointFieldPMG& points = surfaceEngine_.points();
 
-    const VRWGraph* bpAtProcsPtr(NULL);
+    const VRWGraph* bpAtProcsPtr(nullptr);
     if( Pstream::parRun() )
         bpAtProcsPtr = &surfaceEngine_.bpAtProcs();
 
@@ -327,7 +327,7 @@ void meshSurfaceMapper::mapVerticesOntoSurfacePatches
     const labelList& bPoints = surfaceEngine_.boundaryPoints();
     const pointFieldPMG& points = surfaceEngine_.points();
 
-    const VRWGraph* bpAtProcsPtr(NULL);
+    const VRWGraph* bpAtProcsPtr(nullptr);
     if( Pstream::parRun() )
         bpAtProcsPtr = &surfaceEngine_.bpAtProcs();
 

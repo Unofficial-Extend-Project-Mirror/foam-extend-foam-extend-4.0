@@ -426,7 +426,7 @@ public:
             bool checkTopology
             (
                 const bool report = false,
-                labelHashSet* setPtr = NULL
+                labelHashSet* setPtr = nullptr
             ) const;
 
             //- Checks primitivePatch for faces sharing point but not edge.
@@ -438,7 +438,7 @@ public:
             bool checkPointManifold
             (
                 const bool report = false,
-                labelHashSet* setPtr = NULL
+                labelHashSet* setPtr = nullptr
             ) const;
 
             //- Write generic VTK patch, HJ, 14/Jan/2009

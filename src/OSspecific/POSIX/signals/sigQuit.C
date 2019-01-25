@@ -38,7 +38,7 @@ struct sigaction Foam::sigQuit::oldAction_;
 void Foam::sigQuit::sigHandler(int)
 {
     // Reset old handling
-    if (sigaction(SIGQUIT, &oldAction_, NULL) < 0)
+    if (sigaction(SIGQUIT, &oldAction_, nullptr) < 0)
     {
         FatalErrorIn
         (
@@ -61,7 +61,7 @@ void Foam::sigQuit::sigHandler(int)
 
 Foam::sigQuit::sigQuit()
 {
-    oldAction_.sa_handler = NULL;
+    oldAction_.sa_handler = nullptr;
 }
 
 
@@ -70,7 +70,7 @@ Foam::sigQuit::sigQuit()
 Foam::sigQuit::~sigQuit()
 {
     // Reset old handling
-    if (oldAction_.sa_handler && sigaction(SIGQUIT, &oldAction_, NULL) < 0)
+    if (oldAction_.sa_handler && sigaction(SIGQUIT, &oldAction_, nullptr) < 0)
     {
         FatalErrorIn
         (

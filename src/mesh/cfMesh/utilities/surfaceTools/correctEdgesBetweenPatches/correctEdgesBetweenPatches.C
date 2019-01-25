@@ -83,7 +83,7 @@ void correctEdgesBetweenPatches::decomposeCorrectedCells()
 correctEdgesBetweenPatches::correctEdgesBetweenPatches(polyMeshGen& mesh)
 :
     mesh_(mesh),
-    msePtr_(NULL),
+    msePtr_(nullptr),
     patchNames_(mesh.boundaries().size()),
     patchTypes_(mesh.boundaries().size()),
     newBoundaryFaces_(),

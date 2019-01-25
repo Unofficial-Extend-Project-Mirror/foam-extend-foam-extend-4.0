@@ -325,7 +325,7 @@ Foam::mixerRotor::mixerRotor
     ),
     useTopoSliding_(dict.lookup("useTopoSliding")),
     attachDetach_(dict.lookupOrDefault<bool>("attachDetach", true)),
-    movingPointsMaskPtr_(NULL)
+    movingPointsMaskPtr_(nullptr)
 {
     // Make sure the coordinate system does not operate in degrees
     // Bug fix, HJ, 3/Oct/2011

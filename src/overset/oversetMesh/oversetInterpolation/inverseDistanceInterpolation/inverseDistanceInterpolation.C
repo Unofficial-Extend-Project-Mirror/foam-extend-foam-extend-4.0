@@ -132,7 +132,7 @@ Foam::inverseDistanceInterpolation::inverseDistanceInterpolation
 )
 :
     oversetInterpolation(overset, name),
-    weightsPtr_(NULL)
+    weightsPtr_(nullptr)
 {}
 
 

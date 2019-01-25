@@ -741,8 +741,8 @@ Foam::selectionAmgPolicy::selectionAmgPolicy
     ),
     nCoarseEqns_(0),
     coarsen_(false),
-    Pptr_(NULL),
-    Rptr_(NULL)
+    Pptr_(nullptr),
+    Rptr_(nullptr)
 {
     calcCoarsening();
 }

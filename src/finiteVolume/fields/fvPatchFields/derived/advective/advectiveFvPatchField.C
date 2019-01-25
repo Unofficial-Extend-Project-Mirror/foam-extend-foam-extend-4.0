@@ -362,8 +362,8 @@ void advectiveFvPatchField<Type>::updateCoeffs()
     fvsPatchField<scalar> phip = this->lookupPatchField
     (
         phiName_,
-        reinterpret_cast<const surfaceScalarField*>(NULL),
-        reinterpret_cast<const scalar*>(NULL)
+        reinterpret_cast<const surfaceScalarField*>(0),
+        reinterpret_cast<const scalar*>(0)
     );
 
     // Treatment for supercritical inlet or outlet.  HJ, 28/Oct/2009

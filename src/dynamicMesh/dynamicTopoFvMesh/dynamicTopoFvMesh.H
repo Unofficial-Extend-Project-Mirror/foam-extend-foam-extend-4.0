@@ -678,7 +678,7 @@ class dynamicTopoFvMesh
         (
             const label eIndex,
             const bool overRidePurityCheck = false,
-            label* nProcCurves = NULL
+            label* nProcCurves = nullptr
         ) const;
 
         // Allocate dynamic programming tables
@@ -1002,8 +1002,8 @@ class dynamicTopoFvMesh
             bool checkFace = false,
             bool checkEdge = false,
             bool checkPure = false,
-            FixedList<label, 2>* patchLabels = NULL,
-            FixedList<vector, 2>* patchNormals = NULL
+            FixedList<label, 2>* patchLabels = nullptr,
+            FixedList<vector, 2>* patchNormals = nullptr
         ) const;
 
         // Read optional dictionary parameters

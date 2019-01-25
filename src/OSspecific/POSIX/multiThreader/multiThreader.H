@@ -65,7 +65,7 @@ extern "C"
 typedef void *(*threadFunctionType)(void *);
 
 #define threadReturnType void *
-#define threadReturnValue NULL
+#define threadReturnValue nullptr
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

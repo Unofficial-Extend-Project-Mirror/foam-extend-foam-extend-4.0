@@ -158,12 +158,12 @@ Foam::polyMesh::polyMesh
         *this,
         is
     ),
-    globalMeshDataPtr_(NULL),
+    globalMeshDataPtr_(nullptr),
     moving_(false),
     changing_(false),
     curMotionTimeIndex_(time().timeIndex()),
-    oldAllPointsPtr_(NULL),
-    oldPointsPtr_(NULL)
+    oldAllPointsPtr_(nullptr),
+    oldPointsPtr_(nullptr)
 {
     // Check if the faces and cells are valid
     forAll (allFaces_, faceI)

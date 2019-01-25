@@ -83,7 +83,7 @@ Foam::twoStrokeEngine::twoStrokeEngine
     headPointsSetName_(engTime().engineDict().lookup("headPointsSetName")),
     headCellsSetName_(engTime().engineDict().lookup("headCellsSetName")),
     movingCellSetName_(engTime().engineDict().lookup("movingCellSetName")),
-    movingPointsMaskPtr_(NULL),
+    movingPointsMaskPtr_(nullptr),
     deformSwitch_(readScalar(engTime().engineDict().lookup("deformAngle"))),
     pistonPosition_(-GREAT),
     virtualPistonPosition_(-GREAT),

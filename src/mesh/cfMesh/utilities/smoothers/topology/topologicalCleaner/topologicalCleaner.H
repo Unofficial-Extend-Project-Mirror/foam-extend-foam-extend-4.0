@@ -97,13 +97,13 @@ public:
         //- check and fix vertices where two or more groups of cells meet
         void checkInvalidConnectionsForVerticesCells
         (
-            labelHashSet* irregularNodes = NULL
+            labelHashSet* irregularNodes = nullptr
         );
 
         //- check and fix vertices where two or more groups of faces meet
         void checkInvalidConnectionsForVerticesFaces
         (
-            labelHashSet* irregularNodes = NULL
+            labelHashSet* irregularNodes = nullptr
         );
 };
 

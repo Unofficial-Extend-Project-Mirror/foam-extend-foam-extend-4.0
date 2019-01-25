@@ -160,9 +160,9 @@ tetCreatorOctree::tetCreatorOctree
     tetPoints_(),
     tets_(),
     sortedLeaves_(),
-    subNodeLabelsPtr_(NULL),
-    cubeLabelPtr_(NULL),
-    faceCentreLabelPtr_(NULL),
+    subNodeLabelsPtr_(nullptr),
+    cubeLabelPtr_(nullptr),
+    faceCentreLabelPtr_(nullptr),
     created_(false)
 {
     createTets();

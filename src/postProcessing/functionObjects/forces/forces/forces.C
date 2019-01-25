@@ -191,7 +191,7 @@ Foam::forces::forces
     rhoRef_(VGREAT),
     pRef_(0),
     CofR_(vector::zero),
-    forcesFilePtr_(NULL)
+    forcesFilePtr_(nullptr)
 {
     // Check if the available mesh is an fvMesh otherise deactivate
     if (!isA<fvMesh>(obr_))

@@ -165,7 +165,7 @@ void meshSurfaceMapper::preMapVertices(const label nIterations)
         }
 
         //- pointer needed in case of parallel calculation
-        const VRWGraph* bpAtProcsPtr(NULL);
+        const VRWGraph* bpAtProcsPtr(nullptr);
 
         if( Pstream::parRun() )
         {

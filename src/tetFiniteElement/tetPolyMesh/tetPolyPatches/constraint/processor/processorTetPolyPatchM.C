@@ -59,16 +59,16 @@ processorTetPolyPatch::processorTetPolyPatch
 :
     coupledFaceTetPolyPatch(patch, bm),
     procPolyPatch_(refCast<const processorPolyPatch>(patch)),
-    localEdgeIndicesPtr_(NULL),
-    cutEdgeIndicesPtr_(NULL),
-    cutEdgeOwnerIndicesPtr_(NULL),
-    cutEdgeOwnerStartPtr_(NULL),
-    cutEdgeNeighbourIndicesPtr_(NULL),
-    cutEdgeNeighbourStartPtr_(NULL),
-    doubleCutEdgeIndicesPtr_(NULL),
-    doubleCutOwnerPtr_(NULL),
-    doubleCutNeighbourPtr_(NULL),
-    ownNeiDoubleMaskPtr_(NULL)
+    localEdgeIndicesPtr_(nullptr),
+    cutEdgeIndicesPtr_(nullptr),
+    cutEdgeOwnerIndicesPtr_(nullptr),
+    cutEdgeOwnerStartPtr_(nullptr),
+    cutEdgeNeighbourIndicesPtr_(nullptr),
+    cutEdgeNeighbourStartPtr_(nullptr),
+    doubleCutEdgeIndicesPtr_(nullptr),
+    doubleCutOwnerPtr_(nullptr),
+    doubleCutNeighbourPtr_(nullptr),
+    ownNeiDoubleMaskPtr_(nullptr)
 {}
 
 

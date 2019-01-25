@@ -285,7 +285,7 @@ public:
                 const unallocLabelList& internalData
             ) const
             {
-                return tmp<labelField>(NULL);
+                return tmp<labelField>(nullptr);
             }
 
             //- Initialise interface data transfer
@@ -303,7 +303,7 @@ public:
                 const unallocLabelList& interfaceData
             ) const
             {
-                return tmp<labelField>(NULL);
+                return tmp<labelField>(nullptr);
             }
 
             //- Initialise transfer of internal field adjacent to the interface
@@ -321,7 +321,7 @@ public:
                 const unallocLabelList& iF
             ) const
             {
-                return tmp<labelField>(NULL);
+                return tmp<labelField>(nullptr);
             }
 };
 

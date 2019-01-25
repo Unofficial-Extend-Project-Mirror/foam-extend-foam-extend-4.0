@@ -654,10 +654,10 @@ edgeExtractor::edgeExtractor
 )
 :
     mesh_(mesh),
-    surfaceEnginePtr_(NULL),
+    surfaceEnginePtr_(nullptr),
     meshOctree_(octree),
-    surfPartitionerPtr_(NULL),
-    surfEdgeClassificationPtr_(NULL),
+    surfPartitionerPtr_(nullptr),
+    surfEdgeClassificationPtr_(nullptr),
     pointValence_(),
     pointPatch_(),
     facePatch_(),

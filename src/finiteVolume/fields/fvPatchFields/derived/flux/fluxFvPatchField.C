@@ -147,8 +147,8 @@ void fluxFvPatchField<Type>::updateCoeffs()
         this->lookupPatchField
         (
             gammaName_,
-            reinterpret_cast<const volScalarField*>(NULL),
-            reinterpret_cast<const scalar*>(NULL)
+            reinterpret_cast<const volScalarField*>(0),
+            reinterpret_cast<const scalar*>(0)
         );
 
     this->gradient() = reactivity_*flux_/gammap;

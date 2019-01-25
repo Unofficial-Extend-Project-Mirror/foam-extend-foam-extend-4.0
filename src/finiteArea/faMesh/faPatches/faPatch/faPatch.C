@@ -74,9 +74,9 @@ Foam::faPatch::faPatch
     patchIdentifier(name, index),
     ngbPolyPatchIndex_(ngbPolyPatchIndex),
     boundaryMesh_(bm),
-    edgeFacesPtr_(NULL),
-    pointLabelsPtr_(NULL),
-    pointEdgesPtr_(NULL)
+    edgeFacesPtr_(nullptr),
+    pointLabelsPtr_(nullptr),
+    pointEdgesPtr_(nullptr)
 {}
 
 
@@ -93,9 +93,9 @@ Foam::faPatch::faPatch
     patchIdentifier(name, dict, index),
     ngbPolyPatchIndex_(readInt(dict.lookup("ngbPolyPatchIndex"))),
     boundaryMesh_(bm),
-    edgeFacesPtr_(NULL),
-    pointLabelsPtr_(NULL),
-    pointEdgesPtr_(NULL)
+    edgeFacesPtr_(nullptr),
+    pointLabelsPtr_(nullptr),
+    pointEdgesPtr_(nullptr)
 {}
 
 Foam::faPatch::faPatch(const faPatch& p, const faBoundaryMesh& bm)
@@ -104,9 +104,9 @@ Foam::faPatch::faPatch(const faPatch& p, const faBoundaryMesh& bm)
     patchIdentifier(p, p.index()),
     ngbPolyPatchIndex_(p.ngbPolyPatchIndex_),
     boundaryMesh_(bm),
-    edgeFacesPtr_(NULL),
-    pointLabelsPtr_(NULL),
-    pointEdgesPtr_(NULL)
+    edgeFacesPtr_(nullptr),
+    pointLabelsPtr_(nullptr),
+    pointEdgesPtr_(nullptr)
 {}
 
 

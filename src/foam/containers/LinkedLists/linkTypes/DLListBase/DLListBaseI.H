@@ -190,7 +190,7 @@ inline Foam::DLListBase::iterator::iterator(DLListBase& s, link* elmt)
 inline Foam::DLListBase::iterator::iterator(DLListBase& s)
 :
     curList_(s),
-    curElmt_(NULL),
+    curElmt_(nullptr),
     curLink_()
 {}
 

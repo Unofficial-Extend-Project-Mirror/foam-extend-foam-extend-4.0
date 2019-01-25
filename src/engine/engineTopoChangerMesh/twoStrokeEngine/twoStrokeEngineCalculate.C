@@ -91,7 +91,7 @@ const Foam::scalarField& Foam::twoStrokeEngine::movingPointsMask() const
 {
     if(movingPointsMaskPtr_)
     {
-        movingPointsMaskPtr_ = NULL;
+        movingPointsMaskPtr_ = nullptr;
     }
 
     if (!movingPointsMaskPtr_)

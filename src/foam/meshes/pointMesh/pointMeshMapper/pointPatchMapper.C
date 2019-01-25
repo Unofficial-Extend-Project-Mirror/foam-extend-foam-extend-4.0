@@ -124,9 +124,9 @@ Foam::pointPatchMapper::pointPatchMapper
       ? mpm_.oldPatchNMeshPoints()[patch_.index()]
       : 0
     ),
-    directAddrPtr_(NULL),
-    interpolationAddrPtr_(NULL),
-    weightsPtr_(NULL)
+    directAddrPtr_(nullptr),
+    interpolationAddrPtr_(nullptr),
+    weightsPtr_(nullptr)
 {}
 
 

@@ -290,12 +290,12 @@ void Foam::lduAddressing::calcInternalBoundaryEqnCoeffs
 Foam::lduAddressing::lduAddressing(const label nEqns)
 :
     size_(nEqns),
-    losortPtr_(NULL),
-    ownerStartPtr_(NULL),
-    losortStartPtr_(NULL),
+    losortPtr_(nullptr),
+    ownerStartPtr_(nullptr),
+    losortStartPtr_(nullptr),
     extendedAddr_(5),
-    internalEqnCoeffsPtr_(NULL),
-    flippedInternalEqnCoeffsPtr_(NULL),
+    internalEqnCoeffsPtr_(nullptr),
+    flippedInternalEqnCoeffsPtr_(nullptr),
     boundaryEqnCoeffs_()
 {}
 

@@ -80,7 +80,7 @@ Foam::autoPtr<Foam::solid> Foam::solid::New(Istream& is)
             << ", should be coeffs or defaultCoeffs"
             << exit(FatalError);
 
-        return autoPtr<solid>(NULL);
+        return autoPtr<solid>(nullptr);
     }
 }
 

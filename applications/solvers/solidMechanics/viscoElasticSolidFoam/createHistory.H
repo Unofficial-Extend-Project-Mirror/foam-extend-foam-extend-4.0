@@ -1,5 +1,5 @@
-OFstream* forceFilePtr(NULL);
-// OFstream* stressFilePtr(NULL);
+OFstream* forceFilePtr(nullptr);
+// OFstream* stressFilePtr(nullptr);
 word historyPatchName(mesh.solutionDict().subDict("solidMechanics").lookup("historyPatch"));
 label historyPatchID = mesh.boundaryMesh().findPatchID(historyPatchName);
 if(historyPatchID == -1)

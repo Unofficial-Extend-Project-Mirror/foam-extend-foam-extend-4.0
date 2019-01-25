@@ -236,7 +236,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
     procMasterFaces_(),
     comm_(fineGgiInterface_.comm()),
     tag_(fineGgiInterface_.tag()),
-    mapPtr_(NULL),
+    mapPtr_(nullptr),
     lTime_()
 {
     // New algorithm will assemble local clusters on the master side and

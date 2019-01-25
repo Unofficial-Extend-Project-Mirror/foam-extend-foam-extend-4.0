@@ -39,7 +39,7 @@ namespace Foam
 
 void clockTime::getTime(struct timeval& t)
 {
-    gettimeofday(&t, NULL);
+    gettimeofday(&t, nullptr);
 }
 
 

@@ -182,7 +182,7 @@ void constraint<Type>::eliminateEquation
     if (matrix.symmetric())
     {
         // get the coefficients
-        scalarField* coeffs = NULL;
+        scalarField* coeffs = nullptr;
 
         if (matrix.hasUpper())
         {
@@ -311,7 +311,7 @@ void constraint<Type>::eliminateEquation
         if (matrix.symmetric())
         {
             // get the coefficients
-            scalarField* coeffs = NULL;
+            scalarField* coeffs = nullptr;
 
             if (matrix.hasUpper())
             {

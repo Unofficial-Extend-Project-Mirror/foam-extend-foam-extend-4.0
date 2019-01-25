@@ -178,7 +178,7 @@ autoPtr<coupledLduSolver> coupledLduSolver::New
                "no diagonal or off-diagonal coefficient"
             << exit(FatalError);
 
-        return autoPtr<coupledLduSolver>(NULL);
+        return autoPtr<coupledLduSolver>(nullptr);
     }
 }
 

@@ -65,16 +65,16 @@ globalTetPolyPatch::globalTetPolyPatch
     meshCutEdges_(meshCutEdges),
     meshCutEdgeMask_(meshCutEdgeMask),
     boundaryIndex_(index),
-    localEdgeIndicesPtr_(NULL),
-    cutEdgeIndicesPtr_(NULL),
-    cutEdgeOwnerIndicesPtr_(NULL),
-    cutEdgeOwnerStartPtr_(NULL),
-    cutEdgeNeighbourIndicesPtr_(NULL),
-    cutEdgeNeighbourStartPtr_(NULL),
+    localEdgeIndicesPtr_(nullptr),
+    cutEdgeIndicesPtr_(nullptr),
+    cutEdgeOwnerIndicesPtr_(nullptr),
+    cutEdgeOwnerStartPtr_(nullptr),
+    cutEdgeNeighbourIndicesPtr_(nullptr),
+    cutEdgeNeighbourStartPtr_(nullptr),
     doubleCutEdgeIndicesPtr_(new labelList(0)),
     doubleCutOwnerPtr_(new labelList(0)),
     doubleCutNeighbourPtr_(new labelList(0)),
-    ownNeiDoubleMaskPtr_(NULL)
+    ownNeiDoubleMaskPtr_(nullptr)
 {}
 
 

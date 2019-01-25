@@ -366,10 +366,10 @@ void voronoiMeshGenerator::generateMesh()
 voronoiMeshGenerator::voronoiMeshGenerator(const Time& time)
 :
     runTime_(time),
-    surfacePtr_(NULL),
-    modSurfacePtr_(NULL),
-    octreePtr_(NULL),
-    pointRegionsPtr_(NULL),
+    surfacePtr_(nullptr),
+    modSurfacePtr_(nullptr),
+    octreePtr_(nullptr),
+    pointRegionsPtr_(nullptr),
     meshDict_
     (
         IOobject

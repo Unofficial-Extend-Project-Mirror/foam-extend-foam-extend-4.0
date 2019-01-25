@@ -63,7 +63,7 @@ Foam::faEdgeMapper::faEdgeMapper
     mesh_(mesh),
     mpm_(mpm),
     sizeBeforeMapping_(mesh.nInternalEdges()),
-    directAddrPtr_(NULL)
+    directAddrPtr_(nullptr)
 {}
 
 

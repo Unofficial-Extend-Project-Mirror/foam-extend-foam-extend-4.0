@@ -285,8 +285,8 @@ Foam::distanceSurface::distanceSurface
     regularise_(dict.lookupOrDefault("regularise", true)),
     zoneName_(word::null),
     needsUpdate_(true),
-    isoSurfPtr_(NULL),
-    facesPtr_(NULL)
+    isoSurfPtr_(nullptr),
+    facesPtr_(nullptr)
 {
 //    dict.readIfPresent("zone", zoneName_);
 //

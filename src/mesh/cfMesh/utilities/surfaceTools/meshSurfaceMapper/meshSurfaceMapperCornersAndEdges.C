@@ -323,7 +323,7 @@ void meshSurfaceMapper::mapEdgeNodes(const labelLongList& nodesToMap)
     scalarList mappingDistance;
     findMappingDistance(nodesToMap, mappingDistance);
 
-    const VRWGraph* bpAtProcsPtr(NULL);
+    const VRWGraph* bpAtProcsPtr(nullptr);
     if( Pstream::parRun() )
         bpAtProcsPtr = &surfaceEngine_.bpAtProcs();
 

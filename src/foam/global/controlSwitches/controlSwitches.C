@@ -55,7 +55,7 @@ Foam::debug::controlSwitches<T>::controlSwitches
     switchDescription_(switchDescription)
 {
     // Register the switch in its list
-    if (*switchValuesTable == NULL)
+    if (*switchValuesTable == nullptr)
     {
         *switchValuesTable =
             new std::map<std::string, std::list<controlSwitches<T> *> >();

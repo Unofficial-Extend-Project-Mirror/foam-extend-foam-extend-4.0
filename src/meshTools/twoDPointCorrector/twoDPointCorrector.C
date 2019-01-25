@@ -191,8 +191,8 @@ twoDPointCorrector::twoDPointCorrector(const polyMesh& mesh)
 :
     mesh_(mesh),
     required_(mesh_.nGeometricD() == 2),
-    planeNormalPtr_(NULL),
-    normalEdgeIndicesPtr_(NULL)
+    planeNormalPtr_(nullptr),
+    normalEdgeIndicesPtr_(nullptr)
 {}
 
 

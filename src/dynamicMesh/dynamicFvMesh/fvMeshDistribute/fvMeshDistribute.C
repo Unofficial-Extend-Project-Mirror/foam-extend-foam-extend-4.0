@@ -576,7 +576,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::fvMeshDistribute::mergeSharedPoints
 
     if (returnReduce(pointToMaster.size(), sumOp<label>()) == 0)
     {
-        return autoPtr<mapPolyMesh>(NULL);
+        return autoPtr<mapPolyMesh>(nullptr);
     }
 
     directTopoChange meshMod(mesh_);
@@ -1782,7 +1782,7 @@ Foam::autoPtr<Foam::mapDistributePolyMesh> Foam::fvMeshDistribute::distribute
                 sendBufs[procI][i] = *ptr++;
             }
             // Clear OStringStream
-            sendStr.set(procI, NULL);
+            sendStr.set(procI, nullptr);
         }
 
         // Transfer sendBufs into recvBufs

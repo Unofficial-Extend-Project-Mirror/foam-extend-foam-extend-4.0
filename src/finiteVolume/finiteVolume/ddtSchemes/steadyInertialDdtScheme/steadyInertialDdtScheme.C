@@ -194,7 +194,7 @@ steadyInertialDdtScheme<Type>::convectionCofrDeltaT() const
         )   << "Incorrect dimensions of phi: " << phi.dimensions()
             << abort(FatalError);
 
-        return tmp<surfaceScalarField>(NULL);
+        return tmp<surfaceScalarField>(nullptr);
     }
 }
 
@@ -227,7 +227,7 @@ steadyInertialDdtScheme<Type>::diffusionCofrDeltaT() const
         )   << "Cannot find nu"
             << abort(FatalError);
 
-        return tmp<surfaceScalarField>(NULL);
+        return tmp<surfaceScalarField>(nullptr);
     }
 }
 
@@ -260,7 +260,7 @@ steadyInertialDdtScheme<Type>::diffusionCofrDeltaT
         )   << "Incorrect dimensions of nu: " << nuf.dimensions()
             << abort(FatalError);
 
-        return tmp<surfaceScalarField>(NULL);
+        return tmp<surfaceScalarField>(nullptr);
     }
 }
 

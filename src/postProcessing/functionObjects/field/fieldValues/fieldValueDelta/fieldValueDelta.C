@@ -70,8 +70,8 @@ Foam::fieldValues::fieldValueDelta::fieldValueDelta
     loadFromFiles_(loadFromFiles),
     log_(true),
     operation_(opSubtract),
-    source1Ptr_(NULL),
-    source2Ptr_(NULL)
+    source1Ptr_(nullptr),
+    source2Ptr_(nullptr)
 {
     read(dict);
 }

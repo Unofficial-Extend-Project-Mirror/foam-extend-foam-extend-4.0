@@ -49,7 +49,7 @@ const meshSurfaceEngine& refineBoundaryLayers::surfaceEngine() const
 refineBoundaryLayers::refineBoundaryLayers(polyMeshGen& mesh)
 :
     mesh_(mesh),
-    msePtr_(NULL),
+    msePtr_(nullptr),
     globalNumLayers_(1),
     globalThicknessRatio_(1.0),
     globalMaxThicknessFirstLayer_(VGREAT),

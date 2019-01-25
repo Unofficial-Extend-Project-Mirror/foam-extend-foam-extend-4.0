@@ -646,7 +646,7 @@ Foam::fieldValues::faceSource::faceSource
 )
 :
     fieldValue(name, obr, dict, typeName, loadFromFiles),
-    surfaceWriterPtr_(NULL),
+    surfaceWriterPtr_(nullptr),
     source_(sourceTypeNames_.read(dict.lookup("source"))),
     operation_(operationTypeNames_.read(dict.lookup("operation"))),
     weightFieldName_("none"),

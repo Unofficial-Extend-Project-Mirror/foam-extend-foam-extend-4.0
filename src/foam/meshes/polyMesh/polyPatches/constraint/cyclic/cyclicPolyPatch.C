@@ -815,8 +815,8 @@ Foam::cyclicPolyPatch::cyclicPolyPatch
 )
 :
     coupledPolyPatch(name, size, start, index, bm),
-    coupledPointsPtr_(NULL),
-    coupledEdgesPtr_(NULL),
+    coupledPointsPtr_(nullptr),
+    coupledEdgesPtr_(nullptr),
     featureCos_(0.9),
     transform_(UNKNOWN),
     rotationAxis_(vector::zero),
@@ -835,8 +835,8 @@ Foam::cyclicPolyPatch::cyclicPolyPatch
 )
 :
     coupledPolyPatch(name, dict, index, bm),
-    coupledPointsPtr_(NULL),
-    coupledEdgesPtr_(NULL),
+    coupledPointsPtr_(nullptr),
+    coupledEdgesPtr_(nullptr),
     featureCos_(0.9),
     transform_(UNKNOWN),
     rotationAxis_(vector::zero),
@@ -904,8 +904,8 @@ Foam::cyclicPolyPatch::cyclicPolyPatch
 )
 :
     coupledPolyPatch(pp, bm, index, newSize, newStart),
-    coupledPointsPtr_(NULL),
-    coupledEdgesPtr_(NULL),
+    coupledPointsPtr_(nullptr),
+    coupledEdgesPtr_(nullptr),
     featureCos_(pp.featureCos_),
     transform_(pp.transform_),
     rotationAxis_(pp.rotationAxis_),
@@ -921,8 +921,8 @@ Foam::cyclicPolyPatch::cyclicPolyPatch
 )
 :
     coupledPolyPatch(pp),
-    coupledPointsPtr_(NULL),
-    coupledEdgesPtr_(NULL),
+    coupledPointsPtr_(nullptr),
+    coupledEdgesPtr_(nullptr),
     featureCos_(pp.featureCos_),
     transform_(pp.transform_),
     rotationAxis_(pp.rotationAxis_),
@@ -939,8 +939,8 @@ Foam::cyclicPolyPatch::cyclicPolyPatch
 )
 :
     coupledPolyPatch(pp, bm),
-    coupledPointsPtr_(NULL),
-    coupledEdgesPtr_(NULL),
+    coupledPointsPtr_(nullptr),
+    coupledEdgesPtr_(nullptr),
     featureCos_(pp.featureCos_),
     transform_(pp.transform_),
     rotationAxis_(pp.rotationAxis_),

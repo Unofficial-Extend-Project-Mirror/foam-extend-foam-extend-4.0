@@ -48,7 +48,7 @@ cellShape extrudedTriangleCellShape
     faceList& frontAndBackFaces
 )
 {
-    const static cellModel* prismModelPtr_ = NULL;
+    const static cellModel* prismModelPtr_ = nullptr;
 
     if (!prismModelPtr_)
     {

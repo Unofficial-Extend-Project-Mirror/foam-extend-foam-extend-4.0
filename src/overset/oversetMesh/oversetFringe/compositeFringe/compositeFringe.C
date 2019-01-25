@@ -138,9 +138,9 @@ Foam::compositeFringe::compositeFringe
 )
 :
     oversetFringe(mesh, region, dict),
-    fringeHolesPtr_(NULL),
-    acceptorsPtr_(NULL),
-    finalDonorAcceptorsPtr_(NULL)
+    fringeHolesPtr_(nullptr),
+    acceptorsPtr_(nullptr),
+    finalDonorAcceptorsPtr_(nullptr)
 {
     // Read fringes
     readBaseFringes(dict);

@@ -157,10 +157,10 @@ topoSurfaceMapper::topoSurfaceMapper
     tMapper_(mapper),
     direct_(false),
     sizeBeforeMapping_(mpm.nOldInternalFaces()),
-    directAddrPtr_(NULL),
-    interpolationAddrPtr_(NULL),
-    weightsPtr_(NULL),
-    insertedFaceLabelsPtr_(NULL)
+    directAddrPtr_(nullptr),
+    interpolationAddrPtr_(nullptr),
+    weightsPtr_(nullptr),
+    insertedFaceLabelsPtr_(nullptr)
 {
     // Fetch offset sizes from topoMapper
     const labelList& sizes = tMapper_.faceSizes();

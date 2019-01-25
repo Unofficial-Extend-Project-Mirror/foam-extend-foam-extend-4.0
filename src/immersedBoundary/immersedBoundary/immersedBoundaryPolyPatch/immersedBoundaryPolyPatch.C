@@ -1355,21 +1355,21 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     isWall_(true),
     movingIb_(false),
     ibUpdateTimeIndex_(-1),
-    triSurfSearchPtr_(NULL),
-    ibPatchPtr_(NULL),
-    ibCellsPtr_(NULL),
-    ibCellCentresPtr_(NULL),
-    ibCellVolumesPtr_(NULL),
-    ibFacesPtr_(NULL),
-    ibFaceCentresPtr_(NULL),
-    ibFaceAreasPtr_(NULL),
-    nearestTriPtr_(NULL),
-    deadCellsPtr_(NULL),
-    deadFacesPtr_(NULL),
+    triSurfSearchPtr_(nullptr),
+    ibPatchPtr_(nullptr),
+    ibCellsPtr_(nullptr),
+    ibCellCentresPtr_(nullptr),
+    ibCellVolumesPtr_(nullptr),
+    ibFacesPtr_(nullptr),
+    ibFaceCentresPtr_(nullptr),
+    ibFaceAreasPtr_(nullptr),
+    nearestTriPtr_(nullptr),
+    deadCellsPtr_(nullptr),
+    deadFacesPtr_(nullptr),
     correctedFields_(immersedBoundaryCorrectedMeshFields::New(bm.mesh())),
-    correctedIbPatchFaceAreasPtr_(NULL),
+    correctedIbPatchFaceAreasPtr_(nullptr),
     topoChangeIndex_(-1),
-    oldIbPointsPtr_(NULL)
+    oldIbPointsPtr_(nullptr)
 {}
 
 
@@ -1398,21 +1398,21 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     isWall_(dict.lookup("isWall")),
     movingIb_(false),
     ibUpdateTimeIndex_(-1),
-    triSurfSearchPtr_(NULL),
-    ibPatchPtr_(NULL),
-    ibCellsPtr_(NULL),
-    ibCellCentresPtr_(NULL),
-    ibCellVolumesPtr_(NULL),
-    ibFacesPtr_(NULL),
-    ibFaceCentresPtr_(NULL),
-    ibFaceAreasPtr_(NULL),
-    nearestTriPtr_(NULL),
-    deadCellsPtr_(NULL),
-    deadFacesPtr_(NULL),
+    triSurfSearchPtr_(nullptr),
+    ibPatchPtr_(nullptr),
+    ibCellsPtr_(nullptr),
+    ibCellCentresPtr_(nullptr),
+    ibCellVolumesPtr_(nullptr),
+    ibFacesPtr_(nullptr),
+    ibFaceCentresPtr_(nullptr),
+    ibFaceAreasPtr_(nullptr),
+    nearestTriPtr_(nullptr),
+    deadCellsPtr_(nullptr),
+    deadFacesPtr_(nullptr),
     correctedFields_(immersedBoundaryCorrectedMeshFields::New(bm.mesh())),
-    correctedIbPatchFaceAreasPtr_(NULL),
+    correctedIbPatchFaceAreasPtr_(nullptr),
     topoChangeIndex_(-1),
-    oldIbPointsPtr_(NULL)
+    oldIbPointsPtr_(nullptr)
 {
     if (size() > 0)
     {
@@ -1461,21 +1461,21 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     isWall_(pp.isWall_),
     movingIb_(false),
     ibUpdateTimeIndex_(-1),
-    triSurfSearchPtr_(NULL),
-    ibPatchPtr_(NULL),
-    ibCellsPtr_(NULL),
-    ibCellCentresPtr_(NULL),
-    ibCellVolumesPtr_(NULL),
-    ibFacesPtr_(NULL),
-    ibFaceCentresPtr_(NULL),
-    ibFaceAreasPtr_(NULL),
-    nearestTriPtr_(NULL),
-    deadCellsPtr_(NULL),
-    deadFacesPtr_(NULL),
+    triSurfSearchPtr_(nullptr),
+    ibPatchPtr_(nullptr),
+    ibCellsPtr_(nullptr),
+    ibCellCentresPtr_(nullptr),
+    ibCellVolumesPtr_(nullptr),
+    ibFacesPtr_(nullptr),
+    ibFaceCentresPtr_(nullptr),
+    ibFaceAreasPtr_(nullptr),
+    nearestTriPtr_(nullptr),
+    deadCellsPtr_(nullptr),
+    deadFacesPtr_(nullptr),
     correctedFields_(immersedBoundaryCorrectedMeshFields::New(bm.mesh())),
-    correctedIbPatchFaceAreasPtr_(NULL),
+    correctedIbPatchFaceAreasPtr_(nullptr),
     topoChangeIndex_(-1),
-    oldIbPointsPtr_(NULL)
+    oldIbPointsPtr_(nullptr)
 {}
 
 
@@ -1502,17 +1502,17 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     isWall_(pp.isWall_),
     movingIb_(false),
     ibUpdateTimeIndex_(-1),
-    triSurfSearchPtr_(NULL),
-    ibPatchPtr_(NULL),
-    ibCellsPtr_(NULL),
-    ibCellCentresPtr_(NULL),
-    ibCellVolumesPtr_(NULL),
-    ibFacesPtr_(NULL),
-    ibFaceCentresPtr_(NULL),
-    ibFaceAreasPtr_(NULL),
-    nearestTriPtr_(NULL),
-    deadCellsPtr_(NULL),
-    deadFacesPtr_(NULL),
+    triSurfSearchPtr_(nullptr),
+    ibPatchPtr_(nullptr),
+    ibCellsPtr_(nullptr),
+    ibCellCentresPtr_(nullptr),
+    ibCellVolumesPtr_(nullptr),
+    ibFacesPtr_(nullptr),
+    ibFaceCentresPtr_(nullptr),
+    ibFaceAreasPtr_(nullptr),
+    nearestTriPtr_(nullptr),
+    deadCellsPtr_(nullptr),
+    deadFacesPtr_(nullptr),
     correctedFields_
     (
         immersedBoundaryCorrectedMeshFields::New
@@ -1520,9 +1520,9 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
             pp.boundaryMesh().mesh()
         )
     ),
-    correctedIbPatchFaceAreasPtr_(NULL),
+    correctedIbPatchFaceAreasPtr_(nullptr),
     topoChangeIndex_(-1),
-    oldIbPointsPtr_(NULL)
+    oldIbPointsPtr_(nullptr)
 {}
 
 
@@ -1550,21 +1550,21 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     isWall_(pp.isWall_),
     movingIb_(false),
     ibUpdateTimeIndex_(-1),
-    triSurfSearchPtr_(NULL),
-    ibPatchPtr_(NULL),
-    ibCellsPtr_(NULL),
-    ibCellCentresPtr_(NULL),
-    ibCellVolumesPtr_(NULL),
-    ibFacesPtr_(NULL),
-    ibFaceCentresPtr_(NULL),
-    ibFaceAreasPtr_(NULL),
-    nearestTriPtr_(NULL),
-    deadCellsPtr_(NULL),
-    deadFacesPtr_(NULL),
+    triSurfSearchPtr_(nullptr),
+    ibPatchPtr_(nullptr),
+    ibCellsPtr_(nullptr),
+    ibCellCentresPtr_(nullptr),
+    ibCellVolumesPtr_(nullptr),
+    ibFacesPtr_(nullptr),
+    ibFaceCentresPtr_(nullptr),
+    ibFaceAreasPtr_(nullptr),
+    nearestTriPtr_(nullptr),
+    deadCellsPtr_(nullptr),
+    deadFacesPtr_(nullptr),
     correctedFields_(immersedBoundaryCorrectedMeshFields::New(bm.mesh())),
-    correctedIbPatchFaceAreasPtr_(NULL),
+    correctedIbPatchFaceAreasPtr_(nullptr),
     topoChangeIndex_(-1),
-    oldIbPointsPtr_(NULL)
+    oldIbPointsPtr_(nullptr)
 {}
 
 

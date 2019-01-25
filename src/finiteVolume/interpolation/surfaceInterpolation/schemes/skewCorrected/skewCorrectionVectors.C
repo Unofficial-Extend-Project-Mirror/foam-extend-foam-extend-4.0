@@ -42,7 +42,7 @@ Foam::skewCorrectionVectors::skewCorrectionVectors(const fvMesh& mesh)
 :
     MeshObject<fvMesh, skewCorrectionVectors>(mesh),
     skew_(true),
-    skewCorrectionVectors_(NULL)
+    skewCorrectionVectors_(nullptr)
 {}
 
 

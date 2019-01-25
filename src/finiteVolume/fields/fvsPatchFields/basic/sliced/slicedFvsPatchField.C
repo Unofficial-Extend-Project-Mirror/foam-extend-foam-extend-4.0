@@ -153,9 +153,9 @@ tmp<fvsPatchField<Type> > slicedFvsPatchField<Type>::clone
 template<class Type>
 slicedFvsPatchField<Type>::~slicedFvsPatchField<Type>()
 {
-    // Set the fvsPatchField storage pointer to NULL before its destruction
+    // Set the fvsPatchField storage pointer to nullptr before its destruction
     // to protect the field it a slice of.
-    UList<Type>::operator=(UList<Type>(NULL, 0));
+    UList<Type>::operator=(UList<Type>(nullptr, 0));
 }
 
 

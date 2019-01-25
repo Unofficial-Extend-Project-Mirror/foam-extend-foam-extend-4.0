@@ -34,6 +34,9 @@ License
 #include "cloud.H"
 #include "cloudDistribute.H"
 
+#include "IFstream.H"
+#include "OFstream.H"
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
@@ -258,7 +261,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                 true    // Create passive processor patches
             );
             fvMesh& procMesh = procMeshPtr();
-
+            procMesh.write();
             // Create a field decomposer
             fvFieldDecomposer fieldDecomposer
             (
@@ -271,18 +274,18 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
 
             if (procI != Pstream::myProcNo())
             {
-                // Pout<< "Send mesh and fields to processor " << procI << endl;
+                Pout<< "Send mesh and fields to processor " << procI << endl;
 
-                // OFstream toProc
-                // (
-                //     "from" + Foam::name(Pstream::myProcNo())
-                //   + "To" + Foam::name(procI)
-                // );
-                OPstream toProc
+                OFstream toProc
                 (
-                    Pstream::blocking,
-                    procI
+                    "from" + Foam::name(Pstream::myProcNo())
+                  + "To" + Foam::name(procI)
                 );
+                // OPstream toProc
+                // (
+                //     Pstream::blocking,
+                //     procI
+                // );
 
                 // Send the mesh and fields to target processor
                 toProc << procMesh << nl;
@@ -415,6 +418,8 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         }
     }
 
+    sleep(2);
+    
     // Collect pieces of mesh and fields from other processors
     for (label procI = 0; procI < meshDecomp.nProcs(); procI++)
     {
@@ -423,19 +428,19 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
             // Check if there is a mesh to send
             if (migratedCells[procI][Pstream::myProcNo()] > 0)
             {
-                // Pout<< "Receive mesh and fields from " << procI << endl;
+                Pout<< "Receive mesh and fields from " << procI << endl;
 
                 // Note: communication can be optimised.  HJ, 27/Feb/2018
-                // IFstream fromProc
-                // (
-                //     "from" + Foam::name(procI)
-                //   + "To" + Foam::name(Pstream::myProcNo())
-                // );
-                IPstream fromProc
+                IFstream fromProc
                 (
-                    Pstream::blocking,
-                    procI
+                    "from" + Foam::name(procI)
+                  + "To" + Foam::name(Pstream::myProcNo())
                 );
+                // IPstream fromProc
+                // (
+                //     Pstream::blocking,
+                //     procI
+                // );
 
                 // Receive the mesh
                 procMeshes.set

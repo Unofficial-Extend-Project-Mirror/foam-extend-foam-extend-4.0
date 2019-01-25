@@ -695,8 +695,8 @@ Foam::BlockMatrixSelection<Type>::BlockMatrixSelection
     normPtr_(BlockCoeffNorm<Type>::New(dict)),
     nCoarseEqns_(0),
     coarsen_(false),
-    Pptr_(NULL),
-    Rptr_(NULL),
+    Pptr_(nullptr),
+    Rptr_(nullptr),
     rowLabel_()
 {
     calcCoarsening();

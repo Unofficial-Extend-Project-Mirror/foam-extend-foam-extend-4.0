@@ -85,7 +85,7 @@ inline const Foam::labelList& Foam::cellMatcher::faceLabels() const
 
 inline const Foam::cellModel& Foam::cellMatcher::model() const
 {
-    if (cellModelPtr_ == NULL)
+    if (cellModelPtr_ == nullptr)
     {
         cellModelPtr_ = cellModeller::lookup(cellModelName_);
     }

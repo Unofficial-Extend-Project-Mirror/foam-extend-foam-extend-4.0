@@ -63,10 +63,10 @@ voronoiMeshExtractor::voronoiMeshExtractor
 :
     tetCreator_(octree, meshDict),
     mesh_(mesh),
-    pointEdgesPtr_(NULL),
-    edgesPtr_(NULL),
-    edgeTetsPtr_(NULL),
-    boundaryEdgePtr_(NULL)
+    pointEdgesPtr_(nullptr),
+    edgesPtr_(nullptr),
+    edgeTetsPtr_(nullptr),
+    boundaryEdgePtr_(nullptr)
 {}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

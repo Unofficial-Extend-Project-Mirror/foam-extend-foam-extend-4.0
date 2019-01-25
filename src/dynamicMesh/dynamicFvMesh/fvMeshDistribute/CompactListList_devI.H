@@ -223,7 +223,7 @@ inline Foam::UList<T> Foam::CompactListList_dev<T, Container>::operator[]
 )
 {
     label start = offsets_[i];
-    return UList<T>((m_.size() ? &m_[start] : NULL), offsets_[i+1] - start);
+    return UList<T>((m_.size() ? &m_[start] : nullptr), offsets_[i+1] - start);
 }
 
 
@@ -237,7 +237,7 @@ Foam::CompactListList_dev<T, Container>::operator[]
     label start = offsets_[i];
     return UList<T>
     (
-        (m_.size() ? const_cast<T*>(&m_[start]) : NULL),
+        (m_.size() ? const_cast<T*>(&m_[start]) : nullptr),
         offsets_[i+1] - start
     );
 }

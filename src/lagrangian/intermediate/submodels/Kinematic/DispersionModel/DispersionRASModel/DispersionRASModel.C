@@ -43,9 +43,9 @@ Foam::DispersionRASModel<CloudType>::DispersionRASModel
             "RASProperties"
         )
     ),
-    kPtr_(NULL),
+    kPtr_(nullptr),
     ownK_(false),
-    epsilonPtr_(NULL),
+    epsilonPtr_(nullptr),
     ownEpsilon_(false)
 {}
 
@@ -95,13 +95,13 @@ void Foam::DispersionRASModel<CloudType>::cacheFields(const bool store)
         if (ownK_ && kPtr_)
         {
             delete kPtr_;
-            kPtr_ = NULL;
+            kPtr_ = nullptr;
             ownK_ = false;
         }
         if (ownEpsilon_ && epsilonPtr_)
         {
             delete epsilonPtr_;
-            epsilonPtr_ = NULL;
+            epsilonPtr_ = nullptr;
             ownEpsilon_ = false;
         }
     }

@@ -145,8 +145,8 @@ eMesh::eMesh(const polyMesh& pMesh, const word& subDir)
         ),
         *this
     ),
-    fePtr_(NULL),
-    efPtr_(NULL)
+    fePtr_(nullptr),
+    efPtr_(nullptr)
 {
     if (debug)
     {

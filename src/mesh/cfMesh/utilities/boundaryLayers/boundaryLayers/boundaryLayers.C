@@ -537,8 +537,8 @@ boundaryLayers::boundaryLayers
 )
 :
     mesh_(mesh),
-    msePtr_(NULL),
-    meshPartitionerPtr_(NULL),
+    msePtr_(nullptr),
+    meshPartitionerPtr_(nullptr),
     patchWiseLayers_(true),
     terminateLayersAtConcaveEdges_(false),
     is2DMesh_(false),

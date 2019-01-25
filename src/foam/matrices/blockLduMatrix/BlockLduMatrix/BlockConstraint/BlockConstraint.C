@@ -59,10 +59,10 @@ BlockConstraint<Type>::BlockConstraint
     fixedComponents_(fixedCmpts),
     matrixCoeffsSet_(false),
     diagCoeff_(),
-    upperCoeffsOwnerPtr_(NULL),
-    upperCoeffsNeighbourPtr_(NULL),
-    lowerCoeffsOwnerPtr_(NULL),
-    lowerCoeffsNeighbourPtr_(NULL)
+    upperCoeffsOwnerPtr_(nullptr),
+    upperCoeffsNeighbourPtr_(nullptr),
+    lowerCoeffsOwnerPtr_(nullptr),
+    lowerCoeffsNeighbourPtr_(nullptr)
 {}
 
 
@@ -74,10 +74,10 @@ BlockConstraint<Type>::BlockConstraint(const BlockConstraint& e)
     value_(e.value_),
     fixedComponents_(e.fixedComponents_),
     matrixCoeffsSet_(false),
-    upperCoeffsOwnerPtr_(NULL),
-    upperCoeffsNeighbourPtr_(NULL),
-    lowerCoeffsOwnerPtr_(NULL),
-    lowerCoeffsNeighbourPtr_(NULL)
+    upperCoeffsOwnerPtr_(nullptr),
+    upperCoeffsNeighbourPtr_(nullptr),
+    lowerCoeffsOwnerPtr_(nullptr),
+    lowerCoeffsNeighbourPtr_(nullptr)
 {}
 
 
@@ -89,10 +89,10 @@ BlockConstraint<Type>::BlockConstraint(Istream& is)
     value_(pTraits<Type>(is)),
     fixedComponents_(pTraits<Type>(is)),
     matrixCoeffsSet_(false),
-    upperCoeffsOwnerPtr_(NULL),
-    upperCoeffsNeighbourPtr_(NULL),
-    lowerCoeffsOwnerPtr_(NULL),
-    lowerCoeffsNeighbourPtr_(NULL)
+    upperCoeffsOwnerPtr_(nullptr),
+    upperCoeffsNeighbourPtr_(nullptr),
+    lowerCoeffsOwnerPtr_(nullptr),
+    lowerCoeffsNeighbourPtr_(nullptr)
 {}
 
 

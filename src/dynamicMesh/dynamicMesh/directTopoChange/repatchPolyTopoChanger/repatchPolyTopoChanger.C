@@ -52,7 +52,7 @@ Foam::directTopoChange& Foam::repatchPolyTopoChanger::meshMod()
 Foam::repatchPolyTopoChanger::repatchPolyTopoChanger(polyMesh& mesh)
 :
     mesh_(mesh),
-    meshModPtr_(NULL)
+    meshModPtr_(nullptr)
 {}
 
 

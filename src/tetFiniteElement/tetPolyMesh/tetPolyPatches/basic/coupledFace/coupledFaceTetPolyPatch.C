@@ -44,8 +44,8 @@ Foam::coupledFaceTetPolyPatch::coupledFaceTetPolyPatch
 :
     faceTetPolyPatch(patch, bm),
     coupledPolyPatch_(refCast<const coupledPolyPatch>(patch)),
-    nonGlobalPatchPointsPtr_(NULL),
-    meshPointsPtr_(NULL)
+    nonGlobalPatchPointsPtr_(nullptr),
+    meshPointsPtr_(nullptr)
 {}
 
 

@@ -140,8 +140,8 @@ public:
             neighbEdgeCentres_(),
             neighbEdgeLengths_(),
             neighbEdgeFaceCentres_(),
-            neighbPointsPtr_(NULL),
-            nonGlobalPatchPointsPtr_(NULL)
+            neighbPointsPtr_(nullptr),
+            nonGlobalPatchPointsPtr_(nullptr)
         {}
 
         //- Construct from dictionary
@@ -159,8 +159,8 @@ public:
             neighbEdgeCentres_(),
             neighbEdgeLengths_(),
             neighbEdgeFaceCentres_(),
-            neighbPointsPtr_(NULL),
-            nonGlobalPatchPointsPtr_(NULL)
+            neighbPointsPtr_(nullptr),
+            nonGlobalPatchPointsPtr_(nullptr)
         {}
 
 

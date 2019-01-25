@@ -1239,7 +1239,7 @@ bool faMeshDecomposition::writeDecomposition()
         (
             curPatchSizes.size()
           + curProcessorPatchSizes.size(),
-            reinterpret_cast<faPatch*>(NULL)
+            reinterpret_cast<faPatch*>(0)
         );
 
         label nPatches = 0;

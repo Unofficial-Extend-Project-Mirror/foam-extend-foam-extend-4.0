@@ -71,13 +71,13 @@ Foam::standardPenaltyFriction::standardPenaltyFriction
       slaveFaceZoneID
   ),
  frictionContactModelDict_(dict.subDict(name+"FrictionModelDict")),
-  frictionLawPtr_(NULL),
+  frictionLawPtr_(nullptr),
   mesh_(patch.boundaryMesh().mesh()),
   slaveDisp_(mesh().boundaryMesh()[slavePatchID].size(), vector::zero),
   slaveTraction_(mesh().boundaryMesh()[slavePatchID].size(), vector::zero),
   oldSlaveTraction_(mesh().boundaryMesh()[slavePatchID].size(), vector::zero),
   slaveValueFrac_(mesh().boundaryMesh()[slavePatchID].size(), symmTensor::zero),
-  frictionPenaltyFactorPtr_(NULL),
+  frictionPenaltyFactorPtr_(nullptr),
   frictionPenaltyScale_
   (readScalar(frictionContactModelDict_.lookup("penaltyScale"))),
   relaxFac_(readScalar(frictionContactModelDict_.lookup("relaxationFactor"))),
@@ -85,7 +85,7 @@ Foam::standardPenaltyFriction::standardPenaltyFriction
   infoFreq_(readInt(frictionContactModelDict_.lookup("infoFrequency"))),
   oscillationCorr_(frictionContactModelDict_.lookup("oscillationCorrection")),
   smoothingSteps_(readInt(frictionContactModelDict_.lookup("smoothingSteps"))),
-  contactFilePtr_(NULL)
+  contactFilePtr_(nullptr)
 {
   // create friction law
   frictionLawPtr_ = frictionLaw::New(

@@ -112,8 +112,8 @@ Pout<< "zoneName:" << zoneName
 
 
 
-    INTEGER4 *PassiveVarArray = NULL;
-    INTEGER4 *VarShareArray   = NULL;
+    INTEGER4 *PassiveVarArray = nullptr;
+    INTEGER4 *VarShareArray   = nullptr;
     INTEGER4  ShrConn         = 0;
 
     INTEGER4  NumBConns       = 0;   /* No Boundary Connections */
@@ -192,8 +192,8 @@ Pout<< "zoneName:" << zoneName
     << endl;
 
 
-    INTEGER4 *PassiveVarArray = NULL;
-    INTEGER4 *VarShareArray   = NULL;
+    INTEGER4 *PassiveVarArray = nullptr;
+    INTEGER4 *VarShareArray   = nullptr;
     INTEGER4  ShrConn         = 0;
 
     INTEGER4  NumBConns       = 0;   /* No Boundary Connections */
@@ -274,8 +274,8 @@ Pout<< "zoneName:" << zoneName
     << endl;
 
 
-    INTEGER4 *PassiveVarArray = NULL;
-    INTEGER4 *VarShareArray   = NULL;
+    INTEGER4 *PassiveVarArray = nullptr;
+    INTEGER4 *VarShareArray   = nullptr;
     INTEGER4  ShrConn         = 0;
 
 
@@ -374,9 +374,9 @@ void Foam::tecplotWriter::writeConnectivity(const fvMesh& mesh) const
             FaceNodes.begin(),      /* The face nodes array */
             FaceLeftElems.begin(),  /* The left elements array  */
             FaceRightElems.begin(), /* The right elements array  */
-            NULL,       /* No boundary connection counts */
-            NULL,       /* No boundary connection elements */
-            NULL        /* No boundary connection zones */
+            nullptr,       /* No boundary connection counts */
+            nullptr,       /* No boundary connection elements */
+            nullptr        /* No boundary connection zones */
         )
     )
     {
@@ -488,9 +488,9 @@ void Foam::tecplotWriter::writeConnectivity
             FaceNodes.begin(),      /* The face nodes array */
             FaceLeftElems.begin(),  /* The left elements array  */
             FaceRightElems.begin(), /* The right elements array  */
-            NULL,       /* No boundary connection counts */
-            NULL,       /* No boundary connection elements */
-            NULL        /* No boundary connection zones */
+            nullptr,       /* No boundary connection counts */
+            nullptr,       /* No boundary connection elements */
+            nullptr        /* No boundary connection zones */
         )
     )
     {

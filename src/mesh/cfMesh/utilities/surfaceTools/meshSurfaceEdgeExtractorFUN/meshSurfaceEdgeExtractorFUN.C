@@ -76,7 +76,7 @@ meshSurfaceEdgeExtractorFUN::meshSurfaceEdgeExtractorFUN
 :
     mesh_(mesh),
     meshOctree_(octree),
-    surfaceEnginePtr_(NULL),
+    surfaceEnginePtr_(nullptr),
     createWrapperSheet_(createWrapperSheet)
 {
     if( Pstream::parRun() )

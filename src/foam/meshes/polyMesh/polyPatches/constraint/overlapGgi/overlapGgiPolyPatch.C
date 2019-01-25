@@ -149,11 +149,11 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
     zoneIndex_(-1),
     rotationAxis_(vector(0, 0, 1)),
     nCopies_(0),
-    expandedMasterPtr_(NULL),
-    expandedSlavePtr_(NULL),
-    patchToPatchPtr_(NULL),
-    localParallelPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    expandedMasterPtr_(nullptr),
+    expandedSlavePtr_(nullptr),
+    patchToPatchPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr)
 {}
 
 
@@ -178,11 +178,11 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
     zoneIndex_(-1),
     rotationAxis_(axis),
     nCopies_(nCopies),
-    expandedMasterPtr_(NULL),
-    expandedSlavePtr_(NULL),
-    patchToPatchPtr_(NULL),
-    localParallelPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    expandedMasterPtr_(nullptr),
+    expandedSlavePtr_(nullptr),
+    patchToPatchPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr)
 {}
 
 
@@ -202,11 +202,11 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
     zoneIndex_(-1),
     rotationAxis_(dict.lookup("rotationAxis")),
     nCopies_(readScalar(dict.lookup("nCopies"))),
-    expandedMasterPtr_(NULL),
-    expandedSlavePtr_(NULL),
-    patchToPatchPtr_(NULL),
-    localParallelPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    expandedMasterPtr_(nullptr),
+    expandedSlavePtr_(nullptr),
+    patchToPatchPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr)
 {}
 
 
@@ -227,11 +227,11 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
     zoneIndex_(-1),
     rotationAxis_(pp.rotationAxis_),
     nCopies_(pp.nCopies_),
-    expandedMasterPtr_(NULL),
-    expandedSlavePtr_(NULL),
-    patchToPatchPtr_(NULL),
-    localParallelPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    expandedMasterPtr_(nullptr),
+    expandedSlavePtr_(nullptr),
+    patchToPatchPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr)
 {}
 
 
@@ -248,11 +248,11 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
     zoneIndex_(-1),
     rotationAxis_(pp.rotationAxis_),
     nCopies_(pp.nCopies_),
-    expandedMasterPtr_(NULL),
-    expandedSlavePtr_(NULL),
-    patchToPatchPtr_(NULL),
-    localParallelPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    expandedMasterPtr_(nullptr),
+    expandedSlavePtr_(nullptr),
+    patchToPatchPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr)
 {}
 
 
@@ -270,11 +270,11 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
     zoneIndex_(-1),
     rotationAxis_(pp.rotationAxis_),
     nCopies_(pp.nCopies_),
-    expandedMasterPtr_(NULL),
-    expandedSlavePtr_(NULL),
-    patchToPatchPtr_(NULL),
-    localParallelPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    expandedMasterPtr_(nullptr),
+    expandedSlavePtr_(nullptr),
+    patchToPatchPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr)
 {}
 
 

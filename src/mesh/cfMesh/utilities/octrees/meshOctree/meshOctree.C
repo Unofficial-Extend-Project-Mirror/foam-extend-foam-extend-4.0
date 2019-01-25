@@ -49,7 +49,7 @@ meshOctree::meshOctree(const triSurf& ts, const bool isQuadtree)
     surface_(ts),
     neiProcs_(),
     neiRange_(),
-    initialCubePtr_(NULL),
+    initialCubePtr_(nullptr),
     initialCubeRotation_(0),
     rootBox_(),
     isRootInitialised_(false),

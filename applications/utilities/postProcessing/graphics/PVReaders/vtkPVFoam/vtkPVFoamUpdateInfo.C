@@ -198,7 +198,7 @@ void Foam::vtkPVFoam::updateInfoPatches()
     if (debug)
     {
         Info<< "<beg> Foam::vtkPVFoam::updateInfoPatches"
-            << " [meshPtr=" << (meshPtr_ ? "set" : "NULL") << "]" << endl;
+            << " [meshPtr=" << (meshPtr_ ? "set" : "nullptr") << "]" << endl;
     }
 
     vtkDataArraySelection* partSelection = reader_->GetPartSelection();
@@ -292,7 +292,7 @@ void Foam::vtkPVFoam::updateInfoZones()
     if (debug)
     {
         Info<< "<beg> Foam::vtkPVFoam::updateInfoZones"
-            << " [meshPtr=" << (meshPtr_ ? "set" : "NULL") << "]" << endl;
+            << " [meshPtr=" << (meshPtr_ ? "set" : "nullptr") << "]" << endl;
     }
 
     vtkDataArraySelection* partSelection = reader_->GetPartSelection();

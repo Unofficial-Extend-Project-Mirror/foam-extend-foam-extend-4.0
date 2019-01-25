@@ -1,6 +1,6 @@
 bool solidInterfaceCorr = rheology.solidInterfaceActive();
 
-solidInterface* solidInterfacePtr(NULL);
+solidInterface* solidInterfacePtr(nullptr);
 
 {
     if (solidInterfaceCorr)

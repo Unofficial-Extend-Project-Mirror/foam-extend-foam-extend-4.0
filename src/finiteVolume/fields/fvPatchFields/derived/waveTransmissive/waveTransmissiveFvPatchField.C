@@ -157,16 +157,16 @@ tmp<scalarField> waveTransmissiveFvPatchField<Type>::supercritical() const
     const fvPatchField<scalar>& psip = this->lookupPatchField
     (
         psiName_,
-        reinterpret_cast<const volScalarField*>(NULL),
-        reinterpret_cast<const scalar*>(NULL)
+        reinterpret_cast<const volScalarField*>(0),
+        reinterpret_cast<const scalar*>(0)
     );
 
     const fvPatchVectorField& U =
         this->lookupPatchField
         (
             UName_,
-            reinterpret_cast<const volVectorField*>(NULL),
-            reinterpret_cast<const vector*>(NULL)
+            reinterpret_cast<const volVectorField*>(0),
+            reinterpret_cast<const vector*>(0)
         );
 
     // Calculate the speed of the field wave w

@@ -157,7 +157,7 @@ template<class T, Foam::label staticSize>
 inline Foam::DynList<T, staticSize>::~DynList()
 {
     allocateSize(0);
-    //UList<T>::reset(NULL, 0);
+    //UList<T>::reset(nullptr, 0);
 }
 
 

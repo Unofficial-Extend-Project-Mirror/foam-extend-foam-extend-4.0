@@ -205,10 +205,10 @@ Foam::spray::spray
     angleOfWedge_(0.0),
 
     interpolationSchemes_(sprayProperties_.subDict("interpolationSchemes")),
-    UInterpolator_(NULL),
-    rhoInterpolator_(NULL),
-    pInterpolator_(NULL),
-    TInterpolator_(NULL),
+    UInterpolator_(nullptr),
+    rhoInterpolator_(nullptr),
+    pInterpolator_(nullptr),
+    TInterpolator_(nullptr),
 
     sms_(mesh_.nCells(), vector::zero),
     shs_(mesh_.nCells(), 0.0),

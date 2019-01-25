@@ -249,8 +249,8 @@ Foam::label Foam::parMetisDecomp::decompose
 
     // Weight info
     int wgtFlag = 0;
-    int* vwgtPtr = NULL;
-    int* adjwgtPtr = NULL;
+    int* vwgtPtr = nullptr;
+    int* adjwgtPtr = nullptr;
 
     if (cellWeights.size())
     {

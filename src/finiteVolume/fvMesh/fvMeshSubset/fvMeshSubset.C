@@ -436,8 +436,8 @@ Foam::fvMeshSubset::fvMeshSubset
 :
     regIOobject(io),
     baseMesh_(baseMesh),
-    fvMeshSubsetPtr_(NULL),
-    pointMeshSubsetPtr_(NULL),
+    fvMeshSubsetPtr_(nullptr),
+    pointMeshSubsetPtr_(nullptr),
     pointMap_(0),
     faceMap_(0),
     cellMap_(0),

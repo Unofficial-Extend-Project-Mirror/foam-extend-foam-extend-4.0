@@ -602,14 +602,14 @@ topoPatchMapper::topoPatchMapper
     direct_(false),
     sizeBeforeMapping_(0),
     conservative_(false),
-    directAddrPtr_(NULL),
-    interpolationAddrPtr_(NULL),
-    weightsPtr_(NULL),
-    insertedFaceLabelsPtr_(NULL),
-    insertedFaceIndexMapPtr_(NULL),
-    insertedFaceAddressingPtr_(NULL),
-    areasPtr_(NULL),
-    centresPtr_(NULL)
+    directAddrPtr_(nullptr),
+    interpolationAddrPtr_(nullptr),
+    weightsPtr_(nullptr),
+    insertedFaceLabelsPtr_(nullptr),
+    insertedFaceIndexMapPtr_(nullptr),
+    insertedFaceAddressingPtr_(nullptr),
+    areasPtr_(nullptr),
+    centresPtr_(nullptr)
 {
     // Compute sizeBeforeMapping.
     // - This needs to be done before insertedObjects

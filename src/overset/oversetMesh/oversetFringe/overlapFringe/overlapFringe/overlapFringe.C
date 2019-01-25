@@ -394,9 +394,9 @@ Foam::overlapFringe::overlapFringe
 )
 :
     oversetFringe(mesh, region, dict),
-    fringeHolesPtr_(NULL),
-    acceptorsPtr_(NULL),
-    finalDonorAcceptorsPtr_(NULL),
+    fringeHolesPtr_(nullptr),
+    acceptorsPtr_(nullptr),
+    finalDonorAcceptorsPtr_(nullptr),
 
     holesSetName_(dict.lookupOrDefault<word>("holes", word())),
     initPatchNames_
@@ -412,7 +412,7 @@ Foam::overlapFringe::overlapFringe
     (
         readScalar(dict.lookup("suitablePairFraction"))
     ),
-    cumulativeDonorAcceptorsPtr_(NULL),
+    cumulativeDonorAcceptorsPtr_(nullptr),
     cacheFringe_(dict.lookupOrDefault<Switch>("cacheFringe", false)),
     fringeIter_(0)
 {

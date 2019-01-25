@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
                   dimensionedVector("zero", dimForce/dimArea, vector::zero)
                   );
 
-          volTensorField* gradUPtr = NULL;
+          volTensorField* gradUPtr = nullptr;
           if (nonLinear)
           {
               gradUPtr = new volTensorField

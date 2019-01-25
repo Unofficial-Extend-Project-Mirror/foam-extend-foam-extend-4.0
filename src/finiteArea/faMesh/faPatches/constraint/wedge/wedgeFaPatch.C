@@ -87,7 +87,7 @@ Foam::wedgeFaPatch::wedgeFaPatch
 )
 :
     faPatch(name, dict, index, bm),
-    wedgePolyPatchPtr_(NULL),
+    wedgePolyPatchPtr_(nullptr),
     axisPointsChecked_(false)
 {
     if(ngbPolyPatchIndex() == -1)

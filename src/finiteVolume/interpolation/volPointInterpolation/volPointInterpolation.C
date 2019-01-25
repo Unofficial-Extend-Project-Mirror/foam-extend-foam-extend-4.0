@@ -153,7 +153,7 @@ volPointInterpolation::volPointInterpolation(const fvMesh& vm)
 :
     MeshObject<fvMesh, volPointInterpolation>(vm),
     boundaryInterpolator_(vm),
-    pointWeightsPtr_(NULL)
+    pointWeightsPtr_(nullptr)
 {}
 
 

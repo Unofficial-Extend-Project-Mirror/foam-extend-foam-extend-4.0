@@ -103,7 +103,7 @@ public:
         //- store regions into subsets with a given prefix
         const triSurf* surfaceWithPatches
         (
-            IOdictionary* meshDictPtr = NULL,
+            IOdictionary* meshDictPtr = nullptr,
             const word prefix = "patch_",
             const bool forceOverwrite = false
         ) const;

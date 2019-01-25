@@ -1651,22 +1651,22 @@ Foam::oversetRegion::oversetRegion
     zoneIndex_(mesh_.cellZones().findZoneID(name_)),
     donorRegionNames_(dict.lookup("donorRegions")),
     fringePtr_(),
-    donorRegionsPtr_(NULL),
-    acceptorRegionsPtr_(NULL),
+    donorRegionsPtr_(nullptr),
+    acceptorRegionsPtr_(nullptr),
 
-    acceptorCellsPtr_(NULL),
-    donorCellsPtr_(NULL),
-    cutHoleCellsPtr_(NULL),
-    holeCellsPtr_(NULL),
-    eligibleDonorCellsPtr_(NULL),
+    acceptorCellsPtr_(nullptr),
+    donorCellsPtr_(nullptr),
+    cutHoleCellsPtr_(nullptr),
+    holeCellsPtr_(nullptr),
+    eligibleDonorCellsPtr_(nullptr),
 
-    holeTriMeshPtr_(NULL),
-    holeSearchPtr_(NULL),
+    holeTriMeshPtr_(nullptr),
+    holeSearchPtr_(nullptr),
 
-    localBoundsPtr_(NULL),
-    globalBoundsPtr_(NULL),
-    cellSearchPtr_(NULL),
-    procBoundBoxesPtr_(NULL),
+    localBoundsPtr_(nullptr),
+    globalBoundsPtr_(nullptr),
+    cellSearchPtr_(nullptr),
+    procBoundBoxesPtr_(nullptr),
     useLocalBoundBoxes_
     (
         dict.lookupOrDefault<Switch>

@@ -225,7 +225,7 @@ Foam::PODOrthoNormalBase<Type>::PODOrthoNormalBase
 )
 :
     orthoFields_(),
-    interpolationCoeffsPtr_(NULL)
+    interpolationCoeffsPtr_(nullptr)
 {
     calcOrthoBase(snapshots, accuracy);
 }

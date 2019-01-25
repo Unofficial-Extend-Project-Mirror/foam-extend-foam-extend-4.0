@@ -166,7 +166,7 @@ inline Foam::SLListBase::iterator::iterator(SLListBase& s, link* elmt)
 inline Foam::SLListBase::iterator::iterator(SLListBase& s)
 :
     curList_(s),
-    curElmt_(NULL),
+    curElmt_(nullptr),
     curLink_()
 {}
 

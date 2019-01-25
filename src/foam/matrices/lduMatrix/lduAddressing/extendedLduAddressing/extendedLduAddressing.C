@@ -421,12 +421,12 @@ Foam::extendedLduAddressing::extendedLduAddressing
 :
     lduAddr_(lduAddr),
     p_(extensionLevel),
-    extendedLowerPtr_(NULL),
-    extendedUpperPtr_(NULL),
-    faceMapPtr_(NULL),
-    extendedLosortPtr_(NULL),
-    extendedOwnerStartPtr_(NULL),
-    extendedLosortStartPtr_(NULL)
+    extendedLowerPtr_(nullptr),
+    extendedUpperPtr_(nullptr),
+    faceMapPtr_(nullptr),
+    extendedLosortPtr_(nullptr),
+    extendedOwnerStartPtr_(nullptr),
+    extendedLosortStartPtr_(nullptr)
 {
     // Issue an error if a negative extension level is selected
     if (p_ < 0)

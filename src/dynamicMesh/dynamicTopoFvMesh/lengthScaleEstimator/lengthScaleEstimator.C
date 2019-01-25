@@ -74,7 +74,7 @@ lengthScaleEstimator::lengthScaleEstimator
     sliceHoldOff_(0),
     sliceBoxes_(0),
     field_("none"),
-    scale_(NULL),
+    scale_(nullptr),
     gradient_(false),
     fieldLength_(0.0),
     lowerRefineLevel_(0.001),
@@ -1029,10 +1029,10 @@ void lengthScaleEstimator::calculateLengthScale
     // If a field has been specified, use that.
     if (field_ != "none")
     {
-        const volScalarField* vFldPtr = NULL;
+        const volScalarField* vFldPtr = nullptr;
 
         // Temporary pointer for gradient
-        volScalarField* magGradPtr = NULL;
+        volScalarField* magGradPtr = nullptr;
 
         if (gradient_)
         {

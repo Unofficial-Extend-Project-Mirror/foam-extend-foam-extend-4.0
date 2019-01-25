@@ -277,7 +277,7 @@ int main(int argc, char *argv[])
     }
 
     // Current mesh. Start off from unloaded mesh.
-    autoPtr<fieldviewTopology> topoPtr(NULL);
+    autoPtr<fieldviewTopology> topoPtr(nullptr);
 
     label fieldViewTime = 0;
 
@@ -410,7 +410,7 @@ int main(int argc, char *argv[])
         writeInt(fvFile, volFieldNames.size());
         forAll(volFieldNames, fieldI)
         {
-            if (volFieldPtrs[fieldI] == NULL)
+            if (volFieldPtrs[fieldI] == nullptr)
             {
                 Info<< "    dummy field for "
                     << volFieldNames[fieldI].c_str() << endl;
@@ -436,7 +436,7 @@ int main(int argc, char *argv[])
         }
         forAll(surfFieldNames, fieldI)
         {
-            if (surfFieldPtrs[fieldI] == NULL)
+            if (surfFieldPtrs[fieldI] == nullptr)
             {
                 Info<< "    dummy surface field for "
                     << surfFieldNames[fieldI].c_str() << endl;
@@ -644,7 +644,7 @@ int main(int argc, char *argv[])
 
         forAll(volFieldPtrs, fieldI)
         {
-            if (volFieldPtrs[fieldI] != NULL)
+            if (volFieldPtrs[fieldI] != nullptr)
             {
                 const volScalarField& vField = *volFieldPtrs[fieldI];
 
@@ -689,7 +689,7 @@ int main(int argc, char *argv[])
 
         forAll(volFieldPtrs, fieldI)
         {
-            if (volFieldPtrs[fieldI] != NULL)
+            if (volFieldPtrs[fieldI] != nullptr)
             {
                 const volScalarField& vsf = *volFieldPtrs[fieldI];
 
@@ -730,7 +730,7 @@ int main(int argc, char *argv[])
         // surfFields
         forAll(surfFieldPtrs, fieldI)
         {
-            if (surfFieldPtrs[fieldI] != NULL)
+            if (surfFieldPtrs[fieldI] != nullptr)
             {
                 const surfaceScalarField& ssf = *surfFieldPtrs[fieldI];
 
@@ -778,7 +778,7 @@ int main(int argc, char *argv[])
         writeInt(fvFile, FV_ARB_POLY_BNDRY_VARS);
         forAll(volFieldPtrs, fieldI)
         {
-            if (volFieldPtrs[fieldI] != NULL)
+            if (volFieldPtrs[fieldI] != nullptr)
             {
                 const volScalarField& vsf = *volFieldPtrs[fieldI];
 
@@ -815,7 +815,7 @@ int main(int argc, char *argv[])
         // surfFields
         forAll(surfFieldPtrs, fieldI)
         {
-            if (surfFieldPtrs[fieldI] != NULL)
+            if (surfFieldPtrs[fieldI] != nullptr)
             {
                 const surfaceScalarField& ssf = *surfFieldPtrs[fieldI];
 
@@ -920,7 +920,7 @@ int main(int argc, char *argv[])
 
                 forAll(sprayScalarFieldPtrs, fieldI)
                 {
-                    if (sprayScalarFieldPtrs[fieldI] != NULL)
+                    if (sprayScalarFieldPtrs[fieldI] != nullptr)
                     {
                         const IOField<scalar>& sprayField =
                             *sprayScalarFieldPtrs[fieldI];
@@ -937,7 +937,7 @@ int main(int argc, char *argv[])
                 }
                 forAll(sprayVectorFieldPtrs, fieldI)
                 {
-                    if (sprayVectorFieldPtrs[fieldI] != NULL)
+                    if (sprayVectorFieldPtrs[fieldI] != nullptr)
                     {
                         const IOField<vector>& sprayVectorField =
                             *sprayVectorFieldPtrs[fieldI];

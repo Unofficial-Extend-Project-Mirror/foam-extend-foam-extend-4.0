@@ -550,17 +550,17 @@ solidInterface::solidInterface
   name_(name),
   mesh_(mesh),
   rheology_(rheology),
-  subMeshPtr_(NULL),
-  globalInterFacesPtr_(NULL),
-  localInterFacesPtr_(NULL),
-  interfaceUPtr_(NULL),
-  processorPatchesPtr_(NULL),
-  processorPatchFacesPtr_(NULL),
-  processorInterfaceUPtr_(NULL),
-  indicatorPtr_(NULL),
-  indicatorFieldMapPtr_(NULL),
-  processorPatchMapPtr_(NULL),
-  processorPatchFacesMapPtr_(NULL)
+  subMeshPtr_(nullptr),
+  globalInterFacesPtr_(nullptr),
+  localInterFacesPtr_(nullptr),
+  interfaceUPtr_(nullptr),
+  processorPatchesPtr_(nullptr),
+  processorPatchFacesPtr_(nullptr),
+  processorInterfaceUPtr_(nullptr),
+  indicatorPtr_(nullptr),
+  indicatorFieldMapPtr_(nullptr),
+  processorPatchMapPtr_(nullptr),
+  processorPatchFacesMapPtr_(nullptr)
 {}
 
 

@@ -390,7 +390,7 @@ Foam::cellFeatures::cellFeatures
     minCos_(minCos),
     cellI_(cellI),
     featureEdge_(10*mesh.cellEdges()[cellI].size()),
-    facesPtr_(NULL),
+    facesPtr_(nullptr),
     faceMap_(0)
 {
     const labelList& cEdges = mesh_.cellEdges()[cellI_];

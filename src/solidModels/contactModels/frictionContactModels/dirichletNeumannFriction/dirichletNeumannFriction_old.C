@@ -69,7 +69,7 @@ Foam::dirichletNeumannFriction::dirichletNeumannFriction
       slaveFaceZoneID
       ),
   frictionContactModelDict_(dict.subDict(name+"FrictionModelDict")),
-  frictionLawPtr_(NULL),
+  frictionLawPtr_(nullptr),
   mesh_(patch.boundaryMesh().mesh()),
   slaveDisp_(mesh().boundaryMesh()[slavePatchID].size(), vector::zero),
   slaveTraction_(mesh().boundaryMesh()[slavePatchID].size(), vector::zero),
@@ -81,7 +81,7 @@ Foam::dirichletNeumannFriction::dirichletNeumannFriction
   oscillationCorr_(frictionContactModelDict_.lookup("oscillationCorrection")),
   oscillationCorrFac_
   (readScalar(frictionContactModelDict_.lookup("oscillationCorrectionFactor"))),
-  contactFilePtr_(NULL)
+  contactFilePtr_(nullptr)
 {
   // create friction law
   frictionLawPtr_ =

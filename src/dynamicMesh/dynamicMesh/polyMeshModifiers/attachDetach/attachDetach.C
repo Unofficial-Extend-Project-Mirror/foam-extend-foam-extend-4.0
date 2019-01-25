@@ -297,7 +297,7 @@ Foam::attachDetach::attachDetach
     triggerIndex_(0),
     state_(UNKNOWN),
     trigger_(false),
-    pointMatchMapPtr_(NULL)
+    pointMatchMapPtr_(nullptr)
 {
     checkDefinition();
 }
@@ -333,7 +333,7 @@ Foam::attachDetach::attachDetach
     triggerIndex_(0),
     state_(UNKNOWN),
     trigger_(false),
-    pointMatchMapPtr_(NULL)
+    pointMatchMapPtr_(nullptr)
 {
     checkDefinition();
 }

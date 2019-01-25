@@ -28,7 +28,7 @@ License
 template<class Form, class Type>
 inline Foam::Matrix<Form, Type>::Matrix()
 :
-    v_(NULL),
+    v_(nullptr),
     n_(0),
     m_(0)
 {}

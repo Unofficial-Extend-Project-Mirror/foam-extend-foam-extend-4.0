@@ -486,28 +486,28 @@ public:
                 bool checkCellsZipUp
                 (
                     const bool report = false,
-                    labelHashSet* setPtr = NULL
+                    labelHashSet* setPtr = nullptr
                 ) const;
 
                 //- Check uniqueness of face vertices
                 bool checkFaceVertices
                 (
                     const bool report = false,
-                    labelHashSet* setPtr = NULL
+                    labelHashSet* setPtr = nullptr
                 ) const;
 
                 //- Check face-face connectivity
                 bool checkFaceFaces
                 (
                     const bool report = false,
-                    labelHashSet* setPtr = NULL
+                    labelHashSet* setPtr = nullptr
                 ) const;
 
                 //- Check face ordering
                 bool checkUpperTriangular
                 (
                     const bool report = false,
-                    labelHashSet* setPtr = NULL
+                    labelHashSet* setPtr = nullptr
                 ) const;
 
 
@@ -520,29 +520,29 @@ public:
                 bool checkClosedCells
                 (
                     const bool report = false,
-                    labelHashSet* setPtr = NULL,
-                    labelHashSet* highAspectSetPtr = NULL
+                    labelHashSet* setPtr = nullptr,
+                    labelHashSet* highAspectSetPtr = nullptr
                 ) const;
 
                 //- Check for negative face areas
                 bool checkFaceAreas
                 (
                     const bool report = false,
-                    labelHashSet* setPtr = NULL
+                    labelHashSet* setPtr = nullptr
                 ) const;
 
                 //- Check for negative cell volumes
                 bool checkCellVolumes
                 (
                     const bool report = false,
-                    labelHashSet* setPtr = NULL
+                    labelHashSet* setPtr = nullptr
                 ) const;
 
                 //- Check for non-orthogonality
                 bool checkFaceOrthogonality
                 (
                     const bool report = false,
-                    labelHashSet* setPtr = NULL
+                    labelHashSet* setPtr = nullptr
                 ) const;
 
                 //- Check face pyramid volume
@@ -550,21 +550,21 @@ public:
                 (
                     const bool report = false,
                     const scalar minPyrVol = -SMALL,
-                    labelHashSet* setPtr = NULL
+                    labelHashSet* setPtr = nullptr
                 ) const;
 
                 //- Check face skewness
                 bool checkFaceSkewness
                 (
                     const bool report = false,
-                    labelHashSet* setPtr = NULL
+                    labelHashSet* setPtr = nullptr
                 ) const;
 
                 //- Check face angles
                 bool checkFaceAngles
                 (
                     const bool report = false,
-                    labelHashSet* setPtr = NULL
+                    labelHashSet* setPtr = nullptr
                 ) const;
 
                 //- Check face warpage: decompose face and check ratio between
@@ -581,14 +581,14 @@ public:
                 (
                     const bool report,
                     const Vector<label>& directions,
-                    labelHashSet* setPtr = NULL
+                    labelHashSet* setPtr = nullptr
                 ) const;
 
                 //- Check for unused points
                 bool checkPoints
                 (
                     const bool report = false,
-                    labelHashSet* setPtr = NULL
+                    labelHashSet* setPtr = nullptr
                 ) const;
 
                 //- Check for point-point-nearness,
@@ -597,7 +597,7 @@ public:
                 (
                     const bool report,
                     const scalar reportDistSqr,
-                    labelHashSet* setPtr = NULL
+                    labelHashSet* setPtr = nullptr
                 ) const;
 
                 //- Check edge length
@@ -605,14 +605,14 @@ public:
                 (
                     const bool report,
                     const scalar minLenSqr,
-                    labelHashSet* setPtr = NULL
+                    labelHashSet* setPtr = nullptr
                 ) const;
 
                 //- Check cell determinant
                 bool checkCellDeterminant
                 (
                     const bool report = false,
-                    labelHashSet* setPtr = NULL
+                    labelHashSet* setPtr = nullptr
                 ) const;
 
 

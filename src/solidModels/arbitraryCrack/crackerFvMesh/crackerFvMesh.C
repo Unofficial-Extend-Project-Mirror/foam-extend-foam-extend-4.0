@@ -430,12 +430,12 @@ Foam::crackerFvMesh::crackerFvMesh
     ),
     topoChangeMap_(),
     crackPatchID_(word(dict_.lookup("crackPatch")), boundaryMesh()),
-    regionsPtr_(NULL),
-    nCellsInRegionPtr_(NULL),
-    globalCrackFaceCentresPtr_(NULL),
-    globalCrackFaceSizesPtr_(NULL),
+    regionsPtr_(nullptr),
+    nCellsInRegionPtr_(nullptr),
+    globalCrackFaceCentresPtr_(nullptr),
+    globalCrackFaceSizesPtr_(nullptr),
     localCrackStart_(-1),
-    globalCrackFaceAddressingPtr_(NULL)
+    globalCrackFaceAddressingPtr_(nullptr)
 {
     addZonesAndModifiers();
 }

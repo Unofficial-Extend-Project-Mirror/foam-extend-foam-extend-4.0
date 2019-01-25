@@ -34,7 +34,7 @@ Foam::IOReferencer<Type>::IOReferencer
 )
 :
     regIOobject(io),
-    typePtr_(NULL)
+    typePtr_(nullptr)
 {
     if
     (

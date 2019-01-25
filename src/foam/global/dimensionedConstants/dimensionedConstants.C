@@ -33,7 +33,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dictionary* dimensionedConstantsPtr_(NULL);
+dictionary* dimensionedConstantsPtr_(nullptr);
 
 dictionary& dimensionedConstants()
 {

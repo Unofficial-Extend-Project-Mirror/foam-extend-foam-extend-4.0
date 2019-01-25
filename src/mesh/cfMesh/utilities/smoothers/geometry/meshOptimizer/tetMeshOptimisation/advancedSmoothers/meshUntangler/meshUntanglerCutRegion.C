@@ -163,12 +163,12 @@ void meshUntangler::cutRegion::createInitialConfiguration
 
 meshUntangler::cutRegion::cutRegion(const boundBox& bb)
 :
-    pointsPtr_(NULL),
-    edgesPtr_(NULL),
-    facesPtr_(NULL),
-    cPtsPtr_(NULL),
-    cEdgesPtr_(NULL),
-    cFacesPtr_(NULL),
+    pointsPtr_(nullptr),
+    edgesPtr_(nullptr),
+    facesPtr_(nullptr),
+    cPtsPtr_(nullptr),
+    cEdgesPtr_(nullptr),
+    cFacesPtr_(nullptr),
     newVertexLabel_(),
     vertexDistance_(),
     vertexTypes_(),
@@ -233,15 +233,15 @@ void meshUntangler::cutRegion::planeCut(const plane& plane)
 
         deleteDemandDrivenData(pointsPtr_);
         pointsPtr_ = cPtsPtr_;
-        cPtsPtr_ = NULL;
+        cPtsPtr_ = nullptr;
 
         deleteDemandDrivenData(edgesPtr_);
         edgesPtr_ = cEdgesPtr_;
-        cEdgesPtr_ = NULL;
+        cEdgesPtr_ = nullptr;
 
         deleteDemandDrivenData(facesPtr_);
         facesPtr_ = cFacesPtr_;
-        cFacesPtr_ = NULL;
+        cFacesPtr_ = nullptr;
     }
 }
 

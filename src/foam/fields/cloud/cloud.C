@@ -60,7 +60,7 @@ Foam::autoPtr<Foam::cloudDistribute> Foam::cloud::cloudDist
 )
 {
     NotImplemented;
-    return autoPtr<cloudDistribute>(NULL);
+    return autoPtr<cloudDistribute>(nullptr);
 }
 
 

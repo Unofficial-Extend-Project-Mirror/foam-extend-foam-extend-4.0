@@ -56,7 +56,7 @@ surfaceMeshGeometryModification::surfaceMeshGeometryModification
 :
     surf_(surf),
     meshDict_(meshDict),
-    coordinateModifierPtr_(NULL),
+    coordinateModifierPtr_(nullptr),
     modificationActive_(false)
 {
     checkModification();
@@ -84,7 +84,7 @@ const triSurf* surfaceMeshGeometryModification::modifyGeometry() const
             "::modifyGeometry() const"
         ) << "Modification is not active" << endl;
 
-        return NULL;
+        return nullptr;
     }
 
     const pointField& pts = surf_.points();
@@ -165,7 +165,7 @@ revertGeometryModification() const
             "::revertGeometryModification() const"
         ) << "Modification is not active" << endl;
 
-        return NULL;
+        return nullptr;
     }
 
     const pointField& pts = surf_.points();

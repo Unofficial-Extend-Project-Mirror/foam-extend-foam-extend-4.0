@@ -234,8 +234,8 @@ Foam::extendedBlockLduMatrix<Type>::extendedBlockLduMatrix
 :
     basicBlockLduMatrix_(blockLdum),
     extLduAddr_(extLduAddr),
-    extendedLowerPtr_(NULL),
-    extendedUpperPtr_(NULL)
+    extendedLowerPtr_(nullptr),
+    extendedUpperPtr_(nullptr)
 {
     if (debug)
     {

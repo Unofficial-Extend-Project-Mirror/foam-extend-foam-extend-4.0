@@ -10,7 +10,7 @@ int USERD_set_filenames
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_set_filenames" << endl << flush;
+    Info<< "Entering: USERD_set_filenames" << endl << flush;
 #endif
 
     char tmp[100];
@@ -28,7 +28,7 @@ int USERD_set_filenames
         // remove the last '/' from rootDir
         if (the_path[lRoot-1] == '/')
         {
-            the_path[lRoot-1] = (char)NULL;
+            the_path[lRoot-1] = '\0';
         }
         else
         {
@@ -53,7 +53,6 @@ int USERD_set_filenames
            << endl;
        return Z_ERR;
     }
-
 
     // construct the global pointers to the database and mesh
 
@@ -80,7 +79,7 @@ int USERD_set_filenames
     );
 
     // set the available number of time-steps
-    TimeList = (const instantList&)Foam::Time::findTimes(rootDir/caseDir);
+    TimeList = Foam::Time::findTimes(rootDir/caseDir);
 
     Num_time_steps = TimeList.size() - 1;
 
@@ -88,10 +87,10 @@ int USERD_set_filenames
 
     // set the number of fields and store their names
     // a valid field must exist for all time-steps
-    runTime.setTime(TimeList[TimeList.size()-1], TimeList.size()-1);
+    runTime.setTime(TimeList.last(), TimeList.size() - 1);
     IOobjectList objects(*meshPtr, runTime.timeName());
 
-    fieldNames = (const wordList&)objects.names();
+    fieldNames = objects.names();
 
     // because of the spray being a 'field' ...
     // get the availabe number of variables and
@@ -100,7 +99,7 @@ int USERD_set_filenames
     label nVar = 0;
     wordList scalars = objects.names(scalarName);
 
-    for (label n=0; n<fieldNames.size(); n++)
+    forAll (fieldNames, n)
     {
         bool isitScalar = false;
         forAll(scalars,i)
@@ -116,7 +115,7 @@ int USERD_set_filenames
 
     wordList vectors = objects.names(vectorName);
 
-    for (label n=0; n<fieldNames.size(); n++)
+    forAll (fieldNames, n)
     {
         bool isitVector = false;
         forAll(vectors,i)
@@ -132,7 +131,7 @@ int USERD_set_filenames
 
     wordList tensors = objects.names(tensorName);
 
-    for (label n=0; n<fieldNames.size(); n++)
+    forAll (fieldNames, n)
     {
         bool isitTensor = false;
         forAll(tensors,i)
@@ -148,14 +147,14 @@ int USERD_set_filenames
 
     bool lagrangianNamesFound = false;
     label n = 0;
-    while ((!lagrangianNamesFound) && (n<Num_time_steps))
+    while (!lagrangianNamesFound && n < Num_time_steps)
     {
-        runTime.setTime(TimeList[n+1], n+1);
+        runTime.setTime(TimeList[n + 1], n + 1);
 
-        Cloud<passiveParticle> lagrangian(*meshPtr);
+        Cloud<passiveParticle> lagrangian(*meshPtr, cloud::defaultName);
 
         n++;
-        if (lagrangian.size()>0)
+        if (lagrangian.size() > 0)
         {
             lagrangianNamesFound = true;
         }
@@ -179,14 +178,12 @@ int USERD_set_filenames
 
         delete sprayPtr;
 
-        sprayPtr = new Cloud<passiveParticle>(*meshPtr);
+        sprayPtr = new Cloud<passiveParticle>(*meshPtr, cloud::defaultName);
 
-        IOobjectList objects(*meshPtr, runTime.timeName(), "lagrangian");
+        IOobjectList objects(*meshPtr, runTime.timeName(), cloud::prefix);
 
-        lagrangianScalarNames =
-            (const wordList&)objects.names(sprayScalarFieldName);
-        lagrangianVectorNames =
-            (const wordList&)objects.names(sprayVectorFieldName);
+        lagrangianScalarNames = objects.names(sprayScalarFieldName);
+        lagrangianVectorNames = objects.names(sprayVectorFieldName);
 
         isSpray[fieldNames.size()] = true;
 
@@ -281,7 +278,7 @@ int USERD_set_filenames
         );
     }
 
-    if(secondMeshPtr)
+    if (secondMeshPtr)
     {
         Num_unstructured_parts += 1;
 
@@ -443,9 +440,8 @@ int USERD_set_filenames
 
 
 #ifdef ENSIGHTDEBUG
-    Info << "Leaving: USERD_set_filenames" << endl << flush;
+    Info<< "Leaving: USERD_set_filenames" << endl << flush;
 #endif
 
     return Z_OK;
 }
-

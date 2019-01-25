@@ -94,7 +94,7 @@ pointFieldDecomposer::pointFieldDecomposer
     patchFieldDecomposerPtrs_
     (
         procMesh_.boundary().size(),
-        static_cast<patchFieldDecomposer*>(NULL)
+        static_cast<patchFieldDecomposer*>(nullptr)
     )
 {
     forAll (boundaryAddressing_, patchi)

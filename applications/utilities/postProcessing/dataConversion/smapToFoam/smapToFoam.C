@@ -204,14 +204,14 @@ int main(int argc, char *argv[])
                 sFields[i]->correctBoundaryConditions();
                 sFields[i]->write();
                 delete sFields[i];
-                sFields[i] = NULL;
+                sFields[i] = nullptr;
             }
             else if (vFields[i])
             {
                 vFields[i]->correctBoundaryConditions();
                 vFields[i]->write();
                 delete vFields[i];
-                vFields[i] = NULL;
+                vFields[i] = nullptr;
             }
         }
 

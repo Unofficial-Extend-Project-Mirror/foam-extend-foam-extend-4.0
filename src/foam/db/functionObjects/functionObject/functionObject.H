@@ -103,7 +103,7 @@ public:
         autoPtr<functionObject> clone() const
         {
             notImplemented("functionObject::clone() const");
-            return autoPtr<functionObject>(NULL);
+            return autoPtr<functionObject>(nullptr);
         }
 
         //- Return a pointer to a new functionObject created on freestore

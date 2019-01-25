@@ -140,7 +140,7 @@ Foam::octreeLine<Type>::octreeLine
     endPoint_(endPoint),
     realStartPoint_(startPoint),
     leafExitPoint_(startPoint_),
-    currentLeaf_(NULL),
+    currentLeaf_(nullptr),
     sortedIntersections_(0),
     lastElem_(-1),
     sortedI_(-1)

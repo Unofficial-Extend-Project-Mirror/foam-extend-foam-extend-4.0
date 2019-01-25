@@ -71,7 +71,7 @@ class tetMeshOptimisation
         void exchangeData
         (
             std::map<label, DynList<parPartTet> >& m,
-            boolList* negativeNodePtr = NULL
+            boolList* negativeNodePtr = nullptr
         );
 
         //- update buffer layer points
@@ -79,7 +79,7 @@ class tetMeshOptimisation
 
         //- make sure that coordinates of moved points remain the same
         //- on all processor containing those points
-        void unifyCoordinatesParallel(const boolList* negativeNodePtr = NULL);
+        void unifyCoordinatesParallel(const boolList* negativeNodePtr = nullptr);
 
 public:
 

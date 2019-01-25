@@ -40,7 +40,7 @@ namespace debug
     // runtime InfoSwitches values.
     // This needs to go on the heap so the destructor will not get
     //  called before the objects' destructor it is overseeing
-    ListInfoControlSwitches* infoSwitchValues_(NULL);
+    ListInfoControlSwitches* infoSwitchValues_(nullptr);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

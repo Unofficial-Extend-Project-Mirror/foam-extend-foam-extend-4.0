@@ -275,7 +275,7 @@ void meshSurfaceMapper2D::mapVerticesOntoSurface(const labelLongList& edgesToMap
     const labelList& bp = surfaceEngine_.bp();
     const pointFieldPMG& points = surfaceEngine_.points();
 
-    const VRWGraph* beAtProcsPtr(NULL);
+    const VRWGraph* beAtProcsPtr(nullptr);
     if( Pstream::parRun() )
         beAtProcsPtr = &surfaceEngine_.beAtProcs();
 
@@ -508,7 +508,7 @@ void meshSurfaceMapper2D::mapVerticesOntoSurfacePatches
     const VRWGraph& edgePatches = surfaceEngine_.edgePatches();
     const labelList& bp = surfaceEngine_.bp();
 
-    const VRWGraph* beAtProcsPtr(NULL);
+    const VRWGraph* beAtProcsPtr(nullptr);
     if( Pstream::parRun() )
         beAtProcsPtr = &surfaceEngine_.beAtProcs();
 

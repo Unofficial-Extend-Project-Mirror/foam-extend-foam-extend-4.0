@@ -279,7 +279,7 @@ Foam::tmp<Foam::scalarField> Foam::basicThermo::h
         "basicThermo::h"
         "(const scalarField& T, const labelList& cells) const"
     );
-    return tmp<scalarField>(NULL);
+    return tmp<scalarField>(nullptr);
 }
 
 
@@ -294,7 +294,7 @@ Foam::tmp<Foam::scalarField> Foam::basicThermo::h
         "basicThermo::h"
         "(const scalarField& T, const label patchi) const"
     );
-    return tmp<scalarField>(NULL);
+    return tmp<scalarField>(nullptr);
 }
 
 
@@ -323,7 +323,7 @@ Foam::tmp<Foam::scalarField> Foam::basicThermo::hs
         "basicThermo::hs"
         "(const scalarField& T, const labelList& cells) const"
     );
-    return tmp<scalarField>(NULL);
+    return tmp<scalarField>(nullptr);
 }
 
 
@@ -338,7 +338,7 @@ Foam::tmp<Foam::scalarField> Foam::basicThermo::hs
         "basicThermo::hs"
         "(const scalarField& T, const label patchi) const"
     );
-    return tmp<scalarField>(NULL);
+    return tmp<scalarField>(nullptr);
 }
 
 
@@ -374,7 +374,7 @@ Foam::tmp<Foam::scalarField> Foam::basicThermo::e
         "basicThermo::e"
         "(const scalarField& T, const labelList& cells) const"
     );
-    return tmp<scalarField>(NULL);
+    return tmp<scalarField>(nullptr);
 }
 
 
@@ -389,7 +389,7 @@ Foam::tmp<Foam::scalarField> Foam::basicThermo::e
         "basicThermo::e"
         "(const scalarField& T, const label patchi) const"
     );
-    return tmp<scalarField>(NULL);
+    return tmp<scalarField>(nullptr);
 }
 
 
@@ -410,7 +410,7 @@ Foam::tmp<Foam::scalarField> Foam::basicThermo::Cp
         "basicThermo::Cp"
         "(const scalarField& T, const label patchi) const"
     );
-    return tmp<scalarField>(NULL);
+    return tmp<scalarField>(nullptr);
 }
 
 
@@ -425,7 +425,7 @@ Foam::tmp<Foam::scalarField> Foam::basicThermo::Cp
         "basicThermo::Cp"
         "(const scalarField& T, const labelList& cells) const"
     );
-    return tmp<scalarField>(NULL);
+    return tmp<scalarField>(nullptr);
 }
 
 
@@ -447,7 +447,7 @@ Foam::tmp<Foam::scalarField> Foam::basicThermo::Cv
         "basicThermo::Cv"
         "(const scalarField& T, const label patchi) const"
     );
-    return tmp<scalarField>(NULL);
+    return tmp<scalarField>(nullptr);
 }
 
 

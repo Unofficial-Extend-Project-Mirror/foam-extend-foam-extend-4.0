@@ -274,14 +274,14 @@ polyMeshGen2DEngine::polyMeshGen2DEngine(const polyMeshGen& mesh)
 :
     mesh_(mesh),
     bb_(),
-    activeFacePtr_(NULL),
-    activeFaceLabelsPtr_(NULL),
-    zMinPointPtr_(NULL),
-    zMinPointLabelsPtr_(NULL),
-    zMinToZMaxPtr_(NULL),
-    zMaxPointPtr_(NULL),
-    zMaxPointLabelsPtr_(NULL),
-    zMaxToZMinPtr_(NULL)
+    activeFacePtr_(nullptr),
+    activeFaceLabelsPtr_(nullptr),
+    zMinPointPtr_(nullptr),
+    zMinPointLabelsPtr_(nullptr),
+    zMinToZMaxPtr_(nullptr),
+    zMaxPointPtr_(nullptr),
+    zMaxPointLabelsPtr_(nullptr),
+    zMaxToZMinPtr_(nullptr)
 {
     const pointFieldPMG& points = mesh_.points();
 

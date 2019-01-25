@@ -430,7 +430,7 @@ void writePatchField
 
     word timeFile = prepend + itoa(timeIndex);
 
-    OFstream *ensightFilePtr = NULL;
+    OFstream *ensightFilePtr = nullptr;
     if (Pstream::master())
     {
         if (timeIndex == 0)
@@ -533,7 +533,7 @@ void ensightFieldAscii
     const labelList& hexes = meshCellSets.hexes;
     const labelList& polys = meshCellSets.polys;
 
-    OFstream *ensightFilePtr = NULL;
+    OFstream *ensightFilePtr = nullptr;
     if (Pstream::master())
     {
         // set the filename of the ensight file
@@ -708,7 +708,7 @@ void ensightFieldBinary
     const labelList& hexes = meshCellSets.hexes;
     const labelList& polys = meshCellSets.polys;
 
-    std::ofstream *ensightFilePtr = NULL;
+    std::ofstream *ensightFilePtr = nullptr;
     if (Pstream::master())
     {
         // set the filename of the ensight file

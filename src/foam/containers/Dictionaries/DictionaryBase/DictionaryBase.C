@@ -94,7 +94,7 @@ bool Foam::DictionaryBase<IDLListType, T>::found(const word& keyword) const
 }
 
 
-// Find and return T*, return NULL if not found
+// Find and return T*, return nullptr if not found
 template<class IDLListType, class T>
 const T* Foam::DictionaryBase<IDLListType, T>::lookupPtr
 (
@@ -109,12 +109,12 @@ const T* Foam::DictionaryBase<IDLListType, T>::lookupPtr
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 }
 
 
-// Find and return T*, return NULL if not found
+// Find and return T*, return nullptr if not found
 template<class IDLListType, class T>
 T* Foam::DictionaryBase<IDLListType, T>::lookupPtr(const word& keyword)
 {
@@ -126,7 +126,7 @@ T* Foam::DictionaryBase<IDLListType, T>::lookupPtr(const word& keyword)
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -223,7 +223,7 @@ T* Foam::DictionaryBase<IDLListType, T>::remove(const word& keyword)
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 }
 

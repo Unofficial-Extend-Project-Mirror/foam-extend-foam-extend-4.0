@@ -30,7 +30,7 @@ License
 
 inline Foam::cellShape::cellShape()
 :
-    m_(NULL)
+    m_(nullptr)
 {}
 
 
@@ -87,7 +87,7 @@ inline Foam::pointField Foam::cellShape::points
 
 inline bool Foam::cellShape::validModel() const
 {
-    return m_ != NULL;
+    return m_ != nullptr;
 }
 
 

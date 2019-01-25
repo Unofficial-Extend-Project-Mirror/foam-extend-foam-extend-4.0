@@ -98,7 +98,7 @@ public:
         virtual autoPtr<externalRadiationSource> clone() const
         {
             notImplemented("autoPt<externalRadiationSource> clone() const");
-            return autoPtr<externalRadiationSource>(NULL);
+            return autoPtr<externalRadiationSource>(nullptr);
 
             return autoPtr<externalRadiationSource>
             (
@@ -136,7 +136,7 @@ public:
                     type() +"::q(const scalarField& Tw) const"
                 );
 
-                return tmp<scalarField>(NULL);
+                return tmp<scalarField>(nullptr);
             };
 
 

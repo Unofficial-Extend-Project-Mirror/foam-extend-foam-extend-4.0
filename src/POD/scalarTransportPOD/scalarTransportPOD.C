@@ -180,7 +180,7 @@ void Foam::scalarTransportPOD::calcDerivativeCoeffs() const
 
     instantList Times = runTime.times();
 
-    volVectorField* Uptr = NULL;
+    volVectorField* Uptr = nullptr;
 
     forAll (Times, i)
     {
@@ -259,9 +259,9 @@ Foam::scalarTransportPOD::scalarTransportPOD
     PODODE(mesh, dict),
     phiName_(dict.lookup("field")),
     coeffs_(),
-    derivativeMatrixPtr_(NULL),
-    orthoBasePtr_(NULL),
-    fieldPtr_(NULL)
+    derivativeMatrixPtr_(nullptr),
+    orthoBasePtr_(nullptr),
+    fieldPtr_(nullptr)
 {
     // Grab coefficients from the first snapshot of the ortho-normal base
     coeffs_.setSize(orthoBase().baseSize());

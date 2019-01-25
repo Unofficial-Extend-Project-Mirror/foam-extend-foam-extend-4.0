@@ -1,6 +1,6 @@
 
-zoneToZoneInterpolation* interpolatorFluidSolidPtr = NULL;
-zoneToZoneInterpolation* interpolatorSolidFluidPtr = NULL;
+zoneToZoneInterpolation* interpolatorFluidSolidPtr = nullptr;
+zoneToZoneInterpolation* interpolatorSolidFluidPtr = nullptr;
 
 
 if(!interpolatorFluidSolidPtr || !interpolatorSolidFluidPtr)

@@ -63,7 +63,7 @@ Foam::sloshingHistory::sloshingHistory
     name_(name),
     time_(t),
     regionName_(polyMesh::defaultRegion),
-    historyFilePtr_(NULL),
+    historyFilePtr_(nullptr),
     freeSurfacePatchID_(-1),
     leftPointID_(-1),
     rightPointID_(-1)

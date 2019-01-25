@@ -138,15 +138,15 @@ class edgeExtractor
         void findFaceCandidates
         (
             labelLongList& faceCandidates,
-            const labelList* facePatchPtr = NULL,
-            const Map<label>* otherFacePatchPtr = NULL
+            const labelList* facePatchPtr = nullptr,
+            const Map<label>* otherFacePatchPtr = nullptr
         ) const;
 
         //- find patches over edges
         void findOtherFacePatchesParallel
         (
             Map<label>& otherFacePatch,
-            const labelList* facePatchPtr = NULL
+            const labelList* facePatchPtr = nullptr
         ) const;
 
         //- find neighbour patches over edges for a boundary face

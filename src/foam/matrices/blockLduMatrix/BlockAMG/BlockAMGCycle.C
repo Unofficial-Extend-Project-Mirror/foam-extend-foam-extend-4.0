@@ -45,7 +45,7 @@ Foam::BlockAMGCycle<Type>::BlockAMGCycle
 )
 :
     levelPtr_(levelPtr),
-    coarseLevelPtr_(NULL),
+    coarseLevelPtr_(nullptr),
     nLevels_(0)
 {}
 

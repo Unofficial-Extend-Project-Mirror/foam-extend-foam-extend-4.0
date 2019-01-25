@@ -193,7 +193,7 @@ public:
         autoPtr<porousZone> clone() const
         {
             notImplemented("autoPtr<porousZone> clone() const");
-            return autoPtr<porousZone>(NULL);
+            return autoPtr<porousZone>(nullptr);
         }
 
         //- Return pointer to new porousZone created on freestore from Istream

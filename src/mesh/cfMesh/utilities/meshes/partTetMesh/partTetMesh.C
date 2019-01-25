@@ -55,14 +55,14 @@ partTetMesh::partTetMesh(polyMeshGen& mesh, const labelLongList& lockedPoints)
     nodeLabelInOrigMesh_(),
     smoothVertex_(),
     pointTets_(),
-    internalPointsOrderPtr_(NULL),
-    boundaryPointsOrderPtr_(NULL),
-    globalPointLabelPtr_(NULL),
-    pAtProcsPtr_(NULL),
-    globalToLocalPointAddressingPtr_(NULL),
-    neiProcsPtr_(NULL),
-    pAtParallelBoundariesPtr_(NULL),
-    pAtBufferLayersPtr_(NULL)
+    internalPointsOrderPtr_(nullptr),
+    boundaryPointsOrderPtr_(nullptr),
+    globalPointLabelPtr_(nullptr),
+    pAtProcsPtr_(nullptr),
+    globalToLocalPointAddressingPtr_(nullptr),
+    neiProcsPtr_(nullptr),
+    pAtParallelBoundariesPtr_(nullptr),
+    pAtBufferLayersPtr_(nullptr)
 {
     List<direction> useCell(mesh.cells().size(), direction(1));
 
@@ -86,14 +86,14 @@ partTetMesh::partTetMesh
     nodeLabelInOrigMesh_(),
     smoothVertex_(),
     pointTets_(),
-    internalPointsOrderPtr_(NULL),
-    boundaryPointsOrderPtr_(NULL),
-    globalPointLabelPtr_(NULL),
-    pAtProcsPtr_(NULL),
-    globalToLocalPointAddressingPtr_(NULL),
-    neiProcsPtr_(NULL),
-    pAtParallelBoundariesPtr_(NULL),
-    pAtBufferLayersPtr_(NULL)
+    internalPointsOrderPtr_(nullptr),
+    boundaryPointsOrderPtr_(nullptr),
+    globalPointLabelPtr_(nullptr),
+    pAtProcsPtr_(nullptr),
+    globalToLocalPointAddressingPtr_(nullptr),
+    neiProcsPtr_(nullptr),
+    pAtParallelBoundariesPtr_(nullptr),
+    pAtBufferLayersPtr_(nullptr)
 {
     const faceListPMG& faces = mesh.faces();
     const cellListPMG& cells = mesh.cells();
@@ -214,14 +214,14 @@ partTetMesh::partTetMesh
     nodeLabelInOrigMesh_(),
     smoothVertex_(),
     pointTets_(),
-    internalPointsOrderPtr_(NULL),
-    boundaryPointsOrderPtr_(NULL),
-    globalPointLabelPtr_(NULL),
-    pAtProcsPtr_(NULL),
-    globalToLocalPointAddressingPtr_(NULL),
-    neiProcsPtr_(NULL),
-    pAtParallelBoundariesPtr_(NULL),
-    pAtBufferLayersPtr_(NULL)
+    internalPointsOrderPtr_(nullptr),
+    boundaryPointsOrderPtr_(nullptr),
+    globalPointLabelPtr_(nullptr),
+    pAtProcsPtr_(nullptr),
+    globalToLocalPointAddressingPtr_(nullptr),
+    neiProcsPtr_(nullptr),
+    pAtParallelBoundariesPtr_(nullptr),
+    pAtBufferLayersPtr_(nullptr)
 {
     const faceListPMG& faces = mesh.faces();
     const cellListPMG& cells = mesh.cells();

@@ -79,10 +79,10 @@ tetPolyMesh::tetPolyMesh(const polyMesh& pMesh)
     nPoints_(-1),
     nEdges_(-1),
     nTets_(-1),
-    lduPtr_(NULL),
+    lduPtr_(nullptr),
     maxNPointsForCell_(-1),
-    parPointsPtr_(NULL),
-    parEdgesPtr_(NULL)
+    parPointsPtr_(nullptr),
+    parEdgesPtr_(nullptr)
 {
     if (debug)
     {

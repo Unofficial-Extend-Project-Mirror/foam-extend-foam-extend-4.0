@@ -173,7 +173,7 @@ meshOptimizer::meshOptimizer(polyMeshGen& mesh)
     mesh_(mesh),
     vertexLocation_(),
     lockedFaces_(),
-    msePtr_(NULL),
+    msePtr_(nullptr),
     enforceConstraints_(false),
     badPointsSubsetName_()
 {

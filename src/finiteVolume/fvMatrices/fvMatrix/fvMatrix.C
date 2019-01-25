@@ -246,8 +246,8 @@ Foam::fvMatrix<Type>::fvMatrix
     internalCoeffs_(psi.mesh().boundary().size()),
     boundaryCoeffs_(psi.mesh().boundary().size()),
     assemblyCompleted_(false),
-    faceFluxCorrectionPtr_(NULL),
-    jumpFaceFluxCorrectionPtr_(NULL)
+    faceFluxCorrectionPtr_(nullptr),
+    jumpFaceFluxCorrectionPtr_(nullptr)
 {
     if (debug)
     {
@@ -305,8 +305,8 @@ Foam::fvMatrix<Type>::fvMatrix(const fvMatrix<Type>& fvm)
     internalCoeffs_(fvm.internalCoeffs_),
     boundaryCoeffs_(fvm.boundaryCoeffs_),
     assemblyCompleted_(fvm.assemblyCompleted_),
-    faceFluxCorrectionPtr_(NULL),
-    jumpFaceFluxCorrectionPtr_(NULL)
+    faceFluxCorrectionPtr_(nullptr),
+    jumpFaceFluxCorrectionPtr_(nullptr)
 {
     if (debug)
     {
@@ -363,8 +363,8 @@ Foam::fvMatrix<Type>::fvMatrix(const tmp<fvMatrix<Type> >& tfvm)
         tfvm.isTmp()
     ),
     assemblyCompleted_(tfvm().assemblyCompleted()),
-    faceFluxCorrectionPtr_(NULL),
-    jumpFaceFluxCorrectionPtr_(NULL)
+    faceFluxCorrectionPtr_(nullptr),
+    jumpFaceFluxCorrectionPtr_(nullptr)
 {
     if (debug)
     {
@@ -378,7 +378,7 @@ Foam::fvMatrix<Type>::fvMatrix(const tmp<fvMatrix<Type> >& tfvm)
         if (tfvm.isTmp())
         {
             faceFluxCorrectionPtr_ = tfvm().faceFluxCorrectionPtr_;
-            tfvm().faceFluxCorrectionPtr_ = NULL;
+            tfvm().faceFluxCorrectionPtr_ = nullptr;
         }
         else
         {
@@ -395,7 +395,7 @@ Foam::fvMatrix<Type>::fvMatrix(const tmp<fvMatrix<Type> >& tfvm)
         if (tfvm.isTmp())
         {
             jumpFaceFluxCorrectionPtr_ = tfvm().jumpFaceFluxCorrectionPtr_;
-            tfvm().jumpFaceFluxCorrectionPtr_ = NULL;
+            tfvm().jumpFaceFluxCorrectionPtr_ = nullptr;
         }
         else
         {
@@ -426,8 +426,8 @@ Foam::fvMatrix<Type>::fvMatrix
     internalCoeffs_(psi.mesh().boundary().size()),
     boundaryCoeffs_(psi.mesh().boundary().size()),
     assemblyCompleted_(false),
-    faceFluxCorrectionPtr_(NULL),
-    jumpFaceFluxCorrectionPtr_(NULL)
+    faceFluxCorrectionPtr_(nullptr),
+    jumpFaceFluxCorrectionPtr_(nullptr)
 {
     if (debug)
     {

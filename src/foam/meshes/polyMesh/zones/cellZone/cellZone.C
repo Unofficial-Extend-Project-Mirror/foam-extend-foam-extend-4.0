@@ -115,7 +115,7 @@ Foam::cellZone::cellZone
     name_(name),
     index_(index),
     zoneMesh_(zm),
-    cellLookupMapPtr_(NULL)
+    cellLookupMapPtr_(nullptr)
 {}
 
 
@@ -131,7 +131,7 @@ Foam::cellZone::cellZone
     name_(name),
     index_(index),
     zoneMesh_(zm),
-    cellLookupMapPtr_(NULL)
+    cellLookupMapPtr_(nullptr)
 {}
 
 
@@ -148,7 +148,7 @@ Foam::cellZone::cellZone
     name_(name),
     index_(index),
     zoneMesh_(zm),
-    cellLookupMapPtr_(NULL)
+    cellLookupMapPtr_(nullptr)
 {}
 
 
@@ -166,7 +166,7 @@ Foam::cellZone::cellZone
     name_(cz.name()),
     index_(index),
     zoneMesh_(zm),
-    cellLookupMapPtr_(NULL)
+    cellLookupMapPtr_(nullptr)
 {}
 
 Foam::cellZone::cellZone
@@ -181,7 +181,7 @@ Foam::cellZone::cellZone
     name_(cz.name()),
     index_(index),
     zoneMesh_(zm),
-    cellLookupMapPtr_(NULL)
+    cellLookupMapPtr_(nullptr)
 {}
 
 

@@ -389,9 +389,9 @@ Foam::adaptiveOverlapFringe::adaptiveOverlapFringe
 )
 :
     oversetFringe(mesh, region, dict),
-    fringeHolesPtr_(NULL),
-    acceptorsPtr_(NULL),
-    finalDonorAcceptorsPtr_(NULL),
+    fringeHolesPtr_(nullptr),
+    acceptorsPtr_(nullptr),
+    finalDonorAcceptorsPtr_(nullptr),
 
     holesSetName_(dict.lookupOrDefault<word>("holes", word())),
     initPatchNames_

@@ -38,8 +38,8 @@ namespace Foam
 inline meshOctreeCube::meshOctreeCube()
 :
     meshOctreeCubeBasic(),
-    activeSlotPtr_(NULL),
-    subCubesPtr_(NULL),
+    activeSlotPtr_(nullptr),
+    subCubesPtr_(nullptr),
     cubeLabel_(-1),
     containedElementsLabel_(-1),
     containedEdgesLabel_(-1)

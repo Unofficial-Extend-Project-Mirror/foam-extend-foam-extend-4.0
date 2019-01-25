@@ -151,7 +151,7 @@ public:
         virtual tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
         correction(const GeometricField<Type, fvPatchField, volMesh>&) const
         {
-            return tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >(NULL);
+            return tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >(nullptr);
         }
 
         //- Return the snGrad of the given cell field

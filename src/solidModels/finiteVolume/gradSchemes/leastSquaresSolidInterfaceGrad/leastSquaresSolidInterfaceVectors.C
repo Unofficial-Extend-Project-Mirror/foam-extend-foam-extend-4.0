@@ -44,8 +44,8 @@ Foam::leastSquaresSolidInterfaceVectors::leastSquaresSolidInterfaceVectors
 (const fvMesh& mesh)
 :
     MeshObject<fvMesh, leastSquaresSolidInterfaceVectors>(mesh),
-    pVectorsPtr_(NULL),
-    nVectorsPtr_(NULL)
+    pVectorsPtr_(nullptr),
+    nVectorsPtr_(nullptr)
 {}
 
 

@@ -119,7 +119,7 @@ void Foam::regExp::set(const char* pattern, const bool ignoreCase) const
 {
     clear();
 
-    // Avoid NULL pointer and zero-length patterns
+    // Avoid nullptr pointer and zero-length patterns
     if (pattern && *pattern)
     {
         int cflags = REG_EXTENDED;

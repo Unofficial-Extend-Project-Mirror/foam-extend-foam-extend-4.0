@@ -60,12 +60,12 @@ constitutiveModel::constitutiveModel
     ),
     sigma_(sigma),
     rheologyLawPtr_(rheologyLaw::New("law", sigma_, subDict("rheology"))),
-    cohesiveDictPtr_(NULL),
-    cohesiveLawPtr_(NULL),
+    cohesiveDictPtr_(nullptr),
+    cohesiveLawPtr_(nullptr),
     planeStress_(lookup("planeStress")),
-    solidInterfacePtr_(NULL),
+    solidInterfacePtr_(nullptr),
     solidInterfaceActive_(false),
-    plasticityStressReturnPtr_(NULL)
+    plasticityStressReturnPtr_(nullptr)
 {
     Info << "Creating constitutive model" << endl;
 

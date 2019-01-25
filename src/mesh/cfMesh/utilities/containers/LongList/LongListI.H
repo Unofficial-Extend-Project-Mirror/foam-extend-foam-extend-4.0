@@ -116,7 +116,7 @@ void Foam::LongList<T, Offset>::clearOut()
     if( dataPtr_ )
     {
         delete [] dataPtr_;
-        dataPtr_ = NULL;
+        dataPtr_ = nullptr;
     }
 
     N_ = 0;
@@ -137,7 +137,7 @@ inline Foam::LongList<T, Offset>::LongList()
     numAllocatedBlocks_(0),
     shift_(),
     mask_(),
-    dataPtr_(NULL)
+    dataPtr_(nullptr)
 {
     initializeParameters();
 }
@@ -152,7 +152,7 @@ inline Foam::LongList<T, Offset>::LongList(const label s)
     numAllocatedBlocks_(0),
     shift_(),
     mask_(),
-    dataPtr_(NULL)
+    dataPtr_(nullptr)
 {
     initializeParameters();
     setSize(s);
@@ -169,7 +169,7 @@ inline Foam::LongList<T, Offset>::LongList(const label s, const T& t)
     numAllocatedBlocks_(0),
     shift_(),
     mask_(),
-    dataPtr_(NULL)
+    dataPtr_(nullptr)
 {
     initializeParameters();
     setSize(s);
@@ -185,7 +185,7 @@ inline Foam::LongList<T, Offset>::LongList(const LongList<T, Offset>& ol)
     numAllocatedBlocks_(0),
     shift_(ol.shift_),
     mask_(ol.mask_),
-    dataPtr_(NULL)
+    dataPtr_(nullptr)
 {
     *this = ol;
 }
@@ -252,7 +252,7 @@ inline void Foam::LongList<T, Offset>::transfer(LongList<T, Offset>& ol)
     shift_ = ol.shift_;
     mask_ = ol.mask_;
 
-    ol.dataPtr_ = NULL;
+    ol.dataPtr_ = nullptr;
     ol.N_ = 0;
     ol.nextFree_ = 0;
     ol.numBlocks_ = 0;

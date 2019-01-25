@@ -78,7 +78,7 @@ class sampledSets
             fieldGroup()
             :
                 DynamicList<word>(0),
-                formatter(NULL)
+                formatter(nullptr)
             {}
 
             //- Construct for a particular format
