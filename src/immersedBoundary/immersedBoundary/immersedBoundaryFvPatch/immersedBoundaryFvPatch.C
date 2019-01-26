@@ -367,10 +367,10 @@ Foam::label Foam::immersedBoundaryFvPatch::size() const
     // Initialisation happens when the fvMesh is initialised, which should be
     // sufficient
     //  HJ, 12/Dec/2018
-    if (!ibPolyPatch_.active())
-    {
-        return 0;
-    }
+    // if (!ibPolyPatch_.active())
+    // {
+    //     return 0;
+    // }
 
     return ibPolyPatch_.ibCells().size();
 }
