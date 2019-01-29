@@ -66,7 +66,7 @@ fixedValueIbFvPatchField<Type>::fixedValueIbFvPatchField
     const dictionary& dict
 )
 :
-    fixedValueFvPatchField<Type>(p, iF, dict),
+    fixedValueFvPatchField<Type>(p, iF),   // Do not read mixed data
     immersedBoundaryFieldBase<Type>
     (
         p,

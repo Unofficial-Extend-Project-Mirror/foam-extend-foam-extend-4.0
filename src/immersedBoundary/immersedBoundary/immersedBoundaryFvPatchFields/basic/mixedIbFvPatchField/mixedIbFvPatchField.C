@@ -70,7 +70,7 @@ mixedIbFvPatchField<Type>::mixedIbFvPatchField
     const dictionary& dict
 )
 :
-    mixedFvPatchField<Type>(p, iF),
+    mixedFvPatchField<Type>(p, iF),   // Do not read mixed data
     immersedBoundaryFieldBase<Type>
     (
         p,
@@ -109,7 +109,7 @@ mixedIbFvPatchField<Type>::mixedIbFvPatchField
     // the patch is active
     // Initialise the value to avoid errors
     // HJ, 1/Dec/2017
-    if (this->ibPatch().ibPolyPatch().active())
+//    if (this->ibPatch().ibPolyPatch().active())
     {
         // Re-interpolate the data related to immersed boundary
         this->updateIbValues();
