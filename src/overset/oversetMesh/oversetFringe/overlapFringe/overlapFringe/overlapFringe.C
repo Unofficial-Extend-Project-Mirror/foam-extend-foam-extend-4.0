@@ -419,19 +419,20 @@ Foam::overlapFringe::overlapFringe
     // Sanity check
     if (minGlobalFraction_ < SMALL || minGlobalFraction_ > 1.0)
     {
-        FatalErrorIn
+        FatalIOErrorIn
         (
             "overlapFringe::overlapFringe\n"
             "(\n"
             "    const fvMesh& mesh,\n"
             "    const oversetRegion& region,\n"
             "    const dictionary& dict,\n"
-            ")\n"
+            ")\n",
+            dict
         )   << "Invalid suitablePairFraction found while reading the overlap "
             << "fringe dictionary."
             << nl
             << "Please specify value between 0 and 1."
-            << endl;
+            << exit(FatalIOError);
     }
 }
 

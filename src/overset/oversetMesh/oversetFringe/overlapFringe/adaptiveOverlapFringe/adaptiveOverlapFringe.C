@@ -418,7 +418,6 @@ Foam::adaptiveOverlapFringe::adaptiveOverlapFringe
         dict.lookupOrDefault<scalar>("orphanSuitability", 1)
     ),
     suitablePairsSuit_(0)
-
 {}
 
 
