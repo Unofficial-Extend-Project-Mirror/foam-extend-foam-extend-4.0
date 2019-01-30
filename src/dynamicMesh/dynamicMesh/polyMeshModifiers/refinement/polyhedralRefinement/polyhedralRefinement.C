@@ -2028,11 +2028,7 @@ void Foam::polyhedralRefinement::setCellsToRefine
         // Get cell index
         const label& cellI = refinementCellCandidates[i];
 
-        if
-        (
-            roughCellCountAfterRefinement < maxCells_
-         && cellLevel_[cellI] < maxRefinementLevel_
-        )
+        if (roughCellCountAfterRefinement < maxCells_)
         {
             // Mark cell for refinement
             refineCell[cellI] = true;
@@ -2047,6 +2043,15 @@ void Foam::polyhedralRefinement::setCellsToRefine
     for (label i = 0; i < nRefinementBufferLayers_; ++i)
     {
         extendMarkedCellsAcrossFaces(refineCell);
+    }
+
+    // Remove all cells that would exceed the maximum refinement level
+    forAll (refineCell, cellI)
+    {
+        if (refineCell[cellI] && (cellLevel_[cellI] + 1 > maxRefinementLevel_))
+        {
+            refineCell[cellI] = false;
+        }
     }
 
     // Make sure that the refinement is face consistent (2:1 consistency) and

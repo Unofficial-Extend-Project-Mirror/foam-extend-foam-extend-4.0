@@ -182,7 +182,9 @@ void pointPatchInterpolation::interpolate
         }
     }
 
-    // Coupled boundaries already updated. Nothing to do. VV, 4/Dec/2017.
+    // Bugfix: Must update boundary conditions for e.g. fixedValue that changes
+    // within e.g. fvMotion solver. Dario Zivkovic, 21/Dec/2018.
+    pf.correctBoundaryConditions();
 
     if (debug)
     {
