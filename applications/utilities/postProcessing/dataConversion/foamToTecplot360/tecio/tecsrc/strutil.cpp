@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known
- * as TecIO, as part of its distribution of OpenFOAM and the
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- *
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #include "stdafx.h"
 #include "MASTER.h"
 #define TECPLOTENGINEMODULE
@@ -29,7 +6,7 @@
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
@@ -44,6 +21,7 @@
 #endif
 #include "ARRLIST.h"
 #include "STRLIST.h"
+#include "CHARTYPE.h"
 #include "STRUTIL.h"
 #include "ALLOC.h"
 
@@ -55,10 +33,18 @@
 #include "TranslatedString.h"
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
+#else
+    #define DECLARE_NUMERIC_LOCALE_SETTER
+    #define VALID_NUMERIC_LOCALE() (true)
 #endif
 
-using namespace std;
-using namespace tecplot::strutil;
+using std::string;
+using tecplot::strutil::translate;
+using tecplot::strutil::dontTranslate;
+using tecplot::strutil::TranslatedString;
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
 
 #ifdef MSWIN
 # pragma warning (disable : 4786) /* STL warning about trucated identifiers */
@@ -77,9 +63,9 @@ static int        FormatStringBufferSize = INITIAL_FORMAT_BUFFER_SIZE;
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
-#if defined MSWIN
-#else
-#endif /* !MSWIN */
+    #if defined MSWIN
+    #else
+    #endif /* !MSWIN */
 #endif
 
 #if defined TECPLOTKERNEL
@@ -120,10 +106,13 @@ char *vFormatString(const char *Format,
      *       causing infinite recursion.
      */
     if (FormatStringBuffer == NULL)
-        FormatStringBuffer = (char *)malloc(FormatStringBufferSize);
+        FormatStringBuffer =  static_cast<char *>(malloc(FormatStringBufferSize));
 
     if (FormatStringBuffer != NULL)
     {
+        DECLARE_NUMERIC_LOCALE_SETTER
+        REQUIRE(VALID_NUMERIC_LOCALE());
+
         Boolean_t TryAgain = FALSE;
         do
         {
@@ -132,7 +121,7 @@ char *vFormatString(const char *Format,
              * can determine if the buffer needs to be expanded. If after we call
              * vsnprintf the end of the buffer has a '\0' we need to expand it.
              */
-            FormatStringBuffer[FormatStringBufferSize - 1] = (char)!'\0';
+            FormatStringBuffer[FormatStringBufferSize - 1] = static_cast<char>(!'\0');
 
 #         if defined MSWIN
             memset(FormatStringBuffer, 0, FormatStringBufferSize - 1);
@@ -169,7 +158,7 @@ char *vFormatString(const char *Format,
                  */
                 free(FormatStringBuffer);
                 FormatStringBufferSize += MAX(1, FormatStringBufferSize / 2);
-                FormatStringBuffer = (char *)malloc(FormatStringBufferSize);
+                FormatStringBuffer = static_cast<char *>(malloc(FormatStringBufferSize));
                 TryAgain = (FormatStringBuffer != NULL);
                 if (!TryAgain)
                     FormatStringBufferSize = INITIAL_FORMAT_BUFFER_SIZE;
@@ -222,7 +211,7 @@ int FormatString(string&           Buffer,
     if (FormattedString != NULL)
     {
         Buffer.assign(FormattedString);
-        Result = (int)Buffer.size();
+        Result = static_cast<int>(Buffer.size());
         FREE_ARRAY(FormattedString, "FormattedString");
     }
     else
@@ -272,14 +261,14 @@ void CopySubString(char       *Target,
     REQUIRE("Target string is sized to accommodate a string who's length "
             "is at least MIN(strlen(&Source[Index]), Count) characters.");
     REQUIRE(VALID_REF(Source));
-    REQUIRE(0 <= Index && Index <= (LgIndex_t)strlen(Source));
+    REQUIRE(0 <= Index && Index <= static_cast<LgIndex_t>(strlen(Source)));
     REQUIRE(Count >= 0);
 
-    Length = MIN((LgIndex_t)strlen(&Source[Index]), Count);
+    Length = MIN(static_cast<LgIndex_t>(strlen(&Source[Index])), Count);
     memmove(Target, &Source[Index], Length);
     Target[Length] = '\0';
 
-    ENSURE(VALID_REF(Target) && (LgIndex_t)strlen(Target) == Length);
+    ENSURE(VALID_REF(Target) && static_cast<LgIndex_t>(strlen(Target)) == Length);
 }
 
 #if defined TECPLOTKERNEL
@@ -299,7 +288,7 @@ char *StringFlushLeft(char *String)
 
     /* move the substring beginning at the first non-whitespace */
     /* character to the head of the string                      */
-    while (isspace(*Start))
+    while (tecplot::isspace(*Start))
         Start++;
     if (Start != String)
         memmove(String, Start, strlen(Start) + 1);
@@ -320,7 +309,7 @@ static char *StringFlushRight(char *String)
 
     REQUIRE(VALID_REF(String));
 
-    for (End = EndOfString(String); End != String && isspace(End[-1]); End--)
+    for (End = EndOfString(String); End != String && tecplot::isspace(End[-1]); End--)
         End[-1] = '\0';
 
     ENSURE(VALID_REF(Result) && Result == String);
@@ -366,11 +355,11 @@ char *StringTruncate(char      *String,
     REQUIRE(VALID_REF(String));
     REQUIRE(MaxLength >= 0);
 
-    if ((LgIndex_t)strlen(String) > MaxLength)
+    if (static_cast<LgIndex_t>(strlen(String)) > MaxLength)
         String[MaxLength] = '\0';/* UTF8_SetAt(String,'\0',MaxLength); */
 
     ENSURE(VALID_REF(String));
-    ENSURE((LgIndex_t)strlen(String) <= MaxLength);
+    ENSURE(static_cast<LgIndex_t>(strlen(String)) <= MaxLength);
     return String;
 }
 
@@ -393,11 +382,21 @@ char *StringTrimAndTruncate(char      *String,
     REQUIRE(VALID_REF(String));
     REQUIRE(MaxLength >= 0);
 
-    TrimLeadAndTrailSpaces(String);
-    StringTruncate(String, MaxLength);
+    /*
+     * Note that we are careful to truncate the string after trimming
+     * whitespace from the left side but then trim whitespace from the end
+     * after truncating to make sure we don't return a string that has
+     * whitespace simply because it truncated on a word break.
+     */
+    StringFlushLeft(String);
+    StringTruncate(String,MaxLength);
+    StringFlushRight(String);
 
     ENSURE(VALID_REF(String));
-    ENSURE((LgIndex_t)strlen(String) <= MaxLength);
+    ENSURE(static_cast<LgIndex_t>(strlen(String)) <= MaxLength);
+    ENSURE(IMPLICATION(strlen(String) != 0,
+                       (!tecplot::isspace(String[0]) &&
+                        !tecplot::isspace(String[strlen(String)-1]))));
     return String;
 }
 
@@ -491,7 +490,6 @@ StringList_pa LineBreakString(const char *String,
 }
 #endif
 
-
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 #endif /* TECPLOTKERNEL */
@@ -520,7 +518,6 @@ int ustrncmp(const  char *s1,
 {
     REQUIRE((s1 == NULL) || VALID_REF(s1));
     REQUIRE((s2 == NULL) || VALID_REF(s2));
-    REQUIRE(Len >= 0);
 
     char *t1;
     char *t2;
@@ -534,8 +531,8 @@ int ustrncmp(const  char *s1,
     else if (s2 == NULL)
         return 1;
 
-    t1 = (char*)s1;
-    t2 = (char*)s2;
+    t1 = const_cast<char*>(s1);
+    t2 = const_cast<char*>(s2);
 
     while (*t1 && *t2 && (I < Len))
     {
@@ -578,7 +575,9 @@ int ustrcmp(const char *s1,
     return (ustrncmp(s1, s2, INT_MAX));
 }
 
-
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
@@ -700,7 +699,7 @@ Boolean_t TackOnString(char       **SBase,
             (*StringToAdd == '\0') &&
             DeleteStringToAdd)
         {
-            char *TMP = (char *)StringToAdd;
+            char *TMP = const_cast<char *>(StringToAdd);
             FREE_ARRAY(TMP, "empty string to add");
         }
     }
@@ -724,7 +723,7 @@ Boolean_t TackOnString(char       **SBase,
         {
             if (DeleteStringToAdd)
             {
-                char *TMP = (char *)StringToAdd;
+                char *TMP = const_cast<char *>(StringToAdd);
                 FREE_ARRAY(TMP, StringToAdd);
             }
             IsOk = FALSE;
@@ -758,7 +757,7 @@ Boolean_t TackOnString(char       **SBase,
 
             if (DeleteStringToAdd)
             {
-                char *TMP = (char *)StringToAdd;
+                char *TMP = const_cast<char *>(StringToAdd);
                 FREE_ARRAY(TMP, StringToAdd);
             }
 

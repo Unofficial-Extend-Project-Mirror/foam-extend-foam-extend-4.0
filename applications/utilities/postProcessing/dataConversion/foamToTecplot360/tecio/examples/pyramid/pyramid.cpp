@@ -20,7 +20,6 @@ int main()
                   &(Debug),
                   &(VIsDouble));
 
-
     /* Call TECZNE112 */
     INTEGER4  ZoneType   = 7;         /* 7 for FEPolyhedron */
     INTEGER4  NumNodes   = 5;         /* number of unique nodes */
@@ -117,7 +116,7 @@ int main()
     delete Z;
 
     /* Define the Face Nodes.
-
+     *
      * The FaceNodes array is used to indicate which nodes define
      * which face. As mentioned earlier, the number of the nodes is
      * implicitly defined by the order in which the nodal data is
@@ -201,14 +200,12 @@ int main()
     FaceRightElems[3]  = 1;
     FaceRightElems[4]  = 1;
 
-    /* Write the face map (created above) using TECPOLY112. */
-    I = TECPOLY112(FaceNodeCounts, /* The face node counts array */
-                   FaceNodes,      /* The face nodes array */
-                   FaceLeftElems,  /* The left elements array  */
-                   FaceRightElems, /* The right elements array  */
-                   NULL,       /* No boundary connection counts */
-                   NULL,       /* No boundary connection elements */
-                   NULL);      /* No boundary connection zones */
+    /* Write the face map (created above) using TECPOLYFACE112. */
+    I = TECPOLYFACE112(&NumFaces,
+                       FaceNodeCounts,  /* The face node counts array */
+                       FaceNodes,       /* The face nodes array */
+                       FaceLeftElems,   /* The left elements array  */
+                       FaceRightElems); /* The right elements array  */
 
     delete FaceNodeCounts;
     delete FaceNodes;
@@ -218,5 +215,4 @@ int main()
     I = TECEND112();
     return 0;
 }
-
 /* DOCEND */

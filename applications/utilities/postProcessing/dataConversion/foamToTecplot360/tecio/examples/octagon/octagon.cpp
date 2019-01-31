@@ -90,9 +90,9 @@ int main()
                   &NumBConnections,
                   NULL,
                   NULL,  /* When Value Location is not specified,
-                        * Tecplot will treat all variables as
-                        * nodal variables.
-                        */
+                          * Tecplot will treat all variables as
+                          * nodal variables.
+                          */
                   NULL,
                   &ShrConn);
     /* DOCEND */
@@ -110,7 +110,7 @@ int main()
      * It is important that you refer to node numbers consistently.
      * The node numbers will be used later to define the
      * connectivity for each element.
-    */
+     */
 
     /* TECDAT Variables */
     /* Set up the variable values.  The variable values will be
@@ -195,7 +195,6 @@ int main()
         FaceNodes[2*ii+1] = ii + 2;
     }
     FaceNodes[15] = 1;
-
     /* DOCEND */
     /* Define the right and left elements of each face.
 
@@ -228,13 +227,11 @@ int main()
     /* DOCEND */
     /* Write the polyhedral data to the file.  */
     /* DOCSTART:octagon_tecpoly.txt*/
-    I = TECPOLY112(NULL,
-                   FaceNodes,
-                   FaceLeftElems,
-                   FaceRightElems,
-                   NULL,
-                   NULL,
-                   NULL);
+    I = TECPOLYFACE112(&NumFaces,
+                       NULL,
+                       FaceNodes,
+                       FaceLeftElems,
+                       FaceRightElems);
 
     delete FaceNodes;
     delete FaceLeftElems;

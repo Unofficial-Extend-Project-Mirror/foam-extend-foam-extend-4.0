@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known
- * as TecIO, as part of its distribution of OpenFOAM and the
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- *
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #include "stdafx.h"
 #include "MASTER.h"
 #define TECPLOTENGINEMODULE
@@ -28,7 +5,7 @@
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
@@ -158,7 +135,7 @@ void LocalReadBlock(FileStream_s   *FileStream,
         {
             ReadPureBlock(FileStream,
                           DoRead,
-                          (void *)CurVPtr,
+                          static_cast<void *>(CurVPtr),
                           FieldDataTypeInFile,
                           0,
                           NumValues,
@@ -205,6 +182,7 @@ Boolean_t STDCALL ReadTec(Boolean_t       GetHeaderInfoOnly,
                           LgIndex_t     **NumPtsK,
                           ZoneType_e    **ZoneType,
                           StringList_pa  *UserRec,
+                          AuxData_pa     *DatasetAuxData,
                           Boolean_t       RawDataSpaceAllocated,
                           NodeMap_t    ***NodeMap,
                           double       ***VDataBase)
@@ -247,22 +225,23 @@ Boolean_t STDCALL ReadTec(Boolean_t       GetHeaderInfoOnly,
                                        FALSE,
                                        NumZones,
                                        NumVars,
-                                       (SmInteger_t *)NULL,
+                                       static_cast<SmInteger_t *>(NULL),
                                        DataSetTitle,
-                                       (Text_s **)NULL,
-                                       (Geom_s **)NULL,
-                                       (StringList_pa  **)NULL,
+                                       static_cast<Text_s **>(NULL),
+                                       static_cast<Geom_s **>(NULL),
+                                       static_cast<StringList_pa  **>(NULL),
                                        UserRec,
-                                       (AuxData_pa *)NULL,
+                                       DatasetAuxData,
+                                       0,
                                        &IsVarCellCentered,
-                                       (Boolean_t *)NULL,
-                                       (Boolean_t *)NULL,
+                                       static_cast<Boolean_t *>(NULL),
+                                       static_cast<Boolean_t *>(NULL),
                                        &ZoneSpecList,
                                        VarNames,
-                                       (ArrayList_pa *)NULL,
-                                       (Set_pa *)NULL,
+                                       static_cast<ArrayList_pa *>(NULL),
+                                       static_cast<Set_pa *>(NULL),
                                        &FNNumBndryConns,
-                                       (DataFileType_e *)NULL);
+                                       static_cast<DataFileType_e *>(NULL));
 
 
 
@@ -437,10 +416,10 @@ Boolean_t STDCALL ReadTec(Boolean_t       GetHeaderInfoOnly,
                 {
                     EntIndex_t NumDupVars, ZZ;
 
-                    NumDupVars = (EntIndex_t)GetIoFileInt(ReadTecFileStream, *IVersion, 0, (LgIndex_t) * NumVars, &InputIsOk);
+                    NumDupVars = static_cast<EntIndex_t>(GetIoFileInt(ReadTecFileStream, *IVersion, 0, static_cast<LgIndex_t>( * NumVars), &InputIsOk));
                     for (J = 0; J < NumDupVars; J++)
                     {
-                        ZZ = (EntIndex_t)GetIoFileInt(ReadTecFileStream, *IVersion, 0, *NumVars, &InputIsOk) - 1;
+                        ZZ = static_cast<EntIndex_t>(GetIoFileInt(ReadTecFileStream, *IVersion, 0, *NumVars, &InputIsOk)) - 1;
                         VarSharesFromZone[ZZ] = CurZone - 1; /* emulate DupVar: share from previous zone */
                     }
                     /* Can't duplicate from the first zone */
@@ -457,10 +436,10 @@ Boolean_t STDCALL ReadTec(Boolean_t       GetHeaderInfoOnly,
                 {
                     for (J = 0; J < *NumVars; J++)
                     {
-                        VarType[J] = (FieldDataType_e)GetIoFileInt(ReadTecFileStream, *IVersion,
+                        VarType[J] = static_cast<FieldDataType_e>(GetIoFileInt(ReadTecFileStream, *IVersion,
                                                                    0,
-                                                                   (LgIndex_t)FieldDataType_Bit,
-                                                                   &InputIsOk);
+                                                                   static_cast<LgIndex_t>(FieldDataType_Bit),
+                                                                   &InputIsOk));
                         if (!InputIsOk)
                         {
                             ErrMsg(translate("Invalid data type - binary input file corrupted"));
@@ -497,13 +476,13 @@ Boolean_t STDCALL ReadTec(Boolean_t       GetHeaderInfoOnly,
                 if (*IVersion >= 105 && InputIsOk)
                 {
                     /* passive variables */
-                    if ((Boolean_t)GetIoFileInt(ReadTecFileStream, *IVersion, 0, 1, &InputIsOk) && InputIsOk)
+                    if (static_cast<Boolean_t>(GetIoFileInt(ReadTecFileStream, *IVersion, 0, 1, &InputIsOk)) && InputIsOk)
                     {
                         for (CurVar = 0; CurVar < *NumVars && InputIsOk; CurVar++)
                         {
-                            IsVarPassive[CurVar] = (Boolean_t)GetIoFileInt(ReadTecFileStream,
+                            IsVarPassive[CurVar] = static_cast<Boolean_t>(GetIoFileInt(ReadTecFileStream,
                                                                            *IVersion,
-                                                                           0, 1, &InputIsOk);
+                                                                           0, 1, &InputIsOk));
                         }
                     }
                 }
@@ -511,7 +490,7 @@ Boolean_t STDCALL ReadTec(Boolean_t       GetHeaderInfoOnly,
                 if (*IVersion >= 101 && InputIsOk)
                 {
                     /* variable sharing: equivalent to DupVar for ReadTec */
-                    if ((Boolean_t)GetIoFileInt(ReadTecFileStream, *IVersion, 0, 1, &InputIsOk) && InputIsOk)
+                    if (static_cast<Boolean_t>(GetIoFileInt(ReadTecFileStream, *IVersion, 0, 1, &InputIsOk)) && InputIsOk)
                     {
                         for (CurVar = 0; CurVar < *NumVars && InputIsOk; CurVar++)
                         {
@@ -928,13 +907,13 @@ Boolean_t STDCALL ReadTec(Boolean_t       GetHeaderInfoOnly,
 
 void * STDCALL TecAlloc(size_t size)
 {
-    return (void *)ALLOC_ARRAY(size, char, "TecAlloc");
+    return static_cast<void *>(ALLOC_ARRAY(size, char, "TecAlloc"));
 }
 
 void STDCALL TecFree(void *ptr)
 {
     /* Hack to remove delete warning... */
-    char *Tmp = (char *)ptr;
+    char *Tmp = static_cast<char *>(ptr);
     FREE_ARRAY(Tmp, "TecAlloc");
 }
 

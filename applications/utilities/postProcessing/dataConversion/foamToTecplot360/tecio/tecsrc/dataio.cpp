@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known
- * as TecIO, as part of its distribution of OpenFOAM and the
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- *
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #include "stdafx.h"
 #include "MASTER.h"
 #define TECPLOTENGINEMODULE
@@ -29,7 +6,7 @@
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
@@ -107,6 +84,7 @@ Boolean_t ReadDataFileHeader(FileStream_s    *FileStream,
                              StringList_pa  **CustomLabelBase,
                              StringList_pa   *UserRec,
                              AuxData_pa      *DataSetAuxData,
+                             ArbParam_t       AuxDataOwner,
                              Set_pa         **IsVarCellCentered,  /* Create an Array dim by zones */
                              Boolean_t       *HasText,
                              Boolean_t       *HasGeoms,
@@ -235,12 +213,12 @@ Boolean_t ReadDataFileHeader(FileStream_s    *FileStream,
             if (IsOk && (UserRec != NULL && *UserRec == NULL))
             {
                 *UserRec = StringListAlloc();
-                IsOk = (Boolean_t)(*UserRec != NULL);
+                IsOk = static_cast<Boolean_t>(*UserRec != NULL);
             }
             if (IsOk && (DataSetAuxData != NULL && *DataSetAuxData == NULL))
             {
-                *DataSetAuxData = AuxDataAlloc();
-                IsOk = (Boolean_t)(*DataSetAuxData != NULL);
+                *DataSetAuxData = AuxDataAlloc(AuxDataOwner);
+                IsOk = static_cast<Boolean_t>(*DataSetAuxData != NULL);
             }
             if (IsOk && (VarAuxDataList != NULL && *VarAuxDataList == NULL) && *NumVars > 0)
             {
@@ -267,7 +245,7 @@ Boolean_t ReadDataFileHeader(FileStream_s    *FileStream,
                          * Now allocate a set for each zone
                          */
                         (*IsVarCellCentered)[Z] = AllocSet(FALSE);
-                        IsOk = (Boolean_t)((*IsVarCellCentered)[Z] != NULL);
+                        IsOk = static_cast<Boolean_t>((*IsVarCellCentered)[Z] != NULL);
                     }
                 }
                 else
@@ -303,13 +281,13 @@ Boolean_t ReadDataFileHeader(FileStream_s    *FileStream,
 
             IsOk = ReadInDataFileTypeTitleAndVarNames(FileStream,
                                                       IVersion,
-                                                      ((Pass == 2) ? &S : (char **)NULL),
-                                                      ((Pass == 2) ? FileType : (DataFileType_e *)NULL),
+                                                      ((Pass == 2) ? &S : static_cast<char **>(NULL)),
+                                                      ((Pass == 2) ? FileType : static_cast<DataFileType_e *>(NULL)),
                                                       &INumVars,
-                                                      ((Pass == 2) ? VarNames : (StringList_pa *)NULL));
+                                                      ((Pass == 2) ? VarNames : static_cast<StringList_pa *>(NULL)));
 
             if (IsOk)
-                *NumVars = (EntIndex_t)INumVars;
+                *NumVars = static_cast<EntIndex_t>(INumVars);
 
             if ((Pass == 2) && S && IsOk && DataSetTitle)
                 *DataSetTitle = S;
@@ -341,7 +319,7 @@ Boolean_t ReadDataFileHeader(FileStream_s    *FileStream,
                         LgIndex_t LocalFNNumBndryConns;
                         IsOk = ReadInZoneHeader(FileStream, IVersion, ZoneSpec,
                                                 OkToLoad ? (*IsVarCellCentered)[*NumZones] : NULL,
-                                                *NumVars, &LocalIsRawFNAvailable,
+                                                *NumVars, AuxDataOwner, &LocalIsRawFNAvailable,
                                                 &LocalFNNumBndryConns);
                         if (IsOk && OkToLoad && IsRawFNAvailable != NULL)
                         {
@@ -362,7 +340,7 @@ Boolean_t ReadDataFileHeader(FileStream_s    *FileStream,
                         if (IsOk)
                         {
                             ArrayListItem_u CurZoneSpecItem;
-                            CurZoneSpecItem.VoidPtr = (void *)ZoneSpec;
+                            CurZoneSpecItem.VoidPtr = static_cast<void *>(ZoneSpec);
                             ArrayListSetItem(*ZoneSpecList, *NumZones,
                                              CurZoneSpecItem,
                                              ZoneSpecItemDestructor, 0);
@@ -471,12 +449,12 @@ Boolean_t ReadDataFileHeader(FileStream_s    *FileStream,
                     Boolean_t OkToLoad;
                     char     *CurUserRec = NULL;
 
-                    OkToLoad = (Boolean_t)((Pass == 2) && UserRec);
+                    OkToLoad = static_cast<Boolean_t>((Pass == 2) && UserRec);
 
                     IsOk = ReadInUserRec(FileStream,
                                          IVersion,
                                          500,
-                                         OkToLoad ? &CurUserRec : (char **)NULL);
+                                         OkToLoad ? &CurUserRec : static_cast<char **>(NULL));
                     if (IsOk && OkToLoad)
                         IsOk = StringListAppendString(*UserRec, CurUserRec);
                     if (CurUserRec)
@@ -510,10 +488,10 @@ Boolean_t ReadDataFileHeader(FileStream_s    *FileStream,
                         AuxData_pa VarAuxData;
                         if (OkToLoad)
                         {
-                            VarAuxData = (AuxData_pa)ArrayListGetVoidPtr(*VarAuxDataList, VarNum);
+                            VarAuxData = static_cast<AuxData_pa>(ArrayListGetVoidPtr(*VarAuxDataList, VarNum));
                             if (VarAuxData == NULL)
                             {
-                                VarAuxData = AuxDataAlloc();
+                                VarAuxData = AuxDataAlloc(AuxDataOwner);
                                 IsOk = (VarAuxData != NULL &&
                                         ArrayListSetVoidPtr(*VarAuxDataList, VarNum, VarAuxData));
                             }

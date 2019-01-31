@@ -11,6 +11,11 @@ C
 C
       program test
 
+C  This code was written for FORTRAN77 compilers. If you are using a
+C  FORTRAN90/95 compiler, we recommend using the .f90 source code files.
+C  Otherwise, you will need to alter the include statement below to include
+C  tecio.for instead of tecio.inc. 
+
       INCLUDE 'tecio.inc'
 
       character*1 NULLCHR
@@ -44,7 +49,7 @@ C
       FNMode = 0
       ShrConn = 0
 C
-C... Open the file and write the tecplot datafile
+C... Open the file and write the tecplot datafile 
 C... header information.
 C
       I = TecIni112('SIMPLE DATASET'//NULLCHR,

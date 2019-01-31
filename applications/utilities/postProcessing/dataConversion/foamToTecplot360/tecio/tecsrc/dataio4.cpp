@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known
- * as TecIO, as part of its distribution of OpenFOAM and the
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- *
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #include "stdafx.h"
 #include "MASTER.h"
 #define TECPLOTENGINEMODULE
@@ -29,7 +6,7 @@
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
@@ -47,6 +24,9 @@
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
+#else /* !TECPLOTKERNEL */
+#define DECLARE_NUMERIC_LOCALE_SETTER
+#define VALID_NUMERIC_LOCALE() (1)
 #endif
 
 #include "GEOM2.h"
@@ -57,6 +37,7 @@
 #include "DATAIO4.h"
 #include "DATASET0.h"
 
+#include "CHARTYPE.h"
 #include "STRUTIL.h"
 #include "ARRLIST.h"
 #include "STRLIST.h"
@@ -105,7 +86,7 @@ static char FilterFloatChar(float X)
     if (((X >= 32.0) && (X <= 127.0)) ||
         ((X >= 160.0) && (X <= 255.0)) ||
         (X == 0.0))
-        C = (char)X;
+        C = static_cast<char>(X);
     else
         C = '?';
     return (C);
@@ -162,7 +143,7 @@ double GetNextValue(FileStream_s   *FileStream,
                 if (!FileStream->IsByteOrderNative)
                     REVERSE_4_BYTES(&L);
                 if (*IsOk)
-                    X = (double)L;
+                    X = static_cast<double>(L);
             } break;
             case FieldDataType_Int16  :
             {
@@ -171,14 +152,14 @@ double GetNextValue(FileStream_s   *FileStream,
                 if (!FileStream->IsByteOrderNative)
                     REVERSE_2_BYTES(&S);
                 if (*IsOk)
-                    X = (double)S;
+                    X = static_cast<double>(S);
             } break;
             case FieldDataType_Byte  :
             {
                 Byte_t B;
                 *IsOk = (TP_FREAD(&B, sizeof(Byte_t), 1, FileStream->File) == 1);
                 if (*IsOk)
-                    X = (double)B;
+                    X = static_cast<double>(B);
             } break;
             case FieldDataType_Bit :
             {
@@ -193,7 +174,7 @@ double GetNextValue(FileStream_s   *FileStream,
                 Byte_t B;
                 *IsOk = (TP_FREAD(&B, sizeof(Byte_t), 1, FileStream->File) == 1);
                 if (*IsOk)
-                    X = (double)(B & (Byte_t)01);
+                    X = static_cast<double>(B & static_cast<Byte_t>(01));
             } break;
             default: CHECK(FALSE); break;
         }
@@ -222,7 +203,7 @@ LgIndex_t GetNextI(FileStream_s *FileStream,
     if (*IsOk)
     {
         Int32_t Int32Val;
-        *IsOk = (TP_FREAD((void *) & Int32Val, 4, 1, FileStream->File) == 1);
+        *IsOk = (TP_FREAD(static_cast<void *>( & Int32Val), 4, 1, FileStream->File) == 1);
         if (!FileStream->IsByteOrderNative)
             REVERSE_4_BYTES(&Int32Val);
 
@@ -253,13 +234,13 @@ LgIndex_t GetIoFileInt(FileStream_s *FileStream,
         float  X;
         if (*IsOk)
         {
-            X = (float)GetNextValue(FileStream, FieldDataType_Float,
-                                    (double)IMin - 1.0e-10,
-                                    (double)IMax + 1.0e-10, IsOk);
+            X = static_cast<float>(GetNextValue(FileStream, FieldDataType_Float,
+                                    static_cast<double>(IMin) - 1.0e-10,
+                                    static_cast<double>(IMax) + 1.0e-10, IsOk));
             if (*IsOk)
             {
-                if (ABS(X) < (float)MAXINDEX)
-                    I = (LgIndex_t)X;
+                if (ABS(X) < static_cast<float>(MAXINDEX))
+                    I = static_cast<LgIndex_t>(X);
                 else
                     *IsOk = FALSE;
             }
@@ -290,7 +271,7 @@ static Boolean_t ReallocString(char      **String,
 
     REQUIRE(VALID_REF(String));
     REQUIRE(*String == NULL || VALID_REF(*String));
-    REQUIRE((*String != NULL && NewLength >= (LgIndex_t)strlen(*String)) ||
+    REQUIRE((*String != NULL && NewLength >= static_cast<LgIndex_t>(strlen(*String))) ||
             (*String == NULL && NewLength >= 0));
 
     NewString = ALLOC_ARRAY(NewLength + 1, char, "reallocated string");
@@ -374,7 +355,7 @@ Boolean_t ReadInString(FileStream_s  *FileStream,
             LgIndex_t I;
             for (I = 0; IsOk && I < MaxCharacters; I++)
             {
-                X = (float)GetNextValue(FileStream, FieldDataType_Float, 0.0, 127.0, &IsOk);
+                X = static_cast<float>(GetNextValue(FileStream, FieldDataType_Float, 0.0, 127.0, &IsOk));
                 if (!IsOk)
                     break;
                 if (ProcessData)
@@ -406,11 +387,6 @@ Boolean_t ReadInString(FileStream_s  *FileStream,
             CharValue = GetIoFileInt(FileStream, IVersion, 0, 255, &IsOk);
             if (IsOk && ProcessData)
             {
-                /* massage the character if necessary */
-                if ((CharValue < 32 && CharValue != '\0' && CharValue != '\n') ||
-                    (CharValue >= 128 && CharValue < 160))
-                    CharValue = ' ';
-
                 /*
                  * if the limit is not exceded, stuff the
                  * character into the buffer
@@ -418,7 +394,7 @@ Boolean_t ReadInString(FileStream_s  *FileStream,
                 if (CharValue != '\0' &&
                     (I < MaxCharacters || MaxCharacters == 0))
                 {
-                    StrBuffer[StrBufferLen] = (char)CharValue;
+                    StrBuffer[StrBufferLen] = static_cast<char>(CharValue);
                     StrBufferLen++;
                 }
 
@@ -439,7 +415,7 @@ Boolean_t ReadInString(FileStream_s  *FileStream,
 
             I++;
         }
-        while (IsOk && (char)CharValue != '\0');
+        while (IsOk && static_cast<char>(CharValue) != '\0');
 
         /* if we failed cleanup if necessary */
         if (!IsOk       &&
@@ -469,7 +445,7 @@ static void ReadDoubleBlock(FileStream_s *FileStream,
     if (DoRead)
     {
         double *DPtr = Buffer + StartIndex;
-        *IsOk = (TP_FREAD(DPtr, sizeof(double), NumValues, FileStream->File) == (size_t)NumValues);
+        *IsOk = (TP_FREAD(DPtr, sizeof(double), NumValues, FileStream->File) == static_cast<size_t>(NumValues));
         if (!FileStream->IsByteOrderNative && *IsOk)
         {
             LgIndex_t N;
@@ -493,7 +469,7 @@ static void ReadFloatBlock(FileStream_s *FileStream,
     if (DoRead)
     {
         float *FPtr = Buffer + StartIndex;
-        *IsOk = (TP_FREAD(FPtr, sizeof(float), NumValues, FileStream->File) == (size_t)NumValues);
+        *IsOk = (TP_FREAD(FPtr, sizeof(float), NumValues, FileStream->File) == static_cast<size_t>(NumValues));
         if (!FileStream->IsByteOrderNative && *IsOk)
         {
             LgIndex_t N;
@@ -524,7 +500,7 @@ static void ReadBitBlock(FileStream_s *FileStream,
         *IsOk = (TP_FREAD(Buffer,
                           sizeof(Byte_t),
                           NumBytes,
-                          FileStream->File) == (size_t)NumBytes);
+                          FileStream->File) == static_cast<size_t>(NumBytes));
     }
     else
         *IsOk = (TP_FSEEK(FileStream->File, NumBytes * sizeof(Byte_t), SEEK_CUR) == 0);
@@ -544,7 +520,7 @@ void ReadByteBlock(FileStream_s *FileStream,
         *IsOk = (TP_FREAD(Buffer + StartIndex,
                           sizeof(Byte_t),
                           NumValues,
-                          FileStream->File) == (size_t)NumValues);
+                          FileStream->File) == static_cast<size_t>(NumValues));
     }
     else
         *IsOk = (TP_FSEEK(FileStream->File, NumValues * sizeof(Byte_t), SEEK_CUR) == 0);
@@ -566,7 +542,7 @@ void ReadInt16Block(FileStream_s *FileStream,
         *IsOk = (TP_FREAD(IntPtr,
                           sizeof(Int16_t),
                           NumValues,
-                          FileStream->File) == (size_t)NumValues);
+                          FileStream->File) == static_cast<size_t>(NumValues));
 
         if (!FileStream->IsByteOrderNative && *IsOk)
         {
@@ -604,7 +580,7 @@ void ReadInt16BlockToInt32(FileStream_s *FileStream,
             *IsOk = (TP_FREAD(&Value, sizeof(Int16_t), 1, FileStream->File) == 1);
             if (!FileStream->IsByteOrderNative && *IsOk)
                 REVERSE_2_BYTES(&Value);
-            Buffer[ValueIndex] = (Int32_t)Value;
+            Buffer[ValueIndex] = static_cast<Int32_t>(Value);
         }
     }
     else
@@ -626,7 +602,7 @@ void ReadInt32Block(FileStream_s *FileStream,
         *IsOk = (TP_FREAD(IntPtr,
                           sizeof(Int32_t),
                           NumValues,
-                          FileStream->File) == (size_t)NumValues);
+                          FileStream->File) == static_cast<size_t>(NumValues));
 
         if (!FileStream->IsByteOrderNative && *IsOk)
         {
@@ -663,7 +639,7 @@ void ReadPureBlock(FileStream_s   *FileStream,
         {
             ReadFloatBlock(FileStream,
                            DoRead,
-                           (float *)Buffer,
+                           static_cast<float *>(Buffer),
                            StartIndex,
                            NumValues,
                            IsOk);
@@ -672,7 +648,7 @@ void ReadPureBlock(FileStream_s   *FileStream,
         {
             ReadDoubleBlock(FileStream,
                             DoRead,
-                            (double *)Buffer,
+                            static_cast<double *>(Buffer),
                             StartIndex,
                             NumValues,
                             IsOk);
@@ -688,7 +664,7 @@ void ReadPureBlock(FileStream_s   *FileStream,
             else
                 ReadBitBlock(FileStream,
                              DoRead,
-                             (Byte_t *)Buffer,
+                             static_cast<Byte_t *>(Buffer),
                              NumValues,
                              IsOk);
         } break;
@@ -696,7 +672,7 @@ void ReadPureBlock(FileStream_s   *FileStream,
         {
             ReadByteBlock(FileStream,
                           DoRead,
-                          (Byte_t *)Buffer,
+                          static_cast<Byte_t *>(Buffer),
                           StartIndex,
                           NumValues,
                           IsOk);
@@ -705,7 +681,7 @@ void ReadPureBlock(FileStream_s   *FileStream,
         {
             ReadInt16Block(FileStream,
                            DoRead,
-                           (Int16_t *)Buffer,
+                           static_cast<Int16_t *>(Buffer),
                            StartIndex,
                            NumValues,
                            IsOk);
@@ -714,7 +690,7 @@ void ReadPureBlock(FileStream_s   *FileStream,
         {
             ReadInt32Block(FileStream,
                            DoRead,
-                           (Int32_t *)Buffer,
+                           static_cast<Int32_t *>(Buffer),
                            StartIndex,
                            NumValues,
                            IsOk);
@@ -866,11 +842,11 @@ Boolean_t ReadInDataFileTypeTitleAndVarNames(FileStream_s   *FileStream,
     if (IVersion >= 109)
     {
         if (FileType)
-            *FileType = (DataFileType_e)GetIoFileInt(FileStream,
+            *FileType = static_cast<DataFileType_e>(GetIoFileInt(FileStream,
                                                      IVersion,
                                                      0,
                                                      DataFileType_Solution,
-                                                     &IsOk);
+                                                     &IsOk));
         else
             GetIoFileInt(FileStream,
                          IVersion,
@@ -882,7 +858,7 @@ Boolean_t ReadInDataFileTypeTitleAndVarNames(FileStream_s   *FileStream,
                      IVersion,
                      ((IVersion < 63) ? 80 : MaxChrsDatasetTitle),
                      DataSetTitle,
-                     (Boolean_t)(DataSetTitle != NULL)))
+                     static_cast<Boolean_t>(DataSetTitle != NULL)))
     {
         if (DataSetTitle)
             TrimLeadAndTrailSpaces(*DataSetTitle);
@@ -924,7 +900,7 @@ Boolean_t ReadInDataFileTypeTitleAndVarNames(FileStream_s   *FileStream,
                             IVersion,
                             ((IVersion < 63) ? 5 : MaxChrsVarName),
                             VarNames ? &VName : NULL,
-                            (Boolean_t)(VarNames != NULL));
+                            static_cast<Boolean_t>(VarNames != NULL));
         if (IsOk && VarNames)
         {
             if (VName == NULL)
@@ -979,7 +955,7 @@ static Boolean_t ReadInPresetZoneColor(FileStream_s *FileStream,
     {
         if (VALID_BASIC_COLOR(ZoneColor))
         {
-            ZoneSpec->ZoneLoadInfo.PresetZoneColor = (EntIndex_t)ZoneColor;
+            ZoneSpec->ZoneLoadInfo.PresetZoneColor = static_cast<EntIndex_t>(ZoneColor);
             AdjustCustomColor(IVersion, &ZoneSpec->ZoneLoadInfo.PresetZoneColor);
         }
         else if (ZoneColor != -1)
@@ -1012,14 +988,14 @@ static void ConvertCommonTimeToSolutionTime(ZoneSpec_s *ZoneSpec)
         CHECK(Type == AuxDataType_String);
 
         char *EndPtr = NULL;
-        double SolutionTime = strtod((const char *)Value, &EndPtr);
-        if (EndPtr != (char *)Value)
+        double SolutionTime = strtod(reinterpret_cast<const char *>(Value), &EndPtr);
+        if (EndPtr != reinterpret_cast<char *>(Value))
         {
             /* we only allow white space to trail a value */
-            while (isspace(*EndPtr))
+            while (tecplot::isspace(*EndPtr))
                 EndPtr++;
         }
-        if (EndPtr != (char *)Value && *EndPtr == '\0')
+        if (EndPtr != reinterpret_cast<char *>(Value) && *EndPtr == '\0')
         {
             ZoneSpec->SolutionTime = SolutionTime;
             ZoneSpec->StrandID     = STRAND_ID_PENDING;
@@ -1038,6 +1014,7 @@ Boolean_t ReadInZoneHeader(FileStream_s *FileStream,
                            ZoneSpec_s   *ZoneSpec,
                            Set_pa        IsVarCellCentered,
                            EntIndex_t    NumVars,
+                           ArbParam_t    AuxDataOwner,
                            Boolean_t    *IsRawFNAvailable,
                            LgIndex_t    *FNNumBndryConns)
 {
@@ -1092,7 +1069,7 @@ Boolean_t ReadInZoneHeader(FileStream_s *FileStream,
             return (FALSE);
         }
 
-        ZoneDataFormat = (DataFormat_e)I1;
+        ZoneDataFormat = static_cast<DataFormat_e>(I1);
 
         IsZoneFinite = (ZoneDataFormat == DataFormat_FEPoint ||
                         ZoneDataFormat == DataFormat_FEBlock);
@@ -1137,7 +1114,7 @@ Boolean_t ReadInZoneHeader(FileStream_s *FileStream,
             {
                 if (IVersion >= 61)
                 {
-                    ZoneSpec->Type = (ZoneType_e)(ZoneSpec->NumPtsK + 1);
+                    ZoneSpec->Type = static_cast<ZoneType_e>(ZoneSpec->NumPtsK + 1);
                     switch (ZoneSpec->Type)
                     {
                         case ZoneType_FETriangle: ZoneSpec->NumPtsK = 3; break;
@@ -1197,7 +1174,7 @@ Boolean_t ReadInZoneHeader(FileStream_s *FileStream,
         IsOk = IsOk && ReadInPresetZoneColor(FileStream, IVersion, ZoneSpec);
 
         /* ZoneType */
-        I1 = (ZoneType_e)GetIoFileInt(FileStream, IVersion, 0, 7, &IsOk);
+        I1 = static_cast<ZoneType_e>(GetIoFileInt(FileStream, IVersion, 0, 7, &IsOk));
         switch (I1)
         {
             case 0: ZoneSpec->Type = ZoneType_Ordered;      break;
@@ -1218,17 +1195,17 @@ Boolean_t ReadInZoneHeader(FileStream_s *FileStream,
         /* DataPacking (Always BLOCK starting with file version 112 so removed from binary format) */
         if (IVersion < 112)
             ZoneSpec->ZoneLoadInfo.IsInBlockFormat =
-                ((DataPacking_e)GetIoFileInt(FileStream, IVersion, 0, 1, &IsOk) == DataPacking_Block);
+                (static_cast<DataPacking_e>(GetIoFileInt(FileStream, IVersion, 0, 1, &IsOk)) == DataPacking_Block);
         else
             ZoneSpec->ZoneLoadInfo.IsInBlockFormat = TRUE;
 
         /* is the variable value location specified? */
-        if ((Boolean_t)GetIoFileInt(FileStream, IVersion, 0, 1, &IsOk) && IsOk)
+        if (static_cast<Boolean_t>(GetIoFileInt(FileStream, IVersion, 0, 1, &IsOk)) && IsOk)
         {
             /* Variable Value Location foreach Var */
             for (Var = 0; Var < NumVars && IsOk; Var++)
             {
-                if ((Boolean_t)GetIoFileInt(FileStream, IVersion, 0, 1, &IsOk) && IsOk &&
+                if (static_cast<Boolean_t>(GetIoFileInt(FileStream, IVersion, 0, 1, &IsOk)) && IsOk &&
                     IsVarCellCentered != NULL)
                 {
                     IsOk = (ZoneSpec->ZoneLoadInfo.IsInBlockFormat);
@@ -1267,14 +1244,14 @@ Boolean_t ReadInZoneHeader(FileStream_s *FileStream,
         /* miscellaneous face neighbor info */
         *FNNumBndryConns = GetIoFileInt(FileStream, IVersion, 0, MAXINDEX, &IsOk);
         if (*FNNumBndryConns != 0)
-            ZoneSpec->FNMode = (FaceNeighborMode_e)GetIoFileInt(FileStream, IVersion, 0, 3, &IsOk);
+            ZoneSpec->FNMode = static_cast<FaceNeighborMode_e>(GetIoFileInt(FileStream, IVersion, 0, 3, &IsOk));
 
         if (IVersion >= 108 && IsOk)
         {
             Boolean_t FaceNeighborsComplete = FALSE;
             if (*FNNumBndryConns != 0 &&
                 ZoneSpec->Type != ZoneType_Ordered)
-                FaceNeighborsComplete = (Boolean_t)GetIoFileInt(FileStream, IVersion, 0, 1, &IsOk);
+                FaceNeighborsComplete = static_cast<Boolean_t>(GetIoFileInt(FileStream, IVersion, 0, 1, &IsOk));
 
             /*
              * If the user defined face neighbors completely specify all the
@@ -1355,7 +1332,7 @@ Boolean_t ReadInZoneHeader(FileStream_s *FileStream,
              I1 = GetIoFileInt(FileStream, IVersion, 0, 1, &IsOk))
         {
             if (ZoneSpec->AuxData == NULL)
-                ZoneSpec->AuxData = AuxDataAlloc();
+                ZoneSpec->AuxData = AuxDataAlloc(AuxDataOwner);
             IsOk = (ZoneSpec->AuxData != NULL);
             if (IsOk)
                 IsOk = ReadInAuxData(FileStream, IVersion, ZoneSpec->AuxData);
@@ -1395,7 +1372,7 @@ Boolean_t ReadInCustomLabels(FileStream_s  *FileStream,
     REQUIRE(VALID_BOOLEAN(OkToLoad));
     REQUIRE(!(OkToLoad) || VALID_REF(CustomLabelBase));
 
-    NumLabels = (short)GetIoFileInt(FileStream, IVersion, 1, MAXINDEX, &IsOk);
+    NumLabels = static_cast<short>(GetIoFileInt(FileStream, IVersion, 1, MAXINDEX, &IsOk));
     if (IsOk && NumLabels != 0 && OkToLoad)
     {
         *CustomLabelBase = StringListAlloc();
@@ -1444,7 +1421,7 @@ Boolean_t ReadInUserRec(FileStream_s  *FileStream,
     if (!ReadInString(FileStream, IVersion,
                       MaxCharactersAllowed,
                       UserRec,
-                      (Boolean_t)(UserRec != NULL)))
+                      static_cast<Boolean_t>(UserRec != NULL)))
     {
         ErrMsg(translate("Invalid USERREC record in binary datafile"));
         return (FALSE);
@@ -1488,7 +1465,7 @@ Boolean_t ReadInAuxData(FileStream_s *FileStream,
     if (IsOk)
     {
         AuxValueType = GetIoFileInt(FileStream, IVersion, 0, 0, &IsOk);
-        if (IsOk && (AuxValueType != (LgIndex_t)AuxDataType_String))
+        if (IsOk && (AuxValueType != static_cast<LgIndex_t>(AuxDataType_String)))
         {
             ErrMsg(translate("Unsupported auxiliary data type"));
             IsOk = FALSE;
@@ -1503,7 +1480,7 @@ Boolean_t ReadInAuxData(FileStream_s *FileStream,
                             DoCollectData);
     if (IsOk && DoCollectData)
         IsOk = AuxDataSetItem(AuxData,
-                              AuxName, (ArbParam_t)AuxValue,
+                              AuxName, reinterpret_cast<ArbParam_t>(AuxValue),
                               AuxDataType_String,
                               TRUE); /* Retain */
 
@@ -1530,7 +1507,7 @@ static void GetZoneAttachment(FileStream_s *FileStream,
     REQUIRE(VALID_REF(IsOk) && VALID_BOOLEAN(*IsOk));
 
     if (IVersion >= 47)
-        *Z = (EntIndex_t)GetIoFileInt(FileStream, IVersion, -1, MAXZONEMAP, IsOk);
+        *Z = static_cast<EntIndex_t>(GetIoFileInt(FileStream, IVersion, -1, MAXZONEMAP, IsOk));
     else
         *Z = 0;
 
@@ -1614,9 +1591,9 @@ Boolean_t ReadInGeometry(FileStream_s *FileStream,
         IsOk = FALSE;
     }
 
-    Geom->Scope = (Scope_e)GetIoFileInt(FileStream, IVersion, 0, 1, &IsOk);
+    Geom->Scope = static_cast<Scope_e>(GetIoFileInt(FileStream, IVersion, 0, 1, &IsOk));
     if (IVersion >= 102)
-        Geom->DrawOrder = (DrawOrder_e)GetIoFileInt(FileStream, IVersion, 0, 1, &IsOk);
+        Geom->DrawOrder = static_cast<DrawOrder_e>(GetIoFileInt(FileStream, IVersion, 0, 1, &IsOk));
     Geom->AnchorPos.Generic.V1 = GetNextValue(FileStream, FFT, -LARGEDOUBLE, LARGEDOUBLE, &IsOk);
     Geom->AnchorPos.Generic.V2 = GetNextValue(FileStream, FFT, -LARGEDOUBLE, LARGEDOUBLE, &IsOk);
     if (IVersion >= 45)
@@ -1626,14 +1603,14 @@ Boolean_t ReadInGeometry(FileStream_s *FileStream,
 
     GetZoneAttachment(FileStream, IVersion, &Geom->Zone, &Geom->AttachToZone, &IsOk);
 
-    Geom->BColor = (SmInteger_t)GetIoFileInt(FileStream, IVersion, 0, 255, &IsOk);
+    Geom->BColor = static_cast<SmInteger_t>(GetIoFileInt(FileStream, IVersion, 0, 255, &IsOk));
 
     AdjustCustomColor(IVersion, &Geom->BColor);
 
     if (IVersion > 47)
     {
-        Geom->FillBColor = (SmInteger_t)GetIoFileInt(FileStream, IVersion, 0, 255, &IsOk);
-        Geom->IsFilled  = (Boolean_t)GetIoFileInt(FileStream, IVersion, 0, 1, &IsOk);
+        Geom->FillBColor = static_cast<SmInteger_t>(GetIoFileInt(FileStream, IVersion, 0, 255, &IsOk));
+        Geom->IsFilled  = static_cast<Boolean_t>(GetIoFileInt(FileStream, IVersion, 0, 1, &IsOk));
         AdjustCustomColor(IVersion, &Geom->FillBColor);
     }
     else
@@ -1644,7 +1621,7 @@ Boolean_t ReadInGeometry(FileStream_s *FileStream,
 
     if (IVersion < 101)
     {
-        Geom->GeomType = (GeomType_e)GetIoFileInt(FileStream, IVersion, 0, 5, &IsOk);
+        Geom->GeomType = static_cast<GeomType_e>(GetIoFileInt(FileStream, IVersion, 0, 5, &IsOk));
         if (Geom->GeomType == GeomType_LineSegs3D)
         {
             /*
@@ -1657,7 +1634,7 @@ Boolean_t ReadInGeometry(FileStream_s *FileStream,
     }
     else
     {
-        Geom->GeomType = (GeomType_e)GetIoFileInt(FileStream, IVersion, 0, 4, &IsOk);
+        Geom->GeomType = static_cast<GeomType_e>(GetIoFileInt(FileStream, IVersion, 0, 4, &IsOk));
     }
 
     /*
@@ -1672,22 +1649,22 @@ Boolean_t ReadInGeometry(FileStream_s *FileStream,
 
     if (IVersion > 41)
     {
-        Geom->LinePattern  = (LinePattern_e)GetIoFileInt(FileStream, IVersion, 0, (LgIndex_t)LinePattern_DashDotDot, &IsOk);
+        Geom->LinePattern  = static_cast<LinePattern_e>(GetIoFileInt(FileStream, IVersion, 0, static_cast<LgIndex_t>(LinePattern_DashDotDot), &IsOk));
     }
     else
     {
-        Geom->LinePattern  = (LinePattern_e)((int)Geom->GeomType % 2);
-        Geom->GeomType     = (GeomType_e)((int)Geom->GeomType / 10);
+        Geom->LinePattern  = static_cast<LinePattern_e>((static_cast<int>(Geom->GeomType) % 2));
+        Geom->GeomType     = static_cast<GeomType_e>((static_cast<int>(Geom->GeomType) / 10));
     }
 
-    if ((IVersion < 49) && ((short)(Geom->GeomType) == 2))
+    if ((IVersion < 49) && (static_cast<short>(Geom->GeomType) == 2))
     {
         Geom->GeomType = GeomType_Rectangle;
         Geom->IsFilled = TRUE;
     }
 
-    if ((IVersion < 70) && ((short)(Geom->GeomType) > 1))
-        Geom->GeomType = (GeomType_e)((short)Geom->GeomType + 1);
+    if ((IVersion < 70) && (static_cast<short>(Geom->GeomType) > 1))
+        Geom->GeomType = static_cast<GeomType_e>((static_cast<short>(Geom->GeomType) + 1));
 
     ResetString(&Geom->MacroFunctionCommand, NULL, TRUE);
 
@@ -1703,12 +1680,12 @@ Boolean_t ReadInGeometry(FileStream_s *FileStream,
                                                  LineThicknessInputSpec.Min,
                                                  LineThicknessInputSpec.Max,
                                                  &IsOk);
-        Geom->NumEllipsePts       = (SmInteger_t)GetIoFileInt(FileStream, IVersion, 2, MaxPtsCircleOrEllipse, &IsOk);
-        Geom->ArrowheadStyle      = (ArrowheadStyle_e)GetIoFileInt(FileStream, IVersion, 0, (LgIndex_t)ArrowheadStyle_Hollow, &IsOk);
-        Geom->ArrowheadAttachment = (ArrowheadAttachment_e)GetIoFileInt(FileStream, IVersion,
+        Geom->NumEllipsePts       = static_cast<SmInteger_t>(GetIoFileInt(FileStream, IVersion, 2, MaxPtsCircleOrEllipse, &IsOk));
+        Geom->ArrowheadStyle      = static_cast<ArrowheadStyle_e>(GetIoFileInt(FileStream, IVersion, 0, static_cast<LgIndex_t>(ArrowheadStyle_Hollow), &IsOk));
+        Geom->ArrowheadAttachment = static_cast<ArrowheadAttachment_e>(GetIoFileInt(FileStream, IVersion,
                                                                         0,
-                                                                        (LgIndex_t)ArrowheadAttachment_AtBothEnds,
-                                                                        &IsOk);
+                                                                        static_cast<LgIndex_t>(ArrowheadAttachment_AtBothEnds),
+                                                                        &IsOk));
 
         Geom->ArrowheadSize  = GetNextValue(FileStream, FFT,
                                             ArrowheadSizeInputSpec.Min,
@@ -1747,26 +1724,26 @@ Boolean_t ReadInGeometry(FileStream_s *FileStream,
     if (IVersion < 70)
         Geom->DataType = FieldDataType_Float;
     else
-        Geom->DataType = (FieldDataType_e)GetIoFileInt(FileStream, IVersion, 1, 2, &IsOk);
+        Geom->DataType = static_cast<FieldDataType_e>(GetIoFileInt(FileStream, IVersion, 1, 2, &IsOk));
     CHECK(VALID_GEOM_FIELD_DATA_TYPE(Geom->DataType));
 
     Geom->Clipping = Clipping_ClipToViewport; /* default value for pre 101 versions */
     if (IVersion >= 101)
     {
-        Geom->Clipping = (Clipping_e)GetIoFileInt(FileStream, IVersion, 0, 2, &IsOk);
+        Geom->Clipping = static_cast<Clipping_e>(GetIoFileInt(FileStream, IVersion, 0, 2, &IsOk));
         /*
          * The second clipping value was deprecated during v10 development and thus removed.
          * This moved Clipping_ClipToFrame to the 2nd position from the 3rd, so we convert
          * value 2 to ClipToFrame to support files made during v10 developement.
          */
-        if (Geom->Clipping == (Clipping_e)2)
+        if (Geom->Clipping == static_cast<Clipping_e>(2))
             Geom->Clipping = Clipping_ClipToFrame;
     }
 
     if (IVersion < 50 ||
         Geom->GeomType == GeomType_LineSegs)
     {
-        Geom->NumSegments = (SmInteger_t)GetIoFileInt(FileStream, IVersion, 1, MaxGeoSegments, &IsOk);
+        Geom->NumSegments = static_cast<SmInteger_t>(GetIoFileInt(FileStream, IVersion, 1, MaxGeoSegments, &IsOk));
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 #endif
@@ -1879,7 +1856,7 @@ Boolean_t ReadInText(FileStream_s *FileStream,
         IsOk = FALSE;
     }
 
-    Text->Scope   = (Scope_e)GetIoFileInt(FileStream, IVersion, 0, 1, &IsOk);
+    Text->Scope   = static_cast<Scope_e>(GetIoFileInt(FileStream, IVersion, 0, 1, &IsOk));
     Text->AnchorPos.Generic.V1 = GetNextValue(FileStream, FFT, -LARGEDOUBLE, LARGEDOUBLE, &IsOk);
     Text->AnchorPos.Generic.V2 = GetNextValue(FileStream, FFT, -LARGEDOUBLE, LARGEDOUBLE, &IsOk);
     if (IVersion >= 101)
@@ -1888,9 +1865,21 @@ Boolean_t ReadInText(FileStream_s *FileStream,
         Text->AnchorPos.Generic.V3 = 0.0; /* default value for pre 101 versions */
 
     if (IVersion > 40)
-        Text->TextShape.Font = (Font_e)GetIoFileInt(FileStream, IVersion, 0, (LgIndex_t)Font_CourierBold, &IsOk);
+    {
+        #if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+        #else
+            Text->TextShape.Font = static_cast<Font_e>(GetIoFileInt(FileStream, IVersion, 0, static_cast<LgIndex_t>(Font_CourierBold), &IsOk));
+        #endif
+    }
     else
-        Text->TextShape.Font = Font_Helvetica;
+    {
+        #if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+        #else
+            Text->TextShape.Font = Font_Helvetica;
+        #endif
+    }
     if (IVersion < 43)
         GetNextValue(FileStream, FFT, -LARGEDOUBLE, LARGEDOUBLE, &IsOk);
     if (IVersion < 70)
@@ -1901,12 +1890,12 @@ Boolean_t ReadInText(FileStream_s *FileStream,
             Text->TextShape.SizeUnits = Units_Frame;
     }
     else
-        Text->TextShape.SizeUnits = (Units_e)GetIoFileInt(FileStream, IVersion, 0, (LgIndex_t)Units_Point, &IsOk);
+        Text->TextShape.SizeUnits = static_cast<Units_e>(GetIoFileInt(FileStream, IVersion, 0, static_cast<LgIndex_t>(Units_Point), &IsOk));
 
     Text->TextShape.Height = GetNextValue(FileStream, FFT, -LARGEDOUBLE, LARGEDOUBLE, &IsOk);
     if (IVersion > 47)
     {
-        Text->Box.BoxType = (TextBox_e)GetIoFileInt(FileStream, IVersion, 0, (LgIndex_t)TextBox_Hollow, &IsOk);
+        Text->Box.BoxType = static_cast<TextBox_e>(GetIoFileInt(FileStream, IVersion, 0, static_cast<LgIndex_t>(TextBox_Hollow), &IsOk));
         if (IVersion < 70)
         {
             if (Text->Box.BoxType == TextBox_Hollow)
@@ -1925,8 +1914,8 @@ Boolean_t ReadInText(FileStream_s *FileStream,
                                                    &IsOk);
         else
             Text->Box.LineThickness = 0.01;
-        Text->Box.BColor     = (ColorIndex_t)GetIoFileInt(FileStream, IVersion, 0, 255, &IsOk);
-        Text->Box.FillBColor = (ColorIndex_t)GetIoFileInt(FileStream, IVersion, 0, 255, &IsOk);
+        Text->Box.BColor     = static_cast<ColorIndex_t>(GetIoFileInt(FileStream, IVersion, 0, 255, &IsOk));
+        Text->Box.FillBColor = static_cast<ColorIndex_t>(GetIoFileInt(FileStream, IVersion, 0, 255, &IsOk));
         AdjustCustomColor(IVersion, &Text->Box.BColor);
         AdjustCustomColor(IVersion, &Text->Box.FillBColor);
     }
@@ -1953,15 +1942,15 @@ Boolean_t ReadInText(FileStream_s *FileStream,
                                          TextLineSpacingInputSpec.Min,
                                          TextLineSpacingInputSpec.Max,
                                          &IsOk);
-        Text->Anchor      = (TextAnchor_e)GetIoFileInt(FileStream, IVersion, 0, (LgIndex_t)TextAnchor_HeadRight, &IsOk);
+        Text->Anchor      = static_cast<TextAnchor_e>(GetIoFileInt(FileStream, IVersion, 0, static_cast<LgIndex_t>(TextAnchor_HeadRight), &IsOk));
     }
 
     GetZoneAttachment(FileStream, IVersion, &Text->Zone, &Text->AttachToZone, &IsOk);
 
-    Text->BColor   = (ColorIndex_t)GetIoFileInt(FileStream, IVersion, 0, 255, &IsOk);
+    Text->BColor   = static_cast<ColorIndex_t>(GetIoFileInt(FileStream, IVersion, 0, 255, &IsOk));
     AdjustCustomColor(IVersion, &Text->BColor);
     if (IVersion < 70)
-        TextLength = (short)GetIoFileInt(FileStream, IVersion, 0, 5000, &IsOk);
+        TextLength = static_cast<short>(GetIoFileInt(FileStream, IVersion, 0, 5000, &IsOk));
 
     ResetString(&Text->MacroFunctionCommand, NULL, TRUE);
 
@@ -1972,9 +1961,9 @@ Boolean_t ReadInText(FileStream_s *FileStream,
         short I, S;
         for (I = 0; I < TextLength; I++)
         {
-            S = (short)GetIoFileInt(FileStream, IVersion, 0, 1000, &IsOk);
+            S = static_cast<short>(GetIoFileInt(FileStream, IVersion, 0, 1000, &IsOk));
             if (OkToLoad && (I <= MaxTextLen))
-                Text->Text[I] = (char)S;
+                Text->Text[I] = static_cast<char>(S);
         }
         if (OkToLoad)
             Text->Text[MIN(TextLength, MaxTextLen)] = '\0';
@@ -1998,8 +1987,8 @@ Boolean_t ReadInText(FileStream_s *FileStream,
              * This moved Clipping_ClipToFrame to the 2nd position from the 3rd, so we convert
              * value 2 to ClipToFrame to support files made during v10 developement.
              */
-            Text->Clipping = (Clipping_e)GetIoFileInt(FileStream, IVersion, 0, 2, &IsOk);
-            if (Text->Clipping == (Clipping_e)2)
+            Text->Clipping = static_cast<Clipping_e>(GetIoFileInt(FileStream, IVersion, 0, 2, &IsOk));
+            if (Text->Clipping == static_cast<Clipping_e>(2))
                 Text->Clipping = Clipping_ClipToFrame;
         }
 
@@ -2039,7 +2028,7 @@ static Boolean_t CompareVersion(float      Version,
                                 char      *VersionString,
                                 Boolean_t  IsByteOrderNative)
 {
-    char *VersionBuf = (char *) & Version;
+    char *VersionBuf = reinterpret_cast<char *>( & Version);
 
     REQUIRE(VALID_REF(VersionString));
 
@@ -2060,7 +2049,7 @@ static float ValidVersions[] = {7.0F,
                                 5.0F,
                                 4.7F, 4.6F, 4.5F, 4.4F, 4.3F, 4.2F, 4.1F, 4.0F
                                };
-#define NUMVALIDVERSIONS ((int)(sizeof(ValidVersions)/sizeof(ValidVersions[0])))
+#define NUMVALIDVERSIONS (static_cast<int>(sizeof(ValidVersions)/sizeof(ValidVersions[0])))
 
 
 /*
@@ -2110,7 +2099,7 @@ static short GetNewInputVersion(FileStream_s *FileStream)
         return (0);
 
     I = 1;
-    while ((I < 4) && isdigit(Buf[I]))
+    while ((I < 4) && tecplot::isdigit(Buf[I]))
         IVersion = IVersion * 10 + Buf[I++] - '0';
 
     if (IVersion < 70)
@@ -2189,7 +2178,7 @@ short GetInputVersion(FileStream_s *FileStream)
     if (IsOk)
         return (IVersion);
     else
-        return ((short)0);
+        return (static_cast<short>(0));
 }
 
 #if defined TECPLOTKERNEL
@@ -2221,8 +2210,8 @@ Boolean_t WriteBinaryByteBlock(FileStream_s    *FileStream,
 
     Boolean_t IsOk = TP_FWRITE(ByteValues,
                                sizeof(Byte_t),
-                               (size_t)NumValues,
-                               FileStream->File) == (size_t)NumValues;
+                               static_cast<size_t>(NumValues),
+                               FileStream->File) == static_cast<size_t>(NumValues);
 
     ENSURE(VALID_BOOLEAN(IsOk));
     return IsOk;
@@ -2250,7 +2239,7 @@ void CopyAndReverseUnalignedBytes(T            *DstBuffer,
     REQUIRE(VALID_REF(SrcBuffer));
     size_t typeSize = sizeof(T);
     for (size_t ii = 0; ii < typeSize; ii++)
-        ((Byte_t *)(DstBuffer))[ii] = ((Byte_t *)(SrcBuffer))[typeSize-1-ii];
+        (reinterpret_cast<Byte_t *>(DstBuffer))[ii] = (reinterpret_cast<const Byte_t *>(SrcBuffer))[typeSize-1-ii];
 }
 
 /**
@@ -2262,7 +2251,7 @@ void CopyUnalignedBytes(T            *DstBuffer,
     REQUIRE(VALID_REF(DstBuffer));
     REQUIRE(VALID_REF(SrcBuffer));
     for (size_t ii = 0; ii < sizeof(T); ii++)
-        ((Byte_t *)(DstBuffer))[ii] = ((Byte_t *)(SrcBuffer))[ii];
+        (reinterpret_cast<Byte_t *>(DstBuffer))[ii] = (reinterpret_cast<const Byte_t *>(SrcBuffer))[ii];
 }
 
 /**
@@ -2298,7 +2287,7 @@ Boolean_t WriteBinaryInt16(FileStream_s *FileStream,
     Boolean_t IsOk;
     REQUIRE(VALID_REF(FileStream) && VALID_REF(FileStream->File));
     REQUIRE("Value can be any Int16_t");
-    IsOk = WriteBinaryDataUnaligned<Int16_t>(FileStream, (Byte_t *) & Value, TRUE/*ValueInNativeOrder*/);
+    IsOk = WriteBinaryDataUnaligned<Int16_t>(FileStream, reinterpret_cast<Byte_t *>( & Value), TRUE/*ValueInNativeOrder*/);
     ENSURE(VALID_BOOLEAN(IsOk));
     return IsOk;
 }
@@ -2312,7 +2301,7 @@ Boolean_t WriteBinaryInt32(FileStream_s *FileStream,
     Boolean_t IsOk;
     REQUIRE(VALID_REF(FileStream) && VALID_REF(FileStream->File));
     REQUIRE("Value can be any Int32_t");
-    IsOk = WriteBinaryDataUnaligned<Int32_t>(FileStream, (Byte_t *) & Value, TRUE/*ValueInNativeOrder*/);
+    IsOk = WriteBinaryDataUnaligned<Int32_t>(FileStream, reinterpret_cast<Byte_t *>( & Value), TRUE/*ValueInNativeOrder*/);
     ENSURE(VALID_BOOLEAN(IsOk));
     return IsOk;
 }
@@ -2421,12 +2410,12 @@ Boolean_t WriteBinaryReal(FileStream_s    *FileStream,
         case FieldDataType_Float :
         {
             float FloatVal = CONVERT_DOUBLE_TO_FLOAT(RR);
-            IsOk = WriteBinaryDataUnaligned<float>(FileStream, (Byte_t *) & FloatVal, TRUE/*NativeOrdering*/);
+            IsOk = WriteBinaryDataUnaligned<float>(FileStream, reinterpret_cast<Byte_t *>( & FloatVal), TRUE/*NativeOrdering*/);
         } break;
         case FieldDataType_Double :
         {
             double DoubleVal = CLAMP_DOUBLE(RR);
-            IsOk = WriteBinaryDataUnaligned<double>(FileStream, (Byte_t *) & DoubleVal, TRUE/*NativeOrdering*/);
+            IsOk = WriteBinaryDataUnaligned<double>(FileStream, reinterpret_cast<Byte_t *>( & DoubleVal), TRUE/*NativeOrdering*/);
         } break;
         case FieldDataType_Byte :
         {
@@ -2437,7 +2426,7 @@ Boolean_t WriteBinaryReal(FileStream_s    *FileStream,
             else if (RR < 0)
                 B = 0;
             else
-                B = (Byte_t)RR;
+                B = static_cast<Byte_t>(RR);
             IsOk = WriteBinaryByte(FileStream, B);
         } break;
         default: CHECK(FALSE); break;
@@ -2453,7 +2442,7 @@ Boolean_t WriteFieldDataType(FileStream_s    *FileStream,
                              Boolean_t        WriteBinary)
 {
     if (WriteBinary)
-        return (WriteBinaryInt32(FileStream, (LgIndex_t)FDT));
+        return (WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(FDT)));
     else
     {
         short S = 0;
@@ -2512,14 +2501,14 @@ Boolean_t WriteBinaryFieldDataBlockOfType(FileStream_s      *FileStream,
     if (IsFieldDataDirectAccessAllowed(FieldData))
     {
         Byte_t *ByteArray = GetFieldDataBytePtr(FieldData) + StartOffset * sizeof(T);
-        IsOk = WriteBinaryChecksumByteValues<T>(FileStream, ByteArray, (HgIndex_t)NumValues);
+        IsOk = WriteBinaryChecksumByteValues<T>(FileStream, ByteArray, static_cast<HgIndex_t>(NumValues));
     }
     else
     {
         for (LgIndex_t Offset = StartOffset; Offset < NumValues; Offset++)
         {
-            T         ValueBuffer = (T)GetFieldValue(FieldData, Offset);
-            Byte_t   *ByteValue = (Byte_t *) & ValueBuffer;
+            T         ValueBuffer = static_cast<T>(GetFieldValue(FieldData, Offset));
+            Byte_t   *ByteValue = reinterpret_cast<Byte_t *>( & ValueBuffer);
             IsOk = WriteBinaryChecksumByteValues<T>(FileStream, ByteValue, 1);
         }
     }
@@ -2541,7 +2530,7 @@ static Boolean_t WriteBinaryFieldDataBlockOfTypeBit(FileStream_s      *FileStrea
     if (IsFieldDataDirectAccessAllowed(FieldData))
     {
         Byte_t *ByteArray = GetFieldDataBytePtr(FieldData);
-        IsOk = WriteBinaryChecksumByteValues<Byte_t>(FileStream, ByteArray, (HgIndex_t)NumBytes);
+        IsOk = WriteBinaryChecksumByteValues<Byte_t>(FileStream, ByteArray, static_cast<HgIndex_t>(NumBytes));
     }
     else
     {
@@ -2552,7 +2541,7 @@ static Boolean_t WriteBinaryFieldDataBlockOfTypeBit(FileStream_s      *FileStrea
             Byte_t ValueBuffer = 0;
             for (int ii = 0; ii < 8; ii++)
             {
-                Byte_t CurBit = (Byte_t)GetFieldValue(FieldData, Offset + ii);
+                Byte_t CurBit = static_cast<Byte_t>(GetFieldValue(FieldData, Offset + ii));
                 ValueBuffer |= (CurBit << ii);
             }
             IsOk = WriteBinaryChecksumByteValues<Byte_t>(FileStream, &ValueBuffer, 1);
@@ -2590,58 +2579,46 @@ Boolean_t WriteBinaryFieldDataBlock(FileStream_s *FileStream,
 }
 
 
-static Boolean_t WriteASCIIFieldDataValue(FileStream_s *FileStream,
+static Boolean_t WriteASCIIFieldDataValue(FileStream_s* FileStream,
                                           FieldData_pa  FieldData,
                                           LgIndex_t     Offset,
                                           SmInteger_t   AsciiPrecision)
 {
-    Boolean_t IsOk = FALSE; /* ...quiet compiler */
-
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 #endif
 
-    double V = 0.0;
+    double V = GetFieldValue(FieldData, Offset);
+    CHECK(VALID_NUMERIC_LOCALE());
+
     char buffer[100*MAX_SIZEOFUTF8CHAR];
-    char *AsciiValue = buffer;
-
-#ifdef TECPLOTKERNEL
-/* CORE SOURCE CODE REMOVED */
-#endif
-
-    V = GetFieldValue(FieldData, Offset);
-
     switch (GetFieldDataType(FieldData))
     {
         case FieldDataType_Float :
         case FieldDataType_Double :
-            /*IsOk = FPRINTFOK(fprintf(FileStream->File," %.*E",(int)AsciiPrecision,V)); */
-            sprintf(buffer, " %.*E", (int)AsciiPrecision, V);
+            sprintf(buffer, " %.*E", static_cast<int>(AsciiPrecision), V);
             break;
         case FieldDataType_Int32 :
-            /* IsOk = FPRINTFOK(fprintf(FileStream->File," %*d",(int)AsciiPrecision,ROUNDL(V))); */
-            sprintf(buffer, " %*d", (int)AsciiPrecision, ROUNDL(V));
+            sprintf(buffer, " %*d", static_cast<int>(AsciiPrecision), ROUNDL(V));
             break;
         case FieldDataType_Int16 :
-            /* IsOk = FPRINTFOK(fprintf(FileStream->File," %6d",ROUND2(V))); */
             sprintf(buffer, " %6d", ROUND2(V));
             break;
         case FieldDataType_Byte :
-            /* IsOk = FPRINTFOK(fprintf(FileStream->File," %3d",ROUNDS(V))); */
             sprintf(buffer, " %3d", ROUNDS(V));
             break;
         case FieldDataType_Bit :
-            /* IsOk = FPRINTFOK(fprintf(FileStream->File," %c",((V == 0) ? '0' : '1'))); */
             sprintf(buffer, " %c", ((V == 0) ? '0' : '1'));
             break;
         default: CHECK(FALSE); break;
     }
-    IsOk = FPRINTFOK(fprintf(FileStream->File, buffer));
+
+    Boolean_t IsOk = FPRINTFOK(fprintf(FileStream->File, "%s", buffer));
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 #endif
     ENSURE(VALID_BOOLEAN(IsOk));
-    return (IsOk);
+    return IsOk;
 }
 
 
@@ -2664,6 +2641,8 @@ Boolean_t WriteCCFieldDataBlock(FileStream_s *FileStream,
     LgIndex_t JEnd     = -1;
     LgIndex_t KEnd     = -1;
     Boolean_t IsLinear = -1;
+
+    DECLARE_NUMERIC_LOCALE_SETTER
 
     REQUIRE(VALID_REF(FileStream) && VALID_REF(FileStream->File));
     REQUIRE(VALID_REF(FieldData));
@@ -2755,7 +2734,7 @@ Boolean_t DumpDatafileString(FileStream_s *FileStream,
     {
         const char *CPtr = S;
         while (IsOk && CPtr && *CPtr)
-            IsOk = WriteBinaryInt32(FileStream, (LgIndex_t)(unsigned char) * CPtr++);
+            IsOk = WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(static_cast<unsigned char>( * CPtr++)));
         if (IsOk)
             IsOk = WriteBinaryInt32(FileStream, 0);
     }
@@ -2825,6 +2804,9 @@ static void WriteAsciiTextGeomBasics(FILE*              File,
     REQUIRE(VALID_BOOLEAN(IncludeZ));
     REQUIRE(VALID_BOOLEAN(WriteGridDataAsPolar));
     REQUIRE(VALID_REF(AnchorPos));
+
+    DECLARE_NUMERIC_LOCALE_SETTER
+    CHECK(VALID_NUMERIC_LOCALE());
 
     fprintf(File, "CS=");
     if (CoordSys == CoordSys_Frame)
@@ -2911,26 +2893,26 @@ bool DumpGeometry(FileStream_s* FileStream,
         else
             CHECK(FALSE);
 
-        WriteBinaryInt32(FileStream, (LgIndex_t)Geom->Scope);
-        WriteBinaryInt32(FileStream, (LgIndex_t)Geom->DrawOrder);
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Geom->Scope));
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Geom->DrawOrder));
         WriteBinaryReal(FileStream, Geom->AnchorPos.Generic.V1, FieldDataType_Double);
         WriteBinaryReal(FileStream, Geom->AnchorPos.Generic.V2, FieldDataType_Double);
         WriteBinaryReal(FileStream, Geom->AnchorPos.Generic.V3, FieldDataType_Double);
         if (Geom->AttachToZone)
-            WriteBinaryInt32(FileStream, (LgIndex_t)Geom->Zone);
+            WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Geom->Zone));
         else
-            WriteBinaryInt32(FileStream, (LgIndex_t) - 1);
-        WriteBinaryInt32(FileStream, (LgIndex_t)Geom->BColor);
-        WriteBinaryInt32(FileStream, (LgIndex_t)Geom->FillBColor);
-        WriteBinaryInt32(FileStream, (LgIndex_t)Geom->IsFilled);
+            WriteBinaryInt32(FileStream, static_cast<LgIndex_t>( - 1));
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Geom->BColor));
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Geom->FillBColor));
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Geom->IsFilled));
         CHECK(Geom->GeomType != GeomType_LineSegs3D); /* deprecated */
-        WriteBinaryInt32(FileStream, (LgIndex_t)Geom->GeomType);
-        WriteBinaryInt32(FileStream, (LgIndex_t)Geom->LinePattern);
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Geom->GeomType));
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Geom->LinePattern));
         WriteBinaryReal(FileStream, Geom->PatternLength, FieldDataType_Double);
         WriteBinaryReal(FileStream, Geom->LineThickness, FieldDataType_Double);
-        WriteBinaryInt32(FileStream, (LgIndex_t)Geom->NumEllipsePts);
-        WriteBinaryInt32(FileStream, (LgIndex_t)Geom->ArrowheadStyle);
-        WriteBinaryInt32(FileStream, (LgIndex_t)Geom->ArrowheadAttachment);
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Geom->NumEllipsePts));
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Geom->ArrowheadStyle));
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Geom->ArrowheadAttachment));
         WriteBinaryReal(FileStream, Geom->ArrowheadSize, FieldDataType_Double);
 
         WriteBinaryReal(FileStream, Geom->ArrowheadAngle, FieldDataType_Double);
@@ -2944,7 +2926,7 @@ bool DumpGeometry(FileStream_s* FileStream,
          */
         FDT = GetGeomFieldDataType(Geom);
         WriteFieldDataType(FileStream, FDT, TRUE);
-        WriteBinaryInt32(FileStream, (LgIndex_t)Geom->Clipping);
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Geom->Clipping));
 
         if (Geom->GeomType == GeomType_LineSegs)
         {
@@ -2977,6 +2959,9 @@ bool DumpGeometry(FileStream_s* FileStream,
     }
     else
     {
+        DECLARE_NUMERIC_LOCALE_SETTER
+        CHECK(VALID_NUMERIC_LOCALE());
+
         double ScaleFact;
         if (Geom->PositionCoordSys == CoordSys_Frame)
             ScaleFact = 100.0;
@@ -3035,7 +3020,7 @@ bool DumpGeometry(FileStream_s* FileStream,
         DumpDatafileString(FileStream, Geom->MacroFunctionCommand, FALSE);
 
         if ((Geom->GeomType == GeomType_Circle) || (Geom->GeomType == GeomType_Ellipse))
-            fprintf(FileStream->File, "EP=%ld\n", (long)Geom->NumEllipsePts);
+            fprintf(FileStream->File, "EP=%ld\n", static_cast<long>(Geom->NumEllipsePts));
 
         if (Geom->GeomType == GeomType_LineSegs && Geom->PositionCoordSys != CoordSys_Grid3D)
         {
@@ -3057,6 +3042,7 @@ bool DumpGeometry(FileStream_s* FileStream,
             }
             if (Geom->ArrowheadAttachment != ArrowheadAttachment_None)
             {
+                CHECK(VALID_NUMERIC_LOCALE());
                 fprintf(FileStream->File, "ASZ=%.12G\n",
                         Geom->ArrowheadSize*ArrowheadSizeInputSpec.InterfaceAdjust.ScaleFact);
                 fprintf(FileStream->File, "AAN=%.12G\n",
@@ -3068,15 +3054,17 @@ bool DumpGeometry(FileStream_s* FileStream,
         {
             case GeomType_LineSegs :
             {
+                CHECK(VALID_NUMERIC_LOCALE());
+
                 fprintf(FileStream->File, "T=LINE\n");
                 fprintf(FileStream->File, "DT=");
                 WriteFieldDataType(FileStream, GetFieldDataType(Geom->GeomData.Generic.V1Base), FALSE);
                 fputc('\n', FileStream->File);
-                fprintf(FileStream->File, "%d\n", (int)Geom->NumSegments);
+                fprintf(FileStream->File, "%d\n", static_cast<int>(Geom->NumSegments));
                 SegIndex = 0;
                 for (I = 0; IsOk && (I < Geom->NumSegments); I++)
                 {
-                    fprintf(FileStream->File, "%ld\n", (long)Geom->NumSegPts[I]);
+                    fprintf(FileStream->File, "%ld\n", static_cast<long>(Geom->NumSegPts[I]));
                     for (Index = 0; Index < Geom->NumSegPts[I]; Index++)
                     {
                         fprintf(FileStream->File, "%.12G ", GetFieldValue(Geom->GeomData.Generic.V1Base, SegIndex + Index)*ScaleFact);
@@ -3084,7 +3072,7 @@ bool DumpGeometry(FileStream_s* FileStream,
                         if (Geom->PositionCoordSys == CoordSys_Grid3D)
                             IsOk = FPRINTFOK(fprintf(FileStream->File, " %.12G\n", GetFieldValue(Geom->GeomData.Generic.V3Base, SegIndex + Index)));
                         else
-                            IsOk = (Boolean_t)(fputc('\n', FileStream->File) != EOF);
+                            IsOk = static_cast<Boolean_t>(fputc('\n', FileStream->File) != EOF);
                     }
                     SegIndex += Geom->NumSegPts[I];
                 }
@@ -3150,29 +3138,38 @@ bool DumpText(FileStream_s* FileStream,
         else
             CHECK(FALSE);
 
-        WriteBinaryInt32(FileStream, (LgIndex_t)Text->Scope);
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Text->Scope));
         WriteBinaryReal(FileStream, Text->AnchorPos.Generic.V1, FieldDataType_Double);
         WriteBinaryReal(FileStream, Text->AnchorPos.Generic.V2, FieldDataType_Double);
         WriteBinaryReal(FileStream, Text->AnchorPos.Generic.V3, FieldDataType_Double);
-        WriteBinaryInt32(FileStream, (LgIndex_t)Text->TextShape.Font);
-        WriteBinaryInt32(FileStream, (LgIndex_t)Text->TextShape.SizeUnits);
+        #if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+        #else
+        {
+            WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Text->TextShape.Font));
+        }
+        #endif
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Text->TextShape.SizeUnits));
         WriteBinaryReal(FileStream, Text->TextShape.Height, FieldDataType_Double);
-        WriteBinaryInt32(FileStream, (LgIndex_t)Text->Box.BoxType);
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Text->Box.BoxType));
         WriteBinaryReal(FileStream, Text->Box.Margin, FieldDataType_Double);
         WriteBinaryReal(FileStream, Text->Box.LineThickness, FieldDataType_Double);
-        WriteBinaryInt32(FileStream, (LgIndex_t)Text->Box.BColor);
-        WriteBinaryInt32(FileStream, (LgIndex_t)Text->Box.FillBColor);
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Text->Box.BColor));
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Text->Box.FillBColor));
         WriteBinaryReal(FileStream, Text->Angle, FieldDataType_Double);
         WriteBinaryReal(FileStream, Text->LineSpacing, FieldDataType_Double);
-        WriteBinaryInt32(FileStream, (LgIndex_t)Text->Anchor);
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Text->Anchor));
         if (Text->AttachToZone)
-            WriteBinaryInt32(FileStream, (LgIndex_t)Text->Zone);
+            WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Text->Zone));
         else
-            WriteBinaryInt32(FileStream, (LgIndex_t) - 1);
-        WriteBinaryInt32(FileStream, (LgIndex_t)Text->BColor);
+            WriteBinaryInt32(FileStream, static_cast<LgIndex_t>( - 1));
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Text->BColor));
     }
     else
     {
+        DECLARE_NUMERIC_LOCALE_SETTER
+        CHECK(VALID_NUMERIC_LOCALE());
+
         double ScaleFact;
         Boolean_t IncludeZ = Text->PositionCoordSys == CoordSys_Grid3D;
         if (Text->PositionCoordSys == CoordSys_Frame)
@@ -3229,7 +3226,16 @@ bool DumpText(FileStream_s* FileStream,
         fprintf(FileStream->File, "BXF="); WriteAsciiColor(FileStream->File, Text->Box.FillBColor);
 
         fprintf(FileStream->File, "\nF=");
-        switch (Text->TextShape.Font)
+
+        Font_e font;
+        #if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+        #else
+        {
+            font = Text->TextShape.Font;
+        }
+        #endif
+        switch (font)
         {
             case Font_Helvetica     :   fprintf(FileStream->File, "HELV");         break;
             case Font_HelveticaBold :   fprintf(FileStream->File, "HELV-BOLD");    break;
@@ -3270,7 +3276,7 @@ bool DumpText(FileStream_s* FileStream,
     }
     else
     {
-        WriteBinaryInt32(FileStream, (LgIndex_t)Text->Clipping);
+        WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Text->Clipping));
     }
 
     if (!WriteBinary)
@@ -3345,13 +3351,9 @@ bool writeBinaryVersionNumber(FileStream_s& fileStream,
 #endif
 #if !defined NO_ASSERTS
 #endif
-#if defined ALLOW_USERDEF_NO_NEIGHBORING_ELEMENT
-#else
-#endif
+            #if defined ALLOW_USERDEF_NO_NEIGHBORING_ELEMENT
+            #else
+            #endif
 #if 0 /* not used yet */
-#endif
-#if defined TECPLOTKERNEL
-#endif
-#if defined TECPLOTKERNEL
 #endif
 #endif

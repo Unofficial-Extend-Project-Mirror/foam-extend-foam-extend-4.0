@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known
- * as TecIO, as part of its distribution of OpenFOAM and the
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- *
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #include "stdafx.h"
 #include "MASTER.h"
 #define TECPLOTENGINEMODULE
@@ -29,7 +6,7 @@
  *****************************************************************
  *****************************************************************
  *******                                                  ********
- ****** Copyright (C) 1988-2008 Tecplot, Inc.             ********
+ ****** Copyright (C) 1988-2010 Tecplot, Inc.             ********
  *******       All Rights Reserved.                       ********
  *******                                                  ********
  *****************************************************************
@@ -41,6 +18,7 @@
 #include "TASSERT.h"
 #include "Q_UNICODE.h"
 #include "ALLOC.h"
+#include "CHARTYPE.h"
 #include "STRUTIL.h"
 #include "ARRLIST.h"
 #include "DATASET.h"
@@ -58,7 +36,7 @@ using namespace tecplot::strutil;
  */
 typedef struct
 {
-    const char    *Name;
+    char const*   Name;
     ArbParam_t    Value;
     AuxDataType_e Type;
     Boolean_t     Retain;
@@ -66,14 +44,13 @@ typedef struct
 
 /**
  * Private auxiliary data item container structure.
+ * INVARIANT: ItemList is case-insensitive sorted by AuxDataItem->Name
  */
 typedef struct _AuxData_s
 {
-    /* invariant: ItemList is case-insensitive sorted by AuxDataItem->Name */
+    ArbParam_t   Owner; /* dataset, frame, or page owner or NULL if no owner */
     ArrayList_pa ItemList; /* <AuxDataItem_s *>[dynamic] */
 } AuxData_s;
-
-static Mutex_pa AuxDataMutex = NULL;
 
 
 /**
@@ -90,11 +67,11 @@ Boolean_t AuxDataIsValidNameChar(char      Char,
     REQUIRE(VALID_BOOLEAN(IsLeadChar));
 
     IsValidNameChar = (Char == '_' ||
-                       isalpha(Char));
+                       tecplot::isalpha(Char));
     if (!IsLeadChar)
         IsValidNameChar = (IsValidNameChar ||
                            Char == '.'     ||
-                           isdigit(Char));
+                           tecplot::isdigit(Char));
 
     ENSURE(VALID_BOOLEAN(IsValidNameChar));
     return IsValidNameChar;
@@ -136,13 +113,13 @@ static void AuxDataItemDealloc(AuxDataItem_s **AuxDataItem)
 
     if (*AuxDataItem != NULL)
     {
-        char *Name = (char *)(*AuxDataItem)->Name;
+        char *Name = const_cast<char *>((*AuxDataItem)->Name);
         if (Name != NULL)
             FREE_ARRAY(Name, "auxiliary name");
 
         if ((*AuxDataItem)->Type == AuxDataType_String)
         {
-            char *Value = (char *)(*AuxDataItem)->Value;
+            char *Value = reinterpret_cast<char *>((*AuxDataItem)->Value);
             if (Value != NULL)
                 FREE_ARRAY(Value, "auxiliary value");
         }
@@ -161,35 +138,33 @@ static void AuxDataItemDealloc(AuxDataItem_s **AuxDataItem)
  *
  * NOTE: Copies are made of the name and value.
  *
- * param Name
+ * @param Name
  *     Auxiliary data item's name (case insenstive).
- * param Value
+ * @param Value
  *     Auxiliary data item's value.
- * param Type
+ * @param Type
  *     Auxiliary data item's value type.
- * param Retain
+ * @param Retain
  *     Indicates if the auxiliary data item should persist. In other words
  *     copied, saved, etc.
  *
- * return
+ * @return
  *     A new auxiliary data item or NULL if sufficient memory was not
  *     available.
  */
-static AuxDataItem_s *AuxDataItemAlloc(const char   *Name,
+static AuxDataItem_s* AuxDataItemAlloc(char const*   Name,
                                        ArbParam_t    Value,
                                        AuxDataType_e Type,
                                        Boolean_t     Retain)
 {
-    AuxDataItem_s *Result;
-
     REQUIRE(VALID_REF(Name) && AuxDataIsValidName(Name));
     REQUIRE(IMPLICATION(Type == AuxDataType_String,
-                        (VALID_REF((char *)Value) ||
-                         (char *)Value == NULL)));
+                        (VALID_REF(reinterpret_cast<char *>(Value)) ||
+                         reinterpret_cast<char *>(Value) == NULL)));
     REQUIRE(VALID_ENUM(Type, AuxDataType_e));
     REQUIRE(VALID_BOOLEAN(Retain));
 
-    Result = ALLOC_ITEM(AuxDataItem_s, "auxiliary data item");
+    AuxDataItem_s* Result = ALLOC_ITEM(AuxDataItem_s, "auxiliary data item");
     if (Result != NULL)
     {
         Boolean_t IsOk;
@@ -200,15 +175,15 @@ static AuxDataItem_s *AuxDataItemAlloc(const char   *Name,
         Result->Value = 0; /* to satisfy some compilers' uninitialized warnings */
         if (IsOk && Type == AuxDataType_String)
         {
-            char *strValue = (char *)Value;
+            char *strValue = reinterpret_cast<char *>(Value);
             if (strValue != NULL)
             {
                 char *strCopy = DupString(dontTranslate(strValue));
-                Result->Value = (ArbParam_t)strCopy;
+                Result->Value = reinterpret_cast<ArbParam_t>(strCopy);
                 IsOk = (strCopy != NULL);
             }
             else
-                Result->Value = (ArbParam_t)NULL;
+                Result->Value = static_cast<ArbParam_t>(NULL);
         }
         else
             CHECK(FALSE);
@@ -236,10 +211,11 @@ static AuxDataItem_s *AuxDataItemAlloc(const char   *Name,
 static Boolean_t AuxDataItemListItemDestructor(void       *ItemRef,
                                                ArbParam_t  ClientData)
 {
-    AuxDataItem_s **AuxDataItemRef = (AuxDataItem_s **)ItemRef;
+    AuxDataItem_s **AuxDataItemRef = static_cast<AuxDataItem_s **>(ItemRef);
 
     REQUIRE(VALID_REF(AuxDataItemRef));
     REQUIRE(VALID_REF(*AuxDataItemRef) || *AuxDataItemRef == NULL);
+    UNUSED(ClientData);
 
     if (*AuxDataItemRef != NULL)
         AuxDataItemDealloc(AuxDataItemRef);
@@ -263,10 +239,11 @@ static Boolean_t AuxDataItemListItemDestructor(void       *ItemRef,
 Boolean_t AuxDataItemDestructor(void       *ItemRef,
                                 ArbParam_t  ClientData)
 {
-    AuxData_pa *AuxDataRef = (AuxData_pa *)ItemRef;
+    AuxData_pa *AuxDataRef = static_cast<AuxData_pa *>(ItemRef);
 
     REQUIRE(VALID_REF(AuxDataRef));
     REQUIRE(VALID_REF(*AuxDataRef) || *AuxDataRef == NULL);
+    UNUSED(ClientData);
 
     if (*AuxDataRef != NULL)
         AuxDataDealloc(AuxDataRef);
@@ -296,16 +273,16 @@ static Boolean_t AuxDataItemDuplicator(void       *TargetItemRef,
                                        ArbParam_t ClientData)
 {
     Boolean_t IsOk = TRUE;
-    AuxDataItem_s **TargetAuxDataItemRef = (AuxDataItem_s **)TargetItemRef;
-    AuxDataItem_s **SourceAuxDataItemRef = (AuxDataItem_s **)SourceItemRef;
+    AuxDataItem_s **TargetAuxDataItemRef = static_cast<AuxDataItem_s **>(TargetItemRef);
+    AuxDataItem_s **SourceAuxDataItemRef = static_cast<AuxDataItem_s **>(SourceItemRef);
     Boolean_t       ConsiderRetain;
 
     REQUIRE(VALID_REF(TargetAuxDataItemRef));
     REQUIRE(VALID_REF(SourceAuxDataItemRef));
     REQUIRE(VALID_REF(*SourceAuxDataItemRef) || *SourceAuxDataItemRef == NULL);
-    REQUIRE(VALID_BOOLEAN((Boolean_t)ClientData));
+    REQUIRE(VALID_BOOLEAN(static_cast<Boolean_t>(ClientData)));
 
-    ConsiderRetain = (Boolean_t)ClientData;
+    ConsiderRetain = static_cast<Boolean_t>(ClientData);
 
     /* duplicate the item */
     if (*SourceAuxDataItemRef != NULL &&
@@ -331,7 +308,7 @@ static Boolean_t AuxDataItemDuplicator(void       *TargetItemRef,
  * param AuxData
  *     Reference to an auxiliary data handle or reference to NULL.
  */
-void AuxDataDealloc(AuxData_pa *AuxData)
+void LIBCALL AuxDataDealloc(AuxData_pa *AuxData)
 {
     REQUIRE(VALID_REF(AuxData));
     REQUIRE(VALID_REF(*AuxData) || *AuxData == NULL);
@@ -349,14 +326,17 @@ void AuxDataDealloc(AuxData_pa *AuxData)
 /**
  * Allocates an auxiliary data handle.
  *
- * return
+ * @param Owner
+ *     Auxiliary data owner, either a dataset, frame, or page or NULL if no owner.
+ * @return
  *     Auxiliary data handle or NULL if sufficient memory was not available.
  */
-AuxData_pa AuxDataAlloc(void)
+AuxData_pa AuxDataAlloc(ArbParam_t Owner)
 {
     AuxData_pa Result = ALLOC_ITEM(AuxData_s, "auxiliary data container");
     if (Result != NULL)
     {
+        Result->Owner = Owner;
         Result->ItemList = ArrayListAlloc(0, ArrayListType_VoidPtr, NULL, 0);
         if (Result->ItemList == NULL)
             AuxDataDealloc(&Result);
@@ -441,7 +421,7 @@ AuxData_pa AuxDataCopy(AuxData_pa AuxData,
  * return
  *     Number of items maintained by the auxiliary data.
  */
-LgIndex_t AuxDataGetNumItems(AuxData_pa AuxData)
+LgIndex_t LIBCALL AuxDataGetNumItems(AuxData_pa AuxData)
 {
     LgIndex_t NumItems;
 
@@ -482,56 +462,31 @@ Boolean_t AuxDataGetItemIndex(AuxData_pa  AuxData,
     REQUIRE(VALID_REF(Name) && AuxDataIsValidName(Name));
     REQUIRE(VALID_REF(ItemIndex));
 
-    /*
-     * Note that the current implementation just does a linear search
-     * though the array looking for the index of the item or if not
-     * found the index of the insertion point. This should be replaced
-     * with a binary search.
-     */
     NumItems = AuxDataGetNumItems(AuxData);
 
-# if defined DO_LINEAR_SEARCH
+    int low, high;
+    low = 0;
+    high = NumItems - 1;
+    Index = 0;
+    while (low <= high)
     {
-        for (Index = 0; Index < NumItems; Index++)
+        int CompareResult;
+        Index = (low + high) / 2;
+        AuxDataItem_s* AuxDataItem = static_cast<AuxDataItem_s *>(ArrayListGetVoidPtr(AuxData->ItemList, Index));
+        CompareResult = ustrcmp(Name, AuxDataItem->Name);
+        if (CompareResult < 0)
+            high = Index - 1; /* If the new name is "less" than the one we're comparing to,
+                             don't change Index since Index is already in the right spot */
+        else if (CompareResult > 0)
+            low = ++Index; /* If the new name it "greater" than the one we're comparing
+                          against, we want to make sure its Index is greater than
+                          the current name's index as well, that's why we increment Index here. */
+        else
         {
-            AuxDataItem_s *AuxDataItem =
-                (AuxDataItem_s *)ArrayListGetVoidPtr(AuxData->ItemList, Index);
-            int CompareResult = ustrcmp(AuxDataItem->Name, Name);
-            if (CompareResult >= 0)
-            {
-                FoundItem = (CompareResult == 0);
-                break;
-            }
+            FoundItem = TRUE;
+            break;
         }
     }
-# else
-    {
-        int low, high;
-        low = 0;
-        high = NumItems - 1;
-        Index = 0;
-        while (low <= high)
-        {
-            AuxDataItem_s *AuxDataItem;
-            int CompareResult;
-            Index = (low + high) / 2;
-            AuxDataItem = (AuxDataItem_s *)ArrayListGetVoidPtr(AuxData->ItemList, Index);
-            CompareResult = ustrcmp(Name, AuxDataItem->Name);
-            if (CompareResult < 0)
-                high = Index - 1; /* If the new name is "less" than the one we're comparing to,
-                                 don't change Index since Index is already in the right spot */
-            else if (CompareResult > 0)
-                low = ++Index; /* If the new name it "greater" than the one we're comparing
-                              against, we want to make sure its Index is greater than
-                              the current name's index as well, that's why we increment Index here. */
-            else
-            {
-                FoundItem = TRUE;
-                break;
-            }
-        }
-    }
-# endif
 
     *ItemIndex = Index;
 
@@ -560,12 +515,12 @@ Boolean_t AuxDataGetItemIndex(AuxData_pa  AuxData,
  * param Retain
  *     Address to hold the auxiliary data item retain flag.
  */
-void AuxDataGetItemByIndex(AuxData_pa    AuxData,
-                           LgIndex_t     Index,
-                           const char    **Name,
-                           ArbParam_t    *Value,
-                           AuxDataType_e *Type,
-                           Boolean_t     *Retain)
+void LIBCALL AuxDataGetItemByIndex(AuxData_pa    AuxData,
+		                           LgIndex_t     Index,
+		                           const char    **Name,
+		                           ArbParam_t    *Value,
+		                           AuxDataType_e *Type,
+		                           Boolean_t     *Retain)
 {
     AuxDataItem_s *AuxDataItem;
 
@@ -577,7 +532,7 @@ void AuxDataGetItemByIndex(AuxData_pa    AuxData,
     REQUIRE(VALID_REF(Type));
     REQUIRE(VALID_REF(Retain));
 
-    AuxDataItem = (AuxDataItem_s *)ArrayListGetVoidPtr(AuxData->ItemList, Index);
+    AuxDataItem = static_cast<AuxDataItem_s *>(ArrayListGetVoidPtr(AuxData->ItemList, Index));
     *Name       = AuxDataItem->Name;
     *Value      = AuxDataItem->Value;
     *Type       = AuxDataItem->Type;
@@ -585,8 +540,8 @@ void AuxDataGetItemByIndex(AuxData_pa    AuxData,
 
     ENSURE(VALID_REF(*Name) && AuxDataIsValidName(*Name));
     ENSURE(IMPLICATION(*Type == AuxDataType_String,
-                       (VALID_REF((char *)(*Value)) ||
-                        (char *)(*Value) == NULL)));
+                       (VALID_REF(reinterpret_cast<char *>(*Value)) ||
+                        reinterpret_cast<char *>(*Value) == NULL)));
     ENSURE(VALID_ENUM(*Type, AuxDataType_e));
     ENSURE(VALID_BOOLEAN(*Retain));
 }
@@ -639,8 +594,8 @@ Boolean_t AuxDataGetItemByName(AuxData_pa    AuxData,
     ENSURE(VALID_BOOLEAN(FoundItem));
     ENSURE(IMPLICATION(FoundItem,
                        IMPLICATION(*Type == AuxDataType_String,
-                                   (VALID_REF((char *)(*Value)) ||
-                                    (char *)(*Value) == NULL))));
+                                   (VALID_REF(reinterpret_cast<char *>(*Value)) ||
+                                    reinterpret_cast<char *>(*Value) == NULL))));
     ENSURE(IMPLICATION(FoundItem,
                        VALID_ENUM(*Type, AuxDataType_e)));
     ENSURE(IMPLICATION(FoundItem,
@@ -675,13 +630,13 @@ Boolean_t AuxDataGetBooleanItemByName(AuxData_pa     AuxData, /* IN */
                                      Retain);
 
     if (FoundItem &&
-        (ustrcmp((char *)strValue, "YES")  == 0 ||
-         ustrcmp((char *)strValue, "YEP")  == 0 ||
-         ustrcmp((char *)strValue, "Y")    == 0 ||
-         ustrcmp((char *)strValue, "TRUE") == 0 ||
-         ustrcmp((char *)strValue, "T")    == 0 ||
-         ustrcmp((char *)strValue, "ON")   == 0 ||
-         ustrcmp((char *)strValue, "1")    == 0))
+        (ustrcmp(reinterpret_cast<char *>(strValue), "YES")  == 0 ||
+         ustrcmp(reinterpret_cast<char *>(strValue), "YEP")  == 0 ||
+         ustrcmp(reinterpret_cast<char *>(strValue), "Y")    == 0 ||
+         ustrcmp(reinterpret_cast<char *>(strValue), "TRUE") == 0 ||
+         ustrcmp(reinterpret_cast<char *>(strValue), "T")    == 0 ||
+         ustrcmp(reinterpret_cast<char *>(strValue), "ON")   == 0 ||
+         ustrcmp(reinterpret_cast<char *>(strValue), "1")    == 0))
     {
         *Value = TRUE;
     }
@@ -702,47 +657,44 @@ Boolean_t AuxDataGetBooleanItemByName(AuxData_pa     AuxData, /* IN */
  *
  * NOTE: The auxiliary data makes copies of the name and value.
  *
- * param AuxData
+ * @param AuxData
  *     Auxiliary data handle.
- * param Name
+ * @param Name
  *     Auxiliary data item's name (case insenstive).
- * param Value
+ * @param Value
  *     Auxiliary data item's value.
- * param Type
+ * @param Type
  *     Auxiliary data item's value type.
- * param Retain
+ * @param Retain
  *     Indicates if the auxiliary data item should persist.
  *
- * return
+ * @return
  *     TRUE if the item was added to the auxiliary data.
  */
 Boolean_t AuxDataSetItem(AuxData_pa    AuxData,
-                         const char    *Name,
+                         char const*   Name,
                          ArbParam_t    Value,
                          AuxDataType_e Type,
                          Boolean_t     Retain)
 {
-    Boolean_t     IsOk;
-    AuxDataItem_s *AuxDataItem;
-
     REQUIRE(VALID_REF(AuxData));
     INVARIANT("AuxData->ItemList is case-insensitive sorted by AuxDataItem->Name");
     REQUIRE(VALID_REF(Name) && AuxDataIsValidName(Name));
     REQUIRE(IMPLICATION(Type == AuxDataType_String,
-                        (VALID_REF((char *)Value) ||
-                         (char *)Value == NULL)));
+                        (VALID_REF(reinterpret_cast<char *>(Value)) ||
+                         reinterpret_cast<char *>(Value) == NULL)));
     REQUIRE(VALID_ENUM(Type, AuxDataType_e));
     REQUIRE(VALID_BOOLEAN(Retain));
 
-    AuxDataItem = AuxDataItemAlloc(Name, Value, Type, Retain);
-    IsOk = (AuxDataItem != NULL);
+    AuxDataItem_s* AuxDataItem = AuxDataItemAlloc(Name, Value, Type, Retain);
+    Boolean_t IsOk = (AuxDataItem != NULL);
     if (IsOk)
     {
         LgIndex_t       ItemIndex;
         ArrayListItem_u ListItem;
 
         /* add or replace the item to the list */
-        ListItem.VoidPtr = (void *)AuxDataItem;
+        ListItem.VoidPtr = static_cast<void *>(AuxDataItem);
         if (!AuxDataGetItemIndex(AuxData, Name, &ItemIndex))
             IsOk = ArrayListInsertItem(AuxData->ItemList, ItemIndex, ListItem);
         else
