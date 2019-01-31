@@ -65,7 +65,8 @@ void Foam::ensightPartCells::classify(const labelList& idList)
     size_ = mesh.nCells();
 
     bool limited = false;
-    if (&idList)
+    const labelList* pIdList = &idList;
+    if (pIdList)
     {
         limited = true;
         size_ = idList.size();
