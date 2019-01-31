@@ -770,7 +770,7 @@ void meshOctreeCreator::refineBoxesIntersectingEdgeMeshes()
                 const point& sp = points[e.start()];
                 const point& ep = points[e.end()];
 
-                boundBox edgeBB(sp, ep);
+                boundBox edgeBB(min(sp, ep), max(sp, ep));
 
                 edgeBB.min() -= tol;
                 edgeBB.max() += tol;

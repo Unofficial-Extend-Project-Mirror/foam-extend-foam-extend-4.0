@@ -27,6 +27,7 @@ Description
 
 #include "triSurface2DCheck.H"
 #include "triSurfModifier.H"
+#include "helperFunctions.H"
 #include "boundBox.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -71,7 +72,7 @@ bool triSurface2DCheck::is2DSurface() const
 {
     const pointField& points = surf_.points();
 
-    const vector eigenVal = eigenValues(covarianceMatrix_);
+    const vector eigenVal = help::eigenValues(covarianceMatrix_);
 
     //- the smallest eigenvalue must be zero in case all face normals
     //- lie in a plane
@@ -88,8 +89,8 @@ bool triSurface2DCheck::is2DSurface() const
     //- eigenVectors spanning the plane
     const vector n
     (
-        eigenVector(covarianceMatrix_, eigenVal[1]) ^
-        eigenVector(covarianceMatrix_, eigenVal[2])
+        help::eigenVector(covarianceMatrix_, eigenVal[1]) ^
+        help::eigenVector(covarianceMatrix_, eigenVal[2])
     );
 
     //- check if the plane is in the x-y plane of the coordinate system

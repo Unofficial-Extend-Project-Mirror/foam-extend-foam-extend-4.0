@@ -37,7 +37,7 @@ SourceFiles
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "polyMeshGenCells.H"
-#include "dictionary.H"
+#include "IOdictionary.H"
 
 namespace Foam
 {

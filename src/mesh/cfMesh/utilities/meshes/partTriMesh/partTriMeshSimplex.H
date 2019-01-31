@@ -26,9 +26,9 @@ Class
 
 Description
     A simplex which is used for smoothing purposes
-
+    
 SourceFiles
-
+    
 
 \*---------------------------------------------------------------------------*/
 
@@ -42,7 +42,7 @@ SourceFiles
 
 namespace Foam
 {
-
+    
 // Forward declarations
 class partTriMesh;
 
@@ -55,38 +55,38 @@ class partTriMeshSimplex
     // Private data
         //- points making the simplex
         DynList<point, 32> pts_;
-
+    
         //- triangles making the simplex
         DynList<triFace, 32> trias_;
-
+    
     public:
-
+        
     // Constructors
         //- Construct from partTriMesh and point label
         partTriMeshSimplex(const partTriMesh& tm, const label pI);
-
+    
     // Destructor
         ~partTriMeshSimplex();
-
+    
     // Member functions
         //- return points
         inline DynList<point, 32>& pts()
         {
             return pts_;
         }
-
+        
         //- return points
         inline const DynList<point, 32>& pts() const
         {
             return pts_;
         }
-
+    
         //- return triangles
         inline const DynList<triFace, 32>& triangles() const
         {
             return trias_;
         }
-
+        
         //- return centre point coordinates
         inline const point& centrePoint() const
         {

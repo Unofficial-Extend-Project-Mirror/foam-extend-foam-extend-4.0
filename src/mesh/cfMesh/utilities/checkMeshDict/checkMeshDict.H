@@ -35,8 +35,6 @@ SourceFiles
 #ifndef checkMeshDict_H
 #define checkMeshDict_H
 
-#include "objectRegistry.H"
-#include "foamTime.H"
 #include "IOdictionary.H"
 
 #include <map>
@@ -91,6 +89,9 @@ class checkMeshDict
 
         //- check renameBoundary entry
         void checkRenameBoundary() const;
+
+        //- check entry for mesh quality
+        void checkQualitySettings() const;
 
         //- perform all checks
         void checkEntries() const;

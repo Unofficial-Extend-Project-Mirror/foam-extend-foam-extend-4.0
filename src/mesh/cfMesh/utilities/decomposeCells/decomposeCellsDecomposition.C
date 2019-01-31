@@ -117,7 +117,7 @@ void decomposeCells::checkFaceConnections(const boolList& decomposeCell)
 
             OPstream toOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 decFace.byteSize()
             );
@@ -132,7 +132,7 @@ void decomposeCells::checkFaceConnections(const boolList& decomposeCell)
 
             IPstream fromOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
 
@@ -162,7 +162,7 @@ void decomposeCells::createPointsAndCellFaces(const boolList& decomposeCell)
         }
 }
 
-void decomposeCells::storeBoundaryFaces(const boolList& decomposeCell)
+void decomposeCells::storeBoundaryFaces(const boolList& /*decomposeCell*/)
 {
     meshSurfaceEngine mse(mesh_);
     const faceList::subList& bFaces = mse.boundaryFaces();

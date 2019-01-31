@@ -69,6 +69,168 @@ bool isinf(const ListType& l)
     return false;
 }
 
+inline vector eigenValues(const tensor& t)
+{
+    vector ret(vector::zero);
+
+    if
+    (
+        (
+            mag(t.xy()) + mag(t.xz()) + mag(t.yx())
+          + mag(t.yz()) + mag(t.zx()) + mag(t.zy())
+        )
+      < SMALL
+    )
+    {
+        // diagonal matrix
+        ret.x() = t.xx();
+        ret.y() = t.yy();
+        ret.z() = t.zz();
+    }
+    else
+    {
+        const scalar a = -t.xx() - t.yy() - t.zz();
+
+        const scalar b = t.xx()*t.yy() + t.xx()*t.zz() + t.yy()*t.zz()
+            - t.xy()*t.yx() - t.xz()*t.zx() - t.yz()*t.zy();
+
+        const scalar c = - t.xx()*t.yy()*t.zz() - t.xy()*t.yz()*t.zx()
+            - t.xz()*t.yx()*t.zy() + t.xz()*t.yy()*t.zx()
+            + t.xy()*t.yx()*t.zz() + t.xx()*t.yz()*t.zy();
+
+        // If there is a zero root
+        if( mag(c) < ROOTVSMALL )
+        {
+            const scalar disc = max(sqr(a) - 4*b, 0.0);
+
+            const scalar q = -0.5 * sqrt(max(0.0, disc));
+
+            ret.x() = 0;
+            ret.y() = -0.5 * a + q;
+            ret.z() = -0.5 * a - q;
+        }
+        else
+        {
+            const scalar Q = (a*a - 3*b)/9.0;
+            const scalar R = (2.0*a*a*a - 9.0*a*b + 27.0*c)/54.0;
+
+            const scalar R2 = sqr(R);
+            const scalar Q3 = pow3(Q);
+
+            if( R2 < Q3 )
+            {
+                //- there exist three real roots
+                const scalar sqrtQ = sqrt(Q);
+                const scalar theta = acos(R / (Q*sqrtQ));
+
+                const scalar m2SqrtQ = -2.0 * sqrtQ;
+                const scalar aBy3 = a / 3.0;
+
+                ret.x() = m2SqrtQ*cos(theta/3) - aBy3;
+                ret.y() = m2SqrtQ*cos((theta + 2.0 * M_PI)/3.0) - aBy3;
+                ret.z() = m2SqrtQ*cos((theta - 2.0 * M_PI)/3.0) - aBy3;
+            }
+            else
+            {
+                const scalar A = cbrt(R + sqrt(R2 - Q3));
+
+                //- three equal roots exist in this case
+                if( A < SMALL )
+                {
+                    const scalar root = -a/3;
+                    return vector(root, root, root);
+                }
+                else
+                {
+                    //- roots are complex, return zero in this case
+                    return vector::zero;
+                }
+            }
+        }
+    }
+
+
+    // Sort the eigenvalues into ascending order
+    if( ret.x() > ret.y() )
+    {
+        Swap(ret.x(), ret.y());
+    }
+
+    if( ret.y() > ret.z() )
+    {
+        Swap(ret.y(), ret.z());
+    }
+
+    if( ret.x() > ret.y() )
+    {
+        Swap(ret.x(), ret.y());
+    }
+
+    return ret;
+}
+
+inline vector eigenVector(const tensor& t, const scalar eigenValue)
+{
+    if( mag(eigenValue) < SMALL )
+    {
+        return vector::zero;
+    }
+
+    // Construct the matrix for the eigenvector problem
+    const tensor A(t - eigenValue*I);
+
+    // Calculate the sub-determinants of the 3 components
+    scalar sd0 = A.yy()*A.zz() - A.yz()*A.zy();
+    scalar sd1 = A.xx()*A.zz() - A.xz()*A.zx();
+    scalar sd2 = A.xx()*A.yy() - A.xy()*A.yx();
+
+    scalar magSd0 = mag(sd0);
+    scalar magSd1 = mag(sd1);
+    scalar magSd2 = mag(sd2);
+
+    // Evaluate the eigenvector using the largest sub-determinant
+    if (magSd0 >= magSd1 && magSd0 >= magSd2 && magSd0 > SMALL)
+    {
+        vector ev
+        (
+            1,
+            (A.yz()*A.zx() - A.zz()*A.yx())/sd0,
+            (A.zy()*A.yx() - A.yy()*A.zx())/sd0
+        );
+        ev /= (mag(ev) + VSMALL);
+
+        return ev;
+    }
+    else if (magSd1 >= magSd2 && magSd1 > SMALL)
+    {
+        vector ev
+        (
+            (A.xz()*A.zy() - A.zz()*A.xy())/sd1,
+            1,
+            (A.zx()*A.xy() - A.xx()*A.zy())/sd1
+        );
+        ev /= (mag(ev) + VSMALL);
+
+        return ev;
+    }
+    else if (magSd2 > SMALL)
+    {
+        vector ev
+        (
+            (A.xy()*A.yz() - A.yy()*A.xz())/sd2,
+            (A.yx()*A.xz() - A.xx()*A.yz())/sd2,
+            1
+        );
+        ev /= (mag(ev) + VSMALL);
+
+        return ev;
+    }
+    else
+    {
+        return vector::zero;
+    }
+}
+
 template<class Face1, class Face2>
 inline bool isSharedEdgeConvex
 (
@@ -1056,7 +1218,7 @@ inline bool doTrianglesOverlap
         x /= (mag(x) + VSMALL);
         vector y = vec ^ x;
 
-        DynList<point2D, 6> poly2D(3);
+	DynList<point2D, 6> poly2D(label(3));
         poly2D[0] = point2D((tri0.a() - origin) & x, (tri0.a() - origin) & y);
         poly2D[1] = point2D((tri0.b() - origin) & x, (tri0.b() - origin) & y);
         poly2D[2] = point2D((tri0.c() - origin) & x, (tri0.c() - origin) & y);
@@ -1610,6 +1772,17 @@ inline bool isFaceConvexAndOk
     }
 
     return valid;
+}
+
+inline scalar tetQuality(const tetrahedron<point, point>& tet)
+{
+        return
+            tet.mag()
+           /(
+                8.0/(9.0*sqrt(3.0))
+               *pow3(min(tet.circumRadius(), GREAT))
+              + ROOTVSMALL
+            );
 }
 
 inline point nearestPointOnTheEdge

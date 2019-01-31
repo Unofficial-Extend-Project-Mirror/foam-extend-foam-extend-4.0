@@ -59,67 +59,70 @@ void topologicalCleaner::checkNonConsecutiveBoundaryVertices()
 
         for(label faceI=start;faceI<end;++faceI)
         {
-            const face& bf = faces[faceI];
-
-            # ifdef DEBUGCleaner
-            Info << "Checking boundary face " << faceI << " with vertices "
-                << bf << endl;
+            # ifdef USE_OMP
+            # pragma omp task shared(decomposeFace,faces,cells,owner,faceI)
             # endif
+            {
+                const face& bf = faces[faceI];
 
-            const label bfsize = bf.size();
+                # ifdef DEBUGCleaner
+                Info << "Checking boundary face " << faceI << " with vertices "
+                    << bf << endl;
+                # endif
 
-            const cell& c = cells[owner[faceI]];
+                const cell& c = cells[owner[faceI]];
 
-            forAll(c, fI)
-                if(
-                    (c[fI] < nIntFaces) ||
-                    (mesh_.faceIsInProcPatch(c[fI]) != -1)
-                )
-                {
-                    const face& f = faces[c[fI]];
-
-                    DynList<label> shN;
-
-                    forAll(bf, pI)
-                        forAll(f, pJ)
-                            if( bf[pI] == f[pJ] )
-                            {
-                                shN.append(pI);
-                            }
-
-                    # ifdef DEBUGCleaner
-                    Info << "Shared vertices with internal face " << f
-                        << " are " << shN << endl;
-                    # endif
-
-                    if( shN.size() > 2 )
+                forAll(c, fI)
+                    if(
+                        (c[fI] < nIntFaces) ||
+                        (mesh_.faceIsInProcPatch(c[fI]) != -1)
+                    )
                     {
+                        const face& f = faces[c[fI]];
+
+                        DynList<label> shN;
+
+                        forAll(bf, pI)
+                            forAll(f, pJ)
+                                if( bf[pI] == f[pJ] )
+                                {
+                                    shN.append(pI);
+                                }
+
                         # ifdef DEBUGCleaner
-                        Info << "1. Face has to be split" << endl;
+                        Info << "Shared vertices with internal face " << f
+                            << " are " << shN << endl;
                         # endif
 
-                        decomposeFace[faceI] = true;
-                        decomposeCell_[owner[faceI]] = true;
-                        changed = true;
-                    }
-                    else if( shN.size() == 2 )
-                    {
-                        if( !(
-                                (shN[0] == ((shN[1] + 1) % bfsize)) ||
-                                (shN[0] == ((shN[1] + bfsize - 1) % bfsize))
-                            )
-                        )
+                        if( shN.size() > 2 )
                         {
                             # ifdef DEBUGCleaner
-                            Info << "2. Face has to be split" << endl;
+                            Info << "1. Face has to be split" << endl;
                             # endif
 
                             decomposeFace[faceI] = true;
                             decomposeCell_[owner[faceI]] = true;
                             changed = true;
                         }
+                        else if( shN.size() == 2 )
+                        {
+                            if( !(
+                                    (shN[0] == bf.fcIndex(shN[1])) ||
+                                    (shN[0] == bf.rcIndex(shN[1]))
+                                )
+                            )
+                            {
+                                # ifdef DEBUGCleaner
+                                Info << "2. Face has to be split" << endl;
+                                # endif
+
+                                decomposeFace[faceI] = true;
+                                decomposeCell_[owner[faceI]] = true;
+                                changed = true;
+                            }
+                        }
                     }
-                }
+            }
         }
     }
 

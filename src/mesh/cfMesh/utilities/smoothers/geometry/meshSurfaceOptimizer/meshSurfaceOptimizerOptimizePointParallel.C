@@ -425,8 +425,8 @@ void meshSurfaceOptimizer::edgeNodeDisplacementParallel
 
 void meshSurfaceOptimizer::exchangeData
 (
-    const labelLongList& nodesToSmooth,
-    std::map<label, DynList<parTriFace> >& m
+    const labelLongList& /*nodesToSmooth*/,
+    std::map<label, DynList<parTriFace> >& /*m*/
 ) const
 {
     /*

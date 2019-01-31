@@ -36,8 +36,6 @@ SourceFiles
 #ifndef triangulateNonPlanarBaseFaces_H
 #define triangulateNonPlanarBaseFaces_H
 
-#include "objectRegistry.H"
-#include "foamTime.H"
 #include "polyMeshGenModifier.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

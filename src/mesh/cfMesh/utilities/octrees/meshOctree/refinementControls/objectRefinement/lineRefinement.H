@@ -55,7 +55,7 @@ class lineRefinement
     // Private data
         //- start point of the line
         point p0_;
-
+    
         //- end point of the line
         point p1_;
 
@@ -82,7 +82,7 @@ public:
 
         //- Construct from dictionary
         lineRefinement(const word& name, const dictionary& dict);
-
+        
         //- Construct and return a clone
         virtual autoPtr<objectRefinement> clone
         (
@@ -101,12 +101,12 @@ public:
                 )
             );
         }
-
+    
     // Member Functions
-
+    
         //- check if the line intersects the box
         bool intersectsObject(const boundBox&) const;
-
+        
     //- Return as dictionary of entries
         dictionary dict(bool ignoreType = false) const;
 
@@ -117,7 +117,7 @@ public:
 
         //- Write dictionary
         void writeDict(Ostream&, bool subDict = true) const;
-
+        
     // Member Operators
 
         //- assign from dictionary

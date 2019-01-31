@@ -52,7 +52,7 @@ inline cellListPMG::~cellListPMG()
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
+            
 inline label cellListPMG::size() const
 {
     return nElmts_;
@@ -68,7 +68,7 @@ inline void cellListPMG::setSize(const label nElmts)
             cellList copy(label(1.5*nElmts));
             for(label i=0;i<nElmts_;++i)
                 copy[i].transfer(this->operator[](i));
-
+            
             cellList::transfer(copy);
         }
         else
@@ -106,11 +106,11 @@ inline void cellListPMG::operator=(const cellList& cls)
     forAll(cls, cI)
         this->operator[](cI) = cls[cI];
 }
-
+    
 inline Ostream& operator<<(Ostream& os, const cellListPMG& cls)
 {
     SubList<cell> c(cls, cls.nElmts_, 0);
-
+    
     os << c;
     return os;
 }
@@ -120,7 +120,7 @@ inline Istream& operator>>(Istream& is, cellListPMG& cls)
     cellList& cells = static_cast<cellList&>(cls);
     is >> cells;
     cls.nElmts_  = cells.size();
-
+    
     return is;
 }
 

@@ -686,7 +686,7 @@ void boundaryLayers::createNewPartitionVerticesParallel
 (
     const labelLongList& procPoints,
     const List<direction>& pVertices,
-    const boolList& treatPatches
+    const boolList& /*treatPatches*/
 )
 {
     if( !Pstream::parRun() )

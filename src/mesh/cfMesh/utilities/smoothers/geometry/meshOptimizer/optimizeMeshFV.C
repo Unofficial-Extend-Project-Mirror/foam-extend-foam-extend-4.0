@@ -196,7 +196,7 @@ void meshOptimizer::untangleMeshFV
         // move boundary vertices
         nIter = 0;
 
-        while( nIter++ < maxNumSurfaceIterations );
+        while( nIter++ < maxNumSurfaceIterations )
         {
             if( !relaxedCheck )
             {
@@ -292,8 +292,20 @@ void meshOptimizer::untangleMeshFV
             mesh_.removeFaceSubset(subsetId);
         subsetId = mesh_.addFaceSubset("badFaces");
 
+        const labelList& owner = mesh_.owner();
+        const labelList& neighbour = mesh_.neighbour();
+
+        const label badCellsId =
+                mesh_.addCellSubset("badCells");
+
         forAllConstIter(labelHashSet, badFaces, it)
+        {
             mesh_.addFaceToSubset(subsetId, it.key());
+            mesh_.addCellToSubset(badCellsId, owner[it.key()]);
+            if( neighbour[it.key()] < 0 )
+                continue;
+            mesh_.addCellToSubset(badCellsId, neighbour[it.key()]);
+        }
     }
 
     Info << "Finished untangling the mesh" << endl;

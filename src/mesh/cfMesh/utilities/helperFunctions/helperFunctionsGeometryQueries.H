@@ -65,6 +65,12 @@ namespace help
     template<class ListType>
     bool isinf(const ListType&);
 
+    //- calculate eigenvalues
+    inline vector eigenValues(const tensor&);
+
+    //- calculate eigenvector associated with a given eigenvalue
+    inline vector eigenVector(const tensor&, const scalar eigenValue);
+
     //- check if the faces share a convex edge
     template<class Face1, class Face2>
     inline bool isSharedEdgeConvex
@@ -288,6 +294,9 @@ namespace help
         const pointField& fp,
         DynList<bool>& OkPoints
     );
+
+    //- calculate quality metric of a tetrahedron
+    inline scalar tetQuality(const tetrahedron<point, point>& tet);
 
     //- check if the vertex is on the positive side of the face plane
     inline bool isVertexVisible(const point& p, const plane& pl);

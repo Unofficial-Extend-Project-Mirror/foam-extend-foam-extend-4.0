@@ -39,7 +39,7 @@ namespace Foam
 
 defineTypeNameAndDebug(processorBoundaryPatch, 0);
 addToRunTimeSelectionTable(boundaryPatchBase, processorBoundaryPatch, dictionary);
-
+    
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 processorBoundaryPatch::processorBoundaryPatch
@@ -56,7 +56,7 @@ processorBoundaryPatch::processorBoundaryPatch
     myProcNo_(myProcNo),
     neighbProcNo_(neighbProcNo)
 {}
-
+    
 processorBoundaryPatch::processorBoundaryPatch
 (
     const word& name,
@@ -67,10 +67,10 @@ processorBoundaryPatch::processorBoundaryPatch
     myProcNo_(readLabel(dict.lookup("myProcNo"))),
     neighbProcNo_(readLabel(dict.lookup("neighbProcNo")))
 {
-}
+}   
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
+    
 dictionary processorBoundaryPatch::dict() const
 {
     dictionary dict;
@@ -90,9 +90,9 @@ void processorBoundaryPatch::write(Ostream& os) const
     this->operator<<(os);
 }
 
-void processorBoundaryPatch::writeDict(Ostream& os) const
+void processorBoundaryPatch::writeDict(Ostream& /*os*/) const
 {
-
+    
 }
 
 Ostream& processorBoundaryPatch::operator<<(Ostream& os) const

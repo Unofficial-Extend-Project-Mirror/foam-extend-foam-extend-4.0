@@ -36,8 +36,6 @@ SourceFiles
 #ifndef coordinateModifier_H
 #define coordinateModifier_H
 
-#include "objectRegistry.H"
-#include "foamTime.H"
 #include "word.H"
 #include "point.H"
 #include "coordinateModificationList.H"

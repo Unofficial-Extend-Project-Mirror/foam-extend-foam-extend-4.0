@@ -47,7 +47,7 @@ namespace Foam
 void partTriMesh::createParallelAddressing
 (
     const labelList& nodeLabelForPoint,
-    const labelList& nodeLabelForFace
+    const labelList& /*nodeLabelForFace*/
 )
 {
     const meshSurfaceEngine& mse = mPart_.surfaceEngine();
@@ -351,7 +351,7 @@ void partTriMesh::createBufferLayers()
         {
             const parTriFace& tri = receivedTrias[i];
 
-            DynList<label, 3> triPointLabels(3);
+	    DynList<label, 3> triPointLabels(label(3));
             for(label j=0;j<3;++j)
             {
                 const label gpI = tri.globalLabelOfPoint(j);

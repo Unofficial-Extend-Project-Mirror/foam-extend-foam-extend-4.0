@@ -68,7 +68,7 @@ class symmetryPlaneOptimisation
         void detectSymmetryPlanes();
 
         //- point-planes addressing
-        void pointInPlanes(VRWGraph&) const;
+        bool pointInPlanes(VRWGraph&) const;
 
 public:
 

@@ -26,6 +26,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "renameBoundaryPatches.H"
+#include "symmetryPlaneOptimisation.H"
 #include "demandDrivenData.H"
 #include "IOdictionary.H"
 
@@ -248,12 +249,34 @@ void renameBoundaryPatches::calculateNewBoundary()
     Info << "Finished renaming boundary patches" << endl;
 }
 
+void renameBoundaryPatches::checkEmptyPatches()
+{
+    polyMeshGenModifier meshModifier(mesh_);
+
+    forAll(mesh_.boundaries(), patchI)
+    {
+        boundaryPatch& patch = meshModifier.boundariesAccess()[patchI];
+        if( patch.patchType() == "empty" )
+        {
+            patch.patchType() = "wall";
+        }
+    }
+}
+
+void renameBoundaryPatches::checkSymmetryPlanes()
+{
+    symmetryPlaneOptimisation symmSmother(mesh_);
+
+    symmSmother.optimizeSymmetryPlanes();
+}
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 renameBoundaryPatches::renameBoundaryPatches
 (
     polyMeshGen& mesh,
-    const IOdictionary& meshDict
+    const IOdictionary& meshDict,
+    const bool allowEmptyPatches
 )
 :
     mesh_(mesh),
@@ -261,6 +284,13 @@ renameBoundaryPatches::renameBoundaryPatches
 {
     if( meshDict.found("renameBoundary") )
         calculateNewBoundary();
+
+    if( !allowEmptyPatches )
+    {
+        checkEmptyPatches();
+    }
+
+    checkSymmetryPlanes();
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

@@ -107,7 +107,7 @@ label meshOptimizer::findBadFaces
 label meshOptimizer::findLowQualityFaces
 (
     labelHashSet& badFaces,
-    const boolList& changedFace
+    const boolList& /*changedFace*/
 ) const
 {
     badFaces.clear();

@@ -34,67 +34,67 @@ Description
 
 namespace Foam
 {
-
+    
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 void tetCreatorOctree::createTetsFromFacesWithCentreNode()
 {
     Info << "Creating tets from faces with centre node" << endl;
-
+    
     const labelList& cubeLabel = *cubeLabelPtr_;
     const VRWGraph& nodeLabels = octreeCheck_.nodeLabels();
     const VRWGraph& subNodeLabels = *subNodeLabelsPtr_;
     const FRWGraph<label, 8>& pointLeaves = octreeCheck_.nodeLeaves();
-
+    
     if( !faceCentreLabelPtr_ )
         faceCentreLabelPtr_ = new VRWGraph(cubeLabel.size());
     VRWGraph& faceCentreLabel = *faceCentreLabelPtr_;
-
+    
     //- start creating tets
     forAll(pointLeaves, pointI)
     {
         label pl[8];
         bool create(true);
-
+        
         for(label plI=0;plI<8;++plI)
         {
             pl[plI] = pointLeaves(pointI, plI);
-            if( pl[plI] == -1 )
+            if( pl[plI] == -1 ) 
             {
                 create = false;
                 break;
             }
         }
-
+            
         if( !create )
             continue;
-
+        
         //- create 6 tets for each possible combination
         //- there are 12 possible combinations
         for(label fI=0;fI<6;++fI)
         {
             const label* fEdges = meshOctreeCubeCoordinates::faceEdges_[fI];
-
+            
             for(label feI=0;feI<2;++feI)
             {
                 const label feJ = feI + 2;
-
+                
                 //- the are two possible combinations of edges for each face
                 const label* sEdge =
                     meshOctreeCubeCoordinates::edgeNodes_[fEdges[feI]];
                 const label* eEdge =
                     meshOctreeCubeCoordinates::edgeNodes_[fEdges[feJ]];
-
+                
                 const label sp = sEdge[0];
                 const label ep = eEdge[0];
-
+                
                 if( pl[sp] == pl[ep] )
                     continue;
                 if( pl[sp] != pl[sEdge[1]] )
                     continue;
                 if( pl[ep] != pl[eEdge[1]] )
                     continue;
-
+                
                 # ifdef DEBUGTets
                 Info << "Octree node " << pointI << " has leaves";
                 for(label plI=0;plI<8;++plI)
@@ -103,7 +103,7 @@ void tetCreatorOctree::createTetsFromFacesWithCentreNode()
                 Info << "Searching face " << fI << endl;
                 Info << "Searching face edge " << feI << endl;
                 # endif
-
+                
                 //- allocate face centre labels
                 if( faceCentreLabel.sizeOfRow(pl[sp]) == 0 )
                 {
@@ -119,22 +119,22 @@ void tetCreatorOctree::createTetsFromFacesWithCentreNode()
                 }
                 //- create centre labels
                 label fs, fe;
-
+                
                 fs = meshOctreeCubeCoordinates::edgeFaces_[fEdges[feJ]][0];
                 if( fs == fI )
                     fs = meshOctreeCubeCoordinates::edgeFaces_[fEdges[feJ]][1];
-
+                
                 fe = meshOctreeCubeCoordinates::edgeFaces_[fEdges[feI]][0];
                 if( fe == fI )
                     fe = meshOctreeCubeCoordinates::edgeFaces_[fEdges[feI]][1];
-
+                
                 # ifdef DEBUGTets
                 Info << "Face for the cube at edge " << feI << " is "
                      << fs << endl;
                 Info << "Face for the cube at edge " << feJ << " is "
                      << fe << endl;
                 #endif
-
+                
                 //- create face centre point
                 if( faceCentreLabel(pl[sp], fs) == -1 )
                 {
@@ -147,7 +147,7 @@ void tetCreatorOctree::createTetsFromFacesWithCentreNode()
                     p /= 4;
                     tetPoints_.append(p);
                 }
-
+                
                 //- create tets connecting centroids
                 checkAndAppendTet
                 (
@@ -169,17 +169,17 @@ void tetCreatorOctree::createTetsFromFacesWithCentreNode()
                         cubeLabel[pl[sp]]
                     )
                 );
-
+                
                 FixedList<label, 4> subNodes;
                 subNodes[0] = subNodeLabels(pl[sp], 7-sEdge[1]);
                 subNodes[1] = subNodeLabels(pl[sp], 7-sEdge[0]);
                 subNodes[2] = subNodeLabels(pl[ep], 7-eEdge[0]);
                 subNodes[3] = subNodeLabels(pl[ep], 7-eEdge[1]);
-
+                
                 # ifdef DEBUGTets
                 Info << "Sub nodes are " << subNodes << endl;
                 # endif
-
+                
                 forAll(subNodes, nodeI)
                 {
                     checkAndAppendTet

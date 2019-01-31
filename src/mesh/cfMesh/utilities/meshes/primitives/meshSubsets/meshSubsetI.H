@@ -170,7 +170,7 @@ inline bool meshSubset::operator==(const meshSubset& ms) const
 {
     if( ms.name_ != name_ )
         return false;
-    if( ms.type_ != ms.type_ )
+    if( ms.type_ != type_ )
         return false;
 
     forAllConstIter(std::set<label>, data_, it)

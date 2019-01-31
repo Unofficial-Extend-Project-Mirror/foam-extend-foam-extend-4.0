@@ -46,7 +46,7 @@ scalar textToScalar(const word& w)
 {
     std::stringstream ss;
     ss << w;
-
+    
     double s;
     ss >> s;
     return s;
@@ -62,7 +62,7 @@ word scalarToText(const scalar s)
 {
     std::ostringstream ss;
     ss << s;
-
+    
     return ss.str();
 }
 
@@ -70,7 +70,7 @@ word labelToText(const label l)
 {
     std::ostringstream ss;
     ss << l;
-
+    
     return ss.str();
 }
 

@@ -764,6 +764,54 @@ void checkMeshDict::checkRenameBoundary() const
     }
 }
 
+//Mesh quality criteria specified by the user
+void checkMeshDict::checkQualitySettings() const
+{
+
+    if( meshDict_.found("meshQualitySettings") )
+    {
+        const dictionary& qualityDict = meshDict_.subDict("meshQualitySettings");
+
+        //- read maximum non-orthogonality defined by the user
+        if( qualityDict.found("maxNonOrthogonality") )
+        {
+            readScalar(qualityDict.lookup("maxNonOrthogonality"));
+        }
+
+        //- read maximum skewness defined by the user
+        if( qualityDict.found("maxSkewness") )
+        {
+            readScalar(qualityDict.lookup("maxSkewness"));
+        }
+
+        //- read minimum volume of the face pyramid defined by the user
+        if( qualityDict.found("minPyramidVolume") )
+        {
+            readScalar(qualityDict.lookup("minPyramidVolume"));
+        }
+
+        //- read face flatness defined by the user
+        if( qualityDict.found("faceFlatness") )
+        {
+            readScalar(qualityDict.lookup("faceFlatness"));
+        }
+
+        //- read minimum tetrahedral part of a cell defined by the user
+        if( qualityDict.found("minCellPartTetrahedra") )
+        {
+            readScalar(qualityDict.lookup("minCellPartTetrahedra"));
+        }
+
+        //- read minimum area of a face defined by the user
+        if( qualityDict.found("minimumFaceArea") )
+        {
+            readScalar(qualityDict.lookup("minimumFaceArea"));
+        }
+
+
+    }
+}
+
 void checkMeshDict::checkEntries() const
 {
     checkBasicSettings();
@@ -785,6 +833,8 @@ void checkMeshDict::checkEntries() const
     checkBoundaryLayers();
 
     checkRenameBoundary();
+
+    checkQualitySettings();
 }
 
 void checkMeshDict::updatePatchCellSize
@@ -860,7 +910,7 @@ void checkMeshDict::updatePatchCellSize
 
 void checkMeshDict::updateSubsetCellSize
 (
-    const std::map<word, wordList>& patchesFromPatch
+    const std::map<word, wordList>& /*patchesFromPatch*/
 )
 {
 
@@ -1028,7 +1078,7 @@ void checkMeshDict::updateRemoveCellsIntersectingPatches
 
 void checkMeshDict::updateObjectRefinements
 (
-    const std::map<word, wordList>& patchesFromPatch
+    const std::map<word, wordList>& /*patchesFromPatch*/
 )
 {
 

@@ -136,6 +136,16 @@ void meshOctree::findNearestSurfacePointInRegion
     const point& p
 ) const
 {
+    if( region < 0 )
+    {
+        WarningIn
+        (
+            "void meshOctree::findNearestSurfacePointInRegion(point&, scalar&,"
+            "label&, const label, const point&) const"
+        ) << "Region " << region << " is not valid!" << endl;
+
+        return;
+    }
     const label cLabel = findLeafContainingVertex(p);
     vector sizeVec;
     if( cLabel < 0 )

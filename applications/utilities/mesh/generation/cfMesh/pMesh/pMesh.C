@@ -30,8 +30,6 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
-#include "objectRegistry.H"
-#include "foamTime.H"
 #include "voronoiMeshGenerator.H"
 
 using namespace Foam;

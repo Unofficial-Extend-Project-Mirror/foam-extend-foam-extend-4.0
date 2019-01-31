@@ -94,7 +94,7 @@ bool boxRefinement::intersectsObject(const boundBox& bb) const
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dictionary boxRefinement::dict(bool ignoreType) const
+dictionary boxRefinement::dict(bool /*ignoreType*/) const
 {
     dictionary dict;
 

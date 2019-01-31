@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                |
-| \\      /  F ield         | cfMesh: A library for mesh generation          |
+| \\      /  F ield         | cfMesh: A library for mesh generation          | 
 |  \\    /   O peration     |                                                |
-|   \\  /    A nd           | Author: Franjo Juretic                         |
+|   \\  /    A nd           | Author: Franjo Juretic                         | 
 |    \\/     M anipulation  | E-mail: franjo.juretic@c-fields.com            |
 \*---------------------------------------------------------------------------*/
 
@@ -17,46 +17,48 @@ FoamFile
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-boundaryCellSize 4.5;
-//keepCellsIntersectingBoundary 1;
-maxCellSize      9;
-//minCellSize    0.375;
+boundaryCellSize	4.5;
+//keepCellsIntersectingBoundary	1;
+maxCellSize	9;
+//minCellSize	0.375;
 
-surfaceFile    "socket.fms";
+surfaceFile	"socket.fms";
 
 boundaryLayers
 {
-    maxFirstLayerThickness 2.0;
-    nLayers                1;
-    thicknessRatio         1.2;
+    maxFirstLayerThickness	2.0;
+    nLayers	1;
+    thicknessRatio	1.2;
 
     patchBoundaryLayers
     {
+
         patch7
         {
-            allowDiscontinuity 0;
-            maxFirstLayerThickness 1.0;
-            nLayers            2;
-            thicknessRatio     1.1;
+            allowDiscontinuity	0;
+            maxFirstLayerThickness	1.0;
+            nLayers	2;
+            thicknessRatio	1.1;
         }
     }
 }
 
 localRefinement
 {
+
     patch15
     {
-        additionalRefinementLevels    1;
+        additionalRefinementLevels	1;
     }
 
     subset1
     {
-        cellSize 4.5;
+        cellSize	4.5;
     }
 
     subset2
     {
-        cellSize 4.5;
+        cellSize	4.5;
     }
 }
 

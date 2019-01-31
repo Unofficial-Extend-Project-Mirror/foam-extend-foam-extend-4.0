@@ -46,18 +46,18 @@ namespace Foam
 /*---------------------------------------------------------------------------*\
                            Class refLabelledPoint Declaration
 \*---------------------------------------------------------------------------*/
-
+    
 class refLabelledPoint
 {
     // Private data
         //- label of the object it is associated to
         label objectLabel_;
-
+    
         //- point to be transferred
         labelledPoint p_;
-
+    
     public:
-
+        
     // Constructors
         //- Null construct
         refLabelledPoint()
@@ -65,52 +65,52 @@ class refLabelledPoint
             objectLabel_(-1),
             p_()
         {}
-
+        
         //- Construct from label and labelledPoint
         refLabelledPoint(const label pl, const labelledPoint& p)
         :
             objectLabel_(pl),
             p_(p)
         {}
-
+            
     // Destructor
         ~refLabelledPoint()
         {}
-
+            
     // Member functions
         //- return label of the object it is associated to
         inline label objectLabel() const
         {
             return objectLabel_;
         }
-
+        
         //- return labelledPoint
         inline const labelledPoint& lPoint() const
         {
             return p_;
         }
-
+        
     // Member operators
-
+        
         inline void operator=(const refLabelledPoint& lp)
         {
             objectLabel_ = lp.objectLabel_;
             p_ = lp.p_;
         }
-
+        
         inline bool operator==(const refLabelledPoint& lp) const
         {
             if( objectLabel_ == lp.objectLabel_ )
                 return true;
-
+            
             return false;
         }
-
+        
         inline bool operator!=(const refLabelledPoint& lp) const
         {
             return !this->operator==(lp);
         }
-
+        
     // Friend operators
         friend Ostream& operator<<(Ostream& os, const refLabelledPoint& lp)
         {
@@ -123,21 +123,21 @@ class refLabelledPoint
 
             return os;
         }
-
+        
         friend Istream& operator>>(Istream& is, refLabelledPoint& lp)
         {
             // Read beginning of refLabelledPoint
             is.readBegin("refLabelledPoint");
-
+        
             is >> lp.objectLabel_;
             is >> lp.p_;
-
+            
             // Read end of refLabelledPoint
             is.readEnd("refLabelledPoint");
-
+        
             // Check state of Istream
             is.check("operator>>(Istream&, refLabelledPoint");
-
+            
             return is;
         }
 };

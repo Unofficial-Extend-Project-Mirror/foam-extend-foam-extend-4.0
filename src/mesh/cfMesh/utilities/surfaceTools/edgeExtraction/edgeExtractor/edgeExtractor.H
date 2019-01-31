@@ -38,8 +38,6 @@ SourceFiles
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "objectRegistry.H"
-#include "foamTime.H"
 #include "labelList.H"
 #include "labelLongList.H"
 #include "VRWGraph.H"

@@ -153,7 +153,7 @@ void planeScaling::boundingPlanes(PtrList<plane>& pl) const
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dictionary planeScaling::dict(bool ignoreType) const
+dictionary planeScaling::dict(bool /*ignoreType*/) const
 {
     dictionary dict;
 

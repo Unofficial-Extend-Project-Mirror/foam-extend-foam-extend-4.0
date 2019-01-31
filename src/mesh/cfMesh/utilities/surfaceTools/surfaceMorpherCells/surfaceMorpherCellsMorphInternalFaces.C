@@ -116,7 +116,7 @@ void surfaceMorpherCells::findBoundaryVertices()
                 //- send the list of other processor
                 OPstream toOtherProc
                 (
-                    Pstream::blocking,
+                    Pstream::commsTypes::blocking,
                     procBoundaries[patchI].neiProcNo(),
                     bndVertsToSend.byteSize()
                 );
@@ -130,7 +130,7 @@ void surfaceMorpherCells::findBoundaryVertices()
                 labelList receivedBndNodes;
                 IPstream fromOtherProc
                 (
-                    Pstream::blocking,
+                    Pstream::commsTypes::blocking,
                     procBoundaries[patchI].neiProcNo()
                 );
                 fromOtherProc >> receivedBndNodes;
@@ -531,7 +531,8 @@ bool surfaceMorpherCells::morphInternalFaces()
         //- remove faces which do not exist any more
         boolList removeFace(faces.size(), false);
         bool removeFaces(false);
-        for(register label faceI=0;faceI<nIntFaces;++faceI)
+
+        for(label faceI=0;faceI<nIntFaces;++faceI)
             if( faces[faceI].size() < 3 )
             {
                 removeFace[faceI] = true;

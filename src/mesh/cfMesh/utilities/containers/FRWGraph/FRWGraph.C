@@ -34,15 +34,34 @@ Foam::Ostream& Foam::operator<<
     const Foam::FRWGraph<T, width>& DL
 )
 {
-    os << DL.size() << "(" << endl;
-    for(register label i=0;i<DL.size();++i)
+    os << DL.size() << "(" << nl;
+
+    for(label i=0;i<DL.size();++i)
     {
         os << width << "(";
+
         for(label j=0;j<width;++j)
-            os << DL(i, j) << " " << endl;
-        os << ")" << endl;
+        {
+            if( j )
+            {
+                os << " ";
+            }
+
+            os << DL(i, j);
+        }
+
+        os << ")" << nl;
     }
+
     os << ")";
+
+    // Check state of IOstream
+    os.check
+    (
+        "template<class T, Foam::label width>Foam::Ostream& Foam::operator<<"
+        "(Foam::Ostream& os, const Foam::FRWGraph<T, width>&)"
+    );
+
     return os;
 }
 

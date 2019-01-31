@@ -62,6 +62,13 @@ class renameBoundaryPatches
         //- calculate new boundary and replace the existing one
         void calculateNewBoundary();
 
+        //- find empty patches in 3D meshes and change them to wall
+        void checkEmptyPatches();
+
+        //- check if there exist any symmetry planes
+        //- and make sure they get perfectly flat
+        void checkSymmetryPlanes();
+
         //- Disallow default bitwise copy construct
         renameBoundaryPatches(const renameBoundaryPatches&);
 
@@ -76,7 +83,8 @@ public:
         renameBoundaryPatches
         (
             polyMeshGen& mesh,
-            const IOdictionary& meshDict
+            const IOdictionary& meshDict,
+            const bool allowEmptyPatches = false
         );
 
     // Destructor

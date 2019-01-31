@@ -78,16 +78,16 @@ sphereRefinement::sphereRefinement
 bool sphereRefinement::intersectsObject(const boundBox& bb) const
 {
     const point& c = (bb.max() + bb.min()) / 2.0;
-
+    
     if( magSqr(c - centre_) < sqr(radius_) )
         return true;
-
+    
     return false;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dictionary sphereRefinement::dict(bool ignoreType) const
+dictionary sphereRefinement::dict(bool /*ignoreType*/) const
 {
     dictionary dict;
 
@@ -121,7 +121,7 @@ void sphereRefinement::writeDict(Ostream& os, bool subDict) const
     {
         os << indent << token::BEGIN_BLOCK << incrIndent << nl;
     }
-
+    
     if( additionalRefinementLevels() == 0 && cellSize() >= 0.0 )
     {
         os.writeKeyword("cellSize") << cellSize() << token::END_STATEMENT << nl;
@@ -198,9 +198,9 @@ Ostream& sphereRefinement::operator<<(Ostream& os) const
     write(os);
     return os;
 }
-
+        
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
+        
 } // End namespace Foam
 
 // ************************************************************************* //

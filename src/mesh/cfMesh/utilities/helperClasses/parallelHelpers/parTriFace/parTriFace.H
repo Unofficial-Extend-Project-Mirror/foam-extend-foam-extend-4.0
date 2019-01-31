@@ -99,12 +99,10 @@ class parTriFace
 
     // Member operators
 
-        inline bool operator !=(const parTriFace& ptf) const
+        inline bool operator !=(const parTriFace& /*ptf*/) const
         {
             Serr << "parTriFace::operator!= Not implemented" << endl;
             ::exit(1);
-
-            return true;
         }
 
     // Friend operators

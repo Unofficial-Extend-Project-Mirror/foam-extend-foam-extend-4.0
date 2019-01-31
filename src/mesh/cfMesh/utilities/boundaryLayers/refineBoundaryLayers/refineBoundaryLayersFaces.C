@@ -250,7 +250,7 @@ void refineBoundaryLayers::refineFace
     forAll(facePoints, i)
     {
         facePoints[i].setSize(nLayersDir1+1);
-        facePoints[i] = -1;
+	facePoints[i] = label(-1);
     }
 
     //- add points in the matrix
@@ -1049,7 +1049,7 @@ void refineBoundaryLayers::generateNewFaces()
 
             OPstream toOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 sendData.byteSize()
             );
@@ -1065,7 +1065,7 @@ void refineBoundaryLayers::generateNewFaces()
 
             IPstream fromOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
 

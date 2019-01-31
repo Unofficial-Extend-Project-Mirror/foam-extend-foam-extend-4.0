@@ -52,22 +52,22 @@ class topologicalCleaner
 {
     // Private data
         polyMeshGen& mesh_;
-
+    
         bool changed_;
-
+    
         boolList decomposeCell_;
 
     // Private member functions
-
+    
         //- check and fix incorrectly connected faces
         void checkNonConsecutiveBoundaryVertices();
-
+    
         //- check and fix non-mappable faces
         void checkNonMappableFaces();
-
+    
         //- check and fix non-mappable cells
         void checkNonMappableCells();
-
+    
         //- decompose marked cells
         void decomposeCells();
 
@@ -99,7 +99,7 @@ public:
         (
             labelHashSet* irregularNodes = nullptr
         );
-
+    
         //- check and fix vertices where two or more groups of faces meet
         void checkInvalidConnectionsForVerticesFaces
         (

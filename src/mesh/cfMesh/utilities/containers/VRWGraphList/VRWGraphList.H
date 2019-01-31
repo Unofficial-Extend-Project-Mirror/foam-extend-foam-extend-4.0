@@ -45,17 +45,23 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+
+class VRWGraphList;
+
+Ostream& operator<<(Ostream&, const VRWGraphList&);
+
 /*---------------------------------------------------------------------------*\
                            Class VRWGraphList Declaration
 \*---------------------------------------------------------------------------*/
 
 class VRWGraphList
 {
-
+        
     // Private data
         //- graph containing the data
         VRWGraph data_;
-
+    
         //- number of rows
         LongList<rowElement> rows_;
 
@@ -67,7 +73,7 @@ class VRWGraphList
             const label j,
             const label k
         ) const;
-
+    
 public:
 
     // Constructors
@@ -88,10 +94,10 @@ public:
 
             //- Returns the number of graphs
             inline label size() const;
-
+            
             //- Returns the number of rows in the graph at that position
             inline label sizeOfGraph(const label posI) const;
-
+            
             //- Return the number of element in the row at the given position
             inline label sizeOfRow(const label posI, const label rowI) const;
 
@@ -103,7 +109,7 @@ public:
         //- Append a graph at the end of the graphList
         template<class GraphType>
         inline void appendGraph(const GraphType& l);
-
+        
         //- get and set operators
         inline label operator()
         (
@@ -111,11 +117,11 @@ public:
             const label j,
             const label k
         ) const;
-
+        
         inline label& operator()(const label i, const label j, const label k);
-
+        
         inline const subGraph<const VRWGraph> operator[](const label i) const;
-
+        
         //- Assignment operator
         inline void operator=(const VRWGraphList&);
 

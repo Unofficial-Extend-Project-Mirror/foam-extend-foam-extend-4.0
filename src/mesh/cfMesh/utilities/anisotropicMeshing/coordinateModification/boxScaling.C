@@ -176,7 +176,7 @@ void boxScaling::boundingPlanes(PtrList<plane>&pl) const
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dictionary boxScaling::dict(bool ignoreType) const
+dictionary boxScaling::dict(bool /*ignoreType*/) const
 {
     dictionary dict;
 

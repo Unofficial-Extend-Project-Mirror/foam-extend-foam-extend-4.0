@@ -135,7 +135,7 @@ void meshOctreeAutomaticRefinement::setMaxRefLevel()
         {
             finished = false;
 
-            const scalar lSize = size / pow(2, label(maxRefLevel_));
+	    const scalar lSize = size / pow(2.0, label(maxRefLevel_));
 
             if( lSize < cs )
             {

@@ -79,7 +79,7 @@ void whisperReduce(const ListType& neis, const scatterOp& sop, gatherOp& gop)
     {
         //- receive the data
         List<T> receivedData;
-        IPstream fromOtherProc(Pstream::blocking, above[aboveI]);
+        IPstream fromOtherProc(Pstream::commsTypes::blocking, above[aboveI]);
         fromOtherProc >> receivedData;
 
         gop(receivedData);
@@ -94,7 +94,13 @@ void whisperReduce(const ListType& neis, const scatterOp& sop, gatherOp& gop)
         sop(dts);
 
         //- send the data
-        OPstream toOtherProc(Pstream::blocking, neiProc, dts.byteSize());
+        OPstream toOtherProc
+        (
+            Pstream::commsTypes::blocking,
+            neiProc,
+            dts.byteSize()
+        );
+
         toOtherProc << dts;
     }
 
@@ -104,7 +110,7 @@ void whisperReduce(const ListType& neis, const scatterOp& sop, gatherOp& gop)
     {
         //- receive the data
         List<T> receivedData;
-        IPstream fromOtherProc(Pstream::blocking, below[belowI]);
+        IPstream fromOtherProc(Pstream::commsTypes::blocking, below[belowI]);
         fromOtherProc >> receivedData;
 
         gop(receivedData);
@@ -119,7 +125,13 @@ void whisperReduce(const ListType& neis, const scatterOp& sop, gatherOp& gop)
         sop(dts);
 
         //- send the data
-        OPstream toOtherProc(Pstream::blocking, neiProc, dts.byteSize());
+        OPstream toOtherProc
+        (
+            Pstream::commsTypes::blocking,
+            neiProc,
+            dts.byteSize()
+        );
+
         toOtherProc << dts;
     }
 }
@@ -143,14 +155,24 @@ void exchangeMap
     labelHashSet receiveData;
     for(iter=m.begin();iter!=m.end();++iter)
     {
-        OPstream toOtherProc(Pstream::blocking, iter->first, sizeof(label));
+        OPstream toOtherProc
+        (
+            Pstream::commsTypes::blocking,
+            iter->first,
+            sizeof(label)
+        );
 
         toOtherProc << iter->second.size();
     }
 
     for(iter=m.begin();iter!=m.end();++iter)
     {
-        IPstream fromOtherProc(Pstream::blocking, iter->first, sizeof(label));
+        IPstream fromOtherProc
+        (
+            Pstream::commsTypes::blocking,
+            iter->first,
+            sizeof(label)
+        );
 
         label s;
         fromOtherProc >> s;
@@ -159,7 +181,7 @@ void exchangeMap
             receiveData.insert(iter->first);
     }
 
-    if( commsType == Pstream::blocking )
+    if( commsType == Pstream::commsTypes::blocking )
     {
         //- start with blocking type of send and received operation
 
@@ -173,7 +195,7 @@ void exchangeMap
 
             OPstream toOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 iter->first,
                 dts.byteSize()
             );
@@ -186,11 +208,16 @@ void exchangeMap
             if( !receiveData.found(iter->first) )
                 continue;
 
-            IPstream fromOtherProc(Pstream::blocking, iter->first);
+            IPstream fromOtherProc
+            (
+                Pstream::commsTypes::blocking,
+                iter->first
+            );
+
             data.appendFromStream(fromOtherProc);
         }
     }
-    else if( commsType == Pstream::scheduled )
+    else if( commsType == Pstream::commsTypes::scheduled )
     {
         //- start with scheduled data transfer
         //- this type of transfer is intended for long messages because
@@ -204,13 +231,13 @@ void exchangeMap
             if( !receiveData.found(iter->first) )
                 continue;
 
-            //List<T> receive;
-            IPstream fromOtherProc(Pstream::scheduled, iter->first);
-            //fromOtherProc >> receive;
-            data.appendFromStream(fromOtherProc);
+            IPstream fromOtherProc
+            (
+                Pstream::commsTypes::scheduled,
+                iter->first
+            );
 
-            //forAll(receive, i)
-            //    data.append(receive[i]);
+            data.appendFromStream(fromOtherProc);
         }
 
         //- send data to processors with greater ids
@@ -226,7 +253,7 @@ void exchangeMap
 
             OPstream toOtherProc
             (
-                Pstream::scheduled,
+                Pstream::commsTypes::scheduled,
                 iter->first,
                 dts.byteSize()
             );
@@ -243,13 +270,13 @@ void exchangeMap
             if( !receiveData.found(riter->first) )
                 continue;
 
-            IPstream fromOtherProc(Pstream::scheduled, riter->first);
-            //List<T> receive;
-            //fromOtherProc >> receive;
-            data.appendFromStream(fromOtherProc);
+            IPstream fromOtherProc
+            (
+                Pstream::commsTypes::scheduled,
+                riter->first
+            );
 
-            //forAll(receive, i)
-             //   data.append(receive[i]);
+            data.appendFromStream(fromOtherProc);
         }
 
         //- send data to processors with lower ids
@@ -265,7 +292,7 @@ void exchangeMap
 
             OPstream toOtherProc
             (
-                Pstream::scheduled,
+                Pstream::commsTypes::scheduled,
                 riter->first,
                 dts.byteSize()
             );
@@ -317,7 +344,7 @@ void exchangeMap
 
         OPstream toOtherProc
         (
-            Pstream::blocking,
+            Pstream::commsTypes::blocking,
             iter->first,
             dataToSend.byteSize()
         );
@@ -330,7 +357,12 @@ void exchangeMap
         mOut.insert(std::make_pair(iter->first, List<T>()));
         List<T>& dataToReceive = mOut[iter->first];
 
-        IPstream fromOtherProc(Pstream::blocking, iter->first);
+        IPstream fromOtherProc
+        (
+            Pstream::commsTypes::blocking,
+            iter->first
+        );
+
         fromOtherProc >> dataToReceive;
     }
 }

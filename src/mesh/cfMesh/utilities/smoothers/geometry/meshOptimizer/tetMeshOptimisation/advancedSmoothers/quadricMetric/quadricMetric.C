@@ -101,7 +101,7 @@ quadricMetric::~quadricMetric()
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // Implementation of knupp metric untangling
-void quadricMetric::optimizeNodePosition(const scalar tolObsolete)
+void quadricMetric::optimizeNodePosition(const scalar /*tolObsolete*/)
 {
     if( !bb_.contains(p_) )
         p_ = 0.5 * (bb_.min() + bb_.max());

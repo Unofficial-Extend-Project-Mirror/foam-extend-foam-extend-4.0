@@ -39,11 +39,10 @@ namespace Foam
 
 void triSurfaceImportSurfaceAsSubset::createOctree
 (
-    const triSurf& surf,
-    meshOctree& octree
+    const triSurf& /*surf*/,
+    meshOctree& /*octree*/
 )
 {
-
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

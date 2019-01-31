@@ -36,6 +36,8 @@ Description
 #include "volumeOptimizer.H"
 #include "knuppMetric.H"
 
+#include "helperFunctions.H"
+
 #include <map>
 
 # ifdef USE_OMP
@@ -495,16 +497,20 @@ void tetMeshOptimisation::optimiseBoundaryVolumeOptimizer
                         if( mag(ev[2]) > (mag(ev[1]) + mag(ev[0])) )
                         {
                             //- ordinary surface vertex
-                            vector normal = eigenVector(nt, ev[2]);
+                            vector normal = help::eigenVector(nt, ev[2]);
+
                             normal /= (mag(normal)+VSMALL);
                             disp -= (disp & normal) * normal;
                         }
                         else if( mag(ev[1]) > 0.5 * (mag(ev[2]) + mag(ev[0])) )
                         {
                             //- this vertex is on an edge
-                            vector normal1 = eigenVector(nt, ev[1]);
+                            vector normal1 = help::eigenVector(nt, ev[1]);
+
                             normal1 /= (mag(normal1)+VSMALL);
-                            vector normal2 = eigenVector(nt, ev[2]);
+
+                            vector normal2 = help::eigenVector(nt, ev[2]);
+
                             normal2 /= (mag(normal2)+VSMALL);
 
                             vector eVec = normal1 ^ normal2;

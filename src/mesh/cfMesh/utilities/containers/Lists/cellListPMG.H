@@ -29,7 +29,7 @@ Description
     every time it is resized
 
 SourceFiles
-
+    
 
 \*---------------------------------------------------------------------------*/
 
@@ -53,24 +53,24 @@ class cellListPMG
     // Private data
         //- number of used elements
         label nElmts_;
-
+    
     // Disallow bitwise assignment
         void operator=(const cellListPMG&);
-
+    
         cellListPMG(const cellListPMG&);
-
+    
     // Disallow transfer from cellList
         void transfer(cellList&);
-
+    
 public:
-
+    
     // Constructors
         //- null construct
         inline cellListPMG();
 
     // Destructor
         inline ~cellListPMG();
-
+            
     // Member functions
         //- return the number of used elements
         inline label size() const;
@@ -83,15 +83,15 @@ public:
 
         //- add a cell at the end of the list
         inline void append(const cell&);
-
+        
         //- return an element with bound checking
         inline cell& newElmt(const label);
 
     // Member operators
         inline void operator=(const cellList&);
-
+    
         friend inline Ostream& operator<<(Ostream&, const cellListPMG&);
-
+        
         friend inline Istream& operator>>(Istream&, cellListPMG&);
 };
 

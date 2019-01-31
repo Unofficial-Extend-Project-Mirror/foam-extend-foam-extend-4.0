@@ -23,7 +23,7 @@ License
 
 Description
 
-\*----------------------p-----------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "decomposeCells.H"
 #include "helperFunctions.H"
@@ -55,8 +55,10 @@ void decomposeCells::findAddressingForCell
     const faceListPMG& faces = mesh_.faces();
     forAll(faceEdges, feI)
     {
-        faceEdges[feI].setSize(faces[c[feI]].size());
-        faceEdges[feI] = -1;
+        DynList<label, 8>& fEdges = faceEdges[feI];
+
+        fEdges.setSize(faces[c[feI]].size());
+        fEdges = label(-1);
     }
 
     forAll(c, fI)
@@ -127,9 +129,9 @@ void decomposeCells::findAddressingForCell
 label decomposeCells::findTopVertex
 (
     const label cellI,
-    const DynList<label, 32>& vrt,
-    const DynList<edge, 64>& edges,
-    const DynList<DynList<label, 2>, 64>& edgeFaces
+    const DynList<label, 32>& /*vrt*/,
+    const DynList<edge, 64>& /*edges*/,
+    const DynList<DynList<label, 2>, 64>& /*edgeFaces*/
 )
 {
     const cell& c = mesh_.cells()[cellI];

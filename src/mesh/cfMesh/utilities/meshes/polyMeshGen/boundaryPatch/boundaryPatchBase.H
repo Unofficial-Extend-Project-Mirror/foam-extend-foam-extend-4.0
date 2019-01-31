@@ -51,23 +51,23 @@ namespace Foam
 class boundaryPatchBase
 {
 protected:
-
+    
     // Protected data
         word name_;
-
+    
         word type_;
-
+    
         label nFaces_;
-
+    
         label startFace_;
 
 public:
-
+    
     //- Runtime type information
     TypeName("boundaryPatchBase");
 
     // Constructors
-
+    
         boundaryPatchBase
         (
             const word&,
@@ -84,7 +84,7 @@ public:
         {}
 
     // Declare run-time constructor selection table
-
+            
         declareRunTimeSelectionTable
         (
             autoPtr,
@@ -98,20 +98,20 @@ public:
         );
 
     // Selectors
-
+        
         static autoPtr<boundaryPatchBase> New
         (
             const word& name,
             const dictionary& dict
         );
-
+        
         static autoPtr<boundaryPatchBase> New
         (
             Istream&
         );
-
+        
     // Construct and return a clone
-
+    
         autoPtr<boundaryPatchBase> clone() const
         {
             return New
@@ -120,7 +120,7 @@ public:
                 this->dict()
             );
         }
-
+        
     //- Write
         virtual void write(Ostream&) const = 0;
 
@@ -133,45 +133,45 @@ public:
         {
             return name_;
         }
-
+        
         inline word& patchName()
         {
             return name_;
         }
-
+        
         inline const word& patchType() const
         {
             return type_;
         }
-
+        
         inline word& patchType()
         {
             return type_;
         }
-
+        
         inline label patchStart() const
         {
             return startFace_;
         }
-
+        
         inline label& patchStart()
         {
             return startFace_;
         }
-
+        
         inline label patchSize() const
         {
             return nFaces_;
         }
-
+        
         inline label& patchSize()
         {
             return nFaces_;
         }
-
+        
         //- Return as dictionary of entries
         virtual dictionary dict() const = 0;
-
+        
     // Member operators
         friend Ostream& operator<<(Ostream&, const boundaryPatchBase&);
         virtual Istream& operator>>(Istream&) = 0;

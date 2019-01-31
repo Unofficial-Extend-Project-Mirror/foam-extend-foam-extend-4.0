@@ -50,7 +50,7 @@ void sortEdgesIntoChains::createNodeLabels()
             newNodeLabel_.insert(e.end(), nPoints++);
     }
 
-    edgesAtPoint_.setSize(nPoints, DynList<label>());
+    edgesAtPoint_.setSize(nPoints);
     forAll(bEdges_, eI)
     {
         const edge& e = bEdges_[eI];
@@ -69,7 +69,7 @@ void sortEdgesIntoChains::createNodeLabels()
 bool sortEdgesIntoChains::findPointsBelongingToTheChain
 (
     const label currPos,
-    boolList& chainEdges
+    DynList<bool>& chainEdges
 ) const
 {
     # ifdef DEBUGSort
@@ -150,7 +150,7 @@ bool sortEdgesIntoChains::findPointsBelongingToTheChain
     return true;
 }
 
-void sortEdgesIntoChains::shrinkEdges(const boolList& chainEdges)
+void sortEdgesIntoChains::shrinkEdges(const DynList<bool>& chainEdges)
 {
     forAll(chainEdges, eI)
         if( chainEdges[eI] )
@@ -168,14 +168,14 @@ void sortEdgesIntoChains::shrinkEdges(const boolList& chainEdges)
         }
 }
 
-void sortEdgesIntoChains::createChainFromEdges(const boolList& chainEdges)
+void sortEdgesIntoChains::createChainFromEdges(const DynList<bool>& chainEdges)
 {
-    direction i(0);
+    label i(0);
     forAll(chainEdges, eI)
         if( chainEdges[eI] )
             ++i;
 
-    labelList chainPoints(i);
+    DynList<label> chainPoints(i);
     i = 0;
 
     forAll(chainEdges, eI)
@@ -232,7 +232,7 @@ void sortEdgesIntoChains::sortEdges()
 
     if( !openEdges_ )
     {
-        boolList chainEdges(bEdges_.size());
+        DynList<bool> chainEdges(bEdges_.size());
         forAll(edgesAtPoint_, pI)
             if( findPointsBelongingToTheChain(pI, chainEdges) )
             {
@@ -257,12 +257,11 @@ sortEdgesIntoChains::sortEdgesIntoChains(const DynList<edge>& bEdges)
 }
 
 sortEdgesIntoChains::~sortEdgesIntoChains()
-{
-}
+{}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *//
 // Member functions
-const DynList<labelList>& sortEdgesIntoChains::sortedChains() const
+const DynList<DynList<label> >& sortEdgesIntoChains::sortedChains() const
 {
     return createdChains_;
 }

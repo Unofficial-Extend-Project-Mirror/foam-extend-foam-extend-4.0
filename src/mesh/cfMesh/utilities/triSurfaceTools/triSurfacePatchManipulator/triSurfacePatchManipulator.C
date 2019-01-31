@@ -31,6 +31,7 @@ Description
 #include "checkMeshDict.H"
 
 #include <map>
+#include <stdexcept>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -206,9 +207,28 @@ const triSurf* triSurfacePatchManipulator::surfaceWithPatches
             }
         }
 
+        bool foundProblematic(false);
         forAll(patchToNewPatches, patchI)
         {
             const word& pName = origPatches[patchI].name();
+
+            if
+            (
+                (patchTypes[pName] == "symmetryPlane") &&
+                (patchToNewPatches[patchI].size() > 1)
+            )
+            {
+                SeriousError << "Symmetry plane patch with a name " << pName
+                    << " is decomposed into "
+                    << patchToNewPatches[patchI].size()
+                    << " separate parts. Please split the patch into parts "
+                    << "bounded by feature edges"
+                    << " or change the type to symmetry."
+                    << endl;
+
+                foundProblematic = true;
+            }
+
             patchesForPatch[pName].setSize
             (
                 patchToNewPatches[patchI].size()
@@ -218,6 +238,15 @@ const triSurf* triSurfacePatchManipulator::surfaceWithPatches
 
             forAllConstIter(labelHashSet, patchToNewPatches[patchI], it)
                 patchesForPatch[pName][counter++] = newPatches[it.key()].name();
+        }
+
+        reduce(foundProblematic, maxOp<bool>());
+        if( foundProblematic )
+        {
+            throw std::logic_error
+            (
+                "Cannot optimize symmetryPlane. Exitting.."
+            );
         }
 
         //- update the values in meshDict based on the created patches

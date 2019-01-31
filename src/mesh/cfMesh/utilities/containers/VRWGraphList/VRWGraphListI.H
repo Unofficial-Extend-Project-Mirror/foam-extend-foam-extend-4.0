@@ -25,7 +25,7 @@ License
 
 namespace Foam
 {
-
+    
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 inline void Foam::VRWGraphList::checkIndex
@@ -45,7 +45,7 @@ inline void Foam::VRWGraphList::checkIndex
             << " is not in range " << Foam::label(0)
             << " and " << rows_.size() << abort(FatalError);
     }
-
+    
     if( (j < 0) || (j >= rows_[i].size()) )
         FatalErrorIn
         (
@@ -54,7 +54,7 @@ inline void Foam::VRWGraphList::checkIndex
         ) << "Row index " << Foam::label(j)
             << " is not in range " << Foam::label(0)
             << " and " << rows_[i].size() << abort(FatalError);
-
+    
     if( (k < 0) || (k >= data_.sizeOfRow(rows_[i].start()+j)) )
         FatalErrorIn
         (
@@ -125,10 +125,10 @@ inline void Foam::VRWGraphList::appendGraph
 )
 {
     rowElement re(data_.size(), l.size());
-
+    
     for(label i=0;i<l.size();++i)
         data_.appendList(l[i]);
-
+    
     rows_.append(re);
 }
 
@@ -144,7 +144,7 @@ inline Foam::label Foam::VRWGraphList::operator()
     #ifdef FULLDEBUG
     checkIndex(i, j, k);
     #endif
-
+        
     return data_(rows_[i].start() + j, k);
 }
 
@@ -157,7 +157,7 @@ inline Foam::label& Foam::VRWGraphList::operator()
     #ifdef FULLDEBUG
     checkIndex(i, j, k);
     #endif
-
+        
     return data_(rows_[i].start() + j, k);
 }
 

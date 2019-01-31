@@ -49,14 +49,14 @@ class faceDecomposition
 {
     // private data
         const face& f_;
-
+    
         const pointField& points_;
 
     // private member functions
         //- find concave vertex and return its position
         //- in the face
         label concaveVertex() const;
-
+    
         //- decomposes the face into triangle starting from
         //- the given vertex
         faceList decomposeFaceIntoTriangles(const label cv) const;
@@ -91,7 +91,7 @@ public:
 
         //- decompose face into triangles
         faceList decomposeFaceIntoTriangles() const;
-
+        
         //- decompose face into the minimal number
         //- of convex faces
         faceList decomposeFace() const;

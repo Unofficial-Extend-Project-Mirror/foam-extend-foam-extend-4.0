@@ -26,6 +26,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "quadricFitting.H"
+#include "helperFunctions.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -48,11 +49,15 @@ void quadricFitting::calculateNormalVector()
     mat /= otherPoints_.size();
 
     //- find the eigenvalues of the tensor
-    const vector ev = eigenValues(mat);
+    const vector ev = help::eigenValues(mat);
 
     //- estimate the normal as the eigenvector associated
     //- to the smallest eigenvalue
-    normal_ = eigenVector(mat, ev[0]);
+    # ifdef OpenCFDSpecific
+    normal_ = eigenVectors(mat, ev).x();
+    # else
+    normal_ = help::eigenVector(mat, ev[0]);
+    # endif
 }
 
 void quadricFitting::calculateCoordinateSystem()

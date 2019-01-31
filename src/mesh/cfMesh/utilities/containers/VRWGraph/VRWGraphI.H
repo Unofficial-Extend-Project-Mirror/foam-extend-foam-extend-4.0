@@ -518,7 +518,7 @@ inline bool Foam::VRWGraph::contains
         return false;
     const label size = rows_[rowI].size();
 
-    for(register label i=0;i<size;++i)
+    for(label i=0;i<size;++i)
         if( data_[start+i] == e )
             return true;
 
@@ -536,7 +536,8 @@ inline Foam::label Foam::VRWGraph::containsAtPosition
         return -1;
 
     const label size = rows_[rowI].size();
-    for(register label i=0;i<size;++i)
+
+    for(label i=0;i<size;++i)
         if( data_[start+i] == e )
             return i;
 

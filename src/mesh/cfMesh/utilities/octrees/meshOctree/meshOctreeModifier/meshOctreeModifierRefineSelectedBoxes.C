@@ -489,7 +489,11 @@ void meshOctreeModifier::refineSelectedBoxes
         }
     }
 
+    //- update the list of leaves
     createListOfLeaves();
+
+    //- update the communication pattern
+    updateCommunicationPattern();
 
     # ifdef OCTREETiming
     Info << "Time for actual refinement " << (omp_get_wtime()-regTime) << endl;

@@ -105,7 +105,7 @@ inline Foam::label Foam::FRWGraph<T,width>::size() const
 }
 
 template<class T, Foam::label width>
-inline Foam::label Foam::FRWGraph<T,width>::sizeOfRow(const label rowI) const
+inline Foam::label Foam::FRWGraph<T,width>::sizeOfRow(const label) const
 {
     return width;
 }
@@ -155,7 +155,8 @@ inline bool Foam::FRWGraph<T,width>::contains
 ) const
 {
     const label start = rowI * width;
-    for(register label i=0;i<width;++i)
+
+    for(label i=0;i<width;++i)
         if( data_[start+i] == e )
             return true;
 
@@ -170,7 +171,8 @@ inline Foam::label Foam::FRWGraph<T,width>::containsAtPosition
 ) const
 {
     const label start = rowI * width;
-    for(register label i=0;i<width;++i)
+
+    for(label i=0;i<width;++i)
         if( data_[start+i] == e )
             return i;
 

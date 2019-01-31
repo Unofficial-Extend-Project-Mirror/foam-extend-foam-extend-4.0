@@ -35,22 +35,29 @@ Foam::Ostream& Foam::operator<<
     const Foam::VRWGraph& DL
 )
 {
-    os << DL.size() << nl << token::BEGIN_LIST;
+    os << DL.size() << nl << token::BEGIN_LIST << nl;
 
-    for(register label i=0;i<DL.size();++i)
+    for(label i=0;i<DL.size();++i)
     {
-        os << nl << DL.sizeOfRow(i) << token::BEGIN_LIST;
+        os << DL.sizeOfRow(i) << token::BEGIN_LIST;
         for(label j=0;j<DL.sizeOfRow(i);++j)
         {
-            if( j > 0 ) os << token::SPACE;
+            if( j ) os << token::SPACE;
 
             os << DL(i, j);
         }
 
-        os << token::END_LIST;
+        os << token::END_LIST << nl;
     }
 
-    os << nl << token::END_LIST;
+    os << token::END_LIST;
+
+    // Check state of IOstream
+    os.check
+    (
+        "Foam::Ostream& Foam::operator<<(Foam::Ostream&, const Foam::VRWGraph&)"
+    );
+
     return os;
 }
 

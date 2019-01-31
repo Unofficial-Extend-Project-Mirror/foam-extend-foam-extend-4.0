@@ -26,8 +26,6 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "objectRegistry.H"
-#include "foamTime.H"
 #include "polyMeshGen.H"
 #include "meshSurfaceEngine.H"
 #include "OFstream.H"

@@ -36,8 +36,6 @@ SourceFiles
 #ifndef refineBoundaryLayers_H
 #define refineBoundaryLayers_H
 
-#include "objectRegistry.H"
-#include "foamTime.H"
 #include "polyMeshGenModifier.H"
 #include "meshSurfaceEngine.H"
 #include "DynList.H"

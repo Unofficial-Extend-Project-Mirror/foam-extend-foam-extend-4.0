@@ -66,7 +66,7 @@ inline void meshOptimizer::lockCells(const labelListType& l)
 
             OPstream toOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 dataToSend.byteSize()
             );
@@ -80,7 +80,7 @@ inline void meshOptimizer::lockCells(const labelListType& l)
 
             IPstream fromOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
 
@@ -146,7 +146,7 @@ inline void meshOptimizer::lockFaces(const labelListType& lf)
 
             OPstream toOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 dataToSend.byteSize()
             );
@@ -160,7 +160,7 @@ inline void meshOptimizer::lockFaces(const labelListType& lf)
 
             IPstream fromOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
 
@@ -235,7 +235,7 @@ inline void meshOptimizer::lockPoints(const labelListType& lp)
 
             OPstream toOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 dataToSend.byteSize()
             );
@@ -249,7 +249,7 @@ inline void meshOptimizer::lockPoints(const labelListType& lp)
 
             IPstream fromOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
 

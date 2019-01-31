@@ -135,7 +135,7 @@ void meshSurfaceEngine::calcGlobalBoundaryPointLabels() const
 
             OPstream toOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 dts.byteSize()
             );
@@ -146,7 +146,7 @@ void meshSurfaceEngine::calcGlobalBoundaryPointLabels() const
         {
             IPstream fromOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
             labelList receivedData;
@@ -250,7 +250,7 @@ void meshSurfaceEngine::calcGlobalBoundaryPointLabels() const
 
             OPstream toOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 dts.byteSize()
             );
@@ -261,7 +261,7 @@ void meshSurfaceEngine::calcGlobalBoundaryPointLabels() const
         {
             IPstream fromOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
             labelList receivedData;
@@ -450,7 +450,7 @@ void meshSurfaceEngine::calcGlobalBoundaryEdgeLabels() const
 
             OPstream toOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 dts.byteSize()
             );
@@ -461,7 +461,7 @@ void meshSurfaceEngine::calcGlobalBoundaryEdgeLabels() const
         {
             IPstream fromOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
             labelList receivedData;
@@ -586,7 +586,7 @@ void meshSurfaceEngine::calcGlobalBoundaryEdgeLabels() const
 
             OPstream toOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 dts.byteSize()
             );
@@ -597,7 +597,7 @@ void meshSurfaceEngine::calcGlobalBoundaryEdgeLabels() const
         {
             IPstream fromOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
             labelList receivedData;

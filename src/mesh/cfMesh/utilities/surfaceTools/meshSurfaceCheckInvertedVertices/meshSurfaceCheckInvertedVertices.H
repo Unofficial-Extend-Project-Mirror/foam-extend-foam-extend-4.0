@@ -37,8 +37,6 @@ SourceFiles
 #ifndef meshSurfaceCheckInvertedVertices_H
 #define meshSurfaceCheckInvertedVertices_H
 
-#include "objectRegistry.H"
-#include "foamTime.H"
 #include "polyMeshGenModifier.H"
 #include "HashSet.H"
 

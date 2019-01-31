@@ -44,8 +44,7 @@ checkIrregularSurfaceConnections::checkIrregularSurfaceConnections
 :
     mesh_(mesh),
     meshSurfacePtr_(nullptr)
-{
-}
+{}
 
 // * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * * * * //
 

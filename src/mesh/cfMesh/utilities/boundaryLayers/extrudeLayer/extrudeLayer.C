@@ -374,7 +374,7 @@ void extrudeLayer::createNewVertices()
 
             OPstream toOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 globalLabels.byteSize()
             );
@@ -390,7 +390,7 @@ void extrudeLayer::createNewVertices()
             labelList receivedData;
             IPstream fromOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
 
@@ -498,7 +498,7 @@ void extrudeLayer::createNewVertices()
 
             DynList<label> edgeGroup;
             edgeGroup.setSize(dEdges.size());
-            edgeGroup = -1;
+	    edgeGroup = label(-1);
 
             //- check edge connections and store all edges which can be reached
             //- over other edges into the same group
@@ -538,7 +538,7 @@ void extrudeLayer::createNewVertices()
             //- find face groups from the groups assigned to dual edges
             DynList<label> faceGroups;
             faceGroups.setSize(pointFaces.sizeOfRow(pointI));
-            faceGroups = -1;
+	    faceGroups = label(-1);
 
             forAllRow(pointFaces, pointI, pfI)
             {
@@ -618,7 +618,7 @@ void extrudeLayer::createNewVertices()
         //- assign groups to faces and cells
         DynList<label> faceGroup;
         faceGroup.setSize(pointFaces.sizeOfRow(pointI));
-        faceGroup = -1;
+	faceGroup = label(-1);
 
         label group(0);
 
@@ -1114,7 +1114,7 @@ void extrudeLayer::createLayerCells()
         //- find labels of points
         DynList<label> origFacePoints;
         origFacePoints.setSize(pointFaces.sizeOfRow(pointI));
-        origFacePoints = -1;
+	origFacePoints = label(-1);
 
         forAllRow(pointFaces, pointI, pfI)
         {

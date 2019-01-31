@@ -26,7 +26,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "meshOctreeModifier.H"
-#include "helperFunctionsPar.H"
+#include "helperFunctions.H"
 #include "triSurf.H"
 
 #include <map>
@@ -119,8 +119,8 @@ void meshOctreeModifier::refineTreeForCoordinates
 void meshOctreeModifier::refineTreeForCoordinates
 (
     const meshOctreeCubeCoordinates& cc,
-    const labelList& containedTriangles,
-    const labelList& containedEdges,
+    const labelList& /*containedTriangles*/,
+    const labelList& /*containedEdges*/,
     const short procNo,
     const direction cubeType
 )
@@ -203,14 +203,15 @@ void meshOctreeModifier::addLayerFromNeighbouringProcessors()
         return;
 
     const LongList<meshOctreeCube*>& leaves = octree_.leaves_;
-    const labelList& neiProcs = octree_.neiProcs_;
-    const List<Pair<meshOctreeCubeCoordinates> >& neiRange = octree_.neiRange_;
 
     forAll(leaves, leafI)
         if( leaves[leafI]->procNo() != Pstream::myProcNo() )
             return;
 
     Info << "Adding an additional layer of cells" << endl;
+
+    const labelList& neiProcs = octree_.neiProcs_;
+    const List<Pair<meshOctreeCubeCoordinates> >& neiRange = octree_.neiRange_;
 
     meshOctreeCubeCoordinates minCoord, maxCoord;
     std::map<label, LongList<meshOctreeCubeBasic> > toProcs;
@@ -227,11 +228,14 @@ void meshOctreeModifier::addLayerFromNeighbouringProcessors()
 
         forAll(neiProcs, procI)
         {
-            if(
+            if
+            (
                 (maxCoord >= neiRange[procI].first()) &&
                 (minCoord <= neiRange[procI].second())
             )
+            {
                 toProcs[neiProcs[procI]].append(*leaves[leafI]);
+            }
         }
     }
 
@@ -240,6 +244,9 @@ void meshOctreeModifier::addLayerFromNeighbouringProcessors()
     {
         if( i == Pstream::myProcNo() )
         {
+            Pout << "Neighbour processors " << neiProcs << endl;
+            Pout << "Neighbour range " << neiRange << endl;
+
             std::map<label, LongList<meshOctreeCubeBasic> >::iterator it;
             for(it=toProcs.begin();it!=toProcs.end();++it)
             {
@@ -254,7 +261,7 @@ void meshOctreeModifier::addLayerFromNeighbouringProcessors()
 
     //- exchange data with other processors
     LongList<meshOctreeCubeBasic> receivedCoordinates;
-    help::exchangeMap(toProcs, receivedCoordinates, Pstream::blocking);
+    help::exchangeMap(toProcs, receivedCoordinates, Pstream::commsTypes::blocking);
 
     # ifdef OCTREE_DEBUG
     Pout << "Received " << receivedCoordinates.size()

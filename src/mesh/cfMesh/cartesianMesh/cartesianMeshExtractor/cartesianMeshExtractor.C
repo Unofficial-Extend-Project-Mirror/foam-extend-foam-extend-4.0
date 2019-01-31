@@ -76,24 +76,24 @@ void cartesianMeshExtractor::decomposeSplitHexes()
 void cartesianMeshExtractor::createMesh()
 {
     Info << "Extracting polyMesh" << endl;
-
+    
     //- create points and pointLeaves addressing
     createPointsAndAddressing();
 
     //- create the mesh
     createPolyMesh();
-
+    
     //- decompose split-hex cells into tetrahedra and pyramids
     decomposeSplitHexesIntoTetsAndPyramids();
-
+    
     //- remove unused vertices
     polyMeshGenModifier(mesh_).removeUnusedVertices();
-
+    
     Info << "Mesh has :" << nl
         << mesh_.points().size() << " vertices " << nl
         << mesh_.faces().size() << " faces" << nl
         << mesh_.cells().size() << " cells" << endl;
-
+    
     if( Pstream::parRun() )
     {
         label nCells = mesh_.cells().size();
@@ -112,7 +112,7 @@ void cartesianMeshExtractor::createMesh()
         << " This can be reolved by reducing the maxCellSize by a fraction."
         << "i.e. 2.49999 instead of 2.5." << exit(FatalError);
     }
-
+    
     Info << "Finished extracting polyMesh" << endl;
 }
 

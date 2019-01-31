@@ -48,6 +48,7 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
 class VRWGraphModifier;
 
 class rowElement
@@ -94,6 +95,12 @@ class rowElement
             return size_;
         }
 };
+
+// Forward declaration of friend functions and operators
+
+class VRWGraph;
+
+Ostream& operator<<(Ostream&, const VRWGraph&);
 
 /*---------------------------------------------------------------------------*\
                            Class VRWGraph Declaration

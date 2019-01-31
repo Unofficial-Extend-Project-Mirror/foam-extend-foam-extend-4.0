@@ -42,7 +42,7 @@ SourceFiles
 
 namespace Foam
 {
-
+    
 // Forward declarations
 class partTetMeshSimplex;
 
@@ -58,21 +58,21 @@ class knuppMetric
     // Private data
     //- free vertex
     point& p_;
-
+    
         //- normals of triangles forming the outer hull
         DynList<vector, 64> normals_;
-
+    
         //- centres of triangles forming the outer hull
         DynList<point, 64> centres_;
-
+    
         //- control parameter. It helps the point get inside the feasible region
         scalar beta_;
-
+    
     // Private member functions
         //- evaluate the value of the metric
         scalar evaluateMetric() const;
         scalar evaluateMetricNoBeta() const;
-
+    
         //- evaluate metric gradients
         void evaluateGradients(vector& grad, tensor& gradGrad) const;
 

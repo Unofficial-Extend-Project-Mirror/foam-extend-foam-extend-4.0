@@ -46,7 +46,7 @@ coordinateModification::coordinateModification()
 coordinateModification::coordinateModification
 (
     const word& name,
-    const dictionary& dict
+    const dictionary& /*dict*/
 )
 :
     name_(name)

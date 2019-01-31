@@ -370,7 +370,7 @@ void decomposeFaces::decomposeConcaveInternalFaces
     # endif
 
     //- decompose internal faces
-    for(register label faceI=0;faceI<nIntFaces;++faceI)
+    for(label faceI=0;faceI<nIntFaces;++faceI)
     {
         const face& f = faces[faceI];
 

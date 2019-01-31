@@ -56,7 +56,7 @@ class coneRefinement
         //- start point and the radius
         point p0_;
         scalar r0_;
-
+    
         //- end point and the radius
         point p1_;
         scalar r1_;
@@ -86,7 +86,7 @@ public:
 
         //- Construct from dictionary
         coneRefinement(const word& name, const dictionary& dict);
-
+        
         //- Construct and return a clone
         virtual autoPtr<objectRefinement> clone
         (
@@ -107,12 +107,12 @@ public:
                 )
             );
         }
-
+    
     // Member Functions
-
+    
         //- check if a boundBox intersects or is inside the object
         bool intersectsObject(const boundBox&) const;
-
+        
     //- Return as dictionary of entries
         dictionary dict(bool ignoreType = false) const;
 
@@ -123,7 +123,7 @@ public:
 
         //- Write dictionary
         void writeDict(Ostream&, bool subDict = true) const;
-
+        
     // Member Operators
 
         //- assign from dictionary

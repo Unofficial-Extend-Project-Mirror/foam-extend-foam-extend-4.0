@@ -32,7 +32,6 @@ Description
 #include "triSurfacePatchManipulator.H"
 #include "triSurfaceCleanupDuplicateTriangles.H"
 #include "demandDrivenData.H"
-#include "foamTime.H"
 #include "meshOctreeCreator.H"
 #include "cartesianMeshExtractor.H"
 #include "meshSurfaceEngine.H"
@@ -188,7 +187,7 @@ void cartesian2DMeshGenerator::refBoundaryLayers()
 
 void cartesian2DMeshGenerator::replaceBoundaries()
 {
-    renameBoundaryPatches rbp(mesh_, meshDict_);
+    renameBoundaryPatches rbp(mesh_, meshDict_, true);
 }
 
 void cartesian2DMeshGenerator::renumberMesh()
@@ -198,67 +197,53 @@ void cartesian2DMeshGenerator::renumberMesh()
 
 void cartesian2DMeshGenerator::generateMesh()
 {
-    try
+    if( controller_.runCurrentStep("templateGeneration") )
     {
-        if( controller_.runCurrentStep("templateGeneration") )
-        {
-            createCartesianMesh();
-        }
-
-        if( controller_.runCurrentStep("surfaceTopology") )
-        {
-            surfacePreparation();
-        }
-
-        if( controller_.runCurrentStep("surfaceProjection") )
-        {
-            mapMeshToSurface();
-        }
-
-        if( controller_.runCurrentStep("patchAssignment") )
-        {
-            extractPatches();
-        }
-
-        if( controller_.runCurrentStep("edgeExtraction") )
-        {
-            mapEdgesAndCorners();
-
-            optimiseMeshSurface();
-        }
-
-        if( controller_.runCurrentStep("boundaryLayerGeneration") )
-        {
-            generateBoundaryLayers();
-        }
-
-        if( controller_.runCurrentStep("meshOptimisation") )
-        {
-            optimiseMeshSurface();
-        }
-
-        if( controller_.runCurrentStep("boundaryLayerRefinement") )
-        {
-            refBoundaryLayers();
-        }
-
-        renumberMesh();
-
-        replaceBoundaries();
-
-        controller_.workflowCompleted();
+        createCartesianMesh();
     }
-    catch(const std::string& message)
+
+    if( controller_.runCurrentStep("surfaceTopology") )
     {
-        Info << message << endl;
+        surfacePreparation();
     }
-    catch(...)
+
+    if( controller_.runCurrentStep("surfaceProjection") )
     {
-        WarningIn
-        (
-            "void cartesian2DMeshGenerator::generateMesh()"
-        ) << "Meshing process terminated!" << endl;
+        mapMeshToSurface();
     }
+
+    if( controller_.runCurrentStep("patchAssignment") )
+    {
+        extractPatches();
+    }
+
+    if( controller_.runCurrentStep("edgeExtraction") )
+    {
+        mapEdgesAndCorners();
+
+        optimiseMeshSurface();
+    }
+
+    if( controller_.runCurrentStep("boundaryLayerGeneration") )
+    {
+        generateBoundaryLayers();
+    }
+
+    if( controller_.runCurrentStep("meshOptimisation") )
+    {
+        optimiseMeshSurface();
+    }
+
+    if( controller_.runCurrentStep("boundaryLayerRefinement") )
+    {
+        refBoundaryLayers();
+    }
+
+    renumberMesh();
+
+    replaceBoundaries();
+
+    controller_.workflowCompleted();
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -283,70 +268,87 @@ cartesian2DMeshGenerator::cartesian2DMeshGenerator(const Time& time)
     mesh_(time),
     controller_(mesh_)
 {
-    if( true )
+    try
     {
-        checkMeshDict cmd(meshDict_);
-    }
-
-    fileName surfaceFile = meshDict_.lookup("surfaceFile");
-    if( Pstream::parRun() )
-        surfaceFile = ".."/surfaceFile;
-
-    surfacePtr_ = new triSurf(db_.path()/surfaceFile);
-
-    if( true )
-    {
-        //- save meta data with the mesh (surface mesh + its topology info)
-        triSurfaceMetaData sMetaData(*surfacePtr_);
-        const dictionary& surfMetaDict = sMetaData.metaData();
-
-        mesh_.metaData().add("surfaceFile", surfaceFile, true);
-        mesh_.metaData().add("surfaceMeta", surfMetaDict, true);
-
-        triSurface2DCheck surfCheck(*surfacePtr_);
-        if( !surfCheck.is2DSurface() )
+        if( true )
         {
-            surfCheck.createSubsets();
-
-            Info << "Writting surface with subsets to file "
-                 << "badSurfaceWithSubsets.fms" << endl;
-            surfacePtr_->writeSurface("badSurfaceWithSubsets.fms");
+            checkMeshDict cmd(meshDict_);
         }
-    }
 
-    if( surfacePtr_->featureEdges().size() != 0 )
+        fileName surfaceFile = meshDict_.lookup("surfaceFile");
+        if( Pstream::parRun() )
+            surfaceFile = ".."/surfaceFile;
+
+        surfacePtr_ = new triSurf(db_.path()/surfaceFile);
+
+        if( true )
+        {
+            //- save meta data with the mesh (surface mesh + its topology info)
+            triSurfaceMetaData sMetaData(*surfacePtr_);
+            const dictionary& surfMetaDict = sMetaData.metaData();
+
+            mesh_.metaData().add("surfaceFile", surfaceFile, true);
+            mesh_.metaData().add("surfaceMeta", surfMetaDict, true);
+
+            triSurface2DCheck surfCheck(*surfacePtr_);
+            if( !surfCheck.is2DSurface() )
+            {
+                surfCheck.createSubsets();
+
+                Info << "Writting surface with subsets to file "
+                     << "badSurfaceWithSubsets.fms" << endl;
+                surfacePtr_->writeSurface("badSurfaceWithSubsets.fms");
+            }
+        }
+
+        if( surfacePtr_->featureEdges().size() != 0 )
+        {
+            //- get rid of duplicate triangles as they cause strange problems
+            triSurfaceCleanupDuplicateTriangles
+            (
+                const_cast<triSurf&>(*surfacePtr_)
+            );
+
+            //- create surface patches based on the feature edges
+            //- and update the meshDict based on the given data
+            triSurfacePatchManipulator manipulator(*surfacePtr_);
+
+            const triSurf* surfaceWithPatches =
+                manipulator.surfaceWithPatches(&meshDict_);
+
+            //- delete the old surface and assign the new one
+            deleteDemandDrivenData(surfacePtr_);
+            surfacePtr_ = surfaceWithPatches;
+        }
+
+        if( meshDict_.found("anisotropicSources") )
+        {
+            surfaceMeshGeometryModification surfMod(*surfacePtr_, meshDict_);
+
+            modSurfacePtr_ = surfMod.modifyGeometry();
+
+            octreePtr_ = new meshOctree(*modSurfacePtr_, true);
+        }
+        else
+        {
+            octreePtr_ = new meshOctree(*surfacePtr_, true);
+        }
+
+        meshOctreeCreator(*octreePtr_, meshDict_).createOctreeBoxes();
+
+        generateMesh();
+    }
+    catch(const std::string& message)
     {
-        //- get rid of duplicate triangles as they cause strange problems
-        triSurfaceCleanupDuplicateTriangles(const_cast<triSurf&>(*surfacePtr_));
-
-        //- create surface patches based on the feature edges
-        //- and update the meshDict based on the given data
-        triSurfacePatchManipulator manipulator(*surfacePtr_);
-
-        const triSurf* surfaceWithPatches =
-            manipulator.surfaceWithPatches(&meshDict_);
-
-        //- delete the old surface and assign the new one
-        deleteDemandDrivenData(surfacePtr_);
-        surfacePtr_ = surfaceWithPatches;
+        Info << message << endl;
     }
-
-    if( meshDict_.found("anisotropicSources") )
+    catch(...)
     {
-        surfaceMeshGeometryModification surfMod(*surfacePtr_, meshDict_);
-
-        modSurfacePtr_ = surfMod.modifyGeometry();
-
-        octreePtr_ = new meshOctree(*modSurfacePtr_, true);
+        WarningIn
+        (
+            "cartesian2DMeshGenerator::cartesian2DMeshGenerator(const Time&)"
+        ) << "Meshing process terminated!" << endl;
     }
-    else
-    {
-        octreePtr_ = new meshOctree(*surfacePtr_, true);
-    }
-
-    meshOctreeCreator(*octreePtr_, meshDict_).createOctreeBoxes();
-
-    generateMesh();
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

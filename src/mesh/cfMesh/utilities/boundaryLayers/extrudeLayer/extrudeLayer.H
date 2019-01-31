@@ -36,8 +36,6 @@ SourceFiles
 #ifndef extrudeLayer_H
 #define extrudeLayer_H
 
-#include "objectRegistry.H"
-#include "foamTime.H"
 #include "polyMeshGenModifier.H"
 #include "VRWGraphList.H"
 #include "labelPair.H"

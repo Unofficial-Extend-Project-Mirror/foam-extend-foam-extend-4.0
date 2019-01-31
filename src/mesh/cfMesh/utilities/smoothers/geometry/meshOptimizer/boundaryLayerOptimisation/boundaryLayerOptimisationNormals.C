@@ -1065,7 +1065,7 @@ void boundaryLayerOptimisation::optimiseHairNormalsInside()
                             labelledPoint lp
                             (
                                 globalEdgeLabel[edgeI],
-                                hairVecs[hairEdgeI]
+                                newNormals[hairEdgeI]
                             );
 
                             forAllRow(edgesAtProcs, edgeI, j)
@@ -1108,7 +1108,7 @@ void boundaryLayerOptimisation::optimiseHairNormalsInside()
 
                         if( hairEdges_[hairEdgeI] == e )
                         {
-                            hairVecs[hairEdgeI] += lp.coordinates();
+                            newNormals[hairEdgeI] += lp.coordinates();
 
                             found = true;
                             break;

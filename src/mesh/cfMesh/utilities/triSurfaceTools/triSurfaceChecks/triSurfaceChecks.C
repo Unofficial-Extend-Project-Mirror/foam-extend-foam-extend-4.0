@@ -179,12 +179,11 @@ public:
         template<class labelListType>
         void collectGroups
         (
-            std::map<label, DynList<label> >& neiGroups,
-            const labelListType& elementInGroup,
-            const DynList<label>& localGroupLabel
+            std::map<label, DynList<label> >& /*neiGroups*/,
+            const labelListType& /*elementInGroup*/,
+            const DynList<label>& /*localGroupLabel*/
         ) const
         {
-
         }
 };
 
@@ -209,7 +208,7 @@ public:
     selectOp()
     {}
 
-    bool operator()(const label tI) const
+    bool operator()(const label /*tI*/) const
     {
         return true;
     }
@@ -443,9 +442,9 @@ public:
         template<class labelListType>
         void collectGroups
         (
-            std::map<label, DynList<label> >& neiGroups,
-            const labelListType& elementInGroup,
-            const DynList<label>& localGroupLabel
+            std::map<label, DynList<label> >& /*neiGroups*/,
+            const labelListType& /*elementInGroup*/,
+            const DynList<label>& /*localGroupLabel*/
         ) const
         {
 
@@ -564,9 +563,9 @@ public:
         template<class labelListType>
         void collectGroups
         (
-            std::map<label, DynList<label> >& neiGroups,
-            const labelListType& elementInGroup,
-            const DynList<label>& localGroupLabel
+            std::map<label, DynList<label> >& /*neiGroups*/,
+            const labelListType& /*elementInGroup*/,
+            const DynList<label>& /*localGroupLabel*/
         ) const
         {
 

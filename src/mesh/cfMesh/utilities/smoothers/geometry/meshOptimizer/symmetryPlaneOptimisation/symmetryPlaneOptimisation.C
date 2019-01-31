@@ -30,7 +30,6 @@ Description
 #include "polyMeshGenAddressing.H"
 #include "helperFunctions.H"
 #include "polyMeshGenChecks.H"
-#include "meshOptimizer.H"
 
 // #define DEBUGSearch
 
@@ -96,13 +95,13 @@ void symmetryPlaneOptimisation::detectSymmetryPlanes()
         const point c = it->second.first / it->second.second;
 
         const std::pair<vector, label>& ns = normalSum[it->first];
-        const point n = ns.first / ns.second;
+        const vector n = ns.first / ns.second;
 
         symmetryPlanes_.insert(std::make_pair(it->first, plane(c, n)));
     }
 }
 
-void symmetryPlaneOptimisation::pointInPlanes(VRWGraph& pointInPlanes) const
+bool symmetryPlaneOptimisation::pointInPlanes(VRWGraph& pointInPlanes) const
 {
     const PtrList<boundaryPatch>& boundaries = mesh_.boundaries();
     const pointFieldPMG& points = mesh_.points();
@@ -110,6 +109,8 @@ void symmetryPlaneOptimisation::pointInPlanes(VRWGraph& pointInPlanes) const
 
     pointInPlanes.clear();
     pointInPlanes.setSize(points.size());
+
+    bool foundProblematic(false);
 
     forAll(boundaries, patchI)
     {
@@ -121,8 +122,25 @@ void symmetryPlaneOptimisation::pointInPlanes(VRWGraph& pointInPlanes) const
             {
                 const face& f = faces[faceI];
 
+                const point c = f.centre(points);
+                scalar maxDist(0.0);
                 forAll(f, pI)
+                    maxDist = max(maxDist, mag(points[f[pI]] - c));
+
+                forAll(f, pI)
+                {
+                    std::map<label, plane>::const_iterator it =
+                        symmetryPlanes_.find(patchI);
+                    if( it != symmetryPlanes_.end() )
+                    {
+                        const scalar d = it->second.distance(points[f[pI]]);
+
+                        if( d > 0.5 * maxDist )
+                            foundProblematic = true;
+                    }
+
                     pointInPlanes.appendIfNotIn(f[pI], patchI);
+                }
             }
         }
     }
@@ -174,6 +192,10 @@ void symmetryPlaneOptimisation::pointInPlanes(VRWGraph& pointInPlanes) const
                 pointInPlanes.appendIfNotIn(pointI, receivedData[counter++]);
         }
     }
+
+    reduce(foundProblematic, maxOp<bool>());
+
+    return foundProblematic;
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -198,7 +220,17 @@ void symmetryPlaneOptimisation::optimizeSymmetryPlanes()
     pointFieldPMG& points = mesh_.points();
 
     VRWGraph pointInPlane;
-    pointInPlanes(pointInPlane);
+    if( pointInPlanes(pointInPlane) )
+    {
+        Warning
+            << "Detected large deviation from some symmetry planes."
+            << "Please check your settings and ensure that all your patches"
+            << " with type symmetryPlane are planar. If there exists a patch"
+            << " that is not planar please use the symmetry type, instead."
+            << " Skipping symmetryPlane optimisation..." << endl;
+
+        return;
+    }
 
     forAll(pointInPlane, pointI)
     {
@@ -211,21 +243,49 @@ void symmetryPlaneOptimisation::optimizeSymmetryPlanes()
                 "void symmetryPlaneOptimisation::optimizeSymmetryPlanes()"
             ) << "Point " << pointI << " is in more than three symmetry"
               << " planes. Cannot move it" << endl;
+
+            continue;
         }
 
         point& p = points[pointI];
-        vector disp(vector::zero);
-        for(label plI=0;plI<nPlanes;++plI)
+
+        if( nPlanes == 1 )
         {
             //- point is in a plane
             std::map<label, plane>::const_iterator it =
                 symmetryPlanes_.find(pointInPlane(pointI, 0));
 
-            const point newP = it->second.nearestPoint(points[pointI]);
-            disp += newP - p;
+            p = it->second.nearestPoint(p);
         }
+        else if( nPlanes == 2 )
+        {
+            //- point is at the edge between two planes
+            const plane& pl0 =
+                symmetryPlanes_.find(pointInPlane(pointI, 0))->second;
+            const plane& pl1 =
+                symmetryPlanes_.find(pointInPlane(pointI, 1))->second;
 
-        p += disp;
+            const plane::ray il = pl0.planeIntersect(pl1);
+
+            vector n = il.dir();
+            n /= (mag(n) + VSMALL);
+
+            const scalar lProj = (p - il.refPoint()) & n;
+
+            p = il.refPoint() + lProj * n;
+        }
+        else if( nPlanes == 3 )
+        {
+            //- points is a corner between three planes
+            const plane& pl0 =
+                symmetryPlanes_.find(pointInPlane(pointI, 0))->second;
+            const plane& pl1 =
+                symmetryPlanes_.find(pointInPlane(pointI, 1))->second;
+            const plane& pl2 =
+                symmetryPlanes_.find(pointInPlane(pointI, 2))->second;
+
+            p = pl0.planePlaneIntersect(pl1, pl2);
+        }
     }
 
     labelHashSet badFaces;

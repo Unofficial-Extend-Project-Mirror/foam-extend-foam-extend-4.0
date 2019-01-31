@@ -29,9 +29,11 @@ License
 
 // Construct from Istream
 template<class T, Foam::label staticSize>
-Foam::DynList<T, staticSize>::DynList(Istream& is)
+Foam::DynList<T, staticSize>::DynList(Istream&)
 :
-    UList<T>(),
+    dataPtr_(nullptr),
+    nAllocated_(0),
+    staticData_(),
     nextFree_(0)
 {
     FatalErrorIn
@@ -39,11 +41,6 @@ Foam::DynList<T, staticSize>::DynList(Istream& is)
         "template<class T, Foam::label staticSize>"
         "\nFoam::DynList<T, staticSize>::DynList(Istream& is)"
     ) << "Not implemented" << exit(FatalError);
-
-    List<T> helper(is);
-
-    nextFree_ = helper.size();
-    UList<T>::swap(helper);
 }
 
 
@@ -54,7 +51,7 @@ Foam::Ostream& Foam::operator<<
     const Foam::DynList<T, staticSize>& DL
 )
 {
-    UList<T> helper(const_cast<T*>(DL.begin()), DL.nextFree_);
+    UList<T> helper(DL.dataPtr_, DL.nextFree_);
     os << helper;
 
     return os;
@@ -75,8 +72,10 @@ Foam::Istream& Foam::operator>>
         "(Foam::Istream& is, Foam::DynList<T, staticSize>& DL)"
     ) << "Not implemented" << exit(FatalError);
 
-    is >> static_cast<List<T>&>(DL);
-    DL.nextFree_ = DL.List<T>::size();
+    UList<T> helper(DL.dataPtr_, DL.nextFree_);
+    //is >> static_cast<List<T>&>(DL);
+    is >> helper;
+    DL.nextFree_ = helper.size();
 
     return is;
 }

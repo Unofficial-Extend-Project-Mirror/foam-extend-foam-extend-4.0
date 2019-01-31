@@ -47,18 +47,18 @@ namespace Foam
 /*---------------------------------------------------------------------------*\
                            Class labelledPoint Declaration
 \*---------------------------------------------------------------------------*/
-
+    
 class labelledPoint
 {
     // Private data
         //- point label
         label pLabel_;
-
+    
         //- point coordinates
         point coords_;
-
+    
     public:
-
+        
     // Constructors
         //- Null construct
         labelledPoint()
@@ -66,62 +66,62 @@ class labelledPoint
             pLabel_(-1),
             coords_(vector::zero)
         {}
-
+        
         //- Construct from point and label
         labelledPoint(const label pl, const point& p)
         :
             pLabel_(pl),
             coords_(p)
         {}
-
+            
     // Destructor
         ~labelledPoint()
         {}
-
+            
     // Member functions
         //- return point label
         inline label pointLabel() const
         {
             return pLabel_;
         }
-
+        
         inline label& pointLabel()
         {
             return pLabel_;
         }
-
+        
         //- return point coordinates
         inline const point& coordinates() const
         {
             return coords_;
         }
-
+        
         inline point& coordinates()
         {
             return coords_;
         }
-
+        
     // Member operators
-
+        
         inline void operator=(const labelledPoint& lp)
         {
             pLabel_ = lp.pLabel_;
             coords_ = lp.coords_;
         }
-
+        
         inline bool operator==(const labelledPoint& lp) const
         {
             if( pLabel_ == lp.pLabel_ )
                 return true;
-
+            
             return false;
         }
-
+        
         inline bool operator!=(const labelledPoint& lp) const
         {
             return !this->operator==(lp);
         }
-
+        
     // Friend operators
         friend Ostream& operator<<(Ostream& os, const labelledPoint& lp)
         {
@@ -134,21 +134,21 @@ class labelledPoint
 
             return os;
         }
-
+        
         friend Istream& operator>>(Istream& is, labelledPoint& lp)
         {
             // Read beginning of labelledPoint
             is.readBegin("labelledPoint");
-
+        
             is >> lp.pLabel_;
             is >> lp.coords_;
-
+            
             // Read end of labelledPoint
             is.readEnd("labelledPoint");
-
+        
             // Check state of Istream
             is.check("operator>>(Istream&, labelledPoint");
-
+            
             return is;
         }
 };

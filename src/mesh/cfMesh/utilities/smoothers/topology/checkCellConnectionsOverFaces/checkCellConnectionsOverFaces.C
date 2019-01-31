@@ -121,7 +121,7 @@ public:
 
             OPstream toOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 groupOwner.byteSize()
             );
@@ -138,7 +138,7 @@ public:
 
             IPstream fromOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
 
@@ -171,7 +171,7 @@ public:
     meshConnectionsSelectorOperator()
     {}
 
-    bool operator()(const label cellI) const
+    bool operator()(const label /*cellI*/) const
     {
         return true;
     }

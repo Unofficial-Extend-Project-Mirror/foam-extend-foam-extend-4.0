@@ -97,7 +97,7 @@ inline meshOctreeCubeCoordinates meshOctreeCubeCoordinates::refineForPosition
 ) const
 {
     //- create new boxes in z-order fashion
-    FixedList<label, 3> addPos(0);
+    FixedList<label, 3> addPos(label(0));
     if( i & 1 )
         addPos[0] = 1;
     if( i & 2 )
@@ -523,15 +523,22 @@ inline Istream& operator>>
     meshOctreeCubeCoordinates& cc
 )
 {
-    // Read beginning of meshOctreeCubeCoordinates
+    //- Read beginning of meshOctreeCubeCoordinates
     is.readBegin("meshOctreeCubeCoordinates");
 
+    //- read the level in the octree structure
     label l;
     is >> l;
     cc.level_ = l;
+
+    //- read x, y and z coordinates
+    is.readBegin("meshOctreeCubeCoordinates");
+
     is >> cc.posX_;
     is >> cc.posY_;
     is >> cc.posZ_;
+
+    is.readEnd("meshOctreeCubeCoordinates");
 
     // Read end of meshOctreeCubeCoordinates
     is.readEnd("meshOctreeCubeCoordinates");
@@ -551,9 +558,14 @@ inline Ostream& operator<<
     os << token::BEGIN_LIST;
 
     os << label(cc.level_) << token::SPACE;
+
+    os << token::BEGIN_LIST;
+
     os << cc.posX_ << token::SPACE;
     os << cc.posY_ << token::SPACE;
     os << cc.posZ_ << token::END_LIST;
+
+    os << token::END_LIST;
 
     // Check state of Ostream
     os.check("operator<<(Ostream&, const meshOctreeCubeCoordinates");

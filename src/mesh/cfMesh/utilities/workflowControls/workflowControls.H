@@ -37,8 +37,6 @@ SourceFiles
 #ifndef workflowControls_H
 #define workflowControls_H
 
-#include "objectRegistry.H"
-#include "foamTime.H"
 #include "IOdictionary.H"
 #include "DynList.H"
 

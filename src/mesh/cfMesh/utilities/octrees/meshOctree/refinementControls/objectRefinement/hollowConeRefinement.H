@@ -57,7 +57,7 @@ class hollowConeRefinement
         point p0_;
         scalar r0Outer_;
         scalar r0Inner_;
-
+    
         //- end point and the radii
         point p1_;
         scalar r1Outer_;
@@ -90,7 +90,7 @@ public:
 
         //- Construct from dictionary
         hollowConeRefinement(const word& name, const dictionary& dict);
-
+        
         //- Construct and return a clone
         virtual autoPtr<objectRefinement> clone
         (
@@ -113,12 +113,12 @@ public:
                 )
             );
         }
-
+    
     // Member Functions
-
+    
         //- check if a boundBox intersects or is inside the object
         bool intersectsObject(const boundBox&) const;
-
+        
     //- Return as dictionary of entries
         dictionary dict(bool ignoreType = false) const;
 
@@ -129,7 +129,7 @@ public:
 
         //- Write dictionary
         void writeDict(Ostream&, bool subDict = true) const;
-
+        
     // Member Operators
 
         //- assign from dictionary

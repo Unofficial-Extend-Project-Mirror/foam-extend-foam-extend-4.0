@@ -81,28 +81,22 @@ void triSurfAddressing::calculateEdges() const
                 const label triI = pFacets(pI, pfI);
                 const labelledTri& tri = facets_[triI];
 
-                label pos(-1);
                 forAll(tri, i)
                 {
                     if( tri[i] == pI )
                     {
-                        pos = i;
-
-
-                        if( tri[(pos+1)%3] >= pI )
+                        if( tri[(i+1)%3] >= pI )
                             edgesAtPoint.insert
                             (
-                                std::make_pair(pI, tri[(pos+1)%3])
+                                std::make_pair(pI, tri[(i+1)%3])
                             );
-                        if( tri[(pos+2)%3] >= pI )
+                        if( tri[(i+2)%3] >= pI )
                             edgesAtPoint.insert
                             (
-                                std::make_pair(pI, tri[(pos+2)%3])
+                                std::make_pair(pI, tri[(i+2)%3])
                             );
                     }
                 }
-
-
             }
 
             std::set<std::pair<label, label> >::const_iterator it;
@@ -118,7 +112,6 @@ void triSurfAddressing::calculateEdges() const
         const label threadI(0);
         # endif
         nEdgesForThread[threadI] = edgesHelper.size();
-
 
         # ifdef USE_OMP
         # pragma omp critical

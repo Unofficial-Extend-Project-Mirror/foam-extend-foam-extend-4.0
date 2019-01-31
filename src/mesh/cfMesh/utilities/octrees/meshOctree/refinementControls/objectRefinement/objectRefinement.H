@@ -70,16 +70,14 @@ protected:
         //- refinement thickness fro this object
         scalar refThickness_;
 
-
     // Protected member functions
-
-        //- Set cell size
+        //- set cell size
         void setCellSize(const scalar cellSize)
         {
             cellSize_ = cellSize;
         }
 
-        //- Return cell size
+        //- return cell size
         scalar cellSize() const
         {
             return cellSize_;
@@ -177,7 +175,6 @@ public:
         //- Return as dictionary of entries
         virtual dictionary dict(bool ignoreType = false) const = 0;
 
-
       // Write
 
         //- Write
@@ -186,12 +183,10 @@ public:
         //- Write dictionary
         virtual void writeDict(Ostream&, bool subDict = true) const = 0;
 
-
     // Member Operators
 
         //- assign from dictionary
         virtual void operator=(const dictionary&) = 0;
-
 
     // IOstream Operators
 

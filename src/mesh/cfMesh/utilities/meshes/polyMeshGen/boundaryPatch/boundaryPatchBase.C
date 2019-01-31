@@ -43,7 +43,7 @@ defineTemplateTypeNameAndDebugWithName
     "polyBoundaryMesh",
     0
 );
-
+    
 defineTypeNameAndDebug(boundaryPatchBase, 0);
 defineRunTimeSelectionTable(boundaryPatchBase, dictionary);
 
@@ -60,7 +60,7 @@ autoPtr<boundaryPatchBase> boundaryPatchBase::New
     //- Other patch types are treated as ordinary patches
     if( type != "processor" )
         type = "patch";
-
+    
     dictionaryConstructorTable::iterator cstrIter =
         dictionaryConstructorTablePtr_->find(type);
 
@@ -76,7 +76,7 @@ autoPtr<boundaryPatchBase> boundaryPatchBase::New
             << dictionaryConstructorTablePtr_->toc()
             << exit(FatalIOError);
     }
-
+    
     return autoPtr<boundaryPatchBase>(cstrIter()(name, dict));
 }
 
@@ -90,7 +90,7 @@ autoPtr<boundaryPatchBase> boundaryPatchBase::New
 
     return boundaryPatchBase::New(name, dict);
 }
-
+    
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 boundaryPatchBase::boundaryPatchBase
@@ -106,7 +106,7 @@ boundaryPatchBase::boundaryPatchBase
     nFaces_(nF),
     startFace_(sF)
 {}
-
+    
 boundaryPatchBase::boundaryPatchBase(const word& name, const dictionary& dict)
 :
     name_(name),

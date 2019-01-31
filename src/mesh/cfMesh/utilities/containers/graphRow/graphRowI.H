@@ -160,7 +160,7 @@ inline Foam::Ostream& operator<<
     for(Foam::label i=0;i<r.size();++i)
         os << r[i] << " ";
     os << ")";
-
+    
     return os;
 }
 

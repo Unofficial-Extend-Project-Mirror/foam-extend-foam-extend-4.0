@@ -35,9 +35,9 @@ Description
 
 namespace Foam
 {
-
+    
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
+    
 const meshOctreeCubeCoordinates tetCreatorOctree::edgeCoordinates_[12][4]=
     {
         {    //- edge 0
@@ -113,7 +113,7 @@ const meshOctreeCubeCoordinates tetCreatorOctree::edgeCoordinates_[12][4]=
             meshOctreeCubeCoordinates(0, 1, 0, 0)
         }
     };
-
+    
 const label tetCreatorOctree::faceCentreHelper_[3][4] =
     {
         {3, 5, 2, 4},
@@ -124,18 +124,18 @@ const label tetCreatorOctree::faceCentreHelper_[3][4] =
 void tetCreatorOctree::createTets()
 {
     createPointsAndAddressing();
-
+    
     createTetsFromFacesWithCentreNode();
-
+    
     createTetsAroundSplitEdges();
-
+    
     createTetsAroundEdges();
-
+    
     createTetsFromSplitFaces();
-
+    
     clearOut();
     sortedLeaves_.setSize(0);
-
+    
     created_ = true;
 }
 
@@ -166,7 +166,7 @@ tetCreatorOctree::tetCreatorOctree
     created_(false)
 {
     createTets();
-
+    
     clearOut();
 }
 
