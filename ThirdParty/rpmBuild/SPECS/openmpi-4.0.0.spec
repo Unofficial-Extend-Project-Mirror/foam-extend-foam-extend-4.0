@@ -22,7 +22,7 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
-#     RPM spec file for openmpi-3.1.1
+#     RPM spec file for openmpi-4.0.0
 #
 # Description
 #     RPM spec file for creating a relocatable RPM
@@ -62,7 +62,7 @@
 
 %define name		openmpi
 %define release		%{_WM_OPTIONS}
-%define version 	3.1.1
+%define version 	4.0.0
 
 %define buildroot       %{_topdir}/BUILD/%{name}-%{version}-root
 
@@ -72,11 +72,11 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://www.open-mpi.org/software/ompi/v3.0/downloads
+URL:                    http://www.open-mpi.org/software/ompi/v4.0/downloads
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
-Patch0:                 openmpi-3.1.1.patch
+Patch0:                 openmpi-4.0.0.patch
 
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}

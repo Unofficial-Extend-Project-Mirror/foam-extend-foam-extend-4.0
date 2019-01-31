@@ -113,6 +113,14 @@ then
           -f --define '_configureAdditionalArgs "$WM_THIRD_PARTY_USE_OPENMPI_311_ConfigureAdditionalArgs"')
     }
 
+    # openmpi 4.0.0
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_OPENMPI_400" ] && {
+	echo "Building openmpi 4.0.0"
+	( rpm_make -p openmpi-4.0.0 -s openmpi-4.0.0.spec  -u https://www.open-mpi.org/software/ompi/v4.0/downloads/openmpi-4.0.0.tar.gz \
+          -f --define '_configureAdditionalArgs "$WM_THIRD_PARTY_USE_OPENMPI_400_ConfigureAdditionalArgs"')
+    }
+
     # mvipich2-2.2
     #
     [ ! -z "$WM_THIRD_PARTY_USE_MVAPICH2_22" ] && {
