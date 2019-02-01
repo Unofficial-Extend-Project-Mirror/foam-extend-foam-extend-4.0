@@ -244,7 +244,7 @@ void reduce
 
 void reduce
 (
-    List<label>& Value,
+    labelList& Value,
     const sumOp<List<label> >& bop,
     const int tag = Pstream::msgType(),
     const label comm = Pstream::worldComm
@@ -252,7 +252,7 @@ void reduce
 
 void reduce
 (
-    List<label>& Value,
+    labelList& Value,
     const minOp<List<label> >& bop,
     const int tag = Pstream::msgType(),
     const label comm = Pstream::worldComm
@@ -260,7 +260,7 @@ void reduce
 
 void reduce
 (
-    List<label>& Value,
+    labelList& Value,
     const maxOp<List<label> >& bop,
     const int tag = Pstream::msgType(),
     const label comm = Pstream::worldComm

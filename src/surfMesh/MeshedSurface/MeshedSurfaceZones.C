@@ -71,12 +71,12 @@ template<class Face>
 void Foam::MeshedSurface<Face>::sortFacesAndStore
 (
     const Xfer< List<Face> >& unsortedFaces,
-    const Xfer< List<label> >& zoneIds,
+    const Xfer< labelList >& zoneIds,
     const bool sorted
 )
 {
     List<Face>  oldFaces(unsortedFaces);
-    List<label> zones(zoneIds);
+    labelList zones(zoneIds);
 
     if (sorted)
     {
@@ -87,7 +87,7 @@ void Foam::MeshedSurface<Face>::sortFacesAndStore
     {
         // unsorted - determine the sorted order:
         // avoid SortableList since we discard the main list anyhow
-        List<label> faceMap;
+        labelList faceMap;
         sortedOrder(zones, faceMap);
         zones.clear();
 

@@ -76,7 +76,7 @@ Foam::extendedUpwindCellToFaceStencil::weightedSum
         {
             // Flux out of owner. Use upwind (= owner side) stencil.
             const List<Type>& stField = ownFld[faceI];
-            const List<scalar>& stWeight = ownWeights[faceI];
+            const scalarList& stWeight = ownWeights[faceI];
 
             forAll(stField, i)
             {
@@ -86,7 +86,7 @@ Foam::extendedUpwindCellToFaceStencil::weightedSum
         else
         {
             const List<Type>& stField = neiFld[faceI];
-            const List<scalar>& stWeight = neiWeights[faceI];
+            const scalarList& stWeight = neiWeights[faceI];
 
             forAll(stField, i)
             {
@@ -114,7 +114,7 @@ Foam::extendedUpwindCellToFaceStencil::weightedSum
                 {
                     // Flux out of owner. Use upwind (= owner side) stencil.
                     const List<Type>& stField = ownFld[faceI];
-                    const List<scalar>& stWeight = ownWeights[faceI];
+                    const scalarList& stWeight = ownWeights[faceI];
 
                     forAll(stField, j)
                     {
@@ -124,7 +124,7 @@ Foam::extendedUpwindCellToFaceStencil::weightedSum
                 else
                 {
                     const List<Type>& stField = neiFld[faceI];
-                    const List<scalar>& stWeight = neiWeights[faceI];
+                    const scalarList& stWeight = neiWeights[faceI];
 
                     forAll(stField, j)
                     {

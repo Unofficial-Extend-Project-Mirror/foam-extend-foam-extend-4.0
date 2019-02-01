@@ -859,7 +859,7 @@ inline TensorN<Cmpt, length> inv(const TensorN<Cmpt, length>& t)
     Cmpt* __restrict__ destIter;
 
     // Lists used for bookkeeping on the pivoting
-    List<label> indexCol(length), indexRow(length), iPivot(length);
+    labelList indexCol(length), indexRow(length), iPivot(length);
 
     iPivot = 0;
 

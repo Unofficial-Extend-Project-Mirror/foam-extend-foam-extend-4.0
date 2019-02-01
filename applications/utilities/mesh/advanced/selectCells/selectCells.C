@@ -256,7 +256,7 @@ label selectOutsideCells
 
     // Outside faces
     labelHashSet outsideFacesMap(outsidePts.size() * 6 * 2);
-    DynamicList<label> outsideFaces(outsideFacesMap.size());
+    dynamicLabelList outsideFaces(outsideFacesMap.size());
     // CellInfo on outside faces
     DynamicList<cellInfo> outsideFacesInfo(outsideFacesMap.size());
 

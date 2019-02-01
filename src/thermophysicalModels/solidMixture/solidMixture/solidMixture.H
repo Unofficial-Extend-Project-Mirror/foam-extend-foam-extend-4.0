@@ -52,7 +52,7 @@ class solidMixture
     // Private data
 
         //- The names of the solids
-        List<word> components_;
+        wordList components_;
 
         //- The solid properties
         PtrList<solid> properties_;
@@ -81,7 +81,7 @@ public:
     // Member Functions
 
         //- Return the sold names
-        inline const List<word>& components() const
+        inline const wordList& components() const
         {
             return components_;
         }

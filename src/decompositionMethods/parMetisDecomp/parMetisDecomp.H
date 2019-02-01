@@ -77,9 +77,9 @@ class parMetisDecomp
             const pointField& cellCentres,
             Field<label>& cellWeights,
             Field<label>& faceWeights,
-            const List<label>& options,
+            const labelList& options,
 
-            List<label>& finalDecomp
+            labelList& finalDecomp
         );
 
 

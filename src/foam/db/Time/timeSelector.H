@@ -109,7 +109,7 @@ public:
 
         //- Return the set of selected instants in the given list that are
         //  within the ranges
-        List<bool> selected(const instantList&) const;
+        boolList selected(const instantList&) const;
 
         //- Select a list of Time values that are within the ranges
         instantList select(const instantList&) const;

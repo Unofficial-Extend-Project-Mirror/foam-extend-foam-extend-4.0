@@ -31,7 +31,7 @@ License
 
 void Foam::pairPotentialList::readPairPotentialDict
 (
-    const List<word>& idList,
+    const wordList& idList,
     const dictionary& pairPotentialDict,
     const polyMesh& mesh
 )
@@ -180,7 +180,7 @@ Foam::pairPotentialList::pairPotentialList()
 
 Foam::pairPotentialList::pairPotentialList
 (
-    const List<word>& idList,
+    const wordList& idList,
     const dictionary& pairPotentialDict,
     const polyMesh& mesh
 )
@@ -201,7 +201,7 @@ Foam::pairPotentialList::~pairPotentialList()
 
 void Foam::pairPotentialList::buildPotentials
 (
-    const List<word>& idList,
+    const wordList& idList,
     const dictionary& pairPotentialDict,
     const polyMesh& mesh
 )

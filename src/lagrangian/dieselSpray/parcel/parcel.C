@@ -64,7 +64,7 @@ Foam::parcel::parcel
     const vector& U,
     const vector& Uturb,
     const scalarField& X,
-    const List<word>& liquidNames
+    const wordList& liquidNames
 )
 :
     Particle<parcel>(cloud, position, cellI),

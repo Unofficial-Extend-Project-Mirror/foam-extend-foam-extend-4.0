@@ -97,7 +97,7 @@ void Foam::hierarchGeomDecomp::setDecompOrder()
 
 Foam::label Foam::hierarchGeomDecomp::findLower
 (
-    const List<scalar>& l,
+    const scalarList& l,
     const scalar t,
     const label initLow,
     const label initHigh
@@ -179,7 +179,7 @@ void Foam::hierarchGeomDecomp::calculateSortedWeightedSizes
 void Foam::hierarchGeomDecomp::findBinary
 (
     const label sizeTol,
-    const List<scalar>& values,
+    const scalarList& values,
     const label minIndex,       // index of previous value
     const scalar minValue,      // value at minIndex
     const scalar maxValue,      // global max of values
@@ -253,8 +253,8 @@ void Foam::hierarchGeomDecomp::findBinary
 void Foam::hierarchGeomDecomp::findBinary
 (
     const label sizeTol,
-    const List<scalar>& sortedWeightedSizes,
-    const List<scalar>& values,
+    const scalarList& sortedWeightedSizes,
+    const scalarList& values,
     const label minIndex,       // index of previous value
     const scalar minValue,      // value at minIndex
     const scalar maxValue,      // global max of values

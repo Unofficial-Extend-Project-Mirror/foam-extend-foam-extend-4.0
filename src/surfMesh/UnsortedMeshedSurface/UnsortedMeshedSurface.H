@@ -118,7 +118,7 @@ protected:
     // Protected Member functions
 
         //- Return non-const access to the zone Ids
-        List<label>& storedZoneIds()
+        labelList& storedZoneIds()
         {
             return zoneIds_;
         }
@@ -165,7 +165,7 @@ public:
         (
             const Xfer< pointField >&,
             const Xfer< List<Face> >&,
-            const Xfer< List<label> >& zoneIds,
+            const Xfer< labelList >& zoneIds,
             const Xfer< surfZoneIdentifierList >&
         );
 
@@ -269,7 +269,7 @@ public:
             void setSize(const label);
 
             //- Return const access to the zone ids
-            const List<label>& zoneIds() const
+            const labelList& zoneIds() const
             {
                 return zoneIds_;
             }
@@ -322,7 +322,7 @@ public:
             (
                 const Xfer< pointField >&,
                 const Xfer< List<Face> >&,
-                const Xfer< List<label> >& zoneIds
+                const Xfer< labelList >& zoneIds
             );
 
             //- Transfer components (points, faces, zone ids).
@@ -330,7 +330,7 @@ public:
             (
                 const Xfer< List<point> >&,
                 const Xfer< List<Face> >&,
-                const Xfer< List<label> >& zoneIds
+                const Xfer< labelList >& zoneIds
             );
 
             //- Transfer the contents of the argument and annull the argument

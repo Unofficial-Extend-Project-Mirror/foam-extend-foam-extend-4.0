@@ -47,7 +47,7 @@ SourceFiles
 #ifndef meshDualiser_H
 #define meshDualiser_H
 
-#include "DynamicList.H"
+#include "dynamicLabelList.H"
 #include "PackedBoolList.H"
 #include "boolList.H"
 #include "typeInfo.H"
@@ -122,7 +122,7 @@ class meshDualiser
             const bool edgeOrder,
             const label dualCell0,
             const label dualCell1,
-            const DynamicList<label>& verts,
+            const dynamicLabelList& verts,
             directTopoChange& meshMod
         ) const;
 
@@ -135,7 +135,7 @@ class meshDualiser
 
             const label dualCellI,
             const label patchI,
-            const DynamicList<label>& verts,
+            const dynamicLabelList& verts,
             directTopoChange& meshMod
         ) const;
 

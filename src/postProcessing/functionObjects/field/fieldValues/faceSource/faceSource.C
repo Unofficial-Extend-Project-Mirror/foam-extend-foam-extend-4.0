@@ -102,9 +102,9 @@ void Foam::fieldValues::faceSource::setFaceZoneFaces()
 
     const faceZone& fZone = mesh().faceZones()[zoneId];
 
-    DynamicList<label> faceIds(fZone.size());
-    DynamicList<label> facePatchIds(fZone.size());
-    DynamicList<label> faceSigns(fZone.size());
+    dynamicLabelList faceIds(fZone.size());
+    dynamicLabelList facePatchIds(fZone.size());
+    dynamicLabelList faceSigns(fZone.size());
 
     forAll(fZone, i)
     {
@@ -502,7 +502,7 @@ void Foam::fieldValues::faceSource::initialise(const dictionary& dict)
         }
     }
 
-    List<word> orientedFields;
+    wordList orientedFields;
     if (dict.readIfPresent("orientedFields", orientedFields))
     {
         orientedFieldsStart_ = fields_.size();

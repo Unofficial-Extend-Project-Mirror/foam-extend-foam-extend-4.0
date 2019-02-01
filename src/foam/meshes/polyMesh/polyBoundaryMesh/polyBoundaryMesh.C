@@ -515,7 +515,7 @@ Foam::labelList Foam::polyBoundaryMesh::findIndices
     const bool usePatchGroups
 ) const
 {
-    DynamicList<label> indices;
+    dynamicLabelList indices;
 
     if (!key.empty())
     {

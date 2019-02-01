@@ -85,7 +85,7 @@ Foam::scalar Foam::searchableSurfacesQueries::tryMorphTet
     const labelList& surfacesToTest,
     const scalar initDistSqr,
     List<vector>& p,
-    List<scalar>& y,
+    scalarList& y,
     vector& pSum,
     const label ihi,
     const scalar fac
@@ -116,7 +116,7 @@ bool Foam::searchableSurfacesQueries::morphTet
     const scalar convergenceDistSqr,
     const label maxIter,
     List<vector>& p,
-    List<scalar>& y
+    scalarList& y
 )
 {
     vector pSum = sum(p);
@@ -733,7 +733,7 @@ Foam::pointIndexHit Foam::searchableSurfacesQueries::facesIntersection
 
 
     // Get the sum of distances (initial evaluation)
-    List<scalar> nearestDist(nearest.size());
+    scalarList nearestDist(nearest.size());
 
     forAll(nearestDist, i)
     {

@@ -84,7 +84,7 @@ class CompactListList_dev
         label size_;
 
         //- Offset table
-        List<label> offsets_;
+        labelList offsets_;
 
         //- Packed matrix of data
         List<T> m_;
@@ -143,10 +143,10 @@ public:
             inline bool empty() const;
 
             //- Return the offset table (= size()+1)
-            inline const List<label>& offsets() const;
+            inline const labelList& offsets() const;
 
             //- Return non-const access to the offset table
-            inline List<label>& offsets();
+            inline labelList& offsets();
 
             //- Return the packed matrix of data
             inline const List<T>& m() const;

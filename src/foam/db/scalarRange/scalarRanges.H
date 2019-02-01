@@ -36,7 +36,8 @@ SourceFiles
 #define scalarRanges_H
 
 #include "scalarRange.H"
-#include "List.H"
+#include "scalarList.H"
+#include "boolList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -69,10 +70,10 @@ public:
 
         //- Return the set of selected entries in the given list
         //  that are within the ranges
-        List<bool> selected(const List<scalar>&) const;
+        boolList selected(const scalarList&) const;
 
         //- Select a list of values that are within the ranges
-        List<scalar> select(const List<scalar>&) const;
+        scalarList select(const scalarList&) const;
 
         //- Select a list of values that are within the ranges
         void inplaceSelect(List<scalar>&) const;

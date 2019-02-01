@@ -65,10 +65,10 @@ class TRIsurfaceFormatCore
         pointField points_;
 
         //- The zones associated with the faces
-        List<label> zoneIds_;
+        labelList zoneIds_;
 
         //- The solid count, in the order of their first appearance
-        List<label> sizes_;
+        labelList sizes_;
 
 
     // Private Member Functions
@@ -119,13 +119,13 @@ public:
         }
 
         //- Return full access to the zones
-        List<label>& zoneIds()
+        labelList& zoneIds()
         {
             return zoneIds_;
         }
 
         //- The list of zone sizes in the order of their first appearance
-        List<label>& sizes()
+        labelList& sizes()
         {
             return sizes_;
         }

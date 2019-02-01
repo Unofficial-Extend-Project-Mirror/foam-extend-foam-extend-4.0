@@ -57,9 +57,9 @@ class potential
 
         const polyMesh& mesh_;
 
-        List<word> idList_;
+        wordList idList_;
 
-        List<word> siteIdList_;
+        wordList siteIdList_;
 
         label nPairPotIds_;
 
@@ -120,9 +120,9 @@ public:
 
             inline label nIds() const;
 
-            inline const List<word>& idList() const;
+            inline const wordList& idList() const;
 
-            inline const List<word>& siteIdList() const;
+            inline const wordList& siteIdList() const;
 
             inline scalar potentialEnergyLimit() const;
 

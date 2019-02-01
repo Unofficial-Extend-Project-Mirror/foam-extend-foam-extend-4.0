@@ -189,7 +189,7 @@ void Foam::meshReader::createPolyBoundary()
         else if (patchPhysicalTypes_[patchI] == "monitoring")
         {
             // translate the "monitoring" pseudo-boundaries to face sets
-            List<label> monitoring(idList.size());
+            labelList monitoring(idList.size());
 
             label monitorI = 0;
             forAll(idList, bndI)

@@ -68,7 +68,7 @@ class MGridGenGAMGAgglomeration
             labelList& cellCells,
             labelList& cellCellOffsets,
             const vectorField& Si,
-            List<scalar>& faceWeights
+            scalarList& faceWeights
         );
 
         //- Calculate and return agglomeration

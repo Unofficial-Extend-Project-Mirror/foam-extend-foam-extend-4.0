@@ -86,7 +86,7 @@ class cuttingPlane
         (
             const primitiveMesh&,
             const scalarField& dotProducts,
-            List<label>& edgePoint
+            labelList& edgePoint
         );
 
         //- Walk circumference of cell, starting from startEdgeI crossing

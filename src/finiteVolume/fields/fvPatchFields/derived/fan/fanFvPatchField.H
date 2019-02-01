@@ -54,7 +54,7 @@ class fanFvPatchField
     // Private data
 
         //- Fan pressure rise polynomial coefficients
-        List<scalar> f_;
+        scalarList f_;
 
         //- "jump" field
         Field<Type> jump_;

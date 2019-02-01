@@ -39,7 +39,7 @@ SourceFiles
 #include "typeInfo.H"
 #include "runTimeSelectionTables.H"
 #include "autoPtr.H"
-#include "List.H"
+#include "scalarList.H"
 #include "Pair.H"
 #include "Switch.H"
 #include "mathematicalConstants.H"
@@ -72,8 +72,8 @@ protected:
         scalar rMin_;
         scalar dr_;
 
-        List<scalar> forceLookup_;
-        List<scalar> energyLookup_;
+        scalarList forceLookup_;
+        scalarList energyLookup_;
 
         mutable energyScalingFunction* esfPtr_;
 

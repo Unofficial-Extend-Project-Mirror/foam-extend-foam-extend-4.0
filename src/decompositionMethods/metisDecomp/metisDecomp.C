@@ -54,10 +54,10 @@ namespace Foam
 
 Foam::label Foam::metisDecomp::decompose
 (
-    const List<label>& adjncy,
-    const List<label>& xadj,
+    const labelList& adjncy,
+    const labelList& xadj,
     const scalarField& cWeights,
-    List<label>& finalDecomp
+    labelList& finalDecomp
 )
 {
     // Method of decomposition
@@ -76,10 +76,10 @@ Foam::label Foam::metisDecomp::decompose
     Field<real_t> processorWeights;
 
     // cell weights (so on the vertices of the dual)
-    List<label> cellWeights;
+    labelList cellWeights;
 
     // face weights (so on the edges of the dual)
-    List<label> faceWeights;
+    labelList faceWeights;
 
 
     // Check for externally provided cellweights and if so initialise weights
@@ -300,8 +300,8 @@ Foam::labelList Foam::metisDecomp::decompose
             << exit(FatalError);
     }
 
-    List<label> adjncy;
-    List<label> xadj;
+    labelList adjncy;
+    labelList xadj;
     calcCSR
     (
         mesh_,
@@ -310,7 +310,7 @@ Foam::labelList Foam::metisDecomp::decompose
     );
 
     // Decompose using default weights
-    List<label> finalDecomp;
+    labelList finalDecomp;
     decompose(adjncy, xadj, pointWeights, finalDecomp);
 
     // Copy back to labelList
@@ -348,8 +348,8 @@ Foam::labelList Foam::metisDecomp::decompose
     // Make Metis CSR (Compressed Storage Format) storage
     //   adjncy      : contains neighbours (= edges in graph)
     //   xadj(celli) : start of information in adjncy for celli
-    List<label> adjncy;
-    List<label> xadj;
+    labelList adjncy;
+    labelList xadj;
     {
         // Get cellCells on coarse mesh.
         labelListList cellCells;
@@ -365,7 +365,7 @@ Foam::labelList Foam::metisDecomp::decompose
     }
 
     // Decompose using default weights
-    List<label> finalDecomp;
+    labelList finalDecomp;
     decompose(adjncy, xadj, coarseWeights, finalDecomp);
 
 
@@ -406,12 +406,12 @@ Foam::labelList Foam::metisDecomp::decompose
     //   adjncy      : contains neighbours (= edges in graph)
     //   xadj(celli) : start of information in adjncy for celli
 
-    List<label> adjncy;
-    List<label> xadj;
+    labelList adjncy;
+    labelList xadj;
     calcCSR(globalCellCells, adjncy, xadj);
 
     // Decompose using default weights
-    List<label> finalDecomp;
+    labelList finalDecomp;
     decompose(adjncy, xadj, cWeights, finalDecomp);
 
     // Copy back to labelList

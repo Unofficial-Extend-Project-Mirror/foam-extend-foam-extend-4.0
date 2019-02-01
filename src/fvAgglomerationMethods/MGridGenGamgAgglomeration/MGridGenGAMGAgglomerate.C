@@ -50,7 +50,7 @@ makeCompactCellFaceAddressingAndFaceWeights
     labelList& cellCells,
     labelList& cellCellOffsets,
     const vectorField& Si,
-    List<scalar>& faceWeights
+    scalarList& faceWeights
 )
 {
     const label nFineCells = fineAddressing.size();
@@ -122,7 +122,7 @@ Foam::tmp<Foam::labelField> Foam::MGridGenGAMGAgglomeration::agglomerate
     labelList cellCellOffsets;
 
     // Face weights = face areas of the internal faces
-    List<scalar> faceWeights;
+    scalarList faceWeights;
 
     // Create the compact addressing for cellCells and faceWeights
     makeCompactCellFaceAddressingAndFaceWeights
@@ -143,7 +143,7 @@ Foam::tmp<Foam::labelField> Foam::MGridGenGAMGAgglomeration::agglomerate
 
 
     // output: cell -> processor addressing
-    List<label> finalAgglom(nFineCells);
+    labelList finalAgglom(nFineCells);
     int nMoves = -1;
 
 #   ifdef WM_DP

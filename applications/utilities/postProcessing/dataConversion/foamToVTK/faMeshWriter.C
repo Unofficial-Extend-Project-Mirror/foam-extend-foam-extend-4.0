@@ -64,8 +64,8 @@ Foam::faMeshWriter::faMeshWriter
     os_ << "CELLS " << aMesh.nFaces() << ' ' << nFaceVerts
         << std::endl;
 
-    DynamicList<label> vertLabels(nFaceVerts);
-    DynamicList<label> faceTypes(nFaceVerts);
+    dynamicLabelList vertLabels(nFaceVerts);
+    dynamicLabelList faceTypes(nFaceVerts);
 
     forAll(pp, faceI)
     {

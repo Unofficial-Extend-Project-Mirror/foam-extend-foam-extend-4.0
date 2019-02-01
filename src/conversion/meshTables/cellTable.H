@@ -90,7 +90,7 @@ class cellTable
         Map<label> zoneMap() const;
 
         //- A contiguous list of cellTable names
-        List<word> namesList() const;
+        wordList namesList() const;
 
         //- Add required entries - MaterialType
         void addDefaults();

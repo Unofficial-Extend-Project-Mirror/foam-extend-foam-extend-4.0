@@ -294,7 +294,7 @@ namespace meshOps
         const UList<edge>& edges = List<edge>(0),
         const UList<face>& faces = List<face>(0),
         const UList<cell>& cells = List<cell>(0),
-        const UList<label>& owner = List<label>(0),
+        const UList<label>& owner = labelList(0),
         const UList<scalar>& scalField = UList<scalar>(),
         const UList<label>& lablField = UList<label>(),
         const UList<vector>& vectField = UList<vector>()

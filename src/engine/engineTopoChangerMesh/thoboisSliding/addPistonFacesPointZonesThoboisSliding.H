@@ -297,7 +297,7 @@
 
             // valve top points (move all with valve displacement)
             dynamicLabelList valvePistonPoints(nPoints() / 10);
-            List<bool> valvePistonPoint(nPoints(), false);
+            boolList valvePistonPoint(nPoints(), false);
             bool foundOne = false;
 
             const cellList& c = cells();
@@ -397,7 +397,7 @@
 
             // valve top points (move all with valve displacement)
             dynamicLabelList pistonPoints(nPoints() / 10);
-            List<bool> pistonPoint(nPoints(), false);
+            boolList pistonPoint(nPoints(), false);
             bool foundOne = false;
 
             const cellList& c = cells();

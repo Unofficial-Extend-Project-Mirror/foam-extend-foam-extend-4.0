@@ -89,7 +89,7 @@ void writePatch
         << std::endl;
 
 
-    DynamicList<label> vertLabels(nFaceVerts);
+    dynamicLabelList vertLabels(nFaceVerts);
 
     forAll(fp.localFaces(), faceI)
     {

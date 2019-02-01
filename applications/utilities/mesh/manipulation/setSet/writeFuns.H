@@ -36,9 +36,10 @@ SourceFiles
 #define writeFunctions_H
 
 #include "labelList.H"
+#include "scalarList.H"
 #include "floatScalar.H"
 #include "OFstream.H"
-#include "DynamicList.H"
+#include "dynamicLabelList.H"
 #include "point.H"
 
 using namespace Foam;
@@ -68,7 +69,7 @@ public:
 
     //- Write ascii or binary. If binary optionally in-place swaps argument
     static void write(std::ostream&, const bool, DynamicList<floatScalar>&);
-    static void write(std::ostream&, const bool, DynamicList<label>&);
+    static void write(std::ostream&, const bool, dynamicLabelList&);
 
     //- Write ascii or binary. If binary optionally in-place swaps argument
     static void write(std::ostream&, const bool, List<floatScalar>&);
@@ -78,15 +79,15 @@ public:
     static void insert(const point&, DynamicList<floatScalar>& dest);
 
     //- Append elements of labelList to DynamicList
-    static void insert(const labelList&, DynamicList<label>&);
+    static void insert(const labelList&, dynamicLabelList&);
     //- Append elements of scalarList to DynamicList
-    static void insert(const List<scalar>&, DynamicList<floatScalar>&);
+    static void insert(const scalarList&, DynamicList<floatScalar>&);
 
     //- Append elements of scalarList to DynamicList using map
     static void insert
     (
         const labelList& map,
-        const List<scalar>& source,
+        const scalarList& source,
         DynamicList<floatScalar>&
     );
 

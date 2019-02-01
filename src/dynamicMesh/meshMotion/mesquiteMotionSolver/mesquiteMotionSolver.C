@@ -2245,7 +2245,7 @@ void mesquiteMotionSolver::initParallelSurfaceSmoothing()
         (
             bufPoints,
             recvField,
-            List<scalar>(bufPoints.size(), tol),
+            scalarList(bufPoints.size(), tol),
             false,
             pointMap
         );

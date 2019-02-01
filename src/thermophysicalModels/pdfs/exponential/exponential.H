@@ -38,6 +38,7 @@ SourceFiles
 #define exponential_H
 
 #include "pdf.H"
+#include "scalarList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -60,8 +61,8 @@ class exponential
         scalar minValue_;
         scalar maxValue_;
 
-        List<scalar> lambda_;
-        List<scalar> ls_;
+        scalarList lambda_;
+        scalarList ls_;
 
         scalar range_;
 

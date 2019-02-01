@@ -276,19 +276,19 @@ inline const basicMultiComponentMixture& spray::composition() const
 }
 
 
-inline const List<label>& spray::liquidToGasIndex() const
+inline const labelList& spray::liquidToGasIndex() const
 {
     return liquidToGasIndex_;
 }
 
 
-inline const List<label>& spray::gasToLiquidIndex() const
+inline const labelList& spray::gasToLiquidIndex() const
 {
     return gasToLiquidIndex_;
 }
 
 
-inline const List<bool>& spray::isLiquidFuel() const
+inline const boolList& spray::isLiquidFuel() const
 {
     return isLiquidFuel_;
 }

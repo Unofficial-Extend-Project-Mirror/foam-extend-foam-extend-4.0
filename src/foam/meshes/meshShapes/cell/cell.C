@@ -25,6 +25,7 @@ License
 
 #include "cell.H"
 #include "pyramidPointFaceRef.H"
+#include "boolList.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -293,7 +294,7 @@ bool Foam::operator==(const cell& a, const cell& b)
         return false;
     }
 
-    List<bool> fnd(a.size(), false);
+    boolList fnd(a.size(), false);
 
     forAll (b, bI)
     {

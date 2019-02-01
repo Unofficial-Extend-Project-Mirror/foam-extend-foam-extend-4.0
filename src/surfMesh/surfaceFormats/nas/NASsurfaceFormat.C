@@ -362,7 +362,7 @@ bool Foam::fileFormats::NASsurfaceFormat<Face>::read
 
 
     // create default zone names, or from ANSA/Hypermesh information
-    List<word> names(dynSizes.size());
+    wordList names(dynSizes.size());
     forAllConstIter(Map<label>, lookup, iter)
     {
         const label zoneI  = iter();

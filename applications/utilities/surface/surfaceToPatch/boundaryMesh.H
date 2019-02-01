@@ -132,7 +132,7 @@ class boundaryMesh
             const label edgeI,
             const label distance,
             labelList& minDistance,
-            DynamicList<label>& visited
+            dynamicLabelList& visited
         ) const;
 
         //- Get index of polypatch by name

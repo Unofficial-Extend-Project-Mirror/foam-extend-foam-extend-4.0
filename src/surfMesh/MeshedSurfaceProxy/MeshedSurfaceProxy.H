@@ -73,7 +73,7 @@ class MeshedSurfaceProxy
 
         const List<surfZone>& zones_;
 
-        const List<label>& faceMap_;
+        const labelList& faceMap_;
 
 
 public:
@@ -98,7 +98,7 @@ public:
             const pointField&,
             const List<Face>&,
             const List<surfZone>& = List<surfZone>(),
-            const List<label>& faceMap = List<label>()
+            const labelList& faceMap = labelList()
         );
 
 
@@ -151,7 +151,7 @@ public:
             }
 
             //- Const access to the faceMap, zero-sized when unused
-            inline const List<label>& faceMap() const
+            inline const labelList& faceMap() const
             {
                 return faceMap_;
             }

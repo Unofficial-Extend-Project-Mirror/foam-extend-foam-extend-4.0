@@ -293,7 +293,7 @@ void Foam::meshWriters::STARCD::writeCells(const fileName& prefix) const
             const labelList& cFaces  = cells[cellId];
 
             // create (beg,end) indices
-            List<label> indices(cFaces.size() + 1);
+            labelList indices(cFaces.size() + 1);
             indices[0] = indices.size();
 
             label count = indices.size();

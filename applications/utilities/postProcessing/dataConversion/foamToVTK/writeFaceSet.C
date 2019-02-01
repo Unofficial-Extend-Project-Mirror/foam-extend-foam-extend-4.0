@@ -110,7 +110,7 @@ void writeFaceSet
     pStream << "POLYGONS " << fp.size() << ' ' << nFaceVerts
         << std::endl;
 
-    DynamicList<label> vertLabels(nFaceVerts);
+    dynamicLabelList vertLabels(nFaceVerts);
 
     forAll(lf, faceI)
     {

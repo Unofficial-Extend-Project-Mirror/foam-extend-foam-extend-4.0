@@ -103,7 +103,7 @@ class liquidMixture
         static const scalar TrMax;
 
         //- The names of the liquids
-        List<word> components_;
+        wordList components_;
 
         //- The liquid properties
         PtrList<liquid> properties_;
@@ -132,7 +132,7 @@ public:
 
     // Member Functions
 
-        inline const List<word>& components() const
+        inline const wordList& components() const
         {
             return components_;
         }

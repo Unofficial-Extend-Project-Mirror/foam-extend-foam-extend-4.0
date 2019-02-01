@@ -65,7 +65,7 @@ void Foam::fileFormats::VTKsurfaceFormat<Face>::write
 {
     const pointField& pointLst = surf.points();
     const List<Face>&  faceLst = surf.faces();
-    const List<label>& faceMap = surf.faceMap();
+    const labelList& faceMap = surf.faceMap();
 
     const List<surfZone>& zones =
     (

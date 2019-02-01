@@ -29,7 +29,7 @@
              && valves_[valveI].isOpen()
             )
             {
-                List<bool> valveTopPoint(newPoints.size(), false);
+                boolList valveTopPoint(newPoints.size(), false);
 
 /*
                 label layeringVPtsIndex =

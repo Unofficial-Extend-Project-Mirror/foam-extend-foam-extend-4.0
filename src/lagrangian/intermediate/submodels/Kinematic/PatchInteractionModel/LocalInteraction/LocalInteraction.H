@@ -54,7 +54,7 @@ class LocalInteraction
         const List<patchInteractionData> patchData_;
 
         //- List of participating patch ids
-        List<label> patchIds_;
+        labelList patchIds_;
 
 
     // Private member functions

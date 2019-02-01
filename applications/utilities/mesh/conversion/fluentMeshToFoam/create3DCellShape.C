@@ -28,6 +28,7 @@ Description
 
 #include "cellShapeRecognition.H"
 #include "labelList.H"
+#include "boolList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -143,7 +144,7 @@ cellShape create3DCellShape
     labelList pointLabels(curModel.nPoints(), -1);
 
     // Follow the used mesh faces
-    List<bool> meshFaceUsed(localFaces.size(), false);
+    boolList meshFaceUsed(localFaces.size(), false);
 
     // Get the raw model faces
     const faceList& modelFaces = curModel.modelFaces();

@@ -50,7 +50,7 @@ void Foam::readerDatabase::getPolyHedra()
     const cellModel& tetWedge = *(cellModeller::lookup("tetWedge"));
     const cellModel& hex = *(cellModeller::lookup("hex"));
 
-    DynamicList<label> polys(mesh().nCells()/100 + 1);
+    dynamicLabelList polys(mesh().nCells()/100 + 1);
 
     const cellShapeList& cellShapes = mesh().cellShapes();
 

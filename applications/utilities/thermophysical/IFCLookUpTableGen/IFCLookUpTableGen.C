@@ -173,11 +173,11 @@ int main(int argc, char *argv[])
     // Create Look Up Table
     interpolationLookUpTable<scalar> LookUpTable(control);
 
-    const List<label>& dim = LookUpTable.dim();
+    const labelList& dim = LookUpTable.dim();
 
-    const List<scalar>& min = LookUpTable.min();
+    const scalarList& min = LookUpTable.min();
 
-    const List<scalar>& delta = LookUpTable.delta();
+    const scalarList& delta = LookUpTable.delta();
 
     label count = 0;
 

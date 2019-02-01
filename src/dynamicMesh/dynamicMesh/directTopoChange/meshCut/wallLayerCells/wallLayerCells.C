@@ -68,7 +68,7 @@ bool Foam::wallLayerCells::usesCoupledPatch(const label cellI) const
 Foam::wallLayerCells::wallLayerCells
 (
     const polyMesh& mesh,
-    const List<word>& patchNames,
+    const wordList& patchNames,
     const label nLayers
 )
 :

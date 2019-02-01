@@ -135,7 +135,7 @@ void mapLagrangian(const meshToMesh& meshToMeshInterp)
             label sourceParticleI = 0;
 
             // Indices of source particles that get added to targetParcels
-            DynamicList<label> addParticles(sourceParcels.size());
+            dynamicLabelList addParticles(sourceParcels.size());
 
             // Unmapped particles
             labelHashSet unmappedSource(sourceParcels.size());

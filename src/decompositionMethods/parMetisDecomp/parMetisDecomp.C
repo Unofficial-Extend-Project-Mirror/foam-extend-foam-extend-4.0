@@ -64,8 +64,8 @@ Foam::label Foam::parMetisDecomp::decompose
     const pointField& cellCentres,
     Field<label>& cellWeights,
     Field<label>& faceWeights,
-    const List<label>& options,
-    List<label>& finalDecomp
+    const labelList& options,
+    labelList& finalDecomp
 )
 {
     // C style numbering
@@ -85,13 +85,13 @@ Foam::label Foam::parMetisDecomp::decompose
 
 
     // Get number of cells on all processors
-    List<label> nLocalCells(Pstream::nProcs());
+    labelList nLocalCells(Pstream::nProcs());
     nLocalCells[Pstream::myProcNo()] = xadj.size()-1;
     Pstream::gatherList(nLocalCells);
     Pstream::scatterList(nLocalCells);
 
     // Get cell offsets.
-    List<label> cellOffsets(Pstream::nProcs()+1);
+    labelList cellOffsets(Pstream::nProcs()+1);
     label nGlobalCells = 0;
     forAll(nLocalCells, procI)
     {
@@ -120,7 +120,7 @@ Foam::label Foam::parMetisDecomp::decompose
 
     // Number of cells to send to the next processor
     // (is same as number of cells next processor has to receive)
-    List<label> nSendCells(Pstream::nProcs(), 0);
+    labelList nSendCells(Pstream::nProcs(), 0);
 
     for (label procI = nLocalCells.size()-1; procI >=1; procI--)
     {
@@ -317,7 +317,7 @@ Foam::label Foam::parMetisDecomp::decompose
     {
         IPstream fromNextProc(Pstream::blocking, Pstream::myProcNo()+1);
 
-        List<label> nextFinalDecomp(fromNextProc);
+        labelList nextFinalDecomp(fromNextProc);
 
         if (nextFinalDecomp.size() != nSendCells[Pstream::myProcNo()])
         {
@@ -413,7 +413,7 @@ Foam::labelList Foam::parMetisDecomp::decompose
 
 
     // decomposition options. 0 = use defaults
-    List<label> options(3, label(0));
+    labelList options(3, label(0));
     //options[0] = 1;     // don't use defaults but use values below
     //options[1] = -1;    // full debug info
     //options[2] = 15;    // random number seed
@@ -529,7 +529,7 @@ Foam::labelList Foam::parMetisDecomp::decompose
             faceWeights.setSize(adjncy.size());
 
             // Assume symmetric weights. Keep same ordering as adjncy.
-            List<label> nFacesPerCell(mesh_.nCells(), 0);
+            labelList nFacesPerCell(mesh_.nCells(), 0);
 
             // Handle internal faces
             for (label faceI = 0; faceI < mesh_.nInternalFaces(); faceI++)
@@ -583,7 +583,7 @@ Foam::labelList Foam::parMetisDecomp::decompose
 
 
     // Do actual decomposition
-    List<label> finalDecomp;
+    labelList finalDecomp;
     decompose
     (
         xadj,
@@ -638,7 +638,7 @@ Foam::labelList Foam::parMetisDecomp::decompose
     // Get renumbered owner region on other side of coupled faces
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    List<label> globalNeighbour(mesh_.nFaces()-mesh_.nInternalFaces());
+    labelList globalNeighbour(mesh_.nFaces()-mesh_.nInternalFaces());
 
     forAll(patches, patchI)
     {
@@ -791,7 +791,7 @@ Foam::labelList Foam::parMetisDecomp::decompose
     calcCSR(globalCellCells, adjncy, xadj);
 
     // decomposition options. 0 = use defaults
-    List<label> options(3, label(0));
+    labelList options(3, label(0));
     //options[0] = 1;     // don't use defaults but use values below
     //options[1] = -1;    // full debug info
     //options[2] = 15;    // random number seed
@@ -862,7 +862,7 @@ Foam::labelList Foam::parMetisDecomp::decompose
 
 
     // Do actual decomposition
-    List<label> finalDecomp;
+    labelList finalDecomp;
     decompose
     (
         xadj,

@@ -114,7 +114,7 @@ void Foam::cuttingPlane::intersectEdges
 (
     const primitiveMesh& mesh,
     const scalarField& dotProducts,
-    List<label>& edgePoint
+    labelList& edgePoint
 )
 {
     // Use the dotProducts to find out the cut edges.
@@ -407,7 +407,7 @@ void Foam::cuttingPlane::remapFaces
     {
         MeshStorage::remapFaces(faceMap);
 
-        List<label> newCutCells(faceMap.size());
+        labelList newCutCells(faceMap.size());
         forAll(faceMap, faceI)
         {
             newCutCells[faceI] = cutCells_[faceMap[faceI]];

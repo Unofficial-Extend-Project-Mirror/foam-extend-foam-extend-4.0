@@ -120,7 +120,7 @@ Foam::extendedCellToFaceStencil::weightedSum
     for (label faceI = 0; faceI < mesh.nInternalFaces(); faceI++)
     {
         const List<Type>& stField = stencilFld[faceI];
-        const List<scalar>& stWeight = stencilWeights[faceI];
+        const scalarList& stWeight = stencilWeights[faceI];
 
         forAll(stField, i)
         {
@@ -144,7 +144,7 @@ Foam::extendedCellToFaceStencil::weightedSum
             forAll(pSfCorr, i)
             {
                 const List<Type>& stField = stencilFld[faceI];
-                const List<scalar>& stWeight = stencilWeights[faceI];
+                const scalarList& stWeight = stencilWeights[faceI];
 
                 forAll(stField, j)
                 {

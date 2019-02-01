@@ -54,7 +54,7 @@ class tetherPotentialList
 {
     // Private data
 
-        List<label> idMap_;
+        labelList idMap_;
 
 
     // Private Member Functions
@@ -66,9 +66,9 @@ class tetherPotentialList
 
         void readTetherPotentialDict
         (
-            const List<word>& siteIdList,
+            const wordList& siteIdList,
             const dictionary& tetherPotentialDict,
-            const List<word>& tetherSiteIdList
+            const wordList& tetherSiteIdList
         );
 
         //- Disallow default bitwise assignment
@@ -87,9 +87,9 @@ public:
         //- Construct from siteIdList and potental dictionaries
         tetherPotentialList
         (
-            const List<word>& siteIdList,
+            const wordList& siteIdList,
             const dictionary& tetherPotentialDict,
-            const List<word>& tetherSiteIdList
+            const wordList& tetherSiteIdList
         );
 
 
@@ -102,14 +102,14 @@ public:
 
         void buildPotentials
         (
-            const List<word>& siteIdList,
+            const wordList& siteIdList,
             const dictionary& tetherPotentialDict,
-            const List<word>& tetherSiteIdList
+            const wordList& tetherSiteIdList
         );
 
         // Access
 
-            inline const List<word>& idMap() const;
+            inline const wordList& idMap() const;
 
             const tetherPotential& tetherPotentialFunction(const label a) const;
 

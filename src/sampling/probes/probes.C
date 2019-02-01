@@ -380,7 +380,7 @@ void Foam::probes::updateMesh(const mapPolyMesh& mpm)
 
         // 1. Update cells
         {
-            DynamicList<label> elems(elementList_.size());
+            dynamicLabelList elems(elementList_.size());
 
             const labelList& reverseMap = mpm.reverseCellMap();
             forAll(elementList_, i)
@@ -408,7 +408,7 @@ void Foam::probes::updateMesh(const mapPolyMesh& mpm)
 
         // 2. Update faces
         {
-            DynamicList<label> elems(faceList_.size());
+            dynamicLabelList elems(faceList_.size());
 
             const labelList& reverseMap = mpm.reverseFaceMap();
             forAll(faceList_, i)

@@ -79,7 +79,7 @@ public:
         inline static List<Keyed<T> > createList
         (
             const List<T>&,
-            const List<label>& keys
+            const labelList& keys
         );
 
 

@@ -187,7 +187,7 @@ Foam::radiation::wideBandAbsorptionEmission::aCont(const label bandI) const
 
     forAll(a, i)
     {
-        const List<scalar>& species = lookUpTable_.lookUp(ft[i]);
+        const scalarList& species = lookUpTable_.lookUp(ft[i]);
 
         for (label n=0; n<nSpecies; n++)
         {

@@ -173,7 +173,7 @@
         HashTable<label> zoneMap(nZones);
 
         // Cells per zone.
-        List<DynamicList<label> > zoneCells(nZones);
+        List<dynamicLabelList > zoneCells(nZones);
 
         // Running cell counter
         label cellI = 0;

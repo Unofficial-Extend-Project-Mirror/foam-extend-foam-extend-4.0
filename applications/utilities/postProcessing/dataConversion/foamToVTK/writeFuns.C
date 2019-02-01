@@ -170,7 +170,7 @@ void Foam::writeFuns::write
 (
     std::ostream& os,
     const bool binary,
-    DynamicList<label>& elems
+    dynamicLabelList& elems
 )
 {
     labelList& fld = elems.shrink();
@@ -274,7 +274,7 @@ void Foam::writeFuns::insert(const tensor& pt, DynamicList<floatScalar>& dest)
 }
 
 
-void Foam::writeFuns::insert(const labelList& source, DynamicList<label>& dest)
+void Foam::writeFuns::insert(const labelList& source, dynamicLabelList& dest)
 {
     forAll(source, i)
     {

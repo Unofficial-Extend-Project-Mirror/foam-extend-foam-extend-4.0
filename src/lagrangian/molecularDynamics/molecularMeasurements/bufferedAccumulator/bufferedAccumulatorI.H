@@ -66,7 +66,7 @@ inline label bufferedAccumulator<Type>::bufferLength() const
 
 
 template<class Type>
-inline const List<label>& bufferedAccumulator<Type>::bufferOffsets() const
+inline const labelList& bufferedAccumulator<Type>::bufferOffsets() const
 {
     return bufferOffsets_;
 }

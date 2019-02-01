@@ -15,7 +15,7 @@
                     const scalarField& movingPointsTop = movingPointsMaskTop(valveI);
 
                     {
-                        List<bool> valveTopPoint(newPoints.size(), false);
+                        boolList valveTopPoint(newPoints.size(), false);
 
                         labelList valveTopPoints;
 

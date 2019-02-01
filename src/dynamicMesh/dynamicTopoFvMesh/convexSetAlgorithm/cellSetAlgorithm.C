@@ -459,7 +459,7 @@ void cellSetAlgorithm::writeVTK
         List<edge>(0),
         List<face>(0),
         allTets,
-        List<label>(0)
+        labelList(0)
     );
 }
 

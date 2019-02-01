@@ -69,16 +69,16 @@ private:
         fileName fileName_;
 
         //- Table dimensions
-        List<label> dim_;
+        labelList dim_;
 
         //- Min on each dimension
-        List<scalar> min_;
+        scalarList min_;
 
         //- Deltas on each dimension
-        List<scalar> delta_;
+        scalarList delta_;
 
         //- Maximum on each dimension
-        List<scalar> max_;
+        scalarList max_;
 
         //- Dictionary entries
         List<dictionary> entries_;
@@ -87,16 +87,16 @@ private:
         List<dictionary> output_;
 
         //- Input indices from the look up table
-        List<label> entryIndices_;
+        labelList entryIndices_;
 
         //- Output Indeces from the Look Up Table
-        List<label> outputIndices_;
+        labelList outputIndices_;
 
         //- Field names and indices
         HashTable<label> fieldIndices_;
 
         //- Output list containing input and interpolation values of outputs
-        List<scalar> interpOutput_;
+        scalarList interpOutput_;
 
 
     // Private Member Functions
@@ -108,7 +108,7 @@ private:
         void dimensionTable();
 
         //- Find table index by scalarList
-        label index(const List<scalar>&, const bool lastDim=true) const;
+        label index(const scalarList&, const bool lastDim=true) const;
 
         //- Find table index by scalar
         label index(const scalar) const;
@@ -161,7 +161,7 @@ public:
         bool found(const word& fieldName) const;
 
         //- Return the output list given a single input scalar
-        const List<scalar>& lookUp(const scalar);
+        const scalarList& lookUp(const scalar);
 
         //- Write Look Up Table to filename.
         void write
@@ -185,16 +185,16 @@ public:
         inline const List<dictionary>& entries() const;
 
         //- Return const access to the list of min dimensions
-        inline const List<scalar>& min() const;
+        inline const scalarList& min() const;
 
         //- Return const access to the list of dimensions
-        inline const List<label>& dim() const;
+        inline const labelList& dim() const;
 
         //- Return const access to the deltas in each dimension
-        inline const List<scalar>& delta() const;
+        inline const scalarList& delta() const;
 
         //- Return const access to the list of max dimensions
-        inline const List<scalar>& max() const;
+        inline const scalarList& max() const;
 
         //- Return const access to the table name
         inline word tableName() const;

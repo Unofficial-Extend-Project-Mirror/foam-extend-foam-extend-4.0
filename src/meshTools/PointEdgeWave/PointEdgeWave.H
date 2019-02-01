@@ -152,7 +152,7 @@ class PointEdgeWave
         (
             const polyPatch& meshPatch,
             const primitivePatch& patch,
-            const List<label>& patchPointLabels,
+            const labelList& patchPointLabels,
             List<Type>& pointInfo
         ) const;
 
@@ -161,7 +161,7 @@ class PointEdgeWave
         (
             const polyPatch& meshPatch,
             const primitivePatch& patch,
-            const List<label>& patchPointLabels,
+            const labelList& patchPointLabels,
             List<Type>& pointInfo
         ) const;
 

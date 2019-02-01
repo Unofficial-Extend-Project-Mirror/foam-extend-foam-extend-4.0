@@ -146,7 +146,7 @@ protected:
         void sortFacesAndStore
         (
             const Xfer< List<Face> >& unsortedFaces,
-            const Xfer< List<label> >& zoneIds,
+            const Xfer< labelList >& zoneIds,
             const bool sorted
         );
 

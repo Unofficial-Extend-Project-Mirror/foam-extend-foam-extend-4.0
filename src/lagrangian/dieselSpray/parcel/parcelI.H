@@ -30,12 +30,12 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-inline const List<word>& parcel::liquidNames() const
+inline const wordList& parcel::liquidNames() const
 {
     return liquidComponents_;
 }
 
-inline const List<word>& parcel::fuelNames() const
+inline const wordList& parcel::fuelNames() const
 {
     return liquidComponents_;
 }

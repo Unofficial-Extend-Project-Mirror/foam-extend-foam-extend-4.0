@@ -37,6 +37,7 @@ SourceFiles
 #include "VectorN.H"
 #include "SphericalTensorN.H"
 #include "DiagTensorN.H"
+#include "labelList.H"
 
 // * * * * * * * * * * * * * Forward Declarations  * * * * * * * * * * * * * //
 

@@ -71,6 +71,7 @@ SourceFiles
 #include "tolerancesSwitch.H"
 #include "optimisationSwitch.H"
 #include "labelPair.H"
+#include "boolList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -398,7 +399,7 @@ class GGIInterpolation
         (
             const List<point2D>& clippingPolygon,
             const List<point2D>& subjectPolygon,
-            List<bool>& subjectVertexInside
+            boolList& subjectVertexInside
         ) const;
 
         //- Compute the intersection between two 2D polygons using the
@@ -415,7 +416,7 @@ class GGIInterpolation
         (
             const List<point2D>& clippingPolygon,
             const List<point2D>& subjectPolygon,
-            const List<bool>& subjectVertexInside
+            const boolList& subjectVertexInside
         ) const;
 
         //- Compute the area of a 2D polygon

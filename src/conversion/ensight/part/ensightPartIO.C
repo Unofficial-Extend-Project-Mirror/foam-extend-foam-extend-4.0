@@ -55,8 +55,8 @@ void Foam::ensightPart::writeHeader
 void Foam::ensightPart::writeFieldList
 (
     ensightFile& os,
-    const List<scalar>& field,
-    const List<label>& idList
+    const scalarList& field,
+    const labelList& idList
 ) const
 {
     forAll(idList, i)
@@ -172,7 +172,7 @@ void Foam::ensightPart::writeGeometry(ensightGeoFile& os) const
 void Foam::ensightPart::writeScalarField
 (
     ensightFile& os,
-    const List<scalar>& field
+    const scalarList& field
 ) const
 {
     if (size() && field.size() && (os.allowUndef() || isFieldDefined(field)))
@@ -196,9 +196,9 @@ void Foam::ensightPart::writeScalarField
 void Foam::ensightPart::writeVectorField
 (
     ensightFile& os,
-    const List<scalar>& field0,
-    const List<scalar>& field1,
-    const List<scalar>& field2
+    const scalarList& field0,
+    const scalarList& field1,
+    const scalarList& field2
 ) const
 {
     if (size() && field0.size() && (os.allowUndef() || isFieldDefined(field0)))

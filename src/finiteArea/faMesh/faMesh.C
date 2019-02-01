@@ -367,7 +367,7 @@ Foam::faMesh::faMesh
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        List<label>(0)
+        labelList(0)
     ),
     boundary_
     (

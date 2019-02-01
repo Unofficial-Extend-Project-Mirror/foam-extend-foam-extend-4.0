@@ -88,7 +88,7 @@ protected:
     };
 
     // Static data members
-    static List<word> elemTypes_;
+    static wordList elemTypes_;
 
 
 public:
@@ -140,7 +140,7 @@ public:
     // Member Functions
 
         //- static listing of the element types
-        virtual List<word> const& elementTypes() const
+        virtual wordList const& elementTypes() const
         {
             return elemTypes_;
         }

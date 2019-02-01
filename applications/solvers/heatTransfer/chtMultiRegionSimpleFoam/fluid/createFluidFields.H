@@ -8,9 +8,9 @@
     PtrList<compressible::turbulenceModel> turbulence(fluidRegions.size());
     PtrList<volScalarField> DpDtf(fluidRegions.size());
 
-    List<scalar> initialMassFluid(fluidRegions.size());
-    List<label> pRefCellFluid(fluidRegions.size(),0);
-    List<scalar> pRefValueFluid(fluidRegions.size(),0.0);
+    scalarList initialMassFluid(fluidRegions.size());
+    labelList pRefCellFluid(fluidRegions.size(),0);
+    scalarList pRefValueFluid(fluidRegions.size(),0.0);
 
 
     // Populate fluid field pointer lists

@@ -72,7 +72,7 @@ public:
         wallLayerCells
         (
             const polyMesh& mesh,
-            const List<word>& patchNames,
+            const wordList& patchNames,
             const label nLayers
         );
 };

@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
         faceSet set(*iter());
         SortableList<label> faceLabels(set.toc());
 
-        DynamicList<label> addressing(set.size());
+        dynamicLabelList addressing(set.size());
         DynamicList<bool> flipMap(set.size());
 
         if (!noFlipMap)

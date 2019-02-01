@@ -61,7 +61,7 @@ Foam::FreeStream<CloudType>::FreeStream
         this->coeffDict().subDict("numberDensities")
     );
 
-    List<word> molecules(numberDensitiesDict.toc());
+    wordList molecules(numberDensitiesDict.toc());
 
     // Initialise the particleFluxAccumulators_
     particleFluxAccumulators_.setSize(patches_.size());
@@ -216,7 +216,7 @@ void Foam::FreeStream<CloudType>::inflow()
             scalar fA = mag(patch.faceAreas()[f]);
 
             // Cumulative triangle area fractions
-            List<scalar> cTriAFracs(nVertices);
+            scalarList cTriAFracs(nVertices);
 
             scalar previousCummulativeSum = 0.0;
 

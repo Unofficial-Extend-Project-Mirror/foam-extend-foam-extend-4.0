@@ -44,9 +44,9 @@ static fileName caseDir;
 
 static instantList TimeList;
 
-static List<word> fieldNames;
-static List<word> lagrangianScalarNames;
-static List<word> lagrangianVectorNames;
+static wordList fieldNames;
+static wordList lagrangianScalarNames;
+static wordList lagrangianVectorNames;
 static label var2field[maxNames];
 
 static Time *runTimePtr = 0;
@@ -57,7 +57,7 @@ static Cloud<passiveParticle> *sprayPtr = 0;
 static fvMesh* secondMeshPtr = 0;
 static int nSecondMeshPatches = 0;
 static char secondMeshName[] = "cells_2";
-static List<word> secondMeshFieldNames;
+static wordList secondMeshFieldNames;
 static label secondMeshVar2field[maxNames];
 static bool secondMeshIsScalar[maxNames];
 static bool secondMeshIsVector[maxNames];
@@ -71,7 +71,7 @@ static word faScalarName             = "areaScalarField";
 static word faVectorName             = "areaVectorField";
 static word faTensorName             = "areaTensorField";
 static char faMeshName[] = "faCells";
-static List<word> faMeshFieldNames;
+static wordList faMeshFieldNames;
 static label faMeshVar2field[maxNames];
 static bool faMeshIsScalar[maxNames];
 static bool faMeshIsVector[maxNames];

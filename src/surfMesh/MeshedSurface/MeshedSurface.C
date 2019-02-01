@@ -625,7 +625,7 @@ bool Foam::MeshedSurface<Face>::stitchFaces
 
     List<Face>& faceLst = this->storedFaces();
 
-    List<label> faceMap(faceLst.size());
+    labelList faceMap(faceLst.size());
 
     // Reset the point labels to the unique points array
     label newFaceI = 0;
@@ -685,7 +685,7 @@ bool Foam::MeshedSurface<Face>::checkFaces
     bool changed = false;
     List<Face>& faceLst = this->storedFaces();
 
-    List<label> faceMap(faceLst.size());
+    labelList faceMap(faceLst.size());
 
     label newFaceI = 0;
     // Detect badly labelled faces and mark degenerate faces
@@ -848,7 +848,7 @@ Foam::label Foam::MeshedSurface<Face>::triangulate()
 template<class Face>
 Foam::label Foam::MeshedSurface<Face>::triangulate
 (
-    List<label>& faceMapOut
+    labelList& faceMapOut
 )
 {
     label nTri = 0;
@@ -877,7 +877,7 @@ Foam::label Foam::MeshedSurface<Face>::triangulate
     }
 
     List<Face>  newFaces(nTri);
-    List<label> faceMap;
+    labelList faceMap;
 
     // reuse storage from optional faceMap
     if (!faceMapOut.empty())

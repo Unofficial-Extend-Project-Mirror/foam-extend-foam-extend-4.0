@@ -4,7 +4,7 @@
 
         boolList scaleDisp(nPoints(), true);
 
-        List<bool> pistonPoint(newPoints.size(), false);
+        boolList pistonPoint(newPoints.size(), false);
 
         const scalarField& movingPointsMPiston = movingPointsMaskPiston();
 
@@ -109,7 +109,7 @@
 
             const scalarField& movingPointsMPistonValves = movingPointsMaskPistonValves(valveI);
 
-            List<bool> pistonPointValve(newPoints.size(), false);
+            boolList pistonPointValve(newPoints.size(), false);
             labelList pistonPointsV;
 
             {

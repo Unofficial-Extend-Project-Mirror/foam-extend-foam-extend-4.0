@@ -80,7 +80,7 @@ bool Foam::fileFormats::GTSsurfaceFormat<Face>::read
     // write directly into the lists:
     pointField&  pointLst = this->storedPoints();
     List<Face>&  faceLst  = this->storedFaces();
-    List<label>& zoneIds  = this->storedZoneIds();
+    labelList& zoneIds  = this->storedZoneIds();
 
     pointLst.setSize(nPoints);
     faceLst.setSize(nElems);
@@ -344,7 +344,7 @@ void Foam::fileFormats::GTSsurfaceFormat<Face>::write
 {
     const pointField& pointLst   = surf.points();
     const List<Face>& faceLst    = surf.faces();
-    const List<label>& zoneIds   = surf.zoneIds();
+    const labelList& zoneIds   = surf.zoneIds();
     const List<surfZoneIdentifier>& zoneToc = surf.zoneToc();
 
     // check if output triangulation would be required

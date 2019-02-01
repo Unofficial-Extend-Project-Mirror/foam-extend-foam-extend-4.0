@@ -5,7 +5,7 @@
         boolList scaleDisp(nPoints(), true);
         label nScaled = nPoints();
 
-        List<bool> pistonPoint(newPoints.size(), false);
+        boolList pistonPoint(newPoints.size(), false);
 
         label pistonPtsIndex = pointZones().findZoneID("pistonPoints");
         const labelList& pistonPoints = pointZones()[pistonPtsIndex];
@@ -79,7 +79,7 @@
             boolList scaleDisp(nPoints(), true);
             label nScaled = nPoints();
 
-            List<bool> pistonPointValve(newPoints.size(), false);
+            boolList pistonPointValve(newPoints.size(), false);
 
             label pistonValvePtsIndex =
             pointZones().findZoneID("valvePistonPointsV"+Foam::name(valveI + 1));
