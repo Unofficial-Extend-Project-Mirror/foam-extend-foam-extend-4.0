@@ -2113,6 +2113,37 @@ void Foam::polyhedralRefinement::setCellsToRefine
     // Transfer the contents into the data member (ordinary list)
     cellsToRefine_.transfer(cellsToRefineDynamic);
 
+    // Temporary debug stuff: Take a look whether we have selected any face
+    // order error cells
+    const cellSet& errorCellsOwn =
+        mesh_.time().lookupObject<cellSet>("errorCellsOwnBeforeAMR");
+    const cellSet& errorCellsNei =
+        mesh_.time().lookupObject<cellSet>("errorCellsNeiBeforeAMR");
+
+    // Loop through all cellsToRefine_ and check whether we have marked error
+    // cells for refinement
+    forAll (cellsToRefine_, i)
+    {
+        // Get cell indexd
+        const label cellI = cellsToRefine_[i];
+
+        if (errorCellsOwn.found(cellI))
+        {
+            Pout<< "WARNING! " << nl
+                << "Cell: " << cellI << " marked for refinement, and it has"
+                << " ordering error in OWNER list!"
+                << endl;
+        }
+        
+        if (errorCellsNei.found(cellI))
+        {
+            Pout<< "WARNING! " << nl
+                << "Cell: " << cellI << " marked for refinement, and it has"
+                << " ordering error in NEIGHBOUR list!"
+                << endl;
+        }
+    }
+
     Info<< "Selected " << returnReduce(cellsToRefine_.size(), sumOp<label>())
         << " cells to refine." << endl;
 }

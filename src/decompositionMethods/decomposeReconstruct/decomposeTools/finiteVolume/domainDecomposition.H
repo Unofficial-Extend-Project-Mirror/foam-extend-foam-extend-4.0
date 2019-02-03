@@ -137,6 +137,21 @@ class domainDecomposition
         //- Create cell-to processor list using domain decomposition tools
         void distributeCells();
 
+        //- Helper function for decomposeMesh. Given two lists of inter processor
+        //  boundaries and inter processor boundary faces, add neighbouring procJ
+        //  to list of the procI. Also adds faceI into the procI list and return
+        //  whether the procJ is already present in the list of visited
+        //  processors (needed for error handling on cyclic patches)
+        bool addInterProcessorBoundaryData
+        (
+            const label& procI,
+            const label& procJ,
+            const label faceI,
+
+            List<SLList<label> >& interProcBoundaries,
+            List<SLList<SLList<label> > >& interProcBFaces
+        ) const;
+
 
 public:
 
