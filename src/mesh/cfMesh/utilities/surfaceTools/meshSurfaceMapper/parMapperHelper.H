@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     parMapperHelper
@@ -56,9 +59,9 @@ class parMapperHelper
         scalar movingDist_;
         label globalLabel_;
         label patch_;
-    
+
     public:
-        
+
     // Constructors
         explicit inline parMapperHelper()
         :
@@ -67,7 +70,7 @@ class parMapperHelper
             globalLabel_(-1),
             patch_(-1)
         {};
-        
+
         explicit inline parMapperHelper
         (
             const point& p,
@@ -81,7 +84,7 @@ class parMapperHelper
             globalLabel_(globalLabel),
             patch_(patchLabel)
         {}
-    
+
     // Destructor
         ~parMapperHelper()
         {};
@@ -92,27 +95,27 @@ class parMapperHelper
         {
             return p_;
         }
-        
+
         //- return moving distance
         inline const scalar& movingDistance() const
         {
             return movingDist_;
         }
-        
+
         //- return global label
         inline label globalLabel() const
         {
             return globalLabel_;
         }
-        
+
         //- return patch the point is mapped to
         inline label pointPatch() const
         {
             return patch_;
         }
-        
+
     // Operators
-        
+
         inline void operator=(const parMapperHelper& h)
         {
             p_ = h.p_;
@@ -120,15 +123,15 @@ class parMapperHelper
             globalLabel_ = h.globalLabel_;
             patch_ = h.patch_;
         }
-        
+
         inline bool operator!=(const parMapperHelper& h) const
         {
             if( globalLabel_ != h.globalLabel_ )
                 return true;
-            
+
             return false;
         }
-        
+
     // Friend operators
         friend Ostream& operator<<(Ostream& os, const parMapperHelper& h)
         {
@@ -142,23 +145,23 @@ class parMapperHelper
             os.check("operator<<(Ostream&, const parMapperHelper&");
             return os;
         }
-        
+
         friend Istream& operator>>(Istream& is, parMapperHelper& h)
         {
             // Read beginning of parMapperHelper
             is.readBegin("parMapperHelper");
-        
+
             is >> h.p_;
             is >> h.movingDist_;
             is >> h.globalLabel_;
             is >> h.patch_;
-            
+
             // Read end of parMapperHelper
             is.readEnd("parMapperHelper");
-        
+
             // Check state of Istream
             is.check("operator>>(Istream&, parMapperHelper");
-            
+
             return is;
         }
 };

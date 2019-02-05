@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     VRWGraphModifier
@@ -27,7 +30,7 @@ Class
 Description
     This class is a modifier for VRWGraph which allows for multi-threaded
     execution of most time-consuimg functions
-    
+
 SourceFiles
     VRWGraphSMPModifier.H
     VRWGraphSMPModifier.C
@@ -64,7 +67,7 @@ class VRWGraphSMPModifier
 
         //- Disallow bitwise assignment
         void operator=(const VRWGraphSMPModifier&);
-    
+
 public:
 
     // Constructor
@@ -81,27 +84,27 @@ public:
         //- set the size and row sizes
         template<class ListType>
         void setSizeAndRowSize(const ListType&);
-        
+
         //- merge graphs with the identical number of rows
         //- into a single one. Use for SMP parallelisation
         void mergeGraphs(const List<VRWGraph>& graphParts);
-        
+
         //- set the graph to the reverse of the original graph.
         //- the rows of such graph store the rows which contain the elements
         //- of the original graph
         template<class GraphType>
         void reverseAddressing(const GraphType& origGraph);
-        
+
         void reverseAddressing(const VRWGraph& origGraph);
-        
+
         //- set the graph to the reverse of the original graph and mapped
         //- to another space.
         template<class ListType, class GraphType>
         void reverseAddressing(const ListType&, const GraphType&);
-        
+
         template<class ListType>
         void reverseAddressing(const ListType&, const VRWGraph&);
-        
+
         //- optimize memory usage
         // this should be used once the graph will not be resized any more
         void optimizeMemoryUsage();

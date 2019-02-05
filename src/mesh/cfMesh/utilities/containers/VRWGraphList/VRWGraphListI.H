@@ -1,31 +1,34 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
 namespace Foam
 {
-    
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 inline void Foam::VRWGraphList::checkIndex
@@ -45,7 +48,7 @@ inline void Foam::VRWGraphList::checkIndex
             << " is not in range " << Foam::label(0)
             << " and " << rows_.size() << abort(FatalError);
     }
-    
+
     if( (j < 0) || (j >= rows_[i].size()) )
         FatalErrorIn
         (
@@ -54,7 +57,7 @@ inline void Foam::VRWGraphList::checkIndex
         ) << "Row index " << Foam::label(j)
             << " is not in range " << Foam::label(0)
             << " and " << rows_[i].size() << abort(FatalError);
-    
+
     if( (k < 0) || (k >= data_.sizeOfRow(rows_[i].start()+j)) )
         FatalErrorIn
         (
@@ -125,10 +128,10 @@ inline void Foam::VRWGraphList::appendGraph
 )
 {
     rowElement re(data_.size(), l.size());
-    
+
     for(label i=0;i<l.size();++i)
         data_.appendList(l[i]);
-    
+
     rows_.append(re);
 }
 
@@ -144,7 +147,7 @@ inline Foam::label Foam::VRWGraphList::operator()
     #ifdef FULLDEBUG
     checkIndex(i, j, k);
     #endif
-        
+
     return data_(rows_[i].start() + j, k);
 }
 
@@ -157,7 +160,7 @@ inline Foam::label& Foam::VRWGraphList::operator()
     #ifdef FULLDEBUG
     checkIndex(i, j, k);
     #endif
-        
+
     return data_(rows_[i].start() + j, k);
 }
 

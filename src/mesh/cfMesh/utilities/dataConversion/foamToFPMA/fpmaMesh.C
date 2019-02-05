@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -57,19 +60,19 @@ void Foam::fpmaMesh::writePoints(Foam::OFstream& fpmaGeometryFile) const
         const point& p = points[pointI];
         fpmaGeometryFile << p.x() << ' ' << p.y() << ' ' << p.z() << ' ';
     }
-    
+
     fpmaGeometryFile << nl;
 }
 
 void fpmaMesh::writeCells(OFstream& fpmaGeometryFile) const
 {
     const cellListPMG& cells = mesh_.cells();
-    
+
     fpmaGeometryFile << cells.size() << nl;
     forAll(cells, cellI)
     {
         const cell& c = cells[cellI];
-        
+
         fpmaGeometryFile << c.size();
         forAll(c, fI)
             fpmaGeometryFile << ' ' << c[fI];
@@ -84,7 +87,7 @@ void Foam::fpmaMesh::writeFaces(OFstream& fpmaGeometryFile) const
     forAll(faces, faceI)
     {
         const face& f = faces[faceI];
-        
+
         fpmaGeometryFile << f.size();
         forAllReverse(f, pI)
             fpmaGeometryFile << ' ' << f[pI];
@@ -96,9 +99,9 @@ void Foam::fpmaMesh::writeSubsets(Foam::OFstream& fpmaGeometryFile) const
 {
     //- write patches as face selections
     const PtrList<boundaryPatch>& patches = mesh_.boundaries();
-    
+
     label nSubsets(0);
-    
+
     nSubsets += patches.size();
     DynList<label> indices;
     mesh_.pointSubsetIndices(indices);
@@ -110,15 +113,15 @@ void Foam::fpmaMesh::writeSubsets(Foam::OFstream& fpmaGeometryFile) const
     mesh_.cellSubsetIndices(indices);
     nSubsets += indices.size();
     Info << "Mesh has " << indices.size() << " cell subsets" << endl;
-    
+
     fpmaGeometryFile << nSubsets << nl;
-    
+
     //- write patches as face selections
     forAll(patches, patchI)
     {
         label start = patches[patchI].patchStart();
         const label size = patches[patchI].patchSize();
-        
+
         fpmaGeometryFile << patches[patchI].patchName() << nl;
         fpmaGeometryFile << 3 << nl;
         fpmaGeometryFile << size << nl;
@@ -126,14 +129,14 @@ void Foam::fpmaMesh::writeSubsets(Foam::OFstream& fpmaGeometryFile) const
             fpmaGeometryFile << start++ << ' ';
         fpmaGeometryFile << nl;
     }
-    
+
     //- write node selections
     mesh_.pointSubsetIndices(indices);
     forAll(indices, indexI)
     {
         labelLongList nodesInSubset;
         mesh_.pointsInSubset(indices[indexI], nodesInSubset);
-        
+
         fpmaGeometryFile << mesh_.pointSubsetName(indices[indexI]) << nl;
         fpmaGeometryFile << 1 << nl;
         fpmaGeometryFile << nodesInSubset.size() << nl;
@@ -141,14 +144,14 @@ void Foam::fpmaMesh::writeSubsets(Foam::OFstream& fpmaGeometryFile) const
             fpmaGeometryFile << nodesInSubset[i] << ' ';
         fpmaGeometryFile << nl;
     }
-    
+
     //- write face selections
     mesh_.faceSubsetIndices(indices);
     forAll(indices, indexI)
     {
         labelLongList facesInSubset;
         mesh_.facesInSubset(indices[indexI], facesInSubset);
-        
+
         fpmaGeometryFile << mesh_.faceSubsetName(indices[indexI]) << nl;
         fpmaGeometryFile << 3 << nl;
         fpmaGeometryFile << facesInSubset.size() << nl;
@@ -156,14 +159,14 @@ void Foam::fpmaMesh::writeSubsets(Foam::OFstream& fpmaGeometryFile) const
             fpmaGeometryFile << facesInSubset[i] << ' ';
         fpmaGeometryFile << nl;
     }
-    
+
     //- write cell selections
     mesh_.cellSubsetIndices(indices);
     forAll(indices, indexI)
     {
         labelLongList cellsInSubset;
         mesh_.cellsInSubset(indices[indexI], cellsInSubset);
-        
+
         fpmaGeometryFile << mesh_.cellSubsetName(indices[indexI]) << nl;
         fpmaGeometryFile << 2 << nl;
         fpmaGeometryFile << cellsInSubset.size() << nl;
@@ -177,7 +180,7 @@ void Foam::fpmaMesh::writeSubsets(Foam::OFstream& fpmaGeometryFile) const
 void fpmaMesh::write(OFstream& fpmaGeometryFile) const
 {
     writePoints(fpmaGeometryFile);
-    
+
     writeFaces(fpmaGeometryFile);
 
     writeCells(fpmaGeometryFile);

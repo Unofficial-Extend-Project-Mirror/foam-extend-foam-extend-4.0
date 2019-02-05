@@ -1,9 +1,12 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -54,16 +57,16 @@ class xmlTag
     public OStringStream
 {
     // Private data
-    
+
         //- Tag name
         word name_;
-        
+
         //- Attributes
         HashTable<string> attributes_;
-        
+
         //- Child tags
         DynamicList<xmlTag> children_;
-        
+
 public:
 
     // Constructors
@@ -76,7 +79,7 @@ public:
             attributes_(),
             children_()
         {}
-        
+
         //- Construct given tag name
         xmlTag(const word& name)
         :
@@ -101,7 +104,7 @@ public:
 
 
     // Member Functions
-    
+
         //- Add an attribute
         template<class T>
         void addAttribute(const keyType& key, const T& value)
@@ -110,13 +113,13 @@ public:
             os << value;
             attributes_.insert(key, os.str());
         };
-        
+
         //- Add a fileName attribute
         void addAttribute(const keyType& key, const fileName& value)
         {
             attributes_.insert(key, value);
         };
-        
+
         //- Add a string attribute
         void addAttribute(const keyType& key, const string& value)
         {
@@ -128,15 +131,15 @@ public:
         {
             attributes_.insert(key, value);
         };
-        
+
         //- Add a child
         xmlTag& addChild(const xmlTag& tag)
         {
             children_.append(tag);
-            
+
             return children_[children_.size()-1];
         };
-        
+
         //- Create and add a new child
         xmlTag& addChild(const word& name)
         {
@@ -149,26 +152,26 @@ public:
         {
             name_ = tag.name_;
             attributes_ = tag.attributes_;
-            children_ = tag.children_;            
+            children_ = tag.children_;
             OStringStream::rewind();
             Foam::operator<<(*this, tag.str().c_str());
         };
-        
+
     // Friend IOstream Operators
 
         friend Ostream& operator<<(Ostream&, const xmlTag&);
-        
+
         template<class Form, class Cmpt, int nCmpt>
         friend xmlTag& operator<<(xmlTag&, const VectorSpace<Form, Cmpt, nCmpt>&);
-        
+
         friend xmlTag& operator<<(xmlTag&, const labelledTri&);
-        
+
         template<class T, unsigned Size>
         friend xmlTag& operator<<(xmlTag&, const FixedList<T, Size>&);
 
         template<class T>
         friend xmlTag& operator<<(xmlTag&, const LongList<T>&);
-        
+
         template<class T>
         friend xmlTag& operator<<(xmlTag&, const UList<T>&);
 };
@@ -180,7 +183,7 @@ Ostream& operator<<(Ostream& os, const xmlTag& tag)
 {
     // Tag name
     os << indent << '<' << tag.name_;
-    
+
     // Attributes and text
     for
     (
@@ -191,24 +194,24 @@ Ostream& operator<<(Ostream& os, const xmlTag& tag)
     {
         os << token::SPACE << iter.key() << '=' << iter();
     }
-    
+
     if (tag.str().size() || tag.children_.size())
     {
         os << '>' << nl;
-                
+
         // Children
         os.incrIndent();
-        
+
         forAll(tag.children_, i)
         {
             os << tag.children_[i];
         }
-        
+
         os.decrIndent();
-        
+
         // Tag text
         os << tag.str().c_str();
-        
+
         // Close tag
         os << indent << "</" << tag.name_ << '>' << endl;
     }
@@ -229,9 +232,9 @@ xmlTag& operator<<(xmlTag& tag, const UList<T>& data)
     {
         tag << data[i] << token::SPACE;
     }
-    
+
     tag << nl;
-    
+
     return tag;
 }
 
@@ -243,9 +246,9 @@ xmlTag& operator<<(xmlTag& tag, const LongList<T>& data)
     {
         tag << data[i] << token::SPACE;
     }
-    
+
     tag << nl;
-    
+
     return tag;
 }
 
@@ -258,9 +261,9 @@ xmlTag& operator<<(xmlTag& tag, const VectorSpace<Form, Cmpt, nCmpt>& data)
     {
         tag << data[i] << token::SPACE;
     }
-    
+
     tag << nl;
-    
+
     return tag;
 }
 
@@ -272,9 +275,9 @@ xmlTag& operator<<(xmlTag& tag, const FixedList<T, Size>& data)
     {
         tag << data[i] << token::SPACE;
     }
-    
+
     tag << nl;
-    
+
     return tag;
 }
 
@@ -282,10 +285,10 @@ xmlTag& operator<<(xmlTag& tag, const FixedList<T, Size>& data)
 xmlTag& operator<<(xmlTag& tag, const labelledTri& data)
 {
     const triFace& tFace = data;
-    
+
     return tag << tFace;
 }
-    
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
