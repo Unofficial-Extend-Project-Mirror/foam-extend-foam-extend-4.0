@@ -1,22 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
@@ -29,13 +32,13 @@ Description
 #include "argList.H"
 #include "IFstream.H"
 #include "fileName.H"
+#include "triSurf.H"
 #include "triSurfModifier.H"
 #include "boundBox.H"
 #include "OFstream.H"
+
 #include <cstdlib>
 #include <sstream>
-
-#include "triSurfaceDetectFeatureEdges.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Main program:
@@ -121,12 +124,12 @@ int main(int argc, char *argv[])
     //- generate bounding bound triangles
     const label nTriangles = origSurface.size();
     LongList<labelledTri>& newTriangles = sMod.facetsAccess();
-    newTriangles.setSize(nTriangles + 12);
+    newTriangles.setSize(nTriangles+12);
 
     //- create patches
     geometricSurfacePatchList& newPatches = sMod.patchesAccess();
     const label nPatches = origSurface.patches().size();
-    newPatches.setSize(nPatches + 6);
+    newPatches.setSize(nPatches+6);
 
     newPatches[nPatches].name() = "xMin";
     newPatches[nPatches+1].name() = "xMax";

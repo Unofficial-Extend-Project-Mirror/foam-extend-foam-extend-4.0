@@ -1,70 +1,91 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
+template<class T, Foam::label staticSize>
+inline T* Foam::DynList<T, staticSize>::data()
+{
+    return dataPtr_;
+}
+
+template<class T, Foam::label staticSize>
+inline const T* Foam::DynList<T, staticSize>::data() const
+{
+    return dataPtr_;
+}
 
 template<class T, Foam::label staticSize>
 inline void Foam::DynList<T, staticSize>::allocateSize(const label s)
 {
-    if( s > UList<T>::size()  )
+    checkAllocation();
+
+    if( s > staticSize )
     {
-        T* newData = new T[s];
+        if( s > nAllocated_ )
+        {
+            //- allocates enough space for the elements
+            T* newData = new T[s];
 
-        for(label i=0;i<nextFree_;++i)
-            newData[i] = this->operator[](i);
+            for(label i=0;i<nextFree_;++i)
+                newData[i] = this->operator[](i);
 
-        T* data = UList<T>::begin();
-        if( data && (data != staticData_) )
-            delete [] data;
+            if( nAllocated_ > staticSize )
+                delete [] dataPtr_;
 
-        //UList<T>::reset(newData, s);
-        this->UList<T>::operator=(UList<T>(newData, s));
+            dataPtr_ = newData;
+            nAllocated_ = s;
+        }
+        else if( s < nAllocated_ )
+        {
+            //- shrinks the list
+            T* newData = new T[s];
+
+            for(label i=0;i<s;++i)
+                newData[i] = this->operator[](i);
+
+            delete [] dataPtr_;
+
+            dataPtr_ = newData;
+            nAllocated_ = s;
+        }
     }
-    else if( (s > staticSize) && (s < UList<T>::size()) )
+    else
     {
-        T* newData = new T[s];
+        if( nAllocated_ > staticSize )
+        {
+            //- delete dynamically allocated data
+            for(label i=0;i<s;++i)
+                staticData_[i] = dataPtr_[i];
 
-        for(label i=0;i<s;++i)
-            newData[i] = this->operator[](i);
+            delete [] dataPtr_;
+        }
 
-        T* data = UList<T>::begin();
-        delete [] data;
-
-        //UList<T>::reset(newData, s);
-        this->UList<T>::operator=(UList<T>(newData, s));
-    }
-    else if( (s <= staticSize) && (UList<T>::size() > staticSize) )
-    {
-        for(label i=0;i<s;++i)
-            staticData_[i] = UList<T>::operator[](i);
-
-        T* data = UList<T>::begin();
-        if( data && (data != staticData_) )
-            delete [] data;
-
-        //UList<T>::reset(staticData_, staticSize);
-        this->UList<T>::operator=(UList<T>(staticData_, staticSize));
+        dataPtr_ = staticData_;
+        nAllocated_ = staticSize;
     }
 }
 
@@ -82,71 +103,105 @@ inline void Foam::DynList<T, staticSize>::checkIndex(const label i) const
     }
 }
 
+template<class T, Foam::label staticSize>
+inline void Foam::DynList<T, staticSize>::checkAllocation() const
+{
+    if( nextFree_ > nAllocated_ )
+        FatalErrorIn
+        (
+            "template<class T, Foam::label staticSize> "
+            "inline void Foam::DynList<T, staticSize>::"
+            "checkAllocation() const"
+        ) << "nextFree_ is out of scope 0 " << " and " << nAllocated_
+          << abort(FatalError);
+}
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 //- Construct null
 template<class T, Foam::label staticSize>
 inline Foam::DynList<T, staticSize>::DynList()
 :
-    UList<T>(staticData_, staticSize),
+    dataPtr_(nullptr),
+    nAllocated_(0),
+    staticData_(),
     nextFree_(0)
-{}
+{
+    setSize(0);
+
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+}
 
 
 template<class T, Foam::label staticSize>
 inline Foam::DynList<T, staticSize>::DynList(const label s)
 :
-    UList<T>(staticData_, staticSize),
+    dataPtr_(nullptr),
+    nAllocated_(0),
+    staticData_(),
     nextFree_(0)
 {
     setSize(s);
-}
 
-#if WM_LABEL_SIZE == 64
-template<class T, Foam::label staticSize>
-inline Foam::DynList<T, staticSize>::DynList(const int s)
-:
-    UList<T>(staticData_, staticSize),
-    nextFree_(0)
-{
-    setSize(s);
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
 }
-#endif
 
 template<class T, Foam::label staticSize>
 inline Foam::DynList<T, staticSize>::DynList(const label s, const T& val)
 :
-    UList<T>(staticData_, staticSize),
+    dataPtr_(nullptr),
+    nAllocated_(0),
+    staticData_(),
     nextFree_(0)
 {
     setSize(s);
 
     for(label i=0;i<s;++i)
         this->operator[](i) = val;
+
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
 }
 
 template<class T, Foam::label staticSize>
 inline Foam::DynList<T, staticSize>::DynList(const UList<T>& ul)
 :
-    UList<T>(staticData_, staticSize),
+    dataPtr_(nullptr),
+    nAllocated_(0),
+    staticData_(),
     nextFree_(0)
 {
     setSize(ul.size());
 
     forAll(ul, i)
         this->operator[](i) = ul[i];
+
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
 }
 
 template<class T, Foam::label staticSize>
 template<class ListType>
 inline Foam::DynList<T, staticSize>::DynList(const ListType& l)
 :
-    UList<T>(staticData_, staticSize),
+    dataPtr_(nullptr),
+    nAllocated_(0),
+    staticData_(),
     nextFree_(0)
 {
     setSize(l.size());
     for(label i=0;i<nextFree_;++i)
         this->operator[](i) = l[i];
+
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
 }
 
 //- Copy construct
@@ -156,19 +211,24 @@ inline Foam::DynList<T, staticSize>::DynList
     const DynList<T, staticSize>& dl
 )
 :
-    UList<T>(staticData_, staticSize),
+    dataPtr_(nullptr),
+    nAllocated_(0),
+    staticData_(),
     nextFree_(0)
 {
     setSize(dl.size());
     for(label i=0;i<nextFree_;++i)
         this->operator[](i) = dl[i];
+
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
 }
 
 template<class T, Foam::label staticSize>
 inline Foam::DynList<T, staticSize>::~DynList()
 {
     allocateSize(0);
-    //UList<T>::reset(nullptr, 0);
 }
 
 
@@ -177,12 +237,20 @@ inline Foam::DynList<T, staticSize>::~DynList()
 template<class T, Foam::label staticSize>
 inline Foam::label Foam::DynList<T, staticSize>::size() const
 {
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
     return nextFree_;
 }
 
 template<class T, Foam::label staticSize>
 inline Foam::label Foam::DynList<T, staticSize>::byteSize() const
 {
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
     if( !contiguous<T>() )
     {
         FatalErrorIn("DynList<T>::byteSize()")
@@ -192,20 +260,31 @@ inline Foam::label Foam::DynList<T, staticSize>::byteSize() const
     }
 
     return nextFree_*sizeof(T);
-
 }
 
 template<class T, Foam::label staticSize>
 inline void Foam::DynList<T, staticSize>::setSize(const label s)
 {
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
     allocateSize(s);
     nextFree_ = s;
+
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
 }
 
 
 template<class T, Foam::label staticSize>
 inline void Foam::DynList<T, staticSize>::clear()
 {
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
     nextFree_ = 0;
 }
 
@@ -213,34 +292,62 @@ inline void Foam::DynList<T, staticSize>::clear()
 template<class T, Foam::label staticSize>
 void Foam::DynList<T, staticSize>::shrink()
 {
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
     allocateSize(nextFree_);
+
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
 }
 
 template<class T, Foam::label staticSize>
 inline void Foam::DynList<T, staticSize>::append(const T& e)
 {
-    if( nextFree_ >= UList<T>::size() )
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
+    if( nextFree_ >= nAllocated_ )
     {
-        const label newSize = 2*UList<T>::size()+2;
+        const label newSize = 2*nAllocated_+2;
         allocateSize(newSize);
     }
 
-    UList<T>::operator[](nextFree_++) = e;
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
+    this->operator[](nextFree_++) = e;
 }
 
 template<class T, Foam::label staticSize>
 inline void Foam::DynList<T, staticSize>::appendIfNotIn(const T& e)
 {
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
     if( !contains(e) )
          append(e);
+
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
 }
 
 template<class T, Foam::label staticSize>
 inline bool Foam::DynList<T, staticSize>::contains(const T& e) const
 {
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
     for(label i=0;i<nextFree_;++i)
     {
-        if( UList<T>::operator[](i) == e )
+        if( this->operator[](i) == e )
             return true;
     }
 
@@ -253,9 +360,13 @@ inline Foam::label Foam::DynList<T, staticSize>::containsAtPosition
     const T& e
 ) const
 {
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
     for(label i=0;i<nextFree_;++i)
     {
-        if( UList<T>::operator[](i) == e )
+        if( this->operator[](i) == e )
             return i;
     }
 
@@ -265,12 +376,20 @@ inline Foam::label Foam::DynList<T, staticSize>::containsAtPosition
 template<class T, Foam::label staticSize>
 inline const T& Foam::DynList<T, staticSize>::lastElement() const
 {
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
     return this->operator[](nextFree_-1);
 }
 
 template<class T, Foam::label staticSize>
 inline T Foam::DynList<T, staticSize>::removeLastElement()
 {
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
     if( nextFree_ == 0 )
     {
         FatalErrorIn
@@ -279,13 +398,18 @@ inline T Foam::DynList<T, staticSize>::removeLastElement()
         )   << "List is empty" << abort(FatalError);
     }
 
-    T el = UList<T>::operator[](--nextFree_);
+    T el = this->operator[](nextFree_-1);
+    --nextFree_;
     return el;
 }
 
 template<class T, Foam::label staticSize>
 inline T Foam::DynList<T, staticSize>::removeElement(const label i)
 {
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
     if( nextFree_ == 0 )
     {
         FatalErrorIn
@@ -298,12 +422,20 @@ inline T Foam::DynList<T, staticSize>::removeElement(const label i)
     this->operator[](i) = this->operator[](nextFree_-1);
     --nextFree_;
 
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
     return el;
 }
 
 template<class T, Foam::label staticSize>
 inline T& Foam::DynList<T, staticSize>::newElmt(const label i)
 {
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
     return this->operator()(i);
 }
 
@@ -312,12 +444,20 @@ inline T& Foam::DynList<T, staticSize>::newElmt(const label i)
 template<class T, Foam::label staticSize>
 inline T& Foam::DynList<T, staticSize>::operator()(const label i)
 {
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
     nextFree_ = Foam::max(nextFree_, i + 1);
 
-    if( nextFree_ >= UList<T>::size() )
+    if( nextFree_ >= nAllocated_ )
     {
         allocateSize(2 * nextFree_+1);
     }
+
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
 
     return this->operator[](i);
 }
@@ -326,20 +466,22 @@ template<class T, Foam::label staticSize>
 inline const T& Foam::DynList<T, staticSize>::operator[](const label i) const
 {
     # ifdef FULLDEBUG
+    checkAllocation();
     checkIndex(i);
     # endif
 
-    return UList<T>::operator[](i);
+    return dataPtr_[i];
 }
 
 template<class T, Foam::label staticSize>
 inline T& Foam::DynList<T, staticSize>::operator[](const label i)
 {
     # ifdef FULLDEBUG
+    checkAllocation();
     checkIndex(i);
     # endif
 
-    return UList<T>::operator[](i);
+    return dataPtr_[i];
 }
 
 template<class T, Foam::label staticSize>
@@ -385,7 +527,12 @@ inline const T& Foam::DynList<T, staticSize>::rcElement
 template<class T, Foam::label staticSize>
 inline void Foam::DynList<T, staticSize>::operator=(const T& t)
 {
-    UList<T>::operator=(t);
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
+    for(label i=0;i<nextFree_;++i)
+        operator[](i) = t;
 }
 
 template<class T, Foam::label staticSize>
@@ -394,8 +541,16 @@ inline void Foam::DynList<T, staticSize>::operator=
     const DynList<T, staticSize>& dl
 )
 {
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
     allocateSize(dl.size());
     nextFree_ = dl.size();
+
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
 
     for(label i=0;i<nextFree_;++i)
         this->operator[](i) = dl[i];
@@ -405,11 +560,44 @@ template<class T, Foam::label staticSize>
 template<class ListType>
 inline void Foam::DynList<T, staticSize>::operator=(const ListType& l)
 {
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
     allocateSize(l.size());
     nextFree_ = l.size();
 
+    # ifdef DEBUG
+    checkAllocation();
+    # endif
+
     for(label i=0;i<nextFree_;++i)
         this->operator[](i) = l[i];
+}
+
+template<class T, Foam::label staticSize>
+inline bool Foam::DynList<T, staticSize>::operator==
+(
+    const DynList<T, staticSize>& DL
+) const
+{
+    if( nextFree_ != DL.nextFree_ )
+        return false;
+
+    forAll(DL, i)
+        if( this->operator[](i) != DL[i] )
+            return false;
+
+    return true;
+}
+
+template<class T, Foam::label staticSize>
+inline bool Foam::DynList<T, staticSize>::operator!=
+(
+    const DynList<T, staticSize>& DL
+) const
+{
+    return !operator==(DL);
 }
 
 

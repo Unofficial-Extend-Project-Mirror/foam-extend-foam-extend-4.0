@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -202,7 +205,7 @@ Foam::Istream& Foam::operator>>
 
             if( listDelimiter == token::BEGIN_LIST )
             {
-                for(register label i=0;i<size;++i)
+                for(label i=0;i<size;++i)
                 {
                     is >> DL[i];
 
@@ -223,7 +226,7 @@ Foam::Istream& Foam::operator>>
                     "reading the single entry"
                 );
 
-                for(register label i=0;i<size;++i)
+                for(label i=0;i<size;++i)
                 {
                     DL[i] = element;
                 }
@@ -306,7 +309,7 @@ void Foam::LongList<T, Offset>::appendFromStream(Istream& is)
 
             if( listDelimiter == token::BEGIN_LIST )
             {
-                for(register label i=0;i<size;++i)
+                for(label i=0;i<size;++i)
                 {
                     is >> this->operator[](origSize);
                     ++origSize;
@@ -328,7 +331,7 @@ void Foam::LongList<T, Offset>::appendFromStream(Istream& is)
                     "reading the single entry"
                 );
 
-                for(register label i=0;i<size;++i)
+                for(label i=0;i<size;++i)
                 {
                     this->operator[](origSize) = element;
                     ++origSize;
@@ -345,31 +348,6 @@ void Foam::LongList<T, Offset>::appendFromStream(Istream& is)
 
             forAll(buf, i)
                 this->operator[](origSize++) = buf[i];
-
-            /*const label blockSize = 1<<shift_;
-
-            Info << "nextFree_ " << nextFree_ << endl;
-
-            //- append elements by reading binary block
-            while( origSize < nextFree_ )
-            {
-                const label currBlock = origSize >> shift_;
-                const label currPos = origSize & mask_;
-
-                Info << "Orig size " << origSize
-                    << nl << "currBlock " << currBlock
-                    << nl << "currPos " << currPos << endl;
-
-                T* data = &dataPtr_[currBlock][currPos];
-
-                label bs = Foam::min(nextFree_-origSize, blockSize);
-                bs = Foam::min(blockSize - currPos, bs);
-
-                Info << "bs " << bs << endl;
-
-                is.read(reinterpret_cast<char*>(data), bs * sizeof(T));
-                origSize += bs;
-            } */
 
             is.fatalCheck
             (

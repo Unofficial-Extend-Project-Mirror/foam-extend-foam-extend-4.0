@@ -1,35 +1,16 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known
- * as TecIO, as part of its distribution of OpenFOAM and the
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- *
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
 #include "stdafx.h"
 #include "MASTER.h"
+
 #define TECPLOTENGINEMODULE
 
 /*
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
@@ -43,12 +24,11 @@
 #include "ARRLIST.h"
 #include "DATASET.h"
 #include "SET.h"
-#include "DATASHR.h"
 #include "FILESTREAM.h"
+#include "Q_MSG.h"
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 #endif
-#include "Q_MSG.h"
 #include "DATASET0.h"
 
 using namespace tecplot::strutil;
@@ -72,34 +52,35 @@ void OutOfMemoryMsg(void)
 
 /**
  */
-FieldData_pa FieldDataAlloc(void)
+FieldData_pa FieldDataAlloc(Boolean_t doTrackVarSharing)
 {
     FieldData_pa Result;
 
-    Result = (FieldData_pa)ALLOC_ITEM(struct _FieldData_a, "FieldDataPtr");
+    Result = static_cast<FieldData_pa>(ALLOC_ITEM(struct _FieldData_a, "FieldDataPtr"));
     if (Result != NULL)
     {
         Result->Data = NULL;
 
-#     if defined TECPLOTKERNEL /* TecIO doesn't require these features yet */
+        #if defined TECPLOTKERNEL /* TecIO doesn't require these features yet */
 /* CORE SOURCE CODE REMOVED */
-#     else /* ...for TecIO only */
+        #else /* ...for TecIO only */
         Result->GetValueCallback[0] = NULL;
         Result->SetValueCallback[0] = NULL;
-#     endif
+        #endif
 
-#     if defined TECPLOTKERNEL /* TecIO doesn't require these features yet */
+        #if defined TECPLOTKERNEL /* TecIO doesn't require these features yet */
 /* CORE SOURCE CODE REMOVED */
-#     endif
+        #endif
 
         Result->Type             = FieldDataType_Invalid;
         Result->ValueLocation    = ValueLocation_Invalid;
-        Result->RefCount         = 1; /* self */
-        Result->VarShareRefCount = 1; /* self */
-        Result->NumValues        = 0;
-#     if defined TECPLOTKERNEL /* TecIO doesn't require these features yet */
+        #if defined TECPLOTKERNEL /* TecIO doesn't require these features yet */
 /* CORE SOURCE CODE REMOVED */
-#     endif
+        #endif
+        Result->NumValues        = 0;
+        #if defined TECPLOTKERNEL /* TecIO doesn't require these features yet */
+/* CORE SOURCE CODE REMOVED */
+        #endif
     }
 
     ENSURE(VALID_REF(Result) || Result == NULL);
@@ -121,7 +102,7 @@ void FieldDataDeallocData(FieldData_pa FieldData)
         if (FieldData->Data != NULL)
         {
             /* Hack to remove 'deleting void* is undefined' warning... */
-            char *Tmp = (char *)FieldData->Data;
+            char *Tmp = static_cast<char *>(FieldData->Data);
             FREE_ARRAY(Tmp, "FieldData _Data");
             FieldData->Data = NULL;
         }
@@ -132,18 +113,6 @@ void FieldDataDeallocData(FieldData_pa FieldData)
 
     ENSURE(FieldData->Data == NULL);
 }
-
-#if defined TECPLOTKERNEL
-/* CORE SOURCE CODE REMOVED */
-#endif
-
-#if defined TECPLOTKERNEL
-/* CORE SOURCE CODE REMOVED */
-#endif
-
-#if defined TECPLOTKERNEL
-/* CORE SOURCE CODE REMOVED */
-#endif
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
@@ -217,26 +186,21 @@ void FieldDataDealloc(FieldData_pa *FieldData,
 {
     REQUIRE(VALID_REF(FieldData));
     REQUIRE(VALID_REF(*FieldData) || *FieldData == NULL);
-    REQUIRE(IMPLICATION(*FieldData != NULL,
-                        IsStructureReferenced(*FieldData)));
-    REQUIRE(IMPLICATION(*FieldData != NULL && DoTrackVarSharing,
-                        IsVarStructureReferenced(*FieldData)));
-    REQUIRE(VALID_BOOLEAN(DoTrackVarSharing));
-    REQUIRE(IMPLICATION(*FieldData != NULL,
-                        (*FieldData)->RefCount >= (*FieldData)->VarShareRefCount));
+    #if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+    #endif
 
     if (*FieldData != NULL)
     {
-        if (DoTrackVarSharing)
-            DecVarStructureReference(*FieldData);
-        DecStructureReference(*FieldData);
-        if (!IsStructureReferenced(*FieldData))
+        #if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+        #endif
         {
             FieldDataCleanup(*FieldData);
 
-#if defined TECPLOTKERNEL
+            #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
-#endif
+            #endif
 
             FREE_ITEM(*FieldData, "field data");
         }
@@ -248,14 +212,6 @@ void FieldDataDealloc(FieldData_pa *FieldData,
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
-#if !defined NDEBUG || defined CHECKED_BUILD
-#endif
-#endif
-
-#if defined TECPLOTKERNEL
-/* CORE SOURCE CODE REMOVED */
-#if !defined NDEBUG || defined CHECKED_BUILD
-#endif
 #endif
 
 #if defined TECPLOTKERNEL
@@ -269,11 +225,21 @@ static void copyTypedValueArray(void*     DstArray,
                                 LgIndex_t SrcStart,
                                 LgIndex_t SrcEnd)
 {
-    T* SrcPtr    = ((T*)SrcArray) + SrcStart;
-    T* DstPtr    = ((T*)DstArray) + DstStart;
-    size_t numBytes = sizeof(T) * (SrcEnd - SrcStart + 1);
-    memcpy(DstPtr, SrcPtr, numBytes);
+    REQUIRE(VALID_REF(DstArray));
+    REQUIRE(DstStart >= 0);
+    REQUIRE(VALID_REF(SrcArray));
+    REQUIRE(0 <= SrcStart && SrcStart <= SrcEnd+1);
+    REQUIRE(DstArray != SrcArray);
+
+    size_t const numBytes = sizeof(T) * (SrcEnd - SrcStart + 1);
+    if (numBytes != 0)
+    {
+        T const* SrcPtr = (static_cast<T const*>(SrcArray)) + SrcStart;
+        T* DstPtr       = (static_cast<T*>(DstArray)) + DstStart;
+        memcpy(DstPtr, SrcPtr, numBytes);
+    }
 }
+
 /**
  * DstArray and SrcArray are aligned on proper word boundaries.
  */
@@ -289,7 +255,7 @@ void CopyTypedValueArray(FieldDataType_e  ValueType,
     REQUIRE(VALID_REF(DstArray));
     REQUIRE(DstStart >= 0);
     REQUIRE(VALID_REF(SrcArray));
-    REQUIRE(0 <= SrcStart && SrcStart <= SrcEnd);
+    REQUIRE(0 <= SrcStart && SrcStart <= SrcEnd+1);
     REQUIRE(DstArray != SrcArray);
 
     switch (ValueType)
@@ -356,8 +322,8 @@ void SwapBytesInTypedValueArray(FieldDataType_e  ValueType,
         case FieldDataType_Double:
         {
             /* swap 8 bytes blocks */
-            UInt64_t *SrcPtr = ((UInt64_t *)SrcArray) + SrcStart;
-            UInt64_t *SrcPtrEnd = ((UInt64_t *)SrcArray) + SrcEnd;
+            UInt64_t *SrcPtr = (static_cast<UInt64_t *>(SrcArray)) + SrcStart;
+            UInt64_t *SrcPtrEnd = (static_cast<UInt64_t *>(SrcArray)) + SrcEnd;
             CHECK(sizeof(UInt64_t) == 8 && sizeof(double) == 8);
             while (SrcPtr <= SrcPtrEnd)
             {
@@ -369,8 +335,8 @@ void SwapBytesInTypedValueArray(FieldDataType_e  ValueType,
         case FieldDataType_Int32:
         {
             /* swap 4 bytes blocks */
-            UInt32_t *SrcPtr = ((UInt32_t *)SrcArray) + SrcStart;
-            UInt32_t *SrcPtrEnd = ((UInt32_t *)SrcArray) + SrcEnd;
+            UInt32_t *SrcPtr = (static_cast<UInt32_t *>(SrcArray)) + SrcStart;
+            UInt32_t *SrcPtrEnd = (static_cast<UInt32_t *>(SrcArray)) + SrcEnd;
             CHECK(sizeof(UInt32_t) == 4 && sizeof(float) == 4);
             while (SrcPtr <= SrcPtrEnd)
             {
@@ -381,8 +347,8 @@ void SwapBytesInTypedValueArray(FieldDataType_e  ValueType,
         case FieldDataType_Int16:
         {
             /* swap 4 bytes blocks */
-            UInt16_t *SrcPtr = ((UInt16_t *)SrcArray) + SrcStart;
-            UInt16_t *SrcPtrEnd = ((UInt16_t *)SrcArray) + SrcEnd;
+            UInt16_t *SrcPtr = (static_cast<UInt16_t *>(SrcArray)) + SrcStart;
+            UInt16_t *SrcPtrEnd = (static_cast<UInt16_t *>(SrcArray)) + SrcEnd;
             CHECK(sizeof(UInt16_t) == 2);
             while (SrcPtr <= SrcPtrEnd)
             {
@@ -421,8 +387,8 @@ void SwapBytesInUnalignedTypedValueArray(FieldDataType_e  ValueType,
         case FieldDataType_Double:
         {
             /* swap 8-byte blocks */
-            Byte_t *SrcPtr = ((Byte_t *)SrcArray) + SrcStart * sizeof(UInt64_t);
-            Byte_t *SrcPtrEnd = ((Byte_t *)SrcArray) + SrcEnd * sizeof(UInt64_t);
+            Byte_t *SrcPtr = (static_cast<Byte_t *>(SrcArray)) + SrcStart * sizeof(UInt64_t);
+            Byte_t *SrcPtrEnd = (static_cast<Byte_t *>(SrcArray)) + SrcEnd * sizeof(UInt64_t);
             size_t byte_skip = SrcSkip * sizeof(UInt64_t);
             CHECK(sizeof(UInt64_t) == 8 && sizeof(double) == 8);
             while (SrcPtr <= SrcPtrEnd)
@@ -435,8 +401,8 @@ void SwapBytesInUnalignedTypedValueArray(FieldDataType_e  ValueType,
         case FieldDataType_Int32:
         {
             /* swap 4-byte blocks */
-            Byte_t *SrcPtr = ((Byte_t *)SrcArray) + SrcStart * sizeof(UInt32_t);
-            Byte_t *SrcPtrEnd = ((Byte_t *)SrcArray) + SrcEnd * sizeof(UInt32_t);
+            Byte_t *SrcPtr = (static_cast<Byte_t *>(SrcArray)) + SrcStart * sizeof(UInt32_t);
+            Byte_t *SrcPtrEnd = (static_cast<Byte_t *>(SrcArray)) + SrcEnd * sizeof(UInt32_t);
             size_t byte_skip = SrcSkip * sizeof(UInt32_t);
             CHECK(sizeof(UInt32_t) == 4 && sizeof(float) == 4);
             while (SrcPtr <= SrcPtrEnd)
@@ -448,8 +414,8 @@ void SwapBytesInUnalignedTypedValueArray(FieldDataType_e  ValueType,
         case FieldDataType_Int16:
         {
             /* swap 2-byte blocks */
-            Byte_t *SrcPtr = ((Byte_t *)SrcArray) + SrcStart * sizeof(UInt16_t);
-            Byte_t *SrcPtrEnd = ((Byte_t *)SrcArray) + SrcEnd * sizeof(UInt16_t);
+            Byte_t *SrcPtr = (static_cast<Byte_t *>(SrcArray)) + SrcStart * sizeof(UInt16_t);
+            Byte_t *SrcPtrEnd = (static_cast<Byte_t *>(SrcArray)) + SrcEnd * sizeof(UInt16_t);
             size_t byte_skip = SrcSkip * sizeof(UInt16_t);
             CHECK(sizeof(UInt16_t) == 2);
             while (SrcPtr <= SrcPtrEnd)
@@ -509,6 +475,14 @@ void SwapBytesInUnalignedTypedValueArray(FieldDataType_e  ValueType,
 /* CORE SOURCE CODE REMOVED */
 #endif
 
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
 #if defined DEBUG_FIELDVALUES
 # define DEBUG_FIELDVALUES_BAD_VALUE 0x11
 static unsigned char BadValueStr[] =
@@ -531,7 +505,7 @@ static unsigned char BadValueStr[] =
 # else
 #   define FIELD_DATA_VALUE_IS_INITIALIZED(fd, pt, type) \
                    ((sizeof(type) < 4) /* cannot make reliably test with less than four bytes */ || \
-                    memcmp(BadValueStr,((char *)((fd)->Data))+sizeof(type)*(pt), sizeof(type)) != 0)
+                    memcmp(BadValueStr,(static_cast<char *>((fd)->Data))+sizeof(type)*(pt), sizeof(type)) != 0)
 # endif
 #else
 # define FIELD_DATA_VALUE_IS_INITIALIZED(fd, pt, type) TRUE
@@ -552,7 +526,7 @@ double STDCALL GetFieldValueForFloat(const FieldData_pa fd,
     REQUIRE(0 <= pt && pt < GetFieldDataNumValues(fd));
     REQUIRE(FIELD_DATA_VALUE_IS_INITIALIZED(fd, pt, float));
 
-    double Result = (double)GetFieldDataFloatPtr(fd)[pt];
+    double Result = static_cast<double>(GetFieldDataFloatPtr(fd)[pt]);
 
     return Result;
 }
@@ -599,7 +573,7 @@ double STDCALL GetFieldValueForInt32(const FieldData_pa fd,
     REQUIRE(0 <= pt && pt < GetFieldDataNumValues(fd));
     REQUIRE(FIELD_DATA_VALUE_IS_INITIALIZED(fd, pt, Int32_t));
 
-    double Result = (double)GetFieldDataInt32Ptr(fd)[pt];
+    double Result = static_cast<double>(GetFieldDataInt32Ptr(fd)[pt]);
 
     return Result;
 }
@@ -622,7 +596,7 @@ double STDCALL GetFieldValueForInt16(const FieldData_pa fd,
     REQUIRE(0 <= pt && pt < GetFieldDataNumValues(fd));
     REQUIRE(FIELD_DATA_VALUE_IS_INITIALIZED(fd, pt, Int16_t));
 
-    double Result = (double)GetFieldDataInt16Ptr(fd)[pt];
+    double Result = static_cast<double>(GetFieldDataInt16Ptr(fd)[pt]);
 
     return Result;
 }
@@ -646,7 +620,7 @@ double STDCALL GetFieldValueForByte(const FieldData_pa fd,
     REQUIRE(0 <= pt && pt < GetFieldDataNumValues(fd));
     REQUIRE(FIELD_DATA_VALUE_IS_INITIALIZED(fd, pt, Byte_t));
 
-    double Result = (double)GetFieldDataBytePtr(fd)[pt];
+    double Result = static_cast<double>(GetFieldDataBytePtr(fd)[pt]);
 
     return Result;
 }
@@ -850,7 +824,7 @@ static void STDCALL SetFieldValueForByte(FieldData_pa fd,
     else if (val > 255.0)
         GetFieldDataBytePtr(fd)[pt] = 255;
     else
-        GetFieldDataBytePtr(fd)[pt] = (Byte_t)val;
+        GetFieldDataBytePtr(fd)[pt] = static_cast<Byte_t>(val);
 
     ENSURE(FIELD_DATA_VALUE_IS_INITIALIZED(fd, pt, Byte_t));
 }
@@ -955,12 +929,12 @@ Int64_t FieldDataGetBytesNeeded(LgIndex_t       NumValues,
 
     switch (DataType)
     {
-        case FieldDataType_Float:  Result = ((Int64_t)NumValues)*sizeof(float);        break;
-        case FieldDataType_Double: Result = ((Int64_t)NumValues)*sizeof(double);       break;
-        case FieldDataType_Int32:  Result = ((Int64_t)NumValues)*sizeof(LgIndex_t);    break;
-        case FieldDataType_Int16:  Result = ((Int64_t)NumValues)*sizeof(SmInteger_t);  break;
-        case FieldDataType_Byte:   Result = ((Int64_t)NumValues)*sizeof(Byte_t);       break;
-        case FieldDataType_Bit:    Result = ((Int64_t)(NumValues+7)/8)*sizeof(Byte_t); break;
+        case FieldDataType_Float:  Result = (static_cast<Int64_t>(NumValues))*sizeof(float);        break;
+        case FieldDataType_Double: Result = (static_cast<Int64_t>(NumValues))*sizeof(double);       break;
+        case FieldDataType_Int32:  Result = (static_cast<Int64_t>(NumValues))*sizeof(LgIndex_t);    break;
+        case FieldDataType_Int16:  Result = (static_cast<Int64_t>(NumValues))*sizeof(SmInteger_t);  break;
+        case FieldDataType_Byte:   Result = (static_cast<Int64_t>(NumValues))*sizeof(Byte_t);       break;
+        case FieldDataType_Bit:    Result = (static_cast<Int64_t>(NumValues+7)/8)*sizeof(Byte_t);   break;
         default: CHECK(FALSE); break;
     }
 
@@ -969,9 +943,9 @@ Int64_t FieldDataGetBytesNeeded(LgIndex_t       NumValues,
 }
 
 /**
- * On the SGI, HP, and Sun machines 64 bit objects such as doubles must be 8
- * byte aligned while on all other machines 32 bit alignment suffices. Some
- * allow 1 byte alignment but we won't bother with that.
+ * On the SGI, HP, Sun and Itanium Linux machines 64 bit objects such as
+ * doubles must be 8 byte aligned while on all other machines 32 bit alignment
+ * suffices. Some allow 1 byte alignment but we won't bother with that.
  */
 #if defined IRISX || defined HPUX || defined SUNX
 # define SIZEOF_LARGEST_OBJECT_TO_ALIGN sizeof(Int64_t)
@@ -988,7 +962,7 @@ Boolean_t IsOffsetAlignedForFieldDataType(FieldDataType_e FieldDataType,
     REQUIRE(Offset >= 0);
 
     Int64_t SizeOfType = FieldDataGetBytesNeeded(1, FieldDataType);
-    if (SizeOfType > (Int64_t)SIZEOF_LARGEST_OBJECT_TO_ALIGN)
+    if (SizeOfType > static_cast<Int64_t>(SIZEOF_LARGEST_OBJECT_TO_ALIGN))
         SizeOfType = SIZEOF_LARGEST_OBJECT_TO_ALIGN;
 
     Boolean_t HasValidAlignment = (Offset % SizeOfType == 0);
@@ -1006,7 +980,7 @@ Int64_t GetAlignedOffsetForFieldDataType(FieldDataType_e FieldDataType,
     REQUIRE(Offset >= 0);
 
     Int64_t SizeOfType = FieldDataGetBytesNeeded(1, FieldDataType);
-    if (SizeOfType > (Int64_t)SIZEOF_LARGEST_OBJECT_TO_ALIGN)
+    if (SizeOfType > static_cast<Int64_t>(SIZEOF_LARGEST_OBJECT_TO_ALIGN))
         SizeOfType = SIZEOF_LARGEST_OBJECT_TO_ALIGN;
 
     Int64_t NumBytesPastAlignment = (Offset % SizeOfType);
@@ -1049,12 +1023,16 @@ void FieldDataDefineData(FieldData_pa    FieldData,
 # if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 # else /* ...for TecIO only */
-    FieldData->GetValueCallback[0] = (void *)DetermineFieldDataGetFunction(DataType, FALSE);
-    FieldData->SetValueCallback[0] = (void *)DetermineFieldDataSetFunction(DataType, FALSE);
+    FieldData->GetValueCallback[0] = reinterpret_cast<void *>(DetermineFieldDataGetFunction(DataType, FALSE));
+    FieldData->SetValueCallback[0] = reinterpret_cast<void *>(DetermineFieldDataSetFunction(DataType, FALSE));
 #endif
 
     ENSURE(FieldData->Data == NULL);
 }
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
 
 /**
  */
@@ -1071,7 +1049,7 @@ Boolean_t FieldDataAllocData(FieldData_pa FieldData,
      * so we might have to squeeze it down possibly loosing precision.
      */
     Int64_t ActualBytesNeeded = FieldDataGetBytesNeeded(FieldData->NumValues, FieldData->Type);
-    size_t  BytesToAllocate   = (size_t)ActualBytesNeeded;
+    size_t  BytesToAllocate   = static_cast<size_t>(ActualBytesNeeded);
 
     /*
      * 64 bit architectures are effectively unlimited in their allocation size
@@ -1081,12 +1059,12 @@ Boolean_t FieldDataAllocData(FieldData_pa FieldData,
     CHECK(sizeof(size_t) == 4 || sizeof(size_t) == 8);
     Boolean_t IsOk = (FieldData->NumValues <= MAXINDEX &&
                       IMPLICATION(sizeof(size_t) == 4,
-                                  ActualBytesNeeded <= (Int64_t)0xffffffff));
+                                  ActualBytesNeeded <= static_cast<Int64_t>(0xffffffff)));
     if (IsOk)
     {
         if (FieldData->NumValues > 0)
         {
-            FieldData->Data = (void *)ALLOC_ARRAY(BytesToAllocate, char, "FieldData's Data");
+            FieldData->Data = reinterpret_cast<void *>(ALLOC_ARRAY(BytesToAllocate, char, "FieldData's Data"));
             #if defined DEBUG_FIELDVALUES
             {
                 if (FieldData->Data != NULL)
@@ -1100,8 +1078,8 @@ Boolean_t FieldDataAllocData(FieldData_pa FieldData,
              * byte. By zeroing the unused bits at the end of the array we
              * produce consistent data files when written to disk.
              */
-            if (FieldData->Type == FieldDataType_Bit)
-                ((char*)FieldData->Data)[BytesToAllocate-1] = '\0';
+            if (FieldData->Type == FieldDataType_Bit && FieldData->Data != NULL)
+                (static_cast<char*>(FieldData->Data))[BytesToAllocate-1] = '\0';
         }
         IsOk = (FieldData->NumValues == 0 ||
                 FieldData->Data != NULL);
@@ -1109,7 +1087,7 @@ Boolean_t FieldDataAllocData(FieldData_pa FieldData,
             OutOfMemoryMsg();
     }
     else if (ShowErrMsg)
-        ErrMsg(translate("Storage limit (%ld) exceeded for a single variable."), (long)MAXINDEX);
+        ErrMsg(translate("Storage limit (%ld) exceeded for a single variable."), static_cast<long>(MAXINDEX));
 
 # if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
@@ -1179,7 +1157,7 @@ FieldData_pa AllocScratchNodalFieldDataPtr(LgIndex_t       NumValues,
     REQUIRE(VALID_FIELD_DATA_TYPE(Type));
     REQUIRE(VALID_BOOLEAN(ShowErrMsg));
 
-    FieldData_pa Result = FieldDataAlloc();
+    FieldData_pa Result = FieldDataAlloc(FALSE);
     if (Result != NULL)
     {
         FieldDataDefineData(Result, NumValues, Type, ValueLocation_Nodal);
@@ -1478,7 +1456,43 @@ void *GetFieldDataVoidPtr_FUNC(FieldData_pa fd)
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
 #endif /* TECPLOTKERNEL */
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
@@ -1577,6 +1591,12 @@ void CopyFieldValue(FieldData_pa  dst,
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
+#if defined TECPLOTKERNEL
+#endif /* TECPLOTKERNEL */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
 #endif
 
 #if defined TECPLOTKERNEL
@@ -1651,8 +1671,12 @@ void SetFieldDataPtrToAllZeros(FieldData_pa fd)
 
     if (NumBytesToMemSet > 0)
     {
-        void *fd_data = GetFieldDataVoidPtr(fd);
-        memset(fd_data, 0, NumBytesToMemSet);
+        char* fd_data = static_cast<char*>(GetFieldDataVoidPtr(fd));
+        #if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+        #else
+            memset(fd_data, 0, NumBytesToMemSet);
+        #endif
     }
     else
     {

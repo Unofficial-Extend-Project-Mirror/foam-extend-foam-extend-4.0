@@ -1,32 +1,35 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
 \*---------------------------------------------------------------------------*/
 
 #include "meshOctreeModifier.H"
-#include "helperFunctionsPar.H"
+#include "helperFunctions.H"
 #include "triSurf.H"
 
 #include <map>
@@ -119,8 +122,8 @@ void meshOctreeModifier::refineTreeForCoordinates
 void meshOctreeModifier::refineTreeForCoordinates
 (
     const meshOctreeCubeCoordinates& cc,
-    const labelList& containedTriangles,
-    const labelList& containedEdges,
+    const labelList& /*containedTriangles*/,
+    const labelList& /*containedEdges*/,
     const short procNo,
     const direction cubeType
 )
@@ -203,14 +206,15 @@ void meshOctreeModifier::addLayerFromNeighbouringProcessors()
         return;
 
     const LongList<meshOctreeCube*>& leaves = octree_.leaves_;
-    const labelList& neiProcs = octree_.neiProcs_;
-    const List<Pair<meshOctreeCubeCoordinates> >& neiRange = octree_.neiRange_;
 
     forAll(leaves, leafI)
         if( leaves[leafI]->procNo() != Pstream::myProcNo() )
             return;
 
     Info << "Adding an additional layer of cells" << endl;
+
+    const labelList& neiProcs = octree_.neiProcs_;
+    const List<Pair<meshOctreeCubeCoordinates> >& neiRange = octree_.neiRange_;
 
     meshOctreeCubeCoordinates minCoord, maxCoord;
     std::map<label, LongList<meshOctreeCubeBasic> > toProcs;
@@ -227,11 +231,14 @@ void meshOctreeModifier::addLayerFromNeighbouringProcessors()
 
         forAll(neiProcs, procI)
         {
-            if(
+            if
+            (
                 (maxCoord >= neiRange[procI].first()) &&
                 (minCoord <= neiRange[procI].second())
             )
+            {
                 toProcs[neiProcs[procI]].append(*leaves[leafI]);
+            }
         }
     }
 
@@ -240,6 +247,9 @@ void meshOctreeModifier::addLayerFromNeighbouringProcessors()
     {
         if( i == Pstream::myProcNo() )
         {
+            Pout << "Neighbour processors " << neiProcs << endl;
+            Pout << "Neighbour range " << neiRange << endl;
+
             std::map<label, LongList<meshOctreeCubeBasic> >::iterator it;
             for(it=toProcs.begin();it!=toProcs.end();++it)
             {
@@ -254,7 +264,7 @@ void meshOctreeModifier::addLayerFromNeighbouringProcessors()
 
     //- exchange data with other processors
     LongList<meshOctreeCubeBasic> receivedCoordinates;
-    help::exchangeMap(toProcs, receivedCoordinates, Pstream::blocking);
+    help::exchangeMap(toProcs, receivedCoordinates, Pstream::commsTypes::blocking);
 
     # ifdef OCTREE_DEBUG
     Pout << "Received " << receivedCoordinates.size()

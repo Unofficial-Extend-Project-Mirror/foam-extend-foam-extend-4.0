@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     polyMeshGenChecks
@@ -78,6 +81,66 @@ bool checkFaceAreas
     const polyMeshGen&,
     const bool report = false,
     const scalar minFaceArea = VSMALL,
+    labelHashSet* setPtr = nullptr,
+    const boolList* changedFacePtr = nullptr
+);
+
+
+//- Check quality of tetrahedra
+bool checkTetQuality
+(
+    const polyMeshGen&,
+    const bool report = false,
+    const scalar minTetQuality = VSMALL,
+    labelHashSet* setPtr = nullptr,
+    const boolList* changedFacePtr = nullptr
+);
+
+
+//- Check minimum face twist
+bool checkMinTwist
+(
+    const polyMeshGen&,
+    const bool report = false,
+    const scalar minTwist = VSMALL,
+    labelHashSet* setPtr = nullptr,
+    const boolList* changedFacePtr = nullptr
+);
+
+
+//- Check the area of internal faces versus boundary faces
+bool checkCellDeterminant
+(
+    const polyMeshGen&,
+    const bool report = false,
+    const scalar warnDet = 1e-3,
+    labelHashSet* setPtr = nullptr,
+    const boolList* changedFacePtr = nullptr
+);
+
+//- Check volume ratio
+void checkMinVolRatio
+(
+    const polyMeshGen&,
+    scalarField&,
+    const boolList* changedFacePtr = nullptr
+);
+
+bool checkMinVolRatio
+(
+    const polyMeshGen&,
+    const bool report = false,
+    const scalar warnVolRatio = 0.01,
+    labelHashSet* setPtr = nullptr,
+    const boolList* changedFacePtr = nullptr
+);
+
+//- Check face triangle twist
+bool checkTriangleTwist
+(
+    const polyMeshGen&,
+    const bool report = false,
+    const scalar minTwist = VSMALL,
     labelHashSet* setPtr = nullptr,
     const boolList* changedFacePtr = nullptr
 );
@@ -237,6 +300,15 @@ bool checkGeometry(const polyMeshGen&, const bool report = false);
 
 //- Check mesh for correctness. Returns false for no error.
 bool checkMesh(const polyMeshGen&, const bool report = false);
+
+//- Read the user defined mesh quality settings
+label findBadFacesAdditionalChecks
+(
+    const polyMeshGen& mesh,
+    const bool report,
+    labelHashSet& badFaces,
+    const boolList* activeFacePtr = nullptr
+);
 
 //- checks for bad faces making the mesh unusable
 //- checks for negative pyramids and zero area faces

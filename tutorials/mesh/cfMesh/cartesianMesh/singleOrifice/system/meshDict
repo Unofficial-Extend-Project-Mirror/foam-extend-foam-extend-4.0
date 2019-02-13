@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                |
-| \\      /  F ield         | cfMesh: A library for mesh generation          |
+| \\      /  F ield         | cfMesh: A library for mesh generation          | 
 |  \\    /   O peration     |                                                |
-|   \\  /    A nd           | Author: Franjo Juretic                         |
+|   \\  /    A nd           | Author: Franjo Juretic                         | 
 |    \\/     M anipulation  | E-mail: franjo.juretic@c-fields.com            |
 \*---------------------------------------------------------------------------*/
 
@@ -27,12 +27,12 @@ minCellSize 0.50;
 
 anisotropicSources
 {
-    Plane
+    Plane 
     {
         type plane;
         origin (0 0 -20);
-        normal (0 0 1);
-        scalingDistance 45;
+	normal (0 0 1);
+	scalingDistance 45;
         scalingFactor 2;
     }
 }
@@ -42,7 +42,7 @@ localRefinement
     "orificeRegion.*"
     {
         cellSize 0.2;
-    }
+    } 
 }
 
 boundaryLayers
@@ -66,7 +66,7 @@ boundaryLayers
             allowDiscontinuity 0;
         }
 
-        "fixedWalls.*"
+    	"fixedWalls.*"
         {
             nLayers           4;
 
@@ -81,30 +81,30 @@ boundaryLayers
 
 renameBoundary
 {
-    defaultName fixedWalls;
-    defaultType wall;
+    defaultName		fixedWalls;
+    defaultType		wall;
 
     newPatchNames
     {
         "orificeRegion.*"
         {
-            newName orificeRegion;
-            newType     wall;
+            newName	orificeRegion;
+	    type     wall;
         }
-
+ 
         "inlet.*"
         {
             newName     inlet;
-            newType     patch;
+            type     patch;
         }
 
         "outlet.*"
         {
             newName     outlet;
-            newType     patch;
+            type     patch;
         }
     }
 }
-
-
+               
+     
 // ************************************************************************* //

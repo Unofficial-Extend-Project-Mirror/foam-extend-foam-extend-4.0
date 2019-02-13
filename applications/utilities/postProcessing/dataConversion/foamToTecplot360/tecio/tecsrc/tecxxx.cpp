@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known
- * as TecIO, as part of its distribution of OpenFOAM and the
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- *
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #include "stdafx.h"
 #include "MASTER.h"
 
@@ -30,12 +7,12 @@
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
 */
-/* Source file revision $Revision: 7627 $ */
+/* Source file revision $Revision: 37579 $ */
 
 #include "GLOBAL.h"
 #include "TASSERT.h"
@@ -45,6 +22,7 @@
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 #endif
+#include "CHARTYPE.h"
 #include "DATAIO4.h"
 #include "DATASET0.h"
 #include "TECXXX.h"
@@ -134,6 +112,34 @@ static LgIndex_t            KMax[MaxNumFiles]; /* ones based indices */
 static vector<LgIndex_t>    TotalNumFaceNodes[MaxNumFiles]; /* vector dimensioned by num zones */
 static LgIndex_t            TotalNumFaceBndryFaces[MaxNumFiles];
 static LgIndex_t            TotalNumFaceBndryConns[MaxNumFiles];
+struct PolyZoneWriteInfo
+{
+    PolyZoneWriteInfo()
+        : numFacesWritten(0)
+        , faceNodeSum(0)
+        , numBoundaryFacesWritten(0)
+        , boundaryConnectionSum(0)
+        , numFaceNodesOffset(0)
+        , faceNodesOffset(0)
+        , leftElemsOffset(0)
+        , rightElemsOffset(0)
+        , connectionCountsOffset(0)
+        , connectionElemsOffset(0)
+        , connectionZonesOffset(0)
+    {}
+    LgIndex_t numFacesWritten;
+    LgIndex_t faceNodeSum;
+    LgIndex_t numBoundaryFacesWritten;
+    LgIndex_t boundaryConnectionSum;
+    FileOffset_t numFaceNodesOffset;
+    FileOffset_t faceNodesOffset;
+    FileOffset_t leftElemsOffset;
+    FileOffset_t rightElemsOffset;
+    FileOffset_t connectionCountsOffset;
+    FileOffset_t connectionElemsOffset;
+    FileOffset_t connectionZonesOffset;
+};
+static vector<PolyZoneWriteInfo> PolyZoneWriteInfos[MaxNumFiles];
 static LgIndex_t            ICellMax[MaxNumFiles];
 static LgIndex_t            JCellMax[MaxNumFiles];
 static LgIndex_t            KCellMax[MaxNumFiles];
@@ -149,12 +155,13 @@ static vector<Boolean_t>    IsSharedVar[MaxNumFiles];  /* vector dimensioned by 
 static vector<Boolean_t>    IsPassiveVar[MaxNumFiles]; /* vector dimensioned by num vars */
 static INTEGER4             CurZone[MaxNumFiles]; /* zero based zone numbers */
 static INTEGER4             CurVar[MaxNumFiles];  /* zero based var numbers */
-static INTEGER4             FieldDataType;
+static INTEGER4             FieldDataType[MaxNumFiles];
 static INTEGER4             CurFile = -1;
 static vector<Boolean_t>    IsCellCentered[MaxNumFiles]; /* vector dimensioned by num vars */
 static Boolean_t            HasFECONNECT[MaxNumFiles];
 static INTEGER4             FileTypes[MaxNumFiles];
 static vector<INTEGER4>     NumConnectivityNodes[MaxNumFiles]; /* vector dimensioned by num zones */
+static vector<INTEGER4>     NumConnectivityNodesWritten[MaxNumFiles]; /* vector dimensioned by num zones */
 static vector<Boolean_t>    ConnectivityWritten[MaxNumFiles]; /* vector dimensioned by num zones */
 
 /*
@@ -197,7 +204,13 @@ static char const* ZoneTypes[] =
 static void WriteErr(const char *routine_name)
 {
     #if defined MAKEARCHIVE
-    PRINT2("Err: (%s) Write failure on file %d.\n", routine_name, CurFile + 1);
+    {
+        PRINT2("Err: (%s) Write failure on file %d.\n", routine_name, CurFile + 1);
+    }
+    #else
+    {
+        UNUSED(routine_name);
+    }
     #endif
     NumErrs[CurFile]++;
 }
@@ -224,7 +237,7 @@ Boolean_t ParseDupList(LgIndex_t **ShareVarFromZone,
         if (*DupList && !strncmp(DupList, "FECONNECT", 9))
             *ShareConnectivityFromZone = TecXXXZoneNum;
 
-        else if (*DupList && !isdigit(*DupList))
+        else if (*DupList && !tecplot::isdigit(*DupList))
             IsOk = FALSE; /* syntax error */
 
         else if (*DupList)
@@ -239,7 +252,7 @@ Boolean_t ParseDupList(LgIndex_t **ShareVarFromZone,
                 {
                     *ShareVarFromZone = ALLOC_ARRAY(numVarsForFile, LgIndex_t, "Variable sharing list");
                     if (*ShareVarFromZone)
-                        memset(*ShareVarFromZone, (char)0, numVarsForFile * sizeof(LgIndex_t));
+                        memset(*ShareVarFromZone, static_cast<char>(0), numVarsForFile * sizeof(LgIndex_t));
                 }
 
                 if (*ShareVarFromZone)
@@ -372,7 +385,13 @@ INTEGER4 LIBCALL TECINI112(char     *Title,
         CurFile = 0;
 
     #if defined MAKEARCHIVE
-    DebugLevel[NewFile] = *Debug;
+    {
+       DebugLevel[NewFile] = *Debug;
+    }
+    #else
+    {
+        UNUSED(Debug);
+    }
     #endif
     /* check sizes for array sized by number of variables */
     CHECK(VarMinValue[NewFile].empty());
@@ -385,9 +404,11 @@ INTEGER4 LIBCALL TECINI112(char     *Title,
     /* check sizes for array sized by number of zones */
     CHECK(MinMaxOffset[NewFile].empty());
     CHECK(TotalNumFaceNodes[NewFile].empty());
+    CHECK(PolyZoneWriteInfos[NewFile].empty());
     CHECK(NumFaceConnections[NewFile].empty());
     CHECK(FaceNeighborsOrMapWritten[NewFile].empty());
     CHECK(NumConnectivityNodes[NewFile].empty());
+    CHECK(NumConnectivityNodesWritten[NewFile].empty());
     CHECK(ConnectivityWritten[NewFile].empty());
 
     CurZone[NewFile] = -1;
@@ -507,7 +528,7 @@ INTEGER4 LIBCALL TECINI112(char     *Title,
     }
 
     CHECK(TecplotBinaryFileVersion == 112);
-    if (!WriteBinaryInt32(HeadFile[NewFile], (LgIndex_t)FileTypes[NewFile]))
+    if (!WriteBinaryInt32(HeadFile[NewFile], static_cast<LgIndex_t>(FileTypes[NewFile])))
     {
         WriteErr("TECINI112");
         return (-1);
@@ -587,7 +608,7 @@ INTEGER4 LIBCALL TECINI112(char     *Title,
         return (-1);
     }
 
-    if (!WriteBinaryInt32(HeadFile[NewFile], (LgIndex_t)NumVars[NewFile]))
+    if (!WriteBinaryInt32(HeadFile[NewFile], static_cast<LgIndex_t>(NumVars[NewFile])))
     {
         WriteErr("TECINI110");
         return (-1);
@@ -636,9 +657,9 @@ INTEGER4 LIBCALL TECINI112(char     *Title,
     IsOpen[NewFile] = 1;
 
     if (*VIsDouble)
-        FieldDataType = FieldDataType_Double;
+        FieldDataType[NewFile] = FieldDataType_Double;
     else
-        FieldDataType = FieldDataType_Float;
+        FieldDataType[NewFile] = FieldDataType_Float;
 
     return (0);
 }
@@ -787,9 +808,15 @@ static int CheckData(const char *routine_name)
     if (NumDataValuesToWrite[CurFile] != NumDataValuesWritten[CurFile])
     {
         #if defined MAKEARCHIVE
-        PRINT2("Err: (%s) Wrong number of data values in file %d:\n", routine_name, CurFile + 1);
-        PRINT2("     %d data values for Zone %d were processed,\n", NumDataValuesWritten[CurFile], CurZone[CurFile] + 1);
-        PRINT1("     %d data values were expected.\n", NumDataValuesToWrite[CurFile]);
+        {
+            PRINT2("Err: (%s) Wrong number of data values in file %d:\n", routine_name, CurFile + 1);
+            PRINT2("     %d data values for Zone %d were processed,\n", NumDataValuesWritten[CurFile], CurZone[CurFile] + 1);
+            PRINT1("     %d data values were expected.\n", NumDataValuesToWrite[CurFile]);
+        }
+        #else
+        {
+            UNUSED(routine_name);
+        }
         #endif
         NumErrs[CurFile]++;
         return (-1);
@@ -802,8 +829,14 @@ static int CheckFile(const char *routine_name)
     if ((CurFile == -1) || (!IsOpen[CurFile]))
     {
         #if defined MAKEARCHIVE
-        PRINT2("Err: (%s) Attempt to use invalid file (%d).\n",
-               routine_name, CurFile + 1);
+        {
+            PRINT2("Err: (%s) Attempt to use invalid file (%d).\n",
+                   routine_name, CurFile + 1);
+        }
+        #else
+        {
+            UNUSED(routine_name);
+        }
         #endif
         return (-1);
     }
@@ -926,9 +959,11 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
     {
         MinMaxOffset[CurFile].resize(CurZone[CurFile] + 1);
         TotalNumFaceNodes[CurFile].resize(CurZone[CurFile] + 1);
+        PolyZoneWriteInfos[CurFile].resize(CurZone[CurFile] + 1);
         NumFaceConnections[CurFile].resize(CurZone[CurFile] + 1);
         FaceNeighborsOrMapWritten[CurFile].resize(CurZone[CurFile] + 1);
         NumConnectivityNodes[CurFile].resize(CurZone[CurFile] + 1);
+        NumConnectivityNodesWritten[CurFile].resize(CurZone[CurFile] + 1);
         ConnectivityWritten[CurFile].resize(CurZone[CurFile] + 1);
     }
     catch (std::bad_alloc const&)
@@ -949,6 +984,7 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
     KCellMax[CurFile] = *KCellMx;
     /* Set the flags that connectivity, face neighbors or face map hasn't been written for the zone yet. */
     FaceNeighborsOrMapWritten[CurFile][CurZone[CurFile]] = FALSE;
+    NumConnectivityNodesWritten[CurFile][CurZone[CurFile]] = 0;
     ConnectivityWritten[CurFile][CurZone[CurFile]] = FALSE;
 
     if (ZoneType[CurFile] == ZoneType_FEPolygon ||
@@ -975,7 +1011,7 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
     }
 
     WriteBinaryReal(HeadFile[CurFile],
-                    (double)ZoneMarker,
+                    static_cast<double>(ZoneMarker),
                     FieldDataType_Float);
     if (!DumpDatafileString(HeadFile[CurFile],
                             ZnTitle,
@@ -1028,16 +1064,18 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
         ZoneType[CurFile] != ZoneType_FEPolyhedron &&
         *ShareConnectivityFromZone == 0            &&
         FileTypes[CurFile] != SOLUTIONFILE)
+    {
         NumConnectivityNodes[CurFile][CurZone[CurFile]] = NumIndices[CurFile] * JMax[CurFile];
+    }
 
     /*
      * We do not check any return values until the end. If these calls fail,
      * WriteFieldDataType below should fail as well.
      */
-    WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)(*ParentZone) - 1); /* ...ParentZone is zero based for binary file */
-    WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)(*StrandID) - 1);   /* ...StrandID is zero based for binary file */
+    WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(*ParentZone) - 1); /* ...ParentZone is zero based for binary file */
+    WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(*StrandID) - 1);   /* ...StrandID is zero based for binary file */
     WriteBinaryReal(HeadFile[CurFile], *SolutionTime, FieldDataType_Double);
-    WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t) - 1); /* No Zone Color Assignment */
+    WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>( - 1)); /* No Zone Color Assignment */
     WriteBinaryInt32(HeadFile[CurFile], ZoneType[CurFile]);
 
     NumDataValuesToWrite[CurFile] = 0;
@@ -1047,12 +1085,11 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
         IsPassiveVar[CurFile][I] = (PassiveVarList   != NULL && PassiveVarList[I]   == 1); /* ...passive? */
     }
 
-    WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)(ValueLocation != NULL ? 1 : 0)); /* ...are var locations specified? */
+    WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(ValueLocation != NULL ? 1 : 0)); /* ...are var locations specified? */
     if (ValueLocation)
     {
         for (I = 0; I < NumVars[CurFile]; I++)
         {
-            int        VIndex;
             LgIndex_t  NumNodes;
             LgIndex_t  NumCells;
 
@@ -1069,33 +1106,28 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
                 NumCells = JMax[CurFile];
             }
 
-            if (IsSharedVar[CurFile][I])
-                VIndex = ShareVarFromZone[I] - 1;
-            else
-                VIndex = I;
-
-            if (VIndex == 0)
+            if (I == 0)
                 NumRunningVarValues[CurFile][I] = 0;
             else
-                NumRunningVarValues[CurFile][VIndex] = NumRunningVarValues[CurFile][VIndex-1];
+                NumRunningVarValues[CurFile][I] = NumRunningVarValues[CurFile][I-1];
 
-            IsCellCentered[CurFile][VIndex] = (ValueLocation[I] == ValueLocation_CellCentered);
+            IsCellCentered[CurFile][I] = (ValueLocation[I] == ValueLocation_CellCentered);
             if (ValueLocation[I] == ValueLocation_CellCentered)
             {
-                WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)1);
+                WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(1));
                 if (!IsSharedVar[CurFile][I] && !IsPassiveVar[CurFile][I])
                 {
-                    NumDataValuesToWrite[CurFile]        += NumCells;
-                    NumRunningVarValues[CurFile][VIndex] += NumCells;
+                    NumDataValuesToWrite[CurFile]   += NumCells;
+                    NumRunningVarValues[CurFile][I] += NumCells;
                 }
             }
             else if (ValueLocation[I] == ValueLocation_Nodal)
             {
-                WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)0);
+                WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(0));
                 if (!IsSharedVar[CurFile][I] && !IsPassiveVar[CurFile][I])
                 {
-                    NumDataValuesToWrite[CurFile]        += NumNodes;
-                    NumRunningVarValues[CurFile][VIndex] += NumNodes;
+                    NumDataValuesToWrite[CurFile]   += NumNodes;
+                    NumRunningVarValues[CurFile][I] += NumNodes;
                 }
             }
             else
@@ -1122,22 +1154,16 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
 
         for (I = 0; I < NumVars[CurFile]; I++)
         {
-            int VIndex;
-            if (IsSharedVar[CurFile][I])
-                VIndex = ShareVarFromZone[I] - 1;
-            else
-                VIndex = I;
-
-            if (VIndex == 0)
+            if (I == 0)
                 NumRunningVarValues[CurFile][I] = 0;
             else
-                NumRunningVarValues[CurFile][VIndex] = NumRunningVarValues[CurFile][VIndex-1];
+                NumRunningVarValues[CurFile][I] = NumRunningVarValues[CurFile][I-1];
 
-            IsCellCentered[CurFile][VIndex] = FALSE;
+            IsCellCentered[CurFile][I] = FALSE;
             if (!IsSharedVar[CurFile][I] && !IsPassiveVar[CurFile][I])
             {
-                NumDataValuesToWrite[CurFile]        += NumNodes;
-                NumRunningVarValues[CurFile][VIndex] += NumNodes;
+                NumDataValuesToWrite[CurFile]   += NumNodes;
+                NumRunningVarValues[CurFile][I] += NumNodes;
             }
         }
     }
@@ -1150,27 +1176,27 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
      * step and instead fall back to the delivering
      * one neighbor at a time.
      */
-    WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)0); /* IsRawFNAvailable */
+    WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(0)); /* IsRawFNAvailable */
 
-    WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)NumFaceConnections[CurFile][CurZone[CurFile]]);
+    WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(NumFaceConnections[CurFile][CurZone[CurFile]]));
     if (NumFaceConnections[CurFile][CurZone[CurFile]] > 0)
     {
-        WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)FaceNeighborMode[CurFile]);
+        WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(FaceNeighborMode[CurFile]));
         if (ZoneType[CurFile] != ORDERED)
-            WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)0); /* FEFaceNeighborsComplete */
+            WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(0)); /* FEFaceNeighborsComplete */
     }
 
-    WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)IMax[CurFile]);
+    WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(IMax[CurFile]));
     if (ZoneType[CurFile] == FEPOLYGON ||
         ZoneType[CurFile] == FEPOLYHEDRON)
     {
-        WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)KMax[CurFile]);
+        WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(KMax[CurFile]));
 
         /*
          * As of binary version 111 these items moved from the data section to
          * the header.
          */
-        WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)TotalNumFaceNodes[CurFile][CurZone[CurFile]]);
+        WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(TotalNumFaceNodes[CurFile][CurZone[CurFile]]));
         if (TotalNumFaceBndryFaces[CurFile] > 0)
         {
             /* Each boundary face must have >= 1 boundary connection. */
@@ -1193,23 +1219,23 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
              * element in the element list regardless if they have boundary connections
              * or not.
              */
-            WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)TotalNumFaceBndryFaces[CurFile] + 1); /* ...add a boundary face for no neighboring element as a convenience */
+            WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(TotalNumFaceBndryFaces[CurFile]) + 1); /* ...add a boundary face for no neighboring element as a convenience */
         }
         else
-            WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)TotalNumFaceBndryFaces[CurFile]);
-        WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)TotalNumFaceBndryConns[CurFile]);
+            WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(TotalNumFaceBndryFaces[CurFile]));
+        WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(TotalNumFaceBndryConns[CurFile]));
     }
-    WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)JMax[CurFile]);
+    WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(JMax[CurFile]));
 
     if (ZoneType[CurFile] == ORDERED)
     {
-        WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)KMax[CurFile]);
+        WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(KMax[CurFile]));
     }
     else
     {
-        WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)ICellMax[CurFile]);
-        WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)JCellMax[CurFile]);
-        WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)KCellMax[CurFile]);
+        WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(ICellMax[CurFile]));
+        WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(JCellMax[CurFile]));
+        WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(KCellMax[CurFile]));
     }
 
     /*
@@ -1217,16 +1243,16 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
      * Because it currently at the end of the header section we don't need to
      * keep track of the position for seeking back to it.
      */
-    WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)0);
+    WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(0));
 
     WriteBinaryReal(BlckFile[CurFile],
-                    (double)ZoneMarker,
+                    static_cast<double>(ZoneMarker),
                     FieldDataType_Float);
 
     for (I = 0; I < NumVars[CurFile]; I++)
     {
         if (!WriteFieldDataType(BlckFile[CurFile],
-                                (FieldDataType_e)FieldDataType,
+                                static_cast<FieldDataType_e>(FieldDataType[CurFile]),
                                 TRUE))
         {
             WriteErr("TECZNE112");
@@ -1265,7 +1291,7 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
      * mean time, keep track of the starting point so we can seek back to this
      * place.
      */
-    MinMaxOffset[CurFile][CurZone[CurFile]] = (FileOffset_t)TP_FTELL(BlckFile[CurFile]->File);
+    MinMaxOffset[CurFile][CurZone[CurFile]] = static_cast<FileOffset_t>(TP_FTELL(BlckFile[CurFile]->File));
 
     for (I = 0; I < NumVars[CurFile]; I++)
     {
@@ -1543,7 +1569,7 @@ INTEGER4 LIBCALL TECZNE(char     *ZoneTitle,
         INTEGER4 NumFaceBndryFaces = 0;
         INTEGER4 NumFaceBndryConns = 0;
 
-        Result = TECZNE112((char *)ZoneTitle,
+        Result = TECZNE112(static_cast<char *>(ZoneTitle),
                            &ZoneType,
                            IMx,
                            JMx,
@@ -1570,7 +1596,7 @@ INTEGER4 LIBCALL TECZNE(char     *ZoneTitle,
     if (ShareVarFromZone)
         FREE_ARRAY(ShareVarFromZone, "Variable sharing list");
 
-    return (INTEGER4) Result;
+    return static_cast<INTEGER4>( Result);
 }
 #endif // INDEX_16_BIT -- not supported in this test-only mode
 
@@ -1763,7 +1789,7 @@ LIBFUNCTION INTEGER4 LIBCALL teczne_(char     *ZoneTitle,
  */
 static void RewritePendingMinMaxValues(void)
 {
-    FileOffset_t CurrentOffset = (FileOffset_t)TP_FTELL(BlckFile[CurFile]->File);
+    FileOffset_t CurrentOffset = static_cast<FileOffset_t>(TP_FTELL(BlckFile[CurFile]->File));
 
     TP_FSEEK(BlckFile[CurFile]->File, MinMaxOffset[CurFile][CurZone[CurFile]], SEEK_SET);
     int I;
@@ -1788,8 +1814,8 @@ INTEGER4 LIBCALL TECDAT112(INTEGER4 *N,
                            INTEGER4 *IsDouble)
 {
     LgIndex_t  I;
-    double    *dptr = (double *)Data;
-    float     *fptr = (float *)Data;
+    double    *dptr = static_cast<double *>(Data);
+    float     *fptr = static_cast<float *>(Data);
 
     if (CheckFile("TECDAT112") < 0)
         return (-1);
@@ -1809,7 +1835,7 @@ INTEGER4 LIBCALL TECDAT112(INTEGER4 *N,
         if (Value > VarMaxValue[CurFile][CurVar[CurFile]])
             VarMaxValue[CurFile][CurVar[CurFile]] = Value;
 
-        if (!WriteBinaryReal(BlckFile[CurFile], Value, (FieldDataType_e)FieldDataType))
+        if (!WriteBinaryReal(BlckFile[CurFile], Value, static_cast<FieldDataType_e>(FieldDataType[CurFile])))
         {
             WriteErr("TECDAT112");
             return (-1);
@@ -1845,7 +1871,7 @@ INTEGER4 LIBCALL TECDAT112(INTEGER4 *N,
             if (IIndex + 1 == FinalIMax && FinalIMax < IMax[CurFile] - IMaxAdjust)
             {
                 NumOrderedCCDataValuesWritten[CurFile]++;
-                if (!WriteBinaryReal(BlckFile[CurFile], 0.0, (FieldDataType_e)FieldDataType))
+                if (!WriteBinaryReal(BlckFile[CurFile], 0.0, static_cast<FieldDataType_e>(FieldDataType[CurFile])))
                 {
                     WriteErr("TECDAT112");
                     return (-1);
@@ -1858,7 +1884,7 @@ INTEGER4 LIBCALL TECDAT112(INTEGER4 *N,
                 for (II = 1; II <= IMax[CurFile] - IMaxAdjust; II++)
                 {
                     NumOrderedCCDataValuesWritten[CurFile]++;
-                    if (!WriteBinaryReal(BlckFile[CurFile], 0.0, (FieldDataType_e)FieldDataType))
+                    if (!WriteBinaryReal(BlckFile[CurFile], 0.0, static_cast<FieldDataType_e>(FieldDataType[CurFile])))
                     {
                         WriteErr("TECDAT112");
                         return (-1);
@@ -1874,7 +1900,7 @@ INTEGER4 LIBCALL TECDAT112(INTEGER4 *N,
                     for (II = 1; II <= IMax[CurFile] - IMaxAdjust; II++)
                     {
                         NumOrderedCCDataValuesWritten[CurFile]++;
-                        if (!WriteBinaryReal(BlckFile[CurFile], 0.0, (FieldDataType_e)FieldDataType))
+                        if (!WriteBinaryReal(BlckFile[CurFile], 0.0, static_cast<FieldDataType_e>(FieldDataType[CurFile])))
                         {
                             WriteErr("TECDAT112");
                             return (-1);
@@ -1930,7 +1956,7 @@ INTEGER4 LIBCALL TECDAT112(INTEGER4 *N,
            an error message) */
         (NumDataValuesToWrite[CurFile] == NumDataValuesWritten[CurFile]))
     {
-        if (!WriteBinaryInt32(BlckFile[CurFile], (LgIndex_t)1))
+        if (!WriteBinaryInt32(BlckFile[CurFile], static_cast<LgIndex_t>(1)))
         {
             WriteErr("TECDAT112");
             return (-1);
@@ -2147,6 +2173,113 @@ LIBFUNCTION INTEGER4 LIBCALL tecnod_(INTEGER4 *NData)
 #endif
 
 /**
+ * TECNODEXXX
+ */
+INTEGER4 LIBCALL TECNODE112(
+    INTEGER4 *N,
+    INTEGER4 *NData)
+{
+    LgIndex_t I;
+
+
+    if (CheckFile("TECNODE112") < 0)
+        return (-1);
+
+    if (ZoneType[CurFile] == FEPOLYGON ||
+        ZoneType[CurFile] == FEPOLYHEDRON)
+    {
+        /* Wrong way to specify connectivity for polygons and polyhedrons */
+        #if defined MAKEARCHIVE
+        PRINT0("Err: (TECNODE112) Cannot call TECNODE112 for polygonal or polyhedral zones.\n");
+        #endif
+        NumErrs[CurFile]++;
+        return (-1);
+    }
+
+    if (HasFECONNECT[CurFile])
+    {
+        /*
+         * The connectivity list is duplicated,
+         * so we shouldn't be calling TECNODE112()
+         */
+        return (-1);
+    }
+
+    if (FileTypes[CurFile] == SOLUTIONFILE)
+    {
+        #if defined MAKEARCHIVE
+        PRINT0("Err: (TECNODE112) Cannot call TECNODE112 if file type is SOLUTIONFILE.\n");
+        #endif
+        NumErrs[CurFile]++;
+        return (-1);
+    }
+
+    if (ZoneType[CurFile] == ORDERED)
+    {
+        #if defined MAKEARCHIVE
+        PRINT0("Err: (TECNODE112) Cannot call TECNODE112 if zone type is ORDERED.\n");
+        #endif
+        NumErrs[CurFile]++;
+        return (-1);
+    }
+
+    if (CheckData("TECNODE112") < 0)
+        return (-1);
+
+    if (NumConnectivityNodesWritten[CurFile][CurZone[CurFile]] + *N > NumConnectivityNodes[CurFile][CurZone[CurFile]])
+    {
+        #if defined MAKEARCHIVE
+        PRINT0("Err: (TECNODE112) Connectivity Nodes chunk exceeds the total number of  Connectivity Nodes:\n");
+        PRINT2("     Nodes written = %d, Current chunk size = %d, ", NumConnectivityNodesWritten[CurFile][CurZone[CurFile]], *N);
+        PRINT1("total connectivity nodes = %d.\n", NumConnectivityNodes[CurFile][CurZone[CurFile]]);
+        #endif
+        NumErrs[CurFile]++;
+        return (-1);
+    }
+
+    for (I = 0; I < *N; I++)
+    {
+        if ((NData[I] > IMax[CurFile]) ||
+            (NData[I] < 1))
+        {
+            #if defined MAKEARCHIVE
+            PRINT1("Err: (TECNODE112) Invalid node map value at position %d:\n", I);
+            PRINT2("     node map value = %d, max value = %d.\n", NData[I], IMax[CurFile]);
+            #endif
+            NumErrs[CurFile]++;
+            return (-1);
+        }
+        /*
+         * As of version 103 Tecplot assumes that node maps are zero based
+         * instead of ones based. Since we have to maintain the contract we
+         * subtract 1 for the caller.
+         */
+        if (!WriteBinaryInt32(BlckFile[CurFile], NData[I] - 1)) /* zero based */
+        {
+            WriteErr("TECNODE112");
+            return (-1);
+        }
+
+        NumConnectivityNodesWritten[CurFile][CurZone[CurFile]]++;
+    }
+
+    if (NumConnectivityNodesWritten[CurFile][CurZone[CurFile]] == NumConnectivityNodes[CurFile][CurZone[CurFile]])
+    {
+        ConnectivityWritten[CurFile][CurZone[CurFile]] = TRUE;
+    }
+
+    return (0);
+}
+
+#if defined MAKEARCHIVE && !defined _WIN32 /* every platform but Windows Intel */
+LIBFUNCTION INTEGER4 LIBCALL tecnode112_(INTEGER4 *N,
+                                         INTEGER4 *NData)
+{
+    return TECNODE112(N, NData);
+}
+#endif
+
+/**
  * TECENDXXX
  */
 INTEGER4 LIBCALL TECEND112(void)
@@ -2167,7 +2300,10 @@ INTEGER4 LIBCALL TECEND112(void)
             {
                 #if defined MAKEARCHIVE
                 PRINT1("Err: (TECEND112) File %d is being closed without writing connectivity data.\n", CurFile + 1);
-                PRINT1("     Zone %d was defined with a Classic FE zone type but TECNOD112() was not called.\n", ZoneIndex + 1);
+                if (NumConnectivityNodesWritten[CurFile][ZoneIndex] == 0)
+                    PRINT1("     Zone %d was defined with a Classic FE zone type but TECNOD112() was not called.\n", ZoneIndex + 1);
+                else
+                    PRINT1("     Zone %d was defined with a Classic FE zone type but TECNODE112() was not called for all node chunks.\n", ZoneIndex + 1);
                 #endif
                 NumErrs[CurFile]++;
                 RetVal = -1;
@@ -2188,7 +2324,8 @@ INTEGER4 LIBCALL TECEND112(void)
             {
                 #if defined MAKEARCHIVE
                 PRINT1("Err: (TECEND112) File %d is being closed without writing face map data.\n", CurFile + 1);
-                PRINT2("     %d face nodes were specified for zone %d but TECPOLY112() was not called.\n",
+                PRINT2("     %d face nodes were specified for zone %d but TECPOLYFACE112() and/or\n"
+                       "     TECPOLYBCONN112() was not called for all face chunks.\n",
                        TotalNumFaceNodes[CurFile][ZoneIndex], ZoneIndex + 1);
                 #endif
                 NumErrs[CurFile]++;
@@ -2228,10 +2365,10 @@ INTEGER4 LIBCALL TECEND112(void)
         while ((RetVal == 0) &&
                (feof(BlckFile[CurFile]->File) == 0))
         {
-            bytesRead = fread((void*)buffer, 1, BYTES_PER_CHUNK, BlckFile[CurFile]->File);
+            bytesRead = fread(static_cast<void*>(buffer), 1, BYTES_PER_CHUNK, BlckFile[CurFile]->File);
             if (ferror(BlckFile[CurFile]->File) == 0)
             {
-                if (bytesRead != fwrite((void*)buffer, 1, bytesRead, HeadFile[CurFile]->File))
+                if (bytesRead != fwrite(static_cast<void*>(buffer), 1, bytesRead, HeadFile[CurFile]->File))
                 {
                     /* do not call WriteErr, use custom message instead */
                     #if defined MAKEARCHIVE
@@ -2291,9 +2428,11 @@ INTEGER4 LIBCALL TECEND112(void)
     /* reset arrays sized by number of zones */
     MinMaxOffset[CurFile].clear();
     TotalNumFaceNodes[CurFile].clear();
+    PolyZoneWriteInfos[CurFile].clear();
     NumFaceConnections[CurFile].clear();
     FaceNeighborsOrMapWritten[CurFile].clear();
     NumConnectivityNodes[CurFile].clear();
+    NumConnectivityNodesWritten[CurFile].clear();
     ConnectivityWritten[CurFile].clear();
 
     CurFile = 0;
@@ -2388,7 +2527,7 @@ static void GetNextLabel(const char **CPtr,
  */
 INTEGER4 LIBCALL TECLAB112(char *S)
 {
-    const char *CPtr = (const char *)S;
+    const char *CPtr = const_cast<const char *>(S);
     LgIndex_t   N = 0;
     char        Label[60];
 
@@ -2419,13 +2558,13 @@ INTEGER4 LIBCALL TECLAB112(char *S)
     }
 
     WriteBinaryReal(HeadFile[CurFile], CustomLabelMarker, FieldDataType_Float);
-    if (!WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)N))
+    if (!WriteBinaryInt32(HeadFile[CurFile], static_cast<LgIndex_t>(N)))
     {
         WriteErr("TECLAB112");
         return (-1);
     }
 
-    CPtr = (const char *)S;
+    CPtr = const_cast<const char *>(S);
     do
     {
         GetNextLabel(&CPtr, Label);
@@ -2661,7 +2800,7 @@ INTEGER4 LIBCALL TECGEO112(double    *XOrThetaPos,
     if (CheckFile("TECGEO112") < 0)
         return (-1);
 
-    Geom.PositionCoordSys = (CoordSys_e) * PosCoordMode;
+    Geom.PositionCoordSys = static_cast<CoordSys_e>( * PosCoordMode);
     if (Geom.PositionCoordSys == CoordSys_Frame)
         Fract = 0.01;
     else
@@ -2672,21 +2811,21 @@ INTEGER4 LIBCALL TECGEO112(double    *XOrThetaPos,
     Geom.AnchorPos.Generic.V3 = (*ZPos) * Fract;
     Geom.AttachToZone         = *AttachToZone != 0;
     Geom.Zone                 = *Zone - 1;
-    Geom.BColor               = (ColorIndex_t) * Color;
-    Geom.FillBColor           = (ColorIndex_t) * FillColor;
+    Geom.BColor               = static_cast<ColorIndex_t>( * Color);
+    Geom.FillBColor           = static_cast<ColorIndex_t>( * FillColor);
     Geom.IsFilled             = *IsFilled;
-    Geom.GeomType             = (GeomType_e) * GeomType;
-    Geom.LinePattern          = (LinePattern_e) * LinePattern;
+    Geom.GeomType             = static_cast<GeomType_e>( * GeomType);
+    Geom.LinePattern          = static_cast<LinePattern_e>( * LinePattern);
     Geom.PatternLength        = *PatternLength / 100.0;
     Geom.LineThickness        = *LineThickness / 100.0;
     Geom.NumEllipsePts        = *NumEllipsePts;
-    Geom.ArrowheadStyle       = (ArrowheadStyle_e) * ArrowheadStyle;
-    Geom.ArrowheadAttachment  = (ArrowheadAttachment_e) * ArrowheadAttachment;
+    Geom.ArrowheadStyle       = static_cast<ArrowheadStyle_e>( * ArrowheadStyle);
+    Geom.ArrowheadAttachment  = static_cast<ArrowheadAttachment_e>( * ArrowheadAttachment);
     Geom.ArrowheadSize        = *ArrowheadSize / 100.0;
     Geom.ArrowheadAngle       = *ArrowheadAngle / DEGPERRADIANS;
-    Geom.Scope                = (Scope_e) * Scope;
+    Geom.Scope                = static_cast<Scope_e>( * Scope);
     Geom.DrawOrder            = DrawOrder_AfterData;
-    Geom.Clipping             = (Clipping_e) * Clipping;
+    Geom.Clipping             = static_cast<Clipping_e>( * Clipping);
     Geom.NumSegments          = *NumSegments;
     Geom.MacroFunctionCommand = mfc;
     Geom.ImageFileName        = NULL;
@@ -2742,9 +2881,9 @@ INTEGER4 LIBCALL TECGEO112(double    *XOrThetaPos,
 
     for (I = 0; I < RawDataSize; I++)
     {
-        SetFieldValue(Geom.GeomData.Generic.V1Base, I, (double)XOrThetaGeomData[I]*Fract);
-        SetFieldValue(Geom.GeomData.Generic.V2Base, I, (double)YOrRGeomData[I]*Fract);
-        SetFieldValue(Geom.GeomData.Generic.V3Base, I, (double)ZGeomData[I]*Fract);
+        SetFieldValue(Geom.GeomData.Generic.V1Base, I, static_cast<double>(XOrThetaGeomData[I]*Fract));
+        SetFieldValue(Geom.GeomData.Generic.V2Base, I, static_cast<double>(YOrRGeomData[I]*Fract));
+        SetFieldValue(Geom.GeomData.Generic.V3Base, I, static_cast<double>(ZGeomData[I]*Fract));
     }
 
     if (DumpGeometry(HeadFile[CurFile], &Geom, TRUE, FALSE))
@@ -2950,7 +3089,7 @@ INTEGER4 LIBCALL TECGEO(double    *XPos,
                         float     *ZGeomData,
                         char      *mfc)
 {
-    int Clipping = (int)Clipping_ClipToViewport;
+    int Clipping = static_cast<int>(Clipping_ClipToViewport);
     return TECGEO112(XPos,
                      YPos,
                      ZPos,
@@ -3286,7 +3425,7 @@ INTEGER4 LIBCALL TECTXT112(double    *XOrThetaPos,
     if (CheckFile("TECTXT112") < 0)
         return (-1);
 
-    Text.PositionCoordSys    = (CoordSys_e) * PosCoordMode;
+    Text.PositionCoordSys    = static_cast<CoordSys_e>( * PosCoordMode);
     if (Text.PositionCoordSys == CoordSys_Frame)
         Fract = 0.01;
     else
@@ -3297,25 +3436,29 @@ INTEGER4 LIBCALL TECTXT112(double    *XOrThetaPos,
     Text.AnchorPos.Generic.V3 = (*ZOrUnusedPos) * Fract;
     Text.AttachToZone         = *AttachToZone != 0;
     Text.Zone                 = *Zone - 1;
-    Text.BColor               = (ColorIndex_t) * TextColor;
-    Text.TextShape.Font       = (Font_e) * BFont;
-    Text.TextShape.SizeUnits  = (Units_e) * FontHeightUnits;
+    Text.BColor               = static_cast<ColorIndex_t>(*TextColor);
+    #if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+    #else
+        Text.TextShape.Font       = static_cast<Font_e>(*BFont);
+    #endif
+    Text.TextShape.SizeUnits  = static_cast<Units_e>(*FontHeightUnits);
     if (Text.TextShape.SizeUnits == Units_Frame)
         Text.TextShape.Height   = (*FontHeight) / 100.0;
     else
         Text.TextShape.Height   = *FontHeight;
-    Text.Box.BoxType          = (TextBox_e) * BoxType;
+    Text.Box.BoxType          = static_cast<TextBox_e>(*BoxType);
     Text.Box.Margin           = *BoxMargin / 100.0;
     Text.Box.LineThickness    = *BoxLineThickness / 100.0;
-    Text.Box.BColor           = (ColorIndex_t) * BoxColor;
-    Text.Box.FillBColor       = (ColorIndex_t) * BoxFillColor;
-    Text.Anchor               = (TextAnchor_e) * Anchor;
+    Text.Box.BColor           = static_cast<ColorIndex_t>(*BoxColor);
+    Text.Box.FillBColor       = static_cast<ColorIndex_t>(*BoxFillColor);
+    Text.Anchor               = static_cast<TextAnchor_e>(*Anchor);
     Text.LineSpacing          = *LineSpacing;
     Text.Angle                = *Angle / DEGPERRADIANS;
-    Text.Scope                = (Scope_e) * Scope;
+    Text.Scope                = static_cast<Scope_e>(*Scope);
     Text.Text                 = String;
     Text.MacroFunctionCommand = mfc;
-    Text.Clipping             = (Clipping_e) * Clipping;
+    Text.Clipping             = static_cast<Clipping_e>(*Clipping);
 
     #if defined MAKEARCHIVE
     if (DebugLevel[CurFile])
@@ -3493,7 +3636,7 @@ INTEGER4 LIBCALL TECTXT(double    *XPos,
                         char      *mfc)
 {
     double    ZPos     = 0.0;
-    int       Clipping = (int)Clipping_ClipToViewport;
+    int       Clipping = static_cast<int>(Clipping_ClipToViewport);
     return TECTXT112(XPos,
                      YPos,
                      &ZPos,
@@ -3917,11 +4060,11 @@ static Boolean_t AuxDataIsValidNameChar(char      Char,
     REQUIRE(VALID_BOOLEAN(IsLeadChar));
 
     IsValidNameChar = (Char == '_' ||
-                       isalpha(Char));
+                       tecplot::isalpha(Char));
     if (!IsLeadChar)
         IsValidNameChar = (IsValidNameChar ||
                            Char == '.'     ||
-                           isdigit(Char));
+                           tecplot::isdigit(Char));
 
     ENSURE(VALID_BOOLEAN(IsValidNameChar));
     return IsValidNameChar;
@@ -4809,4 +4952,538 @@ LIBFUNCTION INTEGER4 LIBCALL tecpoly111_(INTEGER4 *FaceNodeCounts,
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
+#endif
+
+namespace
+{
+
+void calculateInitialPolyZoneOffsets()
+{
+    PolyZoneWriteInfo& polyZoneWriteInfo = PolyZoneWriteInfos[CurFile][CurZone[CurFile]];
+    polyZoneWriteInfo.numFaceNodesOffset = static_cast<FileOffset_t>(TP_FTELL(BlckFile[CurFile]->File));
+    if (ZoneType[CurFile] == FEPOLYHEDRON)
+    {
+        polyZoneWriteInfo.faceNodesOffset = polyZoneWriteInfo.numFaceNodesOffset +
+            sizeof(INTEGER4) * (KMax[CurFile] + 1);
+    }
+    else
+    {
+        // polygonal zones don't write number of nodes per face
+        polyZoneWriteInfo.faceNodesOffset = polyZoneWriteInfo.numFaceNodesOffset;
+    }
+    polyZoneWriteInfo.leftElemsOffset = polyZoneWriteInfo.faceNodesOffset +
+        sizeof(INTEGER4) * TotalNumFaceNodes[CurFile][CurZone[CurFile]];
+    polyZoneWriteInfo.rightElemsOffset = polyZoneWriteInfo.leftElemsOffset +
+        sizeof(INTEGER4) * KMax[CurFile];
+    polyZoneWriteInfo.connectionCountsOffset = polyZoneWriteInfo.rightElemsOffset +
+        sizeof(INTEGER4) * KMax[CurFile];
+    polyZoneWriteInfo.connectionElemsOffset = polyZoneWriteInfo.connectionCountsOffset +
+        sizeof(INTEGER4) * (TotalNumFaceBndryFaces[CurFile] + 2);
+    polyZoneWriteInfo.connectionZonesOffset = polyZoneWriteInfo.connectionElemsOffset +
+        sizeof(INTEGER4) * TotalNumFaceBndryConns[CurFile];
+}
+
+INTEGER4 checkForPolyFacePreconditions() 
+{
+    if (CheckFile("TECPOLYFACE112") < 0)
+        return (-1);
+
+    if (FaceNeighborsOrMapWritten[CurFile][CurZone[CurFile]])
+    {
+        if (NumErrs[CurFile] == 0)
+        {
+#if defined MAKEARCHIVE
+            PRINT0("Err: (TECPOLYFACE112) TECPOLYFACE112 called after all specified faces were already written.\n");
+#endif
+            NumErrs[CurFile]++;
+        }
+        return (-1);
+    }
+
+    if (KMax[CurFile] == 0 ||
+        (ZoneType[CurFile] != FEPOLYGON &&
+        ZoneType[CurFile] != FEPOLYHEDRON))
+    {
+#if defined MAKEARCHIVE
+        PRINT0("Err: (TECPOLYFACE112) The zone type must be FEPOLYGON or FEPOLYHEDRON and have KMax (NumFaces) > 0.\n");
+        PRINT1("     KMax = %d\n", KMax[CurFile]);
+#endif
+        NumErrs[CurFile]++;
+        /* Mark that the face map has been written for the zone even if it fails so as not to add extra error messages. */
+        FaceNeighborsOrMapWritten[CurFile][CurZone[CurFile]] = TRUE;
+        return (-1);
+    }
+
+    if (ZoneType[CurFile] == FEPOLYHEDRON) /* FEPOLYGON doesn't need TotalNumFaceNodes since this is 2*NumFaces */
+    {
+        if (TotalNumFaceNodes[CurFile][CurZone[CurFile]] <= 0)
+        {
+#if defined MAKEARCHIVE
+            PRINT0("Err: (TECPOLYFACE112) TotalNumFaceNodes MUST be specified for polyhedral zones.\n");
+            PRINT1("     TotalNumFaceNodes = %d\n", TotalNumFaceNodes[CurFile][CurZone[CurFile]]);
+#endif
+            NumErrs[CurFile]++;
+            /* Mark that the face map has been written for the zone even if it fails so as not to add extra error messages. */
+            FaceNeighborsOrMapWritten[CurFile][CurZone[CurFile]] = TRUE;
+            return (-1);
+        }
+    }
+    else
+    {
+        if (TotalNumFaceNodes[CurFile][CurZone[CurFile]] != (2 * KMax[CurFile]))
+        {
+#if defined MAKEARCHIVE
+            PRINT0("Err: (TECPOLYFACE112) TotalNumFaceNodes is specified for the polygonal zone but is not equal to 2 * KMax.\n");
+            PRINT2("     TotalNumFaceNodes = %d.  If specified, it must be 2 * %d.", TotalNumFaceNodes[CurFile][CurZone[CurFile]], KMax[CurFile]);
+#endif
+            NumErrs[CurFile]++;
+            /* Mark that the face map has been written for the zone even if it fails so as not to add extra error messages. */
+            FaceNeighborsOrMapWritten[CurFile][CurZone[CurFile]] = TRUE;
+            return (-1);
+        }
+    }
+
+    return 0;
+}
+
+INTEGER4 getMinNeighborValue(LgIndex_t &MinNeighborValue) 
+{
+    MinNeighborValue = TECIO_NO_NEIGHBORING_ELEM;
+
+    if ((TotalNumFaceBndryFaces[CurFile] > 0  &&
+        TotalNumFaceBndryConns[CurFile] > 0) ||
+        (TotalNumFaceBndryFaces[CurFile] == 0 &&
+        TotalNumFaceBndryConns[CurFile] == 0))
+    {
+        if (TotalNumFaceBndryFaces[CurFile] > 0)
+            MinNeighborValue = -TotalNumFaceBndryFaces[CurFile];
+    }
+    else
+    {
+#if defined MAKEARCHIVE
+        PRINT0("Err: (TECPOLYFACE112) TotalNumFaceBndryFaces and TotalNumFaceBndryConns must both be 0 or both be > 0.\n");
+        PRINT2("     TotalNumFaceBndryFaces = %d, TotalNumFaceBndryConns = %d\n", TotalNumFaceBndryFaces[CurFile], TotalNumFaceBndryConns[CurFile]);
+#endif
+        NumErrs[CurFile]++;
+        /* Mark that the face map has been written for the zone even if it fails so as not to add extra error messages. */
+        FaceNeighborsOrMapWritten[CurFile][CurZone[CurFile]] = TRUE;
+        return (-1);
+    }
+
+    return 0;
+}
+
+INTEGER4 writePolyhedralFaceNodeOffsets(PolyZoneWriteInfo& polyZoneWriteInfo, INTEGER4 NumFaces, INTEGER4* FaceNodeCounts ) 
+{
+    {
+        TP_FSEEK(BlckFile[CurFile]->File, polyZoneWriteInfo.numFaceNodesOffset, SEEK_SET);
+        if (polyZoneWriteInfo.faceNodeSum == 0)
+            if (!WriteBinaryInt32(BlckFile[CurFile], 0))
+            {
+                WriteErr("TECPOLYFACE112");
+                return -1;
+            }
+        for (LgIndex_t Index = 0; Index < NumFaces; Index++)
+        {
+            polyZoneWriteInfo.faceNodeSum += FaceNodeCounts[Index];
+            if (FaceNodeCounts[Index] < 3)
+            {
+#if defined MAKEARCHIVE
+                PRINT1("Err: (TECPOLY112) Invalid face node count value at face %d.  There must be at least 3 nodes in a face.\n", Index + 1);
+                PRINT1("     Face node count value = %d.\n", FaceNodeCounts[Index]);
+#endif
+                NumErrs[CurFile]++;
+                return (-1);
+            }
+            else if (polyZoneWriteInfo.faceNodeSum > TotalNumFaceNodes[CurFile][CurZone[CurFile]])
+            {
+#if defined MAKEARCHIVE
+                PRINT1("Err: (TECPOLY112) The running face node count exceeds the TotalNumFaceNodes (%d) specified.\n", TotalNumFaceNodes[CurFile][CurZone[CurFile]]);
+                PRINT1("     Face node count value = %d.\n", FaceNodeCounts[Index]);
+#endif
+                NumErrs[CurFile]++;
+                return (-1);
+            }
+            else if (!WriteBinaryInt32(BlckFile[CurFile], polyZoneWriteInfo.faceNodeSum))
+            {
+                WriteErr("TECPOLYFACE112");
+                return -1;
+            }
+        }
+        polyZoneWriteInfo.numFaceNodesOffset = static_cast<FileOffset_t>(TP_FTELL(BlckFile[CurFile]->File));
+    }
+
+    return 0;
+}
+
+INTEGER4 writeFaceNodes(PolyZoneWriteInfo& polyZoneWriteInfo, LgIndex_t BeginningFaceNodeSum, INTEGER4 NumFaces, INTEGER4* FaceNodes) 
+{
+    TP_FSEEK(BlckFile[CurFile]->File, polyZoneWriteInfo.faceNodesOffset, SEEK_SET);
+    LgIndex_t LocalFaceNodeSum;
+    if (ZoneType[CurFile] == FEPOLYHEDRON)
+        LocalFaceNodeSum = polyZoneWriteInfo.faceNodeSum - BeginningFaceNodeSum;
+    else
+        LocalFaceNodeSum = 2 * (NumFaces);
+
+    for (LgIndex_t Index = 0; Index < LocalFaceNodeSum; Index++)
+    {
+        if (FaceNodes[Index] < 1 ||
+            FaceNodes[Index] > IMax[CurFile])
+        {
+#if defined MAKEARCHIVE
+            PRINT1("Err: (TECPOLY112) Invalid face node value at node %d:\n", Index + 1);
+            PRINT2("     face node value = %d, valid values are are 1 to %d (inclusive).\n", FaceNodes[Index], IMax[CurFile]);
+#endif
+            NumErrs[CurFile]++;
+            return (-1);
+        }
+        else if (!WriteBinaryInt32(BlckFile[CurFile], FaceNodes[Index] - 1))
+        {
+            WriteErr("TECPOLYFACE112");
+            return -1;
+        }
+    }
+    polyZoneWriteInfo.faceNodesOffset = static_cast<FileOffset_t>(TP_FTELL(BlckFile[CurFile]->File));
+
+    return 0;
+}
+
+INTEGER4 checkElements(INTEGER4 NumFaces, INTEGER4* FaceLeftElems, INTEGER4* FaceRightElems, INTEGER4 MinNeighborValue)
+{
+    for (LgIndex_t Index = 0; Index < NumFaces; Index++)
+    {
+        if (FaceLeftElems[Index] < MinNeighborValue ||
+            FaceLeftElems[Index] > JMax[CurFile])
+        {
+#if defined MAKEARCHIVE
+            PRINT1("Err: (TECPOLYFACE112) Invalid left neighbor value at face %d:\n", Index);
+            PRINT2("     left neighbor value = %d, min value = %d,", FaceLeftElems[Index], MinNeighborValue);
+            PRINT1(" max value = %d.\n", JMax[CurFile]);
+#endif
+            NumErrs[CurFile]++;
+            return (-1);
+        }
+        else if (FaceRightElems[Index] < MinNeighborValue ||
+                 FaceRightElems[Index] > JMax[CurFile])
+        {
+#if defined MAKEARCHIVE
+            PRINT1("Err: (TECPOLYFACE112) Invalid right neighbor value at face %d:\n", Index);
+            PRINT2("     right neighbor value = %d, min value = %d,", FaceRightElems[Index], MinNeighborValue);
+            PRINT1(" max value = %d.\n", JMax[CurFile]);
+#endif
+            NumErrs[CurFile]++;
+            return (-1);
+        }
+        else if (FaceLeftElems[Index] == TECIO_NO_NEIGHBORING_ELEM &&
+                 FaceRightElems[Index] == TECIO_NO_NEIGHBORING_ELEM)
+        {
+#if defined MAKEARCHIVE
+            PRINT1("Err: (TECPOLYFACE112) Both left and right neighbors are set to no neighboring element at face %d.\n", Index);
+#endif
+            NumErrs[CurFile]++;
+            return (-1);
+        }
+    }
+
+    return 0;
+}
+
+/**
+ * Write the items of the integer array, but convert to zero-based
+ */
+INTEGER4 writeDecrementedIntegerArray(INTEGER4 numItems, INTEGER4* items)
+{
+    for (INTEGER4 i = 0; i < numItems; ++i)
+    {
+        if (!WriteBinaryInt32(BlckFile[CurFile], items[i] - 1))
+        {
+            WriteErr("TECPOLYFACE112");
+            return -1;
+        }
+    }
+    return 0;
+}
+
+INTEGER4 writeElements(PolyZoneWriteInfo& polyZoneWriteInfo, INTEGER4 NumFaces, INTEGER4* FaceLeftElems, INTEGER4* FaceRightElems, INTEGER4 MinNeighborValue) 
+{
+    if (checkElements(NumFaces, FaceLeftElems, FaceRightElems, MinNeighborValue) != 0)
+        return (-1);
+
+    TP_FSEEK(BlckFile[CurFile]->File, polyZoneWriteInfo.leftElemsOffset, SEEK_SET);
+    if (writeDecrementedIntegerArray(NumFaces, FaceLeftElems) != 0)
+        return -1;
+    polyZoneWriteInfo.leftElemsOffset = static_cast<FileOffset_t>(TP_FTELL(BlckFile[CurFile]->File));
+
+    TP_FSEEK(BlckFile[CurFile]->File, polyZoneWriteInfo.rightElemsOffset, SEEK_SET);
+    if (writeDecrementedIntegerArray(NumFaces, FaceRightElems) != 0)
+        return -1;
+    polyZoneWriteInfo.rightElemsOffset = static_cast<FileOffset_t>(TP_FTELL(BlckFile[CurFile]->File));
+
+    return 0;
+}
+
+INTEGER4 writeBoundaryConnectionCounts(PolyZoneWriteInfo& polyZoneWriteInfo, INTEGER4 NumBndryFaces, INTEGER4* FaceBndryConnectionCounts) 
+{
+    /*
+    * As a convenience for the ASCII format, TecUtil, and TECIO layers if any
+    * boundary connections exists we automatically add a no-neighboring
+    * connection as the first item so that they can user 0 for no-neighboring
+    * element in the element list regardless if they have boundary connections
+    * or not.
+    *
+    * The first 2 offsets are always 0 so that -1 in the left/right element
+    * arrays always indicates "no neighboring element".
+    */
+    TP_FSEEK(BlckFile[CurFile]->File, polyZoneWriteInfo.connectionCountsOffset, SEEK_SET);
+    if (polyZoneWriteInfo.boundaryConnectionSum == 0)
+    {
+        if (!(WriteBinaryInt32(BlckFile[CurFile], 0) &&
+            WriteBinaryInt32(BlckFile[CurFile], 0)))
+        {
+            WriteErr("TECPOLYFACE112");
+            return -1;
+        }
+    }
+
+    for (LgIndex_t Index = 0; Index < NumBndryFaces; Index++)
+    {
+        polyZoneWriteInfo.boundaryConnectionSum += FaceBndryConnectionCounts[Index];
+        if (FaceBndryConnectionCounts[Index] < 0)
+        {
+#if defined MAKEARCHIVE
+            PRINT1("Err: (TECPOLYBCONN112) Invalid boundary connection count at position %d:\n", Index + 1);
+            PRINT1("     boundary connection count = %d.\n", FaceBndryConnectionCounts[Index]);
+#endif
+            NumErrs[CurFile]++;
+            return (-1);
+        }
+        else if (!WriteBinaryInt32(BlckFile[CurFile], polyZoneWriteInfo.boundaryConnectionSum))
+        {
+            WriteErr("TECPOLYFACE112");
+            return -1;
+        }
+    }
+    if (polyZoneWriteInfo.boundaryConnectionSum > TotalNumFaceBndryConns[CurFile])
+    {
+#if defined MAKEARCHIVE
+        PRINT0("Err: (TECPOLYBCONN112) Invalid number of boundary connections:\n");
+        PRINT2("     number of boundary connections written = %d, total number of boundary connections = %d.",
+            polyZoneWriteInfo.boundaryConnectionSum, TotalNumFaceBndryConns[CurFile]);
+#endif
+        NumErrs[CurFile]++;
+        return (-1);
+    }
+    polyZoneWriteInfo.connectionCountsOffset = static_cast<FileOffset_t>(TP_FTELL(BlckFile[CurFile]->File));
+
+    return 0;
+}
+
+INTEGER4 writeBoundaryConnectionElements(
+    PolyZoneWriteInfo& polyZoneWriteInfo,
+    INTEGER4 NumBndryFaces,
+    INTEGER4* FaceBndryConnectionCounts,
+    INTEGER4* FaceBndryConnectionElems,
+    INTEGER4* FaceBndryConnectionZones) 
+{
+    /* Write the boundary connection elements but convert 1-based to 0-based. */
+    TP_FSEEK(BlckFile[CurFile]->File, polyZoneWriteInfo.connectionElemsOffset, SEEK_SET);
+    LgIndex_t LocalBndryConnCount = 0;
+    for (LgIndex_t Index = 0; Index < NumBndryFaces; Index++)
+    {
+        for (LgIndex_t BIndex = 0; BIndex < FaceBndryConnectionCounts[Index]; BIndex++)
+        {
+            if (BIndex > 0 &&
+                FaceBndryConnectionElems[LocalBndryConnCount] == TECIO_NO_NEIGHBORING_ELEM)
+            {
+#if defined MAKEARCHIVE
+                PRINT1("Err: (TECPOLYBCONN112) Partially obscured faces must specify no neighboring element first. See boundary connections for face %d.\n", polyZoneWriteInfo.numBoundaryFacesWritten + Index + 1);
+#endif
+                NumErrs[CurFile]++;
+                return (-1);
+            }
+            if (FaceBndryConnectionElems[LocalBndryConnCount] < TECIO_NO_NEIGHBORING_ELEM)
+            {
+#if defined MAKEARCHIVE
+                PRINT1("Err: (TECPOLYBCONN112) Invalid boundary element value at boundary connections for face %d:\n", polyZoneWriteInfo.numBoundaryFacesWritten + Index + 1);
+#endif
+                NumErrs[CurFile]++;
+                return (-1);
+            }
+            if (FaceBndryConnectionElems[LocalBndryConnCount] == TECIO_NO_NEIGHBORING_ELEM &&
+                FaceBndryConnectionZones[LocalBndryConnCount] != TECIO_NO_NEIGHBORING_ZONE)
+            {
+#if defined MAKEARCHIVE
+                PRINT1("Err: (TECPOLYBCONN112) Invalid boundary element/zone pair at boundary connections for face %d:\n", Index + 1);
+                PRINT0("     Boundary elements specified as no neighboring element must also specify no neighboring zone.\n");
+#endif
+                NumErrs[CurFile]++;
+                return (-1);
+            }
+            else if (!WriteBinaryInt32(BlckFile[CurFile], FaceBndryConnectionElems[LocalBndryConnCount] - 1))
+            {
+                WriteErr("TECPOLYFACE112");
+                return -1;
+            }
+            LocalBndryConnCount++;
+        }
+    }
+    polyZoneWriteInfo.connectionElemsOffset = static_cast<FileOffset_t>(TP_FTELL(BlckFile[CurFile]->File));
+
+    return 0;
+}
+
+INTEGER4 writeBoundaryConnectionZones(
+    PolyZoneWriteInfo& polyZoneWriteInfo,
+    INTEGER4 NumBndryFaces,
+    INTEGER4* FaceBndryConnectionCounts,
+    INTEGER4* FaceBndryConnectionZones) 
+{
+    TP_FSEEK(BlckFile[CurFile]->File, polyZoneWriteInfo.connectionZonesOffset, SEEK_SET);
+    INTEGER4 LocalBndryConnCount = 0;
+    for (LgIndex_t Index = 0; Index < NumBndryFaces; Index++)
+    {
+        for (LgIndex_t BIndex = 0; BIndex < FaceBndryConnectionCounts[Index]; BIndex++)
+        {
+            if (FaceBndryConnectionZones[LocalBndryConnCount] < TECIO_NO_NEIGHBORING_ZONE)
+            {
+#if defined MAKEARCHIVE
+                PRINT1("Err: (TECPOLYBCONN112) Invalid boundary zone value at boundary connections for face %d:\n", Index + 1);
+#endif
+                NumErrs[CurFile]++;
+                return (-1);
+            }
+            else if (!WriteBinaryInt32(BlckFile[CurFile], FaceBndryConnectionZones[LocalBndryConnCount] - 1))
+            {
+                WriteErr("TECPOLYFACE112");
+                return -1;
+            }
+            LocalBndryConnCount++;
+        }
+    }
+    polyZoneWriteInfo.connectionZonesOffset = static_cast<FileOffset_t>(TP_FTELL(BlckFile[CurFile]->File));
+
+    return 0;
+}
+
+} // namespace
+
+/**
+ * TECPOLYFACEXXX
+ */
+LIBFUNCTION INTEGER4 LIBCALL TECPOLYFACE112(INTEGER4 *NumFaces,
+                                            INTEGER4 *FaceNodeCounts,
+                                            INTEGER4 *FaceNodes,     
+                                            INTEGER4 *FaceLeftElems, 
+                                            INTEGER4 *FaceRightElems)
+{
+    INTEGER4 Result = checkForPolyFacePreconditions();
+    if (Result != 0)
+        return Result;
+
+    INTEGER4 MinNeighborValue;
+    Result = getMinNeighborValue(MinNeighborValue);
+    if (Result != 0)
+        return Result;
+
+    if (PolyZoneWriteInfos[CurFile][CurZone[CurFile]].numFacesWritten == 0 &&
+        PolyZoneWriteInfos[CurFile][CurZone[CurFile]].numBoundaryFacesWritten == 0)
+        calculateInitialPolyZoneOffsets();
+    PolyZoneWriteInfo& polyZoneWriteInfo = PolyZoneWriteInfos[CurFile][CurZone[CurFile]];
+
+    /* Write the facenodesoffsets array from the facenodecounts array. */
+    LgIndex_t BeginningFaceNodeSum = polyZoneWriteInfo.faceNodeSum;
+    if (ZoneType[CurFile] == FEPOLYHEDRON) /* FEPOLYGON doesn't specify facenodesoffsets */
+        Result = writePolyhedralFaceNodeOffsets(polyZoneWriteInfo, *NumFaces, FaceNodeCounts);
+    if (Result != 0)
+        return Result;
+
+    /* Write the facenodes array but convert 1-based to 0-based. */
+    Result = writeFaceNodes(polyZoneWriteInfo, BeginningFaceNodeSum, *NumFaces, FaceNodes);
+    if (Result != 0)
+        return Result;
+
+    /* Write the left and right elements array but convert 1-based to 0-based. */
+    Result = writeElements(polyZoneWriteInfo, *NumFaces, FaceLeftElems, FaceRightElems, MinNeighborValue);
+    if (Result != 0)
+        return Result;
+
+    polyZoneWriteInfo.numFacesWritten += *NumFaces;
+    if (polyZoneWriteInfo.numFacesWritten == KMax[CurFile] &&
+        polyZoneWriteInfo.numBoundaryFacesWritten == TotalNumFaceBndryFaces[CurFile])
+    {
+        FaceNeighborsOrMapWritten[CurFile][CurZone[CurFile]] = TRUE;
+    }
+
+    return 0;
+}
+
+#if defined MAKEARCHIVE && !defined _WIN32 /* every platform but Windows Intel */
+LIBFUNCTION INTEGER4 LIBCALL tecpolyface112_(INTEGER4 *NumFaces,
+                                             INTEGER4 *FaceNodeCounts,
+                                             INTEGER4 *FaceNodes,     
+                                             INTEGER4 *FaceLeftElems, 
+                                             INTEGER4 *FaceRightElems)
+{
+    return TECPOLYFACE112(NumFaces,
+                          FaceNodeCounts,
+                          FaceNodes,    
+                          FaceLeftElems,
+                          FaceRightElems);
+}
+#endif
+
+/**
+ * TECPOLYBCONNXXX
+ */
+LIBFUNCTION INTEGER4 LIBCALL TECPOLYBCONN112(INTEGER4 *NumBndryFaces,
+                                             INTEGER4 *FaceBndryConnectionCounts,
+                                             INTEGER4 *FaceBndryConnectionElems, 
+                                             INTEGER4 *FaceBndryConnectionZones)
+{
+    if (CheckFile("TECPOLYBCONN112") < 0)
+        return (-1);
+
+    if (PolyZoneWriteInfos[CurFile][CurZone[CurFile]].numFacesWritten == 0 &&
+        PolyZoneWriteInfos[CurFile][CurZone[CurFile]].numBoundaryFacesWritten == 0)
+        calculateInitialPolyZoneOffsets();
+    PolyZoneWriteInfo& polyZoneWriteInfo = PolyZoneWriteInfos[CurFile][CurZone[CurFile]];
+
+    /* Write the boundary arrays. */
+    if (TotalNumFaceBndryFaces[CurFile] > 0)
+    {
+        /* Write the boundaryconnectionoffsets array from the boundaryconnectioncounts array. */
+        if (writeBoundaryConnectionCounts(polyZoneWriteInfo, *NumBndryFaces, FaceBndryConnectionCounts) != 0)
+            return -1;
+
+        if (writeBoundaryConnectionElements(polyZoneWriteInfo, *NumBndryFaces,
+            FaceBndryConnectionCounts, FaceBndryConnectionElems, FaceBndryConnectionZones) != 0)
+            return -1;
+
+        /* Write the boundary connection zones but convert 1-based to 0-based. */
+        if (writeBoundaryConnectionZones(polyZoneWriteInfo, *NumBndryFaces,
+            FaceBndryConnectionCounts, FaceBndryConnectionZones) != 0)
+            return -1;
+    }
+
+    polyZoneWriteInfo.numBoundaryFacesWritten += *NumBndryFaces;
+    if (polyZoneWriteInfo.numFacesWritten == KMax[CurFile] &&
+        polyZoneWriteInfo.numBoundaryFacesWritten == TotalNumFaceBndryFaces[CurFile])
+    {
+        FaceNeighborsOrMapWritten[CurFile][CurZone[CurFile]] = TRUE;
+    }
+
+    return 0;
+}
+
+#if defined MAKEARCHIVE && !defined _WIN32 /* every platform but Windows Intel */
+LIBFUNCTION INTEGER4 LIBCALL tecpolybconn112_(INTEGER4 *NumBndryFaces,
+                                              INTEGER4 *FaceBndryConnectionCounts,
+                                              INTEGER4 *FaceBndryConnectionElems, 
+                                              INTEGER4 *FaceBndryConnectionZones)
+{
+    return TECPOLYBCONN112(NumBndryFaces,
+                           FaceBndryConnectionCounts,
+                           FaceBndryConnectionElems, 
+                           FaceBndryConnectionZones);
+}
 #endif

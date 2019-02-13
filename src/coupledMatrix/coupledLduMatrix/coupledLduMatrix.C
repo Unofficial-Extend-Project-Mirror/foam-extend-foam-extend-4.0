@@ -241,7 +241,7 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
                             matrices[rowI],
                             coupleCoeffs[rowI][interfaceI],
                             cmpt,
-                            static_cast<const Pstream::commsTypes>
+                            static_cast<Pstream::commsTypes>
                             (
                                 Pstream::defaultCommsType()
                             ),
@@ -288,7 +288,7 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
                                     matrices[rowI],
                                     coupleCoeffs[rowI][interfaceI],
                                     cmpt,
-                                    static_cast<const Pstream::commsTypes>
+                                    static_cast<Pstream::commsTypes>
                                     (
                                         Pstream::defaultCommsType()
                                     ),
@@ -336,7 +336,7 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
                             matrices[rowI],
                             coupleCoeffs[rowI][interfaceI],
                             cmpt,
-                            static_cast<const Pstream::commsTypes>
+                            static_cast<Pstream::commsTypes>
                             (
                                 Pstream::defaultCommsType()
                             ),
@@ -383,7 +383,7 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
                                     matrices[rowI],
                                     coupleCoeffs[rowI][interfaceI],
                                     cmpt,
-                                    static_cast<const Pstream::commsTypes>
+                                    static_cast<Pstream::commsTypes>
                                     (
                                         Pstream::defaultCommsType()
                                     ),

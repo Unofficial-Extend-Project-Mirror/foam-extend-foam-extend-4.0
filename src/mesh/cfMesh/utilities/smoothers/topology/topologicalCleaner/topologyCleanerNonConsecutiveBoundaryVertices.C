@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -59,67 +62,70 @@ void topologicalCleaner::checkNonConsecutiveBoundaryVertices()
 
         for(label faceI=start;faceI<end;++faceI)
         {
-            const face& bf = faces[faceI];
-
-            # ifdef DEBUGCleaner
-            Info << "Checking boundary face " << faceI << " with vertices "
-                << bf << endl;
+            # ifdef USE_OMP
+            # pragma omp task shared(decomposeFace,faces,cells,owner,faceI)
             # endif
+            {
+                const face& bf = faces[faceI];
 
-            const label bfsize = bf.size();
+                # ifdef DEBUGCleaner
+                Info << "Checking boundary face " << faceI << " with vertices "
+                    << bf << endl;
+                # endif
 
-            const cell& c = cells[owner[faceI]];
+                const cell& c = cells[owner[faceI]];
 
-            forAll(c, fI)
-                if(
-                    (c[fI] < nIntFaces) ||
-                    (mesh_.faceIsInProcPatch(c[fI]) != -1)
-                )
-                {
-                    const face& f = faces[c[fI]];
-
-                    DynList<label> shN;
-
-                    forAll(bf, pI)
-                        forAll(f, pJ)
-                            if( bf[pI] == f[pJ] )
-                            {
-                                shN.append(pI);
-                            }
-
-                    # ifdef DEBUGCleaner
-                    Info << "Shared vertices with internal face " << f
-                        << " are " << shN << endl;
-                    # endif
-
-                    if( shN.size() > 2 )
+                forAll(c, fI)
+                    if(
+                        (c[fI] < nIntFaces) ||
+                        (mesh_.faceIsInProcPatch(c[fI]) != -1)
+                    )
                     {
+                        const face& f = faces[c[fI]];
+
+                        DynList<label> shN;
+
+                        forAll(bf, pI)
+                            forAll(f, pJ)
+                                if( bf[pI] == f[pJ] )
+                                {
+                                    shN.append(pI);
+                                }
+
                         # ifdef DEBUGCleaner
-                        Info << "1. Face has to be split" << endl;
+                        Info << "Shared vertices with internal face " << f
+                            << " are " << shN << endl;
                         # endif
 
-                        decomposeFace[faceI] = true;
-                        decomposeCell_[owner[faceI]] = true;
-                        changed = true;
-                    }
-                    else if( shN.size() == 2 )
-                    {
-                        if( !(
-                                (shN[0] == ((shN[1] + 1) % bfsize)) ||
-                                (shN[0] == ((shN[1] + bfsize - 1) % bfsize))
-                            )
-                        )
+                        if( shN.size() > 2 )
                         {
                             # ifdef DEBUGCleaner
-                            Info << "2. Face has to be split" << endl;
+                            Info << "1. Face has to be split" << endl;
                             # endif
 
                             decomposeFace[faceI] = true;
                             decomposeCell_[owner[faceI]] = true;
                             changed = true;
                         }
+                        else if( shN.size() == 2 )
+                        {
+                            if( !(
+                                    (shN[0] == bf.fcIndex(shN[1])) ||
+                                    (shN[0] == bf.rcIndex(shN[1]))
+                                )
+                            )
+                            {
+                                # ifdef DEBUGCleaner
+                                Info << "2. Face has to be split" << endl;
+                                # endif
+
+                                decomposeFace[faceI] = true;
+                                decomposeCell_[owner[faceI]] = true;
+                                changed = true;
+                            }
+                        }
                     }
-                }
+            }
         }
     }
 

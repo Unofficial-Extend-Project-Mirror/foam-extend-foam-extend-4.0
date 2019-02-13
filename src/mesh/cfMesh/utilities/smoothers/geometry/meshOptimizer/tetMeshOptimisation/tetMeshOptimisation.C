@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -35,6 +38,8 @@ Description
 #include "meshUntangler.H"
 #include "volumeOptimizer.H"
 #include "knuppMetric.H"
+
+#include "helperFunctions.H"
 
 #include <map>
 
@@ -495,16 +500,20 @@ void tetMeshOptimisation::optimiseBoundaryVolumeOptimizer
                         if( mag(ev[2]) > (mag(ev[1]) + mag(ev[0])) )
                         {
                             //- ordinary surface vertex
-                            vector normal = eigenVector(nt, ev[2]);
+                            vector normal = help::eigenVector(nt, ev[2]);
+
                             normal /= (mag(normal)+VSMALL);
                             disp -= (disp & normal) * normal;
                         }
                         else if( mag(ev[1]) > 0.5 * (mag(ev[2]) + mag(ev[0])) )
                         {
                             //- this vertex is on an edge
-                            vector normal1 = eigenVector(nt, ev[1]);
+                            vector normal1 = help::eigenVector(nt, ev[1]);
+
                             normal1 /= (mag(normal1)+VSMALL);
-                            vector normal2 = eigenVector(nt, ev[2]);
+
+                            vector normal2 = help::eigenVector(nt, ev[2]);
+
                             normal2 /= (mag(normal2)+VSMALL);
 
                             vector eVec = normal1 ^ normal2;

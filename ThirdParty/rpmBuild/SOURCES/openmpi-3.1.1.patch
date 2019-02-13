@@ -1,0 +1,28 @@
+--- openmpi-3.1.1_orig/ompi/include/mpi.h.in	2018-06-29 20:38:13.000000000 +0430
++++ openmpi-3.1.1/ompi/include/mpi.h.in		2019-01-30 22:03:31.021316632 +0330
+@@ -307,7 +307,11 @@
+  * when building OMPI).
+  */
+ #if !OMPI_BUILDING
++#if defined(c_plusplus) || defined(__cplusplus)
++#define OMPI_PREDEFINED_GLOBAL(type, global) (static_cast<type> (static_cast<void *> (&(global))))
++#else
+ #define OMPI_PREDEFINED_GLOBAL(type, global) ((type) ((void *) &(global)))
++#endif
+ #else
+ #define OMPI_PREDEFINED_GLOBAL(type, global) ((type) &(global))
+ #endif
+@@ -753,8 +757,13 @@
+  */
+ #define MPI_INFO_ENV OMPI_PREDEFINED_GLOBAL(MPI_Info, ompi_mpi_info_env)
+ 
++#if defined(c_plusplus) || defined(__cplusplus)
++#define MPI_STATUS_IGNORE (static_cast<MPI_Status *> (0))
++#define MPI_STATUSES_IGNORE (static_cast<MPI_Status *> (0))
++#else
+ #define MPI_STATUS_IGNORE ((MPI_Status *) 0)
+ #define MPI_STATUSES_IGNORE ((MPI_Status *) 0)
++#endif
+ 
+ /*
+  * Special MPI_T handles

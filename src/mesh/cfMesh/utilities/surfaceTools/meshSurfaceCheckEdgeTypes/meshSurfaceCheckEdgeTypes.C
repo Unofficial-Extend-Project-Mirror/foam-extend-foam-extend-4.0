@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -69,7 +72,7 @@ void meshSurfaceCheckEdgeTypes::classifyEdges()
         problematicPoint[bp[it.key()]] = true;
 
     //- classify edges
-    edgeTypes_.setSize(edges.size());
+    edgeType_.setSize(edges.size());
 
     # ifdef USE_OMP
     label nThreads = 3 * omp_get_num_procs();
@@ -81,12 +84,6 @@ void meshSurfaceCheckEdgeTypes::classifyEdges()
     # pragma omp parallel num_threads(nThreads)
     # endif
     {
-        # ifdef USE_OMP
-        # pragma omp for schedule(static, 1)
-        # endif
-        forAll(edgeTypes_, edgeI)
-            edgeTypes_[edgeI] = NONE;
-
         // TODO: this is not valid for non-manifold meshes
         //- start checking feature edges
         # ifdef USE_OMP
@@ -94,26 +91,34 @@ void meshSurfaceCheckEdgeTypes::classifyEdges()
         # endif
         forAll(edgeFaces, edgeI)
         {
+            edgeType_[edgeI] = NONE;
+
             if( edgeFaces.sizeOfRow(edgeI) == 2 )
             {
                 const label f0 = edgeFaces(edgeI, 0);
                 const label f1 = edgeFaces(edgeI, 1);
 
                 if( facePatch[f0] == facePatch[f1] )
-                    edgeTypes_[edgeI] |= PATCHEDGE;
+                {
+                    edgeType_[edgeI] |= PATCHEDGE;
+                }
+                else
+                {
+                    edgeType_[edgeI] |= FEATUREEDGE;
+                }
 
                 const edge e = edges[edgeI];
 
                 //- check if the surface is tangled there
                 if( problematicPoint[bp[e.start()]] )
                 {
-                    edgeTypes_[edgeI] |= UNDETERMINED;
+                    edgeType_[edgeI] |= UNDETERMINED;
                     continue;
                 }
 
                 if( problematicPoint[bp[e.end()]] )
                 {
-                    edgeTypes_[edgeI] |= UNDETERMINED;
+                    edgeType_[edgeI] |= UNDETERMINED;
                     continue;
                 }
 
@@ -128,7 +133,7 @@ void meshSurfaceCheckEdgeTypes::classifyEdges()
 
                 if( tet0.mag() > -VSMALL )
                 {
-                    edgeTypes_[edgeI] |= CONCAVEEDGE;
+                    edgeType_[edgeI] |= CONCAVEEDGE;
                     continue;
                 }
 
@@ -142,11 +147,11 @@ void meshSurfaceCheckEdgeTypes::classifyEdges()
 
                 if( tet1.mag() > -VSMALL )
                 {
-                    edgeTypes_[edgeI] |= CONCAVEEDGE;
+                    edgeType_[edgeI] |= CONCAVEEDGE;
                     continue;
                 }
 
-                edgeTypes_[edgeI] |= CONVEXEDGE;
+                edgeType_[edgeI] |= CONVEXEDGE;
             }
         }
     }
@@ -175,7 +180,13 @@ void meshSurfaceCheckEdgeTypes::classifyEdges()
         forAllConstIter(Map<label>, otherPatch, eIter)
         {
             if( eIter() == facePatch[edgeFaces(eIter.key(), 0)] )
-                continue;
+            {
+                edgeType_[eIter()] |= PATCHEDGE;
+            }
+            else
+            {
+                edgeType_[eIter()] |= FEATUREEDGE;
+            }
 
             const edge& e = edges[eIter.key()];
             if
@@ -184,7 +195,7 @@ void meshSurfaceCheckEdgeTypes::classifyEdges()
                 problematicPoint[bp[e.end()]]
             )
             {
-                edgeTypes_[eIter.key()] |= UNDETERMINED;
+                edgeType_[eIter.key()] |= UNDETERMINED;
                 continue;
             }
 
@@ -231,7 +242,7 @@ void meshSurfaceCheckEdgeTypes::classifyEdges()
 
             if ( tet0.mag() > -VSMALL )
             {
-                edgeTypes_[edgeI] |= CONCAVEEDGE;
+                edgeType_[edgeI] |= CONCAVEEDGE;
                 continue;
             }
 
@@ -245,11 +256,11 @@ void meshSurfaceCheckEdgeTypes::classifyEdges()
 
             if ( tet1.mag() > -VSMALL )
             {
-                edgeTypes_[edgeI] |= CONCAVEEDGE;
+                edgeType_[edgeI] |= CONCAVEEDGE;
                 continue;
             }
 
-            edgeTypes_[edgeI] |= CONVEXEDGE;
+            edgeType_[edgeI] |= CONVEXEDGE;
         }
     }
 
@@ -264,27 +275,36 @@ void meshSurfaceCheckEdgeTypes::classifyEdges()
                 surfaceEngine_.boundaryPoints()[bpI]
             );
 
-    forAll(edgeTypes_, edgeI)
+    const label convexId = mesh_.addPointSubset("convexFeatures");
+    const label concaveId = mesh_.addPointSubset("concaveFeatures");
+    const label undeterminedId = mesh_.addPointSubset("undetermnedFeatures");
+    const label patchId = mesh_.addPointSubset("patchPoints");
+
+    forAll(edgeType_, edgeI)
     {
-        if( edgeTypes_[edgeI] & CONVEXEDGE )
+        if( edgeType_[edgeI] & CONVEXEDGE )
         {
             Info <<"Edge " << edgeI << " is convex" << endl;
+            mesh_.addPointToSubset(convexId, edges[edgeI].start());
+            mesh_.addPointToSubset(convexId, edges[edgeI].end());
         }
-        else if( edgeTypes_[edgeI] & CONCAVEEDGE )
+        if( edgeType_[edgeI] & CONCAVEEDGE )
         {
             Info << "Edge " << edgeI << " is concave" << endl;
+            mesh_.addPointToSubset(concaveId, edges[edgeI].start());
+            mesh_.addPointToSubset(concaveId, edges[edgeI].end());
         }
-        else if( edgeTypes_[edgeI] & UNDETERMINED )
+        if( edgeType_[edgeI] & UNDETERMINED )
         {
             Info << "Edge " << edgeI << " is not determined" << endl;
+            mesh_.addPointToSubset(undeterminedId, edges[edgeI].start());
+            mesh_.addPointToSubset(undeterminedId, edges[edgeI].end());
         }
-        else if( edgeTypes_[edgeI] & PATCHEDGE )
+        if( edgeType_[edgeI] & PATCHEDGE )
         {
             Info << "Edge " << edgeI << " is a patch edge" << endl;
-        }
-        else
-        {
-            Info << "Drekec spekec" << edgeI << endl;
+            mesh_.addPointToSubset(patchId, edges[edgeI].start());
+            mesh_.addPointToSubset(patchId, edges[edgeI].end());
         }
     }
     # endif
@@ -298,7 +318,7 @@ meshSurfaceCheckEdgeTypes::meshSurfaceCheckEdgeTypes
 )
 :
     surfaceEngine_(mse),
-    edgeTypes_()
+    edgeType_()
 {
     classifyEdges();
 }
@@ -314,9 +334,9 @@ void meshSurfaceCheckEdgeTypes::convexEdges(labelLongList& convexEdges) const
 {
     convexEdges.clear();
 
-    forAll(edgeTypes_, eI)
+    forAll(edgeType_, eI)
     {
-        if( edgeTypes_[eI] & CONVEXEDGE )
+        if( edgeType_[eI] & CONVEXEDGE )
             convexEdges.append(eI);
     }
 }
@@ -325,9 +345,9 @@ void meshSurfaceCheckEdgeTypes::concaveEdges(labelLongList& concaveEdges) const
 {
     concaveEdges.clear();
 
-    forAll(edgeTypes_, eI)
+    forAll(edgeType_, eI)
     {
-        if( edgeTypes_[eI] & CONCAVEEDGE )
+        if( edgeType_[eI] & CONCAVEEDGE )
             concaveEdges.append(eI);
     }
 }

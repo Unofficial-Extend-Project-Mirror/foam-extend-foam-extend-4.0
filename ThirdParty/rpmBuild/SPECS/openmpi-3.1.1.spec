@@ -72,10 +72,11 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://www.open-mpi.org/software/ompi/v1.8/downloads
+URL:                    http://www.open-mpi.org/software/ompi/v3.0/downloads
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
+Patch0:                 openmpi-3.1.1.patch
 
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
@@ -94,6 +95,8 @@ Group: 			Development/Tools
 
 %prep
 %setup -q
+
+%patch0 -p1
 
 
 %build

@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -84,12 +87,12 @@ void meshOctreeCreator::setRootCubeSizeAndRefParameters()
     {
         finished = false;
 
-        const scalar lSize = size / pow(label(2), label(globalRefLevel_));
+        const scalar lSize = size / Foam::pow(2, label(globalRefLevel_));
 
         if( lSize < (maxSize * (1.0-SMALL)) )
         {
             const scalar bbSize =
-                0.5 * maxSize * pow(label(2), label(globalRefLevel_));
+                0.5 * maxSize * Foam::pow(2, label(globalRefLevel_));
             rootBox.max() = c + point(bbSize, bbSize, bbSize);
             rootBox.min() = c - point(bbSize, bbSize, bbSize);
             finished = true;
@@ -133,7 +136,7 @@ void meshOctreeCreator::setRootCubeSizeAndRefParameters()
         {
             finished = false;
 
-            const scalar lSize = maxSize / Foam::pow(label(2), addLevel);
+            const scalar lSize = maxSize / Foam::pow(2, addLevel);
 
             if( lSize <= cs )
             {
@@ -230,7 +233,7 @@ void meshOctreeCreator::setRootCubeSizeAndRefParameters()
             {
                 finished = false;
 
-                const scalar lSize = maxSize / Foam::pow(label(2), addLevel);
+                const scalar lSize = maxSize / Foam::pow(2, addLevel);
 
                 if( lSize <= cs )
                 {
@@ -308,7 +311,7 @@ void meshOctreeCreator::setRootCubeSizeAndRefParameters()
             {
                 finished = false;
 
-                const scalar lSize = maxSize / Foam::pow(label(2), addLevel);
+                const scalar lSize = maxSize / Foam::pow(2, addLevel);
 
                 if( lSize <= cs )
                 {
@@ -380,7 +383,7 @@ void meshOctreeCreator::setRootCubeSizeAndRefParameters()
                     {
                         finished = false;
 
-                        const scalar lSize = maxSize / Foam::pow(label(2), nLevel);
+                        const scalar lSize = maxSize / Foam::pow(2, nLevel);
 
                         if( lSize <= cs )
                         {
