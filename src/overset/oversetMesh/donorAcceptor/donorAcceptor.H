@@ -134,7 +134,8 @@ public:
             donorProcNo_(-1),
             donorPoint_(vector::zero),
             extendedDonorCells_(),
-            extendedDonorPoints_()
+            extendedDonorPoints_(),
+            withinBB_(false)
         {}
 
         //- Construct from acceptor data

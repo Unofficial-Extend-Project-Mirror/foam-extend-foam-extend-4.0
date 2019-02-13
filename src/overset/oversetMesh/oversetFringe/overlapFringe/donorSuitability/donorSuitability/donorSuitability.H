@@ -224,6 +224,21 @@ public:
                         << " on processor: " << daPair.acceptorProcNo()
                         << " did not find donor candidate."
                         << nl
+                        << "Additional information: "
+                        << nl
+                        <<  (
+                                daPair.withinBB()
+                              ? "   Within bounding box"
+                              : "   Not within bounding box"
+                            )
+                        << nl << tab
+                        << "Donor index: " << daPair.donorCell()
+                        << nl << tab
+                        << "Donor processor index: " << daPair.donorProcNo()
+                        << nl << tab
+                        << "Number of extended donors: "
+                        << daPair.extendedDonorCells().size()
+                        << nl << nl
                         << "Please review your fringe assembly settings"
                         << " (or try using adaptiveOverlap fringe algorithm)."
                         << abort(FatalError);

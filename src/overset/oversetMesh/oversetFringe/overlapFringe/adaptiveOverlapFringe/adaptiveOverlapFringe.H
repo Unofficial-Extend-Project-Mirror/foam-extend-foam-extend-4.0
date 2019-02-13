@@ -105,7 +105,7 @@ class adaptiveOverlapFringe
             //- Name of the cell set defining initial holes (empty by default).
             //  Useful when the resolution of the background mesh is much
             //  coarser than the front mesh and no hole is found
-            const word holesSetName_;
+            const word holesZoneName_;
 
             //- Optional list of patches to start the iterative fringe assembly
             //  process (empty list by default). Useful when we actually have
@@ -124,6 +124,14 @@ class adaptiveOverlapFringe
             //- User defined number of iterations - by default 4 iterations will
             //  be made
             const label specifiedIterationsNumber_;
+
+            //- User specified suitability trend rate. If the trend is larger
+            //  than the specified trend rate, additional iterations are
+            //  performed
+            const scalar minSuitabilityRate_;
+
+            //- Maximum number of iterations
+            const label maxIter_;
 
             //- Relative iteration counter
             mutable label relativeCounter_;
