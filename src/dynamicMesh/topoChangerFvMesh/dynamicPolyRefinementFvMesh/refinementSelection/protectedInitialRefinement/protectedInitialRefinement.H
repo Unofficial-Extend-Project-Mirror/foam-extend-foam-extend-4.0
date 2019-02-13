@@ -70,6 +70,9 @@ class protectedInitialRefinement
         //  transfer for dynamic load balancing
         volScalarField initialCellLevel_;
 
+        //- Minimum refinement level to protect
+        scalar minProtectedLevel_;
+
 
     // Private Member Functions
 
