@@ -489,6 +489,7 @@ Foam::polyMesh::polyMesh
         ),
         0
     ),
+    syncPar_(syncPar),
     clearedPrimitives_(false),
     boundary_
     (
@@ -774,6 +775,7 @@ Foam::polyMesh::polyMesh
         ),
         0
     ),
+    syncPar_(syncPar),
     clearedPrimitives_(false),
     boundary_
     (

@@ -301,7 +301,7 @@ void ReadProblem
             prostarI = regionI;
 
             Pout<< "For region:" << regionI
-                << "did not find ProstarRegionNumber entry. Assuming "
+                << " did not find ProstarRegionNumber entry. Assuming "
                 << prostarI << endl;
         }
 

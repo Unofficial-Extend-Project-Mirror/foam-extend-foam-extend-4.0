@@ -97,6 +97,7 @@ Foam::polyMesh::polyMesh
         ),
         labelList(is)
     ),
+    syncPar_(syncPar),
     clearedPrimitives_(false),
     boundary_
     (

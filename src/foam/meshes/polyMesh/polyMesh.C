@@ -227,6 +227,7 @@ Foam::polyMesh::polyMesh(const IOobject& io)
             IOobject::NO_WRITE
         )
     ),
+    syncPar_(true),  // Reading mesh from IOobject: must be valid
     clearedPrimitives_(false),
     boundary_
     (
@@ -241,7 +242,7 @@ Foam::polyMesh::polyMesh(const IOobject& io)
         ),
         *this
     ),
-    bounds_(allPoints_),
+    bounds_(allPoints_),  // Reading mesh from IOobject: syncPar
     geometricD_(Vector<label>::zero),
     solutionD_(Vector<label>::zero),
     comm_(Pstream::worldComm),
@@ -319,7 +320,6 @@ Foam::polyMesh::polyMesh(const IOobject& io)
                 "cells",
                 // Find the cells file on the basis of the faces file
                 // HJ, 8/Jul/2009
-//                 time().findInstance(meshDir(), "cells"),
                 time().findInstance(meshDir(), "faces"),
                 meshSubDir,
                 *this,
@@ -424,6 +424,7 @@ Foam::polyMesh::polyMesh
         ),
         neighbour
     ),
+    syncPar_(syncPar),
     clearedPrimitives_(false),
     boundary_
     (
@@ -585,6 +586,7 @@ Foam::polyMesh::polyMesh
         ),
         0
     ),
+    syncPar_(syncPar),
     clearedPrimitives_(false),
     boundary_
     (
@@ -1177,6 +1179,14 @@ Foam::tmp<Foam::scalarField> Foam::polyMesh::movePoints
     const pointField& newPoints
 )
 {
+    if (!syncPar_)
+    {
+        Info<< "tmp<scalarField> polyMesh::movePoints"
+            << "(const pointField&) : "
+            << "Moving the mesh for the mesh with syncPar invalidated.  "
+            << "Mesh motion should not be executed." << endl;
+    }
+
     if (debug)
     {
         Info<< "tmp<scalarField> polyMesh::movePoints(const pointField&) : "
