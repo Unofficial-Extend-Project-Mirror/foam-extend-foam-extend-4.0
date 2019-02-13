@@ -67,54 +67,45 @@ void Foam::adaptiveOverlapFringe::suitabilityFractionSlope
     scalar& beta
 ) const
 {
-    // Linear regression coefficients equations implemented down there:
-    // beta = (n*sum(x_i*y_i)-sum(x_i)*sum(y_i)) / (n*sum(x_i^2)-(sum(x_i))^2)
-    // alpha = sum(y_i)/n - beta* (sum(x_i)/n
+    // Linear regression coefficients y = alpha + beta*x
+    // beta = sum((x_i - x_mean)*(y_i - y_mean))/sum(x_i - x_mean)^2
+    // alpha = y_mean - beta*x_mean
+    // x -> iteration number
+    // y -> suitability
 
-    // Iteration ordinal numbers sum (iteration ordinal number represents x
-    // value in x-y coordinate system)
-    scalar iterSum = 0;
+    // Calculate mean values first
+    scalar iterMean = 0;
+    scalar suitabilityMean = 0;
 
-    // Sum of squared iteration ordinal numbers
-    scalar iterSquaredSum = 0;
+    forAllConstIter(FIFOStack<iterationData>, iterHist, it)
+    {
+        iterMean += it().iteration();
+        suitabilityMean += it().suitability();
+    }
 
-    // Average donor/acceptor suitability fraction values sum (average
-    // suitability represents y value in x-y coordinate system)
-    scalar suitabilitySum = 0;
+    reduce(iterMean, sumOp<scalar>());
+    iterMean /= iterHist.size();
+    reduce(suitabilityMean, sumOp<scalar>());
+    suitabilityMean /= iterHist.size();
 
-    // Sum of iteration ordinal number multiplied by donor/acceptor suitability
-    // fraction value from one iteration
-    scalar iterXSuitabilitySum = 0;
+    // Calculate denominator and numerator for beta
+    scalar n = 0;
+    scalar d = 0;
 
-    // Loop through all iteration data objects and calculate values needed for
-    // linear regression calculation
     forAllConstIter(FIFOStack<iterationData>, iterHist, it)
     {
         iterSum += it().iteration();
-        iterSquaredSum += pow(it().iteration(), label(2));
+        iterSquaredSum += pow(it().iteration(), 2);
         suitabilitySum += it().suitability();
         iterXSuitabilitySum += it().iteration()*it().suitability();
     }
 
-    // Number of iterations is equal to iterationDataHistory_ size
-    const label n = iterationDataHistory_.size();
+    reduce(n, sumOp<scalar>());
+    reduce(d, sumOp<scalar>());
 
-    // Calculate slope (i.e. if y = alpha + beta*x, slope is beta)
-    beta =
-        (n*iterXSuitabilitySum - iterSum*suitabilitySum)/
-        (n*iterSquaredSum - pow(iterSum, 2));
-
-    // Calculate mean iteration number - actually we don't need to calculate
-    // it beacuse we are only interested in trend, i.e we need only slope
-    // (beta). Maybe I will need it for diagrams in my master thesis, so
-    // calculate it for now.
-    const scalar meanIter = iterSum/n;
-
-    // Calculate mean suitability from all iterations
-    const scalar meanSuitability = suitabilitySum/n;
-
-    // Calculate intercept
-    alpha = meanSuitability - beta*meanIter;
+    // Calculate regression coefficients
+    beta = n/d;
+    alpha = suitabilityMean - beta*iterMean;
 }
 
 
@@ -179,20 +170,30 @@ void Foam::adaptiveOverlapFringe::calcAddressing() const
     // holes)
     boolList eligibleAcceptors(mesh.nCells(), true);
 
-    // Read user specified holes into allHoles list. Note: if the cell set
-    // is not found, the list will be empty
-    cellSet allHoles
-    (
-        mesh,
-        holesSetName_,
-        IOobject::READ_IF_PRESENT,
-        IOobject::NO_WRITE
-    );
+    // Read user specified holes into allHoles list. Note: use cellZone rather
+    // than cellSet to have correct behaviour on dynamic mesh simulations
+    // We will silently proceed if the zone is not found since this option is
+    // not mandatory but is useful in certain cases
+
+    // Get zone index
+    const label zoneID = mesh.cellZones().findZoneID(holesZoneName_);
+
+    // Create a hash set for allHoles
+    labelHashSet allHoles;
+
+    if (zoneID > -1)
+    {
+        // Get the zone for holes and append them to set
+        const labelList& specifiedHoles = mesh.cellZones()[zoneID];
+
+        allHoles.insert(specifiedHoles);
+    }
+    // else silently proceed without user-specified holes
 
     // Extend allHoles with cutHoles
     forAll (cutHoles, chI)
     {
-        // Note: cellSet is a hashSet so it automatically removes duplicates
+        // Note: duplicated are removed because we're using hash set
         allHoles.insert(cutHoles[chI]);
     }
 
@@ -393,7 +394,7 @@ Foam::adaptiveOverlapFringe::adaptiveOverlapFringe
     acceptorsPtr_(nullptr),
     finalDonorAcceptorsPtr_(nullptr),
 
-    holesSetName_(dict.lookupOrDefault<word>("holes", word())),
+    holesZoneName_(dict.lookupOrDefault<word>("holes", word())),
     initPatchNames_
     (
         dict.lookupOrDefault<wordList>("initPatchNames", wordList())
@@ -408,6 +409,14 @@ Foam::adaptiveOverlapFringe::adaptiveOverlapFringe
     (
         dict.lookupOrDefault<label>("specifiedIterationsNumber", 5)
     ),
+    minSuitabilityRate_
+    (
+        dict.lookupOrDefault<scalar>("minSuitabilityRate", 0.0)
+    ),
+    maxIter_
+    (
+        dict.lookupOrDefault<label>("maximumIterations", 100)
+    ),
     relativeCounter_(specifiedIterationsNumber_),
     additionalIterations_
     (
@@ -418,6 +427,7 @@ Foam::adaptiveOverlapFringe::adaptiveOverlapFringe
         dict.lookupOrDefault<scalar>("orphanSuitability", 1)
     ),
     suitablePairsSuit_(0)
+
 {}
 
 
@@ -666,6 +676,7 @@ bool Foam::adaptiveOverlapFringe::updateIteration
         (additionalIterations_)
      && (fringeIter_ == relativeCounter_)
      && (specifiedIterationsNumber_ > 1)
+     && (fringeIter_ < maxIter_)
     )
     {
         // Slope (i.e. if y = alpha + beta*x, slope is beta)
@@ -694,7 +705,7 @@ bool Foam::adaptiveOverlapFringe::updateIteration
 
         // If the donor/acceptor suitability gradient is positive,
         // make 1 additional iteration
-        if (beta > 0)
+        if (beta > minSuitabilityRate_)
         {
             // Pop the bottom element of the stack
             iterationDataHistory_.pop();
@@ -709,7 +720,7 @@ bool Foam::adaptiveOverlapFringe::updateIteration
                     << " will be performed." << endl;
             }
         }
-     }
+    }
 
     // Go through unsuitable donor/acceptor pairs from previous iteration and
     // find a new batch of acceptors and holes for the next iteration if:
@@ -1075,16 +1086,26 @@ bool Foam::adaptiveOverlapFringe::updateIteration
         reduce(nAccToHoles, sumOp<label>());
         Info<< "Converted " << nAccToHoles << " acceptors to holes." << endl;
 
+        // Bugfix: Although we have found suitable overlap, we need to update
+        // acceptors as well because eligible donors for acceptors of other
+        // regions are calculated based on these acceptors (and holes)
+        labelList& acceptors = *acceptorsPtr_;
+        acceptors.setSize(finalDAPairs.size());
+        forAll (acceptors, aI)
+        {
+            acceptors[aI] = finalDAPairs[aI].acceptorCell();
+        }
+
         // Construct final donor/acceptor list
         finalDonorAcceptorsPtr_ = new donorAcceptorList
         (
-            finalDAPairs
+            finalDAPairs.xfer()
         );
 
         // Construct final fringe holes list
         fringeHolesPtr_ = new labelList
         (
-            fringeHoles
+            fringeHoles.xfer()
         );
 
         // Print information

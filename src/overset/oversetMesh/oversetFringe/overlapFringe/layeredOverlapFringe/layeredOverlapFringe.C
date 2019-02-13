@@ -241,6 +241,7 @@ void Foam::layeredOverlapFringe::calcAddressing() const
                     // Append the cell and mask it to avoid duplicate entries
                     candidateAcceptors.insert(nbrCellI);
                     eligibleAcceptors[nbrCellI] = false;
+                    processorIndicatorIn[nbrCellI] = 1.0;
                 }
             }
         }
@@ -285,6 +286,7 @@ void Foam::layeredOverlapFringe::calcAddressing() const
                         // fringe on this side
                         candidateAcceptors.insert(fc[pfaceI]);
                         eligibleAcceptors[fc[pfaceI]] = false;
+                        processorIndicatorIn[fc[pfaceI]] = 1.0;
                     }
                 }
             }
@@ -332,9 +334,9 @@ Foam::layeredOverlapFringe::layeredOverlapFringe
 )
 :
     oversetFringe(mesh, region, dict),
-    fringeHolesPtr_(NULL),
-    acceptorsPtr_(NULL),
-    finalDonorAcceptorsPtr_(NULL),
+    fringeHolesPtr_(nullptr),
+    acceptorsPtr_(nullptr),
+    finalDonorAcceptorsPtr_(nullptr),
 
     nLayers_(readLabel(dict.lookup("nLayers"))),
     layerIter_(0),
