@@ -94,10 +94,9 @@ void Foam::adaptiveOverlapFringe::suitabilityFractionSlope
 
     forAllConstIter(FIFOStack<iterationData>, iterHist, it)
     {
-        iterSum += it().iteration();
-        iterSquaredSum += pow(it().iteration(), 2);
-        suitabilitySum += it().suitability();
-        iterXSuitabilitySum += it().iteration()*it().suitability();
+        n += (it().iteration() - iterMean)*
+            (it().suitability() - suitabilityMean);
+        d += sqr(it().iteration() - iterMean);
     }
 
     reduce(n, sumOp<scalar>());
