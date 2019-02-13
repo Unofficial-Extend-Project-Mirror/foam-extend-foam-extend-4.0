@@ -56,24 +56,6 @@ inletOutletTotalTemperatureFvPatchScalarField
 Foam::inletOutletTotalTemperatureFvPatchScalarField::
 inletOutletTotalTemperatureFvPatchScalarField
 (
-    const inletOutletTotalTemperatureFvPatchScalarField& ptf,
-    const fvPatch& p,
-    const DimensionedField<scalar, volMesh>& iF,
-    const fvPatchFieldMapper& mapper
-)
-:
-    mixedFvPatchScalarField(ptf, p, iF, mapper),
-    UName_(ptf.UName_),
-    phiName_(ptf.phiName_),
-    psiName_(ptf.psiName_),
-    gamma_(ptf.gamma_),
-    T0_(ptf.T0_, mapper)
-{}
-
-
-Foam::inletOutletTotalTemperatureFvPatchScalarField::
-inletOutletTotalTemperatureFvPatchScalarField
-(
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
     const dictionary& dict
@@ -102,6 +84,24 @@ inletOutletTotalTemperatureFvPatchScalarField
     this->refGrad() = pTraits<scalar>::zero;
     this->valueFraction() = 0.0;
 }
+
+
+Foam::inletOutletTotalTemperatureFvPatchScalarField::
+inletOutletTotalTemperatureFvPatchScalarField
+(
+    const inletOutletTotalTemperatureFvPatchScalarField& ptf,
+    const fvPatch& p,
+    const DimensionedField<scalar, volMesh>& iF,
+    const fvPatchFieldMapper& mapper
+)
+:
+    mixedFvPatchScalarField(ptf, p, iF, mapper),
+    UName_(ptf.UName_),
+    phiName_(ptf.phiName_),
+    psiName_(ptf.psiName_),
+    gamma_(ptf.gamma_),
+    T0_(ptf.T0_, mapper)
+{}
 
 
 Foam::inletOutletTotalTemperatureFvPatchScalarField::
