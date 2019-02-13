@@ -183,7 +183,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
     // Note: rescale only the local ones. HJ, 27/Apr/2016
     // Note: slave neighbours and weights delayed until master cutting
     // is complete.  HJ, 27/Apr/2016
-    List<DynamicList<label> > masterNeighbors(masterPatch_.size());
+    List<dynamicLabelList > masterNeighbors(masterPatch_.size());
     List<DynamicList<scalar> > masterNeighborsWeights(masterPatch_.size());
 
     // Store slave negighbour weights at the same time, but under

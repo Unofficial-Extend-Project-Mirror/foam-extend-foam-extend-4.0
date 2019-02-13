@@ -130,7 +130,7 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
         // Try and consume interfaces as they become available
         bool allUpdated = false;
 
-        for (label i = 0; i < Pstream::nPollProcInterfaces; i++)
+        for (int i = 0; i < Pstream::nPollProcInterfaces; i++)
         {
             allUpdated = true;
 

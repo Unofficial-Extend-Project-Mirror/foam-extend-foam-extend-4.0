@@ -296,8 +296,8 @@ bool Foam::layerAR::update()
     // Whether point displacement is by scaling
     boolList scaleDisp(nPoints(), true);
     label nScaled = nPoints();
-    List<bool> pistonPoint(newPoints.size(), false);
-    List<bool> headPoint(newPoints.size(), false);
+    boolList pistonPoint(newPoints.size(), false);
+    boolList headPoint(newPoints.size(), false);
 
     forAll(pistonPoints, i)
     {

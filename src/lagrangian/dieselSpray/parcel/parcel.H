@@ -53,7 +53,7 @@ class parcel
     // Private member data
 
         // Reference to the names of the liquid components
-            List<word> liquidComponents_;
+            wordList liquidComponents_;
 
         // Defining data (read and written to field files)
 
@@ -165,7 +165,7 @@ public:
             const vector& U,
             const vector& Uturb,
             const scalarField& X,
-            const List<word>& liquidNames
+            const wordList& liquidNames
         );
 
         //- Construct from Istream reading field values if required
@@ -182,10 +182,10 @@ public:
         // Access
 
             //- Return the names of the liquid components
-            inline const List<word>& liquidNames() const;
+            inline const wordList& liquidNames() const;
 
             //- Return the names of the liquid fuel components - identical with liquidNames
-            inline const List<word>& fuelNames() const;
+            inline const wordList& fuelNames() const;
 
             //- Return diameter of droplets in parcel
             inline scalar d() const;

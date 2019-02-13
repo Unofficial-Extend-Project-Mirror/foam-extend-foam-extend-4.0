@@ -79,7 +79,7 @@ void meshToMesh::calcAddressing()
             << "Setting up rescue" << endl;
     }
 
-    List<bool> boundaryCell(fromCells.size(), false);
+    boolList boundaryCell(fromCells.size(), false);
 
     // set reference to boundary
     const polyPatchList& patchesFrom = fromMesh_.boundaryMesh();
@@ -240,7 +240,7 @@ void meshToMesh::cellAddresses
     labelList& cellAddr,
     const pointField& points,
     const fvMesh& fromMesh,
-    const List<bool>& boundaryCell,
+    const boolList& boundaryCell,
     const octree<octreeDataCell>& oc,
     bool forceFind
 ) const

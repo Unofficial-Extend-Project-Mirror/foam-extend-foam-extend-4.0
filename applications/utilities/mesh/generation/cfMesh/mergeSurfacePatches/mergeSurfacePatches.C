@@ -48,7 +48,7 @@ void getPatchIds
 (
     const triSurf& origSurf,
     const wordList& patchNames,
-    DynamicList<label>& patchIds
+    dynamicLabelList& patchIds
 )
 {
     const geometricSurfacePatchList& origPatches = origSurf.patches();
@@ -189,7 +189,7 @@ autoPtr<triSurf> mergeSurfacePatches
     word newPatchType = origPatches[patchIds[0]].geometricType();
 
     // Create patch addressing
-    List<DynamicList<label> > patchAddr(origPatches.size()+1);
+    List<dynamicLabelList > patchAddr(origPatches.size()+1);
 
     forAll(origFacets, faceI)
     {
@@ -331,7 +331,7 @@ int main(int argc, char *argv[])
     triSurf origSurf(inFileName);
 
     // Get patch ids
-    DynamicList<label> patchIds;
+    dynamicLabelList patchIds;
 
     if (args.options().found("patchNames"))
     {

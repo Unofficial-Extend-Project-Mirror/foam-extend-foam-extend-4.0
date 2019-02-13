@@ -205,7 +205,7 @@ void Foam::fileFormats::OFSsurfaceFormat<Face>::write
 )
 {
     const List<Face>&  faceLst = surf.faces();
-    const List<label>& faceMap = surf.faceMap();
+    const labelList& faceMap = surf.faceMap();
 
     OFstream os(filename);
     if (!os.good())

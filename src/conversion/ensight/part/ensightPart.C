@@ -40,7 +40,7 @@ Foam::List<Foam::word> Foam::ensightPart::elemTypes_(0);
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-bool Foam::ensightPart::isFieldDefined(const List<scalar>& field) const
+bool Foam::ensightPart::isFieldDefined(const scalarList& field) const
 {
     forAll(elemLists_, elemI)
     {

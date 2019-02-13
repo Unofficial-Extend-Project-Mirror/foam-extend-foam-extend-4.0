@@ -59,7 +59,7 @@ void Foam::channelIndex::walkOppositeFaces
     const faceList& faces = mesh.faces();
     label nBnd = mesh.nFaces() - mesh.nInternalFaces();
 
-    DynamicList<label> frontFaces(startFaces);
+    dynamicLabelList frontFaces(startFaces);
     forAll(frontFaces, i)
     {
         label faceI = frontFaces[i];
@@ -93,7 +93,7 @@ void Foam::channelIndex::walkOppositeFaces
         }
 
         // Transfer across cells
-        DynamicList<label> newFrontFaces(frontFaces.size());
+        dynamicLabelList newFrontFaces(frontFaces.size());
 
         forAll(frontFaces, i)
         {

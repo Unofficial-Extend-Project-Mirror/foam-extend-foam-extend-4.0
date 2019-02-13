@@ -99,7 +99,7 @@ private:
                 const label& faceI,
                 const boolList& edgeOnEmptyPatch,
                 const labelList& edgeMidPoint,
-                DynamicList<label>& splitFacesIntoTwo,
+                dynamicLabelList& splitFacesIntoTwo,
                 DynamicList<Pair<label> >& splitFacesEmptyEdges
             ) const;
 

@@ -1671,7 +1671,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
                 }
             }
 
-            labelList cellsAroundFace(2, -1);
+            labelList cellsAroundFace(2, label(-1));
 
             cellsAroundFace[0] = mesh.faceOwner()[ac[acI].masterFaceID()];
 

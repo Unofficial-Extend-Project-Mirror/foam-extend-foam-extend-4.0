@@ -198,7 +198,7 @@ private:
         static DynamicList<List<int> > procIDs_;
 
         //- List of parent communicators
-        static DynamicList<label> parentCommunicator_;
+        static dynamicLabelList parentCommunicator_;
 
         //- Structure for linear communications
         static DynamicList<List<commsStruct> > linearCommunication_;

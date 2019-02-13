@@ -117,7 +117,7 @@ Foam::extendedFaceToCellStencil::weightedSum
     forAll(sf, cellI)
     {
         const List<Type>& stField = stencilFld[cellI];
-        const List<scalar>& stWeight = stencilWeights[cellI];
+        const scalarList& stWeight = stencilWeights[cellI];
 
         forAll(stField, i)
         {

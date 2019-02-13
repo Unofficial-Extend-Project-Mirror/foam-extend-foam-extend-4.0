@@ -61,11 +61,11 @@ void readNASEdges
     // coordinates of point
     DynamicList<point> points;
     // Nastran index of point
-    DynamicList<label> pointIndices;
+    dynamicLabelList pointIndices;
 
     // beams
     DynamicList<edge> edges;
-    DynamicList<label> edgeIndices;
+    dynamicLabelList edgeIndices;
 
 
     while (is.good())

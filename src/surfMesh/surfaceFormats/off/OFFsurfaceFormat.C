@@ -113,7 +113,7 @@ bool Foam::fileFormats::OFFsurfaceFormat<Face>::read
             label nVerts;
             lineStream >> nVerts;
 
-            List<label> verts(nVerts);
+            labelList verts(nVerts);
 
             forAll(verts, vertI)
             {
@@ -156,7 +156,7 @@ void Foam::fileFormats::OFFsurfaceFormat<Face>::write
 {
     const pointField& pointLst = surf.points();
     const List<Face>&  faceLst = surf.faces();
-    const List<label>& faceMap = surf.faceMap();
+    const labelList& faceMap = surf.faceMap();
     const List<surfZone>& zoneLst = surf.surfZones();
 
     OFstream os(filename);

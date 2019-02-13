@@ -220,7 +220,7 @@ private:
 
         void writeInterfaces(const objectRegistry&) const;
 
-        //- Write List<label> in constant/polyMesh
+        //- Write labelList in constant/polyMesh
         void writeMeshLabelList
         (
             const objectRegistry& registry,

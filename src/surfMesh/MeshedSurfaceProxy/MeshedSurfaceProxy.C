@@ -225,7 +225,7 @@ Foam::MeshedSurfaceProxy<Face>::MeshedSurfaceProxy
     const pointField& pointLst,
     const List<Face>& faceLst,
     const List<surfZone>& zoneLst,
-    const List<label>& faceMap
+    const labelList& faceMap
 )
 :
     points_(pointLst),

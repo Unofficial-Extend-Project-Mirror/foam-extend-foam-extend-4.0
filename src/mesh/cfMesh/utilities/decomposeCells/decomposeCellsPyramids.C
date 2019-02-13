@@ -23,7 +23,7 @@ License
 
 Description
 
-\*----------------------p-----------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "decomposeCells.H"
 #include "helperFunctions.H"
@@ -56,7 +56,7 @@ void decomposeCells::findAddressingForCell
     forAll(faceEdges, feI)
     {
         faceEdges[feI].setSize(faces[c[feI]].size());
-        faceEdges[feI] = -1;
+        faceEdges[feI] = label(-1);
     }
 
     forAll(c, fI)

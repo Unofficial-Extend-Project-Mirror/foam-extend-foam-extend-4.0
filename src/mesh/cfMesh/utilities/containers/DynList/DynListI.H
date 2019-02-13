@@ -102,6 +102,17 @@ inline Foam::DynList<T, staticSize>::DynList(const label s)
     setSize(s);
 }
 
+#if WM_LABEL_SIZE == 64
+template<class T, Foam::label staticSize>
+inline Foam::DynList<T, staticSize>::DynList(const int s)
+:
+    UList<T>(staticData_, staticSize),
+    nextFree_(0)
+{
+    setSize(s);
+}
+#endif
+
 template<class T, Foam::label staticSize>
 inline Foam::DynList<T, staticSize>::DynList(const label s, const T& val)
 :

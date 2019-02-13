@@ -290,7 +290,7 @@ Foam::pointField Foam::autoSnapDriver::smoothPatchDisplacement
         pp.meshPoints(),
         nBoundary,
         plusEqOp<label>(),  // combine op
-        0,                  // null value
+        label(0),           // null value
         false               // no separation
     );
 
@@ -385,7 +385,7 @@ Foam::pointField Foam::autoSnapDriver::smoothPatchDisplacement
             mesh,
             globalNum,
             plusEqOp<label>(),  // combine op
-            0,                  // null value
+            label(0),           // null value
             false               // no separation
         );
 

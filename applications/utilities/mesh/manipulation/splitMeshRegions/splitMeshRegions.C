@@ -486,7 +486,7 @@ void subsetSurfaceFields
 // Select all cells not in the region
 labelList getNonRegionCells(const labelList& cellRegion, const label regionI)
 {
-    DynamicList<label> nonRegionCells(cellRegion.size());
+    dynamicLabelList nonRegionCells(cellRegion.size());
     forAll (cellRegion, cellI)
     {
         if (cellRegion[cellI] != regionI)

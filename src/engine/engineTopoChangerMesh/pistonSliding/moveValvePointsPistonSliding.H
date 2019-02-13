@@ -28,7 +28,7 @@
              && valves_[valveI].isOpen()
             )
             {
-                List<bool> valveTopPoint(newPoints.size(), false);
+                boolList valveTopPoint(newPoints.size(), false);
 
 //                 const scalarField& movingPointsTop =
 //                     movingPointsMaskTop(valveI);
@@ -107,7 +107,7 @@
        if (valves_[valveI].bottomPatchID().active())
        {
            {
-               List<bool> valveBottomPoint(newPoints.size(), false);
+               boolList valveBottomPoint(newPoints.size(), false);
 
                label valveBottomPtsIndex =
                    pointZones().findZoneID

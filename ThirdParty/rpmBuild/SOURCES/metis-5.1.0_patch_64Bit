@@ -1,0 +1,11 @@
+--- orig/metis-5.1.0/include/metis.h	2019-01-15 12:40:31.050842343 +0100
++++ metis-5.1.0/include/metis.h	2019-01-15 12:43:01.883662756 +0100
+@@ -30,7 +30,7 @@
+  GCC does provides these definitions in stdint.h, but it may require some
+  modifications on other architectures.
+ --------------------------------------------------------------------------*/
+-#define IDXTYPEWIDTH 32
++#define IDXTYPEWIDTH 64
+ 
+ 
+ /*--------------------------------------------------------------------------

@@ -124,7 +124,7 @@ void Foam::prismatic2DRefinement::appendFaceSplitInfo
     const label& faceI,
     const boolList& edgeOnPatchToCut,
     const labelList& edgeMidPoint,
-    DynamicList<label>& splitFacesIntoTwo,
+    dynamicLabelList& splitFacesIntoTwo,
     DynamicList<Pair<label> >& splitFacesEmptyEdges
 ) const
 {
@@ -889,7 +889,7 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
 
     // Allocate enough storage to prevent excessive resizing
     const label nSplitFacesIntoTwo = 3*cellsToRefine_.size();
-    DynamicList<label> splitFacesIntoTwo(nSplitFacesIntoTwo);
+    dynamicLabelList splitFacesIntoTwo(nSplitFacesIntoTwo);
     DynamicList<Pair<label> > splitFacesEmptyEdges(nSplitFacesIntoTwo);
 
     // Get necessary mesh data

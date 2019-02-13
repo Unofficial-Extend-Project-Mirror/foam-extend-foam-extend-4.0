@@ -103,7 +103,7 @@ void Foam::meshReader::addFaceZones(polyMesh& mesh) const
             (
                 iter.key(),
                 iter(),
-                List<bool>(iter().size(), false),
+                boolList(iter().size(), false),
                 nZone,
                 mesh.faceZones()
             )

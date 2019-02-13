@@ -175,15 +175,15 @@ int main(int argc, char *argv[])
     Map<scalar>  timeIndices;
 
     // Track the time indices used by the volume fields
-    DynamicList<label> fieldTimesUsed;
+    dynamicLabelList fieldTimesUsed;
 
     // Track the time indices used by each cloud
-    HashTable<DynamicList<label> > cloudTimesUsed;
+    HashTable<dynamicLabelList > cloudTimesUsed;
 
     // Create a new DynamicList for each cloud
     forAllConstIter(HashTable<HashTable<word> >, cloudFields, cloudIter)
     {
-        cloudTimesUsed.insert(cloudIter.key(), DynamicList<label>());
+        cloudTimesUsed.insert(cloudIter.key(), dynamicLabelList());
     }
 
 

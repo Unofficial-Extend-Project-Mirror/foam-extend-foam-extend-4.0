@@ -458,8 +458,8 @@ void Foam::oversetMesh::calcFringeFaces() const
         acCellIndicator[acc[accI]] = accI;
     }
 
-    DynamicList<label> acF(2*acc.size());
-    DynamicList<label> acFC(2*acc.size());
+    dynamicLabelList acF(2*acc.size());
+    dynamicLabelList acFC(2*acc.size());
     DynamicList<bool> acFF(2*acc.size());
 
     const unallocLabelList& owner = mesh().owner();
@@ -554,7 +554,7 @@ void Foam::oversetMesh::calcFringeFaces() const
 
     // Acceptor internal face collection
 
-    DynamicList<label> acInternalF(2*acc.size());
+    dynamicLabelList acInternalF(2*acc.size());
 
     forAll (neighbour, faceI)
     {
@@ -635,8 +635,8 @@ void Foam::oversetMesh::calcHoleFaces() const
         hole[hc[hcI]] = hcI;
     }
 
-    DynamicList<label> hF(2*hc.size());
-    DynamicList<label> hFC(2*hc.size());
+    dynamicLabelList hF(2*hc.size());
+    dynamicLabelList hFC(2*hc.size());
     DynamicList<bool> hFF(2*hc.size());
 
     const unallocLabelList& owner = mesh().owner();
@@ -734,7 +734,7 @@ void Foam::oversetMesh::calcHoleFaces() const
 
     // Hole faces are the ones where both owner and neighbour is a hole
 
-    DynamicList<label> hIF(2*hc.size());
+    dynamicLabelList hIF(2*hc.size());
 
     forAll (neighbour, faceI)
     {

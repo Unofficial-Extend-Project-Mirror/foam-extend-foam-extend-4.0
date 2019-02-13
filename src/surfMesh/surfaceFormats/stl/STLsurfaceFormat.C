@@ -137,9 +137,9 @@ bool Foam::fileFormats::STLsurfaceFormat<Face>::read
     this->storedPoints().transfer(reader.points());
 
     // retrieve the original zone information
-    List<word>  names(reader.names().xfer());
-    List<label> sizes(reader.sizes().xfer());
-    List<label> zoneIds(reader.zoneIds().xfer());
+    wordList  names(reader.names().xfer());
+    labelList sizes(reader.sizes().xfer());
+    labelList zoneIds(reader.zoneIds().xfer());
 
     // generate the (sorted) faces
     List<Face> faceLst(zoneIds.size());
@@ -157,7 +157,7 @@ bool Foam::fileFormats::STLsurfaceFormat<Face>::read
     {
         // unsorted - determine the sorted order:
         // avoid SortableList since we discard the main list anyhow
-        List<label> faceMap;
+        labelList faceMap;
         sortedOrder(zoneIds, faceMap);
 
         // generate sorted faces
@@ -208,7 +208,7 @@ void Foam::fileFormats::STLsurfaceFormat<Face>::writeAscii
 
     const pointField& pointLst = surf.points();
     const List<Face>&  faceLst = surf.faces();
-    const List<label>& faceMap = surf.faceMap();
+    const labelList& faceMap = surf.faceMap();
 
     const List<surfZone>& zones =
     (
@@ -269,7 +269,7 @@ void Foam::fileFormats::STLsurfaceFormat<Face>::writeBinary
 
     const pointField& pointLst = surf.points();
     const List<Face>&  faceLst = surf.faces();
-    const List<label>& faceMap = surf.faceMap();
+    const labelList& faceMap = surf.faceMap();
 
     const List<surfZone>& zones =
     (
@@ -406,7 +406,7 @@ void Foam::fileFormats::STLsurfaceFormat<Face>::writeBinary
 
     const pointField&  pointLst = surf.points();
     const List<Face>&  faceLst  = surf.faces();
-    const List<label>& zoneIds  = surf.zoneIds();
+    const labelList& zoneIds  = surf.zoneIds();
 
     unsigned int nTris = 0;
     if (MeshedSurface<Face>::isTri())

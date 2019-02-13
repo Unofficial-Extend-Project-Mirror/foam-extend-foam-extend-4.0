@@ -30,6 +30,15 @@ License
 #include <sys/endian.h>
 #endif
 
+// MacOSX
+#ifdef __DARWIN_BYTE_ORDER
+#if __DARWIN_BYTE_ORDER==__DARWIN_BIG_ENDIAN
+#undef LITTLE_ENDIAN
+#else
+#undef BIG_ENDIAN
+#endif
+#endif
+
 #if defined(LITTLE_ENDIAN) \
  || defined(_LITTLE_ENDIAN) \
  || defined(__LITTLE_ENDIAN)
@@ -43,9 +52,9 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-void Foam::writeFuns::swapWord(label& word32)
+void Foam::writeFuns::swapWord(int32_t& word32)
 {
-    char* mem =  reinterpret_cast<char*>(&word32);
+    char* mem = reinterpret_cast<char*>(&word32);
 
     char a = mem[0];
     mem[0] = mem[3];
@@ -57,7 +66,7 @@ void Foam::writeFuns::swapWord(label& word32)
 }
 
 
-void Foam::writeFuns::swapWords(const label nWords, label* words32)
+void Foam::writeFuns::swapWords(const label nWords, int32_t* words32)
 {
     for (label i = 0; i < nWords; i++)
     {
@@ -75,9 +84,9 @@ void Foam::writeFuns::write
 {
     if (binary)
     {
-#       ifdef LITTLEENDIAN
-        swapWords(fField.size(),  reinterpret_cast<label*>(fField.begin()));
-#       endif
+        #ifdef LITTLEENDIAN
+        swapWords(fField.size(), reinterpret_cast<int32_t*>(fField.begin()));
+        #endif
 
         os.write
         (
@@ -125,9 +134,13 @@ void Foam::writeFuns::write
 {
     if (binary)
     {
-#       ifdef LITTLEENDIAN
-        swapWords(elems.size(),  reinterpret_cast<label*>(elems.begin()));
-#       endif
+        #ifdef LITTLEENDIAN
+        swapWords
+        (
+            (sizeof(label)/4)*elems.size(),
+            reinterpret_cast<int32_t*>(elems.begin())
+        );
+        #endif
         os.write
         (
             reinterpret_cast<char*>(elems.begin()),
@@ -156,7 +169,7 @@ void Foam::writeFuns::write
 (
     std::ostream& os,
     const bool binary,
-    DynamicList<label>& elems
+    dynamicLabelList& elems
 )
 {
     labelList& fld = elems.shrink();
@@ -175,7 +188,7 @@ void Foam::writeFuns::insert(const point& pt, DynamicList<floatScalar>& dest)
 
 
 // Store labelList in dest.
-void Foam::writeFuns::insert(const labelList& source, DynamicList<label>& dest)
+void Foam::writeFuns::insert(const labelList& source, dynamicLabelList& dest)
 {
     forAll(source, i)
     {
@@ -187,7 +200,7 @@ void Foam::writeFuns::insert(const labelList& source, DynamicList<label>& dest)
 // Store scalarField in dest
 void Foam::writeFuns::insert
 (
-    const List<scalar>& source,
+    const scalarList& source,
     DynamicList<floatScalar>& dest
 )
 {
@@ -202,7 +215,7 @@ void Foam::writeFuns::insert
 void Foam::writeFuns::insert
 (
     const labelList& map,
-    const List<scalar>& source,
+    const scalarList& source,
     DynamicList<floatScalar>& dest
 )
 {

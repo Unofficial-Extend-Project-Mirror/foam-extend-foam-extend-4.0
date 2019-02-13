@@ -69,7 +69,7 @@ bool Foam::fileFormats::FTRsurfaceFormat<Face>::read
     List< Keyed<triFace> > facesRead(is);
 
     List<Face>  faceLst(facesRead.size());
-    List<label> zoneIds(facesRead.size());
+    labelList zoneIds(facesRead.size());
 
     // disentangle faces/keys - already triangulated
     forAll(facesRead, faceI)

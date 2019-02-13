@@ -812,7 +812,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
 
         // For each new global face created on master proc,
         // record its index under the slave proc array
-        List<DynamicList<label> > procMasterFacesLL(Pstream::nProcs());
+        List<dynamicLabelList > procMasterFacesLL(Pstream::nProcs());
 
         // Note: zone addressing will be assembled only for local clusters
         // using the coarseGlobalFaceOffset

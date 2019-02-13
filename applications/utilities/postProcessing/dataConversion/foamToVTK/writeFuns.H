@@ -55,10 +55,11 @@ class writeFuns
 {
     // Private member functions
 
-        // Swap halves of word.
+        //- Swap halves of word
+        static void swapWord(int32_t& word32);
 
-            static void swapWord(label& word32);
-            static void swapWords(const label nWords, label* words32);
+        //- Swap halves of word
+        static void swapWords(const label nWords, int32_t* words32);
 
 
 public:
@@ -68,7 +69,7 @@ public:
         static void write(std::ostream&, const bool, List<floatScalar>&);
         static void write(std::ostream&, const bool, DynamicList<floatScalar>&);
         static void write(std::ostream&, const bool, labelList&);
-        static void write(std::ostream&, const bool, DynamicList<label>&);
+        static void write(std::ostream&, const bool, dynamicLabelList&);
 
 
     // Write header
@@ -105,7 +106,7 @@ public:
 
 
     //- Append elements to DynamicList
-    static void insert(const labelList&, DynamicList<label>&);
+    static void insert(const labelList&, dynamicLabelList&);
     template<class Type>
     static void insert(const List<Type>&, DynamicList<floatScalar>&);
 

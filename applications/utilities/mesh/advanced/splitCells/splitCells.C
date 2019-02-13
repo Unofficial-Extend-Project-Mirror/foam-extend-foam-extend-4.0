@@ -190,7 +190,7 @@ bool splitHex
     const label cellI,
     const label edgeI,
 
-    DynamicList<label>& cutCells,
+    dynamicLabelList& cutCells,
     DynamicList<labelList>& cellLoops,
     DynamicList<scalarField>& cellEdgeWeights
 )
@@ -306,7 +306,7 @@ bool splitCell
     const boolList& edgeIsCut,
     const scalarField& edgeWeight,
 
-    DynamicList<label>& cutCells,
+    dynamicLabelList& cutCells,
     DynamicList<labelList>& cellLoops,
     DynamicList<scalarField>& cellEdgeWeights
 )
@@ -369,7 +369,7 @@ void collectCuts
     const scalar minSin,
     const cellSet& cellsToCut,
 
-    DynamicList<label>& cutCells,
+    dynamicLabelList& cutCells,
     DynamicList<labelList>& cellLoops,
     DynamicList<scalarField>& cellEdgeWeights
 )
@@ -600,7 +600,7 @@ int main(int argc, char *argv[])
 
 
         // Cut information per cut cell
-        DynamicList<label> cutCells(mesh.nCells()/10 + 10);
+        dynamicLabelList cutCells(mesh.nCells()/10 + 10);
         DynamicList<labelList> cellLoops(mesh.nCells()/10 + 10);
         DynamicList<scalarField> cellEdgeWeights(mesh.nCells()/10 + 10);
 

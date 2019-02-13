@@ -47,7 +47,7 @@ void starMesh::readBoundary()
     labelList pointLabels(4);
     labelList pointLabelsTri(3);
 
-    labelList patchLabels(1000, -1);
+    labelList patchLabels(1000, label(-1));
 
     word patchType;
     patchTypes_.setSize(1000);

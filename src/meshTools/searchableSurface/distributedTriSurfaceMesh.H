@@ -163,7 +163,7 @@ private:
                 const pointField& end,
 
                 List<segment>& allSegments,
-                List<label>& allSegmentMap
+                labelList& allSegmentMap
             ) const;
 
             //- Split edges, distribute, test and collect.

@@ -211,7 +211,7 @@ void edgeExtractor::faceEvaluator::neiFacesProcs
     const VRWGraph& faceEdges = mse.faceEdges();
 
     neiProcs.setSize(faceEdges.sizeOfRow(bfI));
-    neiProcs = Pstream::myProcNo();
+    neiProcs = label(Pstream::myProcNo());
 
     if( Pstream::parRun() )
     {

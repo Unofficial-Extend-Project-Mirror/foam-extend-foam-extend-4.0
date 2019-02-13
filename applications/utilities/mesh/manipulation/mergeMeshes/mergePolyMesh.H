@@ -74,16 +74,16 @@ class mergePolyMesh
         DynamicList<word> cellZoneNames_;
 
         //- Point zones
-        DynamicList<label>  pointZones_;
+        dynamicLabelList  pointZones_;
 
         //- Face zones
-        DynamicList<label>  faceZones_;
+        dynamicLabelList  faceZones_;
 
         //- Face zone Flips
         DynamicList<bool>  faceZoneFlips_;
 
         //- Cell zones
-        DynamicList<label> cellZones_;
+        dynamicLabelList cellZones_;
 
 
     // Private Member Functions

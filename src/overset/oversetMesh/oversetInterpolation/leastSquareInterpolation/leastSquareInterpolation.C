@@ -86,7 +86,7 @@ void Foam::leastSquareInterpolation::calcAddressing() const
     forAll (addr, addrI)
     {
         // Start from donor cells
-        DynamicList<label> curDonors(polyMesh::facesPerCell_);
+        dynamicLabelList curDonors(polyMesh::facesPerCell_);
 
         curDonors.append(donors[addrI]);
 

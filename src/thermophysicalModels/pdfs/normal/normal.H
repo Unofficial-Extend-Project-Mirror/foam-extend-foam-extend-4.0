@@ -44,6 +44,7 @@ SourceFiles
 #define normal_H
 
 #include "pdf.H"
+#include "scalarList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -66,9 +67,9 @@ class normal
         scalar minValue_;
         scalar maxValue_;
 
-        List<scalar> expectation_;
-        List<scalar> variance_;
-        List<scalar> strength_;
+        scalarList expectation_;
+        scalarList variance_;
+        scalarList strength_;
 
         scalar range_;
 

@@ -56,7 +56,7 @@ processorFaPatch::~processorFaPatch()
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-Foam::label Foam::processorFaPatch::comm() const
+int Foam::processorFaPatch::comm() const
 {
     return boundaryMesh().mesh().comm();
 }

@@ -57,13 +57,13 @@ protected:
         autoPtr<liquidMixture> liquids_;
 
         //- List of active liquid names
-        List<word> activeLiquids_;
+        wordList activeLiquids_;
 
         //- Mapping between liquid and carrier species
-        List<label> liqToCarrierMap_;
+        labelList liqToCarrierMap_;
 
         //- Mapping between local and global liquid species
-        List<label> liqToLiqMap_;
+        labelList liqToLiqMap_;
 
 
     // Protected member functions

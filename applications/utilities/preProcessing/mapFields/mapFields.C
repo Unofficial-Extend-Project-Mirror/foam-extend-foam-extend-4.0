@@ -427,7 +427,7 @@ int main(int argc, char *argv[])
         );
 
         List<boundBox> bbsTarget(nProcsTarget);
-        List<bool> bbsTargetSet(nProcsTarget, false);
+        boolList bbsTargetSet(nProcsTarget, false);
 
         for (int procISource=0; procISource<nProcsSource; procISource++)
         {

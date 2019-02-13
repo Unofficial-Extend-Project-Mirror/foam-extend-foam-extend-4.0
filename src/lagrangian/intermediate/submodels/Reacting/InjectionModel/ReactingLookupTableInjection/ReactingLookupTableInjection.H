@@ -85,7 +85,7 @@ class ReactingLookupTableInjection
         reactingParcelInjectionDataIOList injectors_;
 
         //- List of injector cells per injector
-        List<label> injectorCells_;
+        labelList injectorCells_;
 
 
 protected:

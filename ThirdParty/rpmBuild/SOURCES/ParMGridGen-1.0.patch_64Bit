@@ -1,0 +1,38 @@
+--- orig/ParMGridGen-1.0/mgridgen.h	2019-01-15 13:32:54.247812378 +0100
++++ ParMGridGen-1.0/mgridgen.h	2019-01-15 13:35:03.972952464 +0100
+@@ -1,4 +1,4 @@
+-typedef int idxtype;
++typedef long int idxtype;
+ typedef double realtype;
+ 
+ 
+--- orig/ParMGridGen-1.0/parmgridgen.h	2019-01-15 13:32:54.251812414 +0100
++++ ParMGridGen-1.0/parmgridgen.h	2019-01-15 13:42:14.344335223 +0100
+@@ -1,4 +1,4 @@
+-typedef int idxtype;
++typedef long int idxtype;
+ typedef double realtype;
+ 
+ void ParMGridGen(idxtype *, idxtype *, realtype *, realtype *, idxtype *,
+--- orig/ParMGridGen-1.0/ParMGridGen/IMParMetis-2.0/ParMETISLib/struct.h	2019-01-15 13:32:54.247812378 +0100
++++ ParMGridGen-1.0/ParMGridGen/IMParMetis-2.0/ParMETISLib/struct.h	2019-01-15 13:44:17.605231500 +0100
+@@ -15,7 +15,7 @@
+ 
+ /* Indexes are as long as integers for now */
+ #ifdef IDXTYPE_INT
+-typedef int idxtype;
++typedef long int idxtype;
+ #define IDX_DATATYPE	MPI_INT
+ #else
+ typedef short idxtype;
+--- orig/ParMGridGen-1.0/MGridGen/IMlib/IMlib.h	2019-01-15 13:32:54.251812414 +0100
++++ ParMGridGen-1.0/MGridGen/IMlib/IMlib.h	2019-01-15 13:52:11.504522970 +0100
+@@ -16,7 +16,7 @@
+ 
+ /* Indexes are as long as integers for now */
+ #ifdef IDXTYPE_INT
+-typedef int idxtype;
++typedef long int idxtype;
+ #else
+ typedef short idxtype;
+ #endif

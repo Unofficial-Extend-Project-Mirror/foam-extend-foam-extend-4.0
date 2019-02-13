@@ -94,8 +94,8 @@ Foam::patchWriter::patchWriter
     os_ << "CELLS " << nFaces_ << ' ' << nFaceVerts
         << std::endl;
 
-    DynamicList<label> vertLabels(nFaceVerts);
-    DynamicList<label> faceTypes(nFaceVerts);
+    dynamicLabelList vertLabels(nFaceVerts);
+    dynamicLabelList faceTypes(nFaceVerts);
 
     label offset = 0;
 

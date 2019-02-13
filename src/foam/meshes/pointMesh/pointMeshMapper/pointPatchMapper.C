@@ -88,7 +88,7 @@ void Foam::pointPatchMapper::calcAddressing() const
             else
             {
                 // Inserted point. Map from point0 (arbitrary choice)
-                addr[i] = labelList(1, 0);
+                addr[i] = labelList(1, label(0));
                 w[i] = scalarList(1, 1.0);
             }
         }

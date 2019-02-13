@@ -823,7 +823,7 @@ inline Cmpt det(const TensorN<Cmpt, length>& t)
         }
 
         // Handle +/- sign switch
-        result += pow(-1, i)*t(i, 0)*det(subMatrix);
+        result += pow(label(-1), i)*t(i, 0)*det(subMatrix);
     }
 
     return result;
@@ -859,7 +859,7 @@ inline TensorN<Cmpt, length> inv(const TensorN<Cmpt, length>& t)
     Cmpt* __restrict__ destIter;
 
     // Lists used for bookkeeping on the pivoting
-    List<label> indexCol(length), indexRow(length), iPivot(length);
+    labelList indexCol(length), indexRow(length), iPivot(length);
 
     iPivot = 0;
 

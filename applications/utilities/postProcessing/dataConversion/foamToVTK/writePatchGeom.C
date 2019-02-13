@@ -64,7 +64,7 @@ void writePatchGeom
         << std::endl;
 
 
-    DynamicList<label> vertLabels(nFaceVerts);
+    dynamicLabelList vertLabels(nFaceVerts);
 
     forAll(faces, faceI)
     {

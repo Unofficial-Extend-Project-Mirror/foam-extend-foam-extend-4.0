@@ -78,6 +78,7 @@ Prefix: 		%{_prefix}
 Group: 			Development/Tools
 Patch0:                 ParMGridGen-1.0.patch_darwin
 Patch1:                 ParMGridGen-1.0.patch
+Patch2:                 ParMGridGen-1.0.patch_64Bit
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -92,6 +93,10 @@ Patch1:                 ParMGridGen-1.0.patch
 %else
 %patch1 -p1
 %endif
+
+if [ "$WM_LABEL_SIZE" = "64" ]; then
+%patch2 -p1
+fi
 
 %build
     [ -n "$WM_CC" ]         &&  export CC="$WM_CC"

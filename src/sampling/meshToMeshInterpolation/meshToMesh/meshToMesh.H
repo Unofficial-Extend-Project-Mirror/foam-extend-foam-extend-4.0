@@ -103,7 +103,7 @@ class meshToMesh
                 labelList& cells,
                 const pointField& points,
                 const fvMesh& fromMesh,
-                const List<bool>& boundaryCell,
+                const boolList& boundaryCell,
                 const octree<octreeDataCell>& oc,
                 bool forceFind = false
             ) const;

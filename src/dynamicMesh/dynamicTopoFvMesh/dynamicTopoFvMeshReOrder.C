@@ -1901,7 +1901,7 @@ void dynamicTopoFvMesh::threadedMeshReOrdering
     reOrderPtr[3].set(0, &cellZoneMap);
 
     // Set the thread scheduling sequence
-    labelList reOrderSeq(4, -1);
+    labelList reOrderSeq(4, label(-1));
 
     // Points, cells, faces and edges (in that order)
     reOrderSeq[0] = 0;

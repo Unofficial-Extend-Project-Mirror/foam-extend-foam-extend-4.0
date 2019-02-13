@@ -87,7 +87,7 @@ class DsmcCloud
         // The position of an entry in the list maps to the label identifying
         // the typeId, i.e. where typeIdList_ = (N2 O2 CO2)
         // N2 has typeId label = 0, O2 = 1, CO2 = 2.
-        List<word> typeIdList_;
+        wordList typeIdList_;
 
         //- Number of real atoms/molecules represented by a parcel
         scalar nParticle_;
@@ -239,7 +239,7 @@ public:
                 inline const IOdictionary& particleProperties() const;
 
                 //- Return the idList
-                inline const List<word>& typeIdList() const;
+                inline const wordList& typeIdList() const;
 
                 //- Return the number of real particles represented by one
                 //  parcel

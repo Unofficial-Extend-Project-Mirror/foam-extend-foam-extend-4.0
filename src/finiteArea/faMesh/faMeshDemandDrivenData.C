@@ -945,7 +945,7 @@ labelList faMesh::internalPoints() const
     const edgeList& edges = patch().edges();
     label nIntEdges = patch().nInternalEdges();
 
-    List<bool> internal (nPoints(), true);
+    boolList internal (nPoints(), true);
 
     for (label curEdge = nIntEdges; curEdge < edges.size(); curEdge++)
     {
@@ -981,7 +981,7 @@ labelList faMesh::boundaryPoints() const
     const edgeList& edges = patch().edges();
     label nIntEdges = patch().nInternalEdges();
 
-    List<bool> internal (nPoints(), true);
+    boolList internal (nPoints(), true);
 
     for (label curEdge = nIntEdges; curEdge < edges.size(); curEdge++)
     {

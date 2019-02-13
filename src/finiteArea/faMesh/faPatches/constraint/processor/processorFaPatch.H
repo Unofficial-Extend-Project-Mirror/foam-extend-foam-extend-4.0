@@ -211,7 +211,7 @@ public:
         // Communications support
 
             //- Return communicator used for communication
-            virtual label comm() const;
+            virtual int comm() const;
 
             //- Return message tag to use for communication
             virtual int tag() const;

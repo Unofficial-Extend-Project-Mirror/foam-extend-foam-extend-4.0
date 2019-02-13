@@ -43,6 +43,7 @@ SourceFiles
 #define RosinRammler_H
 
 #include "pdf.H"
+#include "scalarList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -65,9 +66,9 @@ class RosinRammler
         scalar minValue_;
         scalar maxValue_;
 
-        List<scalar> d_;
-        List<scalar> n_;
-        List<scalar> ls_;
+        scalarList d_;
+        scalarList n_;
+        scalarList ls_;
 
         scalar range_;
 

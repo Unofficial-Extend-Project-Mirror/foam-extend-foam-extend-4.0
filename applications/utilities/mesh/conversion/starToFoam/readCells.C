@@ -275,7 +275,7 @@ void starMesh::readCells()
     {
         IFstream cellsFile(cellsFileName);
 
-        labelList labels(24, -1);
+        labelList labels(24, label(-1));
         label lineLabel, starLabel, regionLabel, typeFlag;
 
         for (label cellI = 0; cellI < nCells; cellI++)

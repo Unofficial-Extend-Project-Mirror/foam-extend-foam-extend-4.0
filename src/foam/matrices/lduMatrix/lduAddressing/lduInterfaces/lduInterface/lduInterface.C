@@ -59,7 +59,7 @@ Foam::autoPtr<Foam::crMatrix> Foam::lduInterface::prolongationTransfer
     );
 
     // Dummy return to make the compiler happy
-    return autoPtr<crMatrix>(new crMatrix(1, 1, labelList(1, 0)));
+    return autoPtr<crMatrix>(NULL);
 }
 
 

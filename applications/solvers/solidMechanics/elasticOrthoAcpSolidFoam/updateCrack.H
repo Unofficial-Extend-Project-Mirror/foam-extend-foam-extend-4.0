@@ -60,7 +60,7 @@ nCoupledFacesToBreak = 0;
     }
 
     labelList facesToBreak(facesToBreakList);
-    List<scalar> facesToBreakEffTractionFraction
+    scalarList facesToBreakEffTractionFraction
     (
         facesToBreakEffTractionFractionList
     );
@@ -192,7 +192,7 @@ nCoupledFacesToBreak = 0;
     }
 
     labelList coupledFacesToBreak(coupledFacesToBreakList);
-    List<scalar> coupledFacesToBreakEffTractionFraction
+    scalarList coupledFacesToBreakEffTractionFraction
     (
         coupledFacesToBreakEffTractionFractionList
     );

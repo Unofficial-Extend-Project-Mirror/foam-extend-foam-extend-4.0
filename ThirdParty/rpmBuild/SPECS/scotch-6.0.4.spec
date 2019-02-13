@@ -77,6 +77,7 @@ Prefix: 		%{_prefix}
 Group: 			Development/Tools
 Patch0:         scotch-6.0.4_patch_0
 Patch1:         scotch-6.0.4_patch_darwin
+Patch2:         scotch-6.0.4_patch_64Bit
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -91,6 +92,10 @@ Patch1:         scotch-6.0.4_patch_darwin
 %else
 %patch0 -p1
 %endif
+
+if [ "$WM_LABEL_SIZE" = "64" ]; then
+%patch2 -p1
+fi
 
 %build
     # export WM settings in a form that GNU configure recognizes

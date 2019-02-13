@@ -91,7 +91,7 @@ void dynamicTopoFvMesh::computeMapping
         if (skipMapping)
         {
             // Dummy map from cell[0]
-            masterObjects = labelList(1, 0);
+            masterObjects = labelList(1, label(0));
             cellWeights_[cellI].setSize(1, 1.0);
             cellCentres_[cellI].setSize(1, vector::zero);
         }
@@ -248,7 +248,7 @@ void dynamicTopoFvMesh::computeMapping
         {
             // Set dummy masters, so that the conventional
             // faceMapper doesn't crash-and-burn
-            masterObjects = labelList(1, 0);
+            masterObjects = labelList(1, label(0));
 
             continue;
         }
@@ -256,7 +256,7 @@ void dynamicTopoFvMesh::computeMapping
         if (skipMapping)
         {
             // Dummy map from patch[0]
-            masterObjects = labelList(1, 0);
+            masterObjects = labelList(1, label(0));
             faceWeights_[faceI].setSize(1, 1.0);
             faceCentres_[faceI].setSize(1, vector::zero);
         }

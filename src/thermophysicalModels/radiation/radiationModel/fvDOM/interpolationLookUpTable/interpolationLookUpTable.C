@@ -30,7 +30,7 @@ License
 template <class Type>
 Foam::label Foam::interpolationLookUpTable<Type>::index
 (
-    const List<scalar>& indices,
+    const scalarList& indices,
     const bool lastDim
 ) const
 {

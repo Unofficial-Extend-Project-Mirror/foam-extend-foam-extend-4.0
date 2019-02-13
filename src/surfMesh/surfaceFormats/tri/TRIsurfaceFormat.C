@@ -85,8 +85,8 @@ bool Foam::fileFormats::TRIsurfaceFormat<Face>::read
     this->storedPoints().transfer(reader.points());
 
     // retrieve the original zone information
-    List<label> sizes(reader.sizes().xfer());
-    List<label> zoneIds(reader.zoneIds().xfer());
+    labelList sizes(reader.sizes().xfer());
+    labelList zoneIds(reader.zoneIds().xfer());
 
     // generate the (sorted) faces
     List<Face> faceLst(zoneIds.size());
@@ -104,7 +104,7 @@ bool Foam::fileFormats::TRIsurfaceFormat<Face>::read
     {
         // unsorted - determine the sorted order:
         // avoid SortableList since we discard the main list anyhow
-        List<label> faceMap;
+        labelList faceMap;
         sortedOrder(zoneIds, faceMap);
 
         // generate sorted faces
@@ -134,7 +134,7 @@ void Foam::fileFormats::TRIsurfaceFormat<Face>::write
 {
     const pointField& pointLst = surf.points();
     const List<Face>&  faceLst = surf.faces();
-    const List<label>& faceMap = surf.faceMap();
+    const labelList& faceMap = surf.faceMap();
 
     const List<surfZone>& zones =
     (
@@ -208,7 +208,7 @@ void Foam::fileFormats::TRIsurfaceFormat<Face>::write
     // a single zone needs no sorting
     if (surf.zoneToc().size() == 1)
     {
-        const List<label>& zoneIds  = surf.zoneIds();
+        const labelList& zoneIds  = surf.zoneIds();
 
         forAll(faceLst, faceI)
         {

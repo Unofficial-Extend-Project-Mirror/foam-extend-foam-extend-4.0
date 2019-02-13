@@ -103,7 +103,7 @@ reconstructIb
     Field<SymmTensor<scalar> > surfaceSumSqrSfIn = surfaceSumSqrSf.internalField();
 
     // Keep treck of the zero determinant cells
-    DynamicList<label> openCells(20);
+    dynamicLabelList openCells(20);
 
     // Check for zero determinant
     forAll(surfaceSumSqrSfIn, cellI)

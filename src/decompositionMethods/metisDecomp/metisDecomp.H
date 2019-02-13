@@ -63,10 +63,10 @@ class metisDecomp
 
         label decompose
         (
-            const List<int>& adjncy,
-            const List<int>& xadj,
+            const labelList& adjncy,
+            const labelList& xadj,
             const scalarField& cellWeights,
-            List<int>& finalDecomp
+            labelList& finalDecomp
         );
 
 

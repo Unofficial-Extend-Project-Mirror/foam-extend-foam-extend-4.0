@@ -24,7 +24,7 @@
                     movingPointsMaskTop(valveI);
 
                 {
-                    List<bool> valveTopPoint(newPoints.size(), false);
+                    boolList valveTopPoint(newPoints.size(), false);
 
                     label valveTopPtsIndex =
                         pointZones().findZoneID("movingPointsTopZoneV"

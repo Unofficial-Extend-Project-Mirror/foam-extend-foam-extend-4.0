@@ -47,11 +47,11 @@ void Foam::moleculeCloud::buildConstProps()
 {
     Info<< nl << "Reading moleculeProperties dictionary." << endl;
 
-    const List<word>& idList(pot_.idList());
+    const wordList& idList(pot_.idList());
 
     constPropList_.setSize(idList.size());
 
-    const List<word>& siteIdList(pot_.siteIdList());
+    const wordList& siteIdList(pot_.siteIdList());
 
     IOdictionary moleculePropertiesDict
     (
@@ -72,9 +72,9 @@ void Foam::moleculeCloud::buildConstProps()
 
         const dictionary& molDict(moleculePropertiesDict.subDict(id));
 
-        List<word> siteIdNames = molDict.lookup("siteIds");
+        wordList siteIdNames = molDict.lookup("siteIds");
 
-        List<label> siteIds(siteIdNames.size());
+        labelList siteIds(siteIdNames.size());
 
         forAll(siteIdNames, sI)
         {
@@ -196,7 +196,7 @@ void Foam::moleculeCloud::calculatePairForce()
 
         forAll(ril, r)
         {
-            const List<label>& realCells = ril[r].realCellsForInteraction();
+            const labelList& realCells = ril[r].realCellsForInteraction();
 
             forAll(ril[r], refMols)
             {
@@ -515,7 +515,7 @@ void Foam::moleculeCloud::initialiseMolecules
 
                 const vector bulkVelocity(zoneDict.lookup("bulkVelocity"));
 
-                List<word> latticeIds
+                wordList latticeIds
                 (
                     zoneDict.lookup("latticeIds")
                 );
@@ -613,7 +613,7 @@ void Foam::moleculeCloud::initialiseMolecules
                 {
                     tethered = bool
                     (
-                        List<word>(zoneDict.lookup("tetherSiteIds")).size()
+                        wordList(zoneDict.lookup("tetherSiteIds")).size()
                     );
                 }
 

@@ -154,7 +154,7 @@ void Foam::mgMeshLevel::makeChild() const
     );
 
     // MGridGen agglomeration options.
-    List<int> options(4, 0);
+    List<int> options(4);
     options[0] = 4;                   // globular agglom
     options[1] = 6;                   // objective F3 and F2
     options[2] = 128;                 // debugging output level

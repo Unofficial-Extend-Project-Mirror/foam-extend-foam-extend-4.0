@@ -707,7 +707,7 @@ void Foam::combineFaces::setRefinement
         mesh_,
         nPointFaces,
         plusEqOp<label>(),
-        0,                  // null value
+        label(0),           // null value
         false               // no separation
     );
 

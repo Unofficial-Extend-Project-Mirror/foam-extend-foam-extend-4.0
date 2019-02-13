@@ -1379,7 +1379,7 @@ void Foam::directTopoChange::calcCellInflationMaps
     {
         label nCellsFromFaces = 0;
 
-        labelList cellsAroundFace(2, -1);
+        labelList cellsAroundFace(2, label(-1));
 
         // Collect all still existing faces connected to this point.
         forAllConstIter(Map<label>, cellFromFace_, iter)

@@ -403,7 +403,7 @@ void faceSetAlgorithm::writeVTK
         List<edge>(0),
         allTris,
         List<cell>(0),
-        List<label>(0)
+        labelList(0)
     );
 }
 

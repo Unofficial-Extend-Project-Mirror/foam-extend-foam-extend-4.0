@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
     {
         label curMeshEdge = meshEdges[edgeI];
 
-        labelList curEdgePatchIDs(2, -1);
+        labelList curEdgePatchIDs(2, label(-1));
 
         label patchI = -1;
 

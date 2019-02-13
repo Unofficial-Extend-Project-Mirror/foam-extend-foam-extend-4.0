@@ -1279,7 +1279,7 @@ template <class Type>
 void Foam::treeNode<Type>::writeOBJ
 (
     Ostream& os,
-    const label level,
+    const int level,
     label& vertNo
 ) const
 {

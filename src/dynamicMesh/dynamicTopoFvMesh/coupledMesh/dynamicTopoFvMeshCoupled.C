@@ -2406,7 +2406,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                                 (
                                     pointJ,
                                     meshJ.oldPoints_[pItJ.key()],
-                                    labelList(1, -1)
+                                    labelList(1, label(-1))
                                 )
                             );
 
@@ -2500,7 +2500,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                 (
                     pointI,
                     meshI.oldPoints_[pItI.key()],
-                    labelList(1, -1)
+                    labelList(1, label(-1))
                 )
             );
 
@@ -3053,7 +3053,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                 //  - Set an invalid number so that
                 //    an entry is made in facesFromFaces,
                 //    while faceParents is empty.
-                setFaceMapping(fI(), labelList(1, -1));
+                setFaceMapping(fI(), labelList(1, label(-1)));
             }
             else
             {

@@ -65,7 +65,7 @@ class IPstream
         const label comm_;
 
         //- Message size
-        label messageSize_;
+        int messageSize_;
 
 
     // Private member functions

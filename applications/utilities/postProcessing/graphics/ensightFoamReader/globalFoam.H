@@ -43,9 +43,9 @@ static fileName caseDir;
 
 static instantList timeDirs;
 
-static List<word> fieldNames;
-static List<word> lagrangianScalarNames;
-static List<word> lagrangianVectorNames;
+static wordList fieldNames;
+static wordList lagrangianScalarNames;
+static wordList lagrangianVectorNames;
 static label var2field[maxNames];
 
 static Time *runTimePtr = 0;

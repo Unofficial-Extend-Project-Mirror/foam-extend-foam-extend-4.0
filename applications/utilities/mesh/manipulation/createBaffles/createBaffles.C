@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
     fZone.checkParallelSync(true);
 
     // Patches to put baffles into
-    DynamicList<label> newPatches(1);
+    dynamicLabelList newPatches(1);
 
     word patchName(args.additionalArgs()[1]);
     newPatches.append(findPatchID(mesh, patchName));

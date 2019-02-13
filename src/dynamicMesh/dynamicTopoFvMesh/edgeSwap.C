@@ -717,7 +717,7 @@ const changeMap dynamicTopoFvMesh::swapQuadFace
         // Write out VTK files before change
         if (debug > 3)
         {
-            labelList cellHull(2, -1);
+            labelList cellHull(2, label(-1));
 
             cellHull[0] = c0;
             cellHull[1] = c1;
@@ -1041,7 +1041,7 @@ const changeMap dynamicTopoFvMesh::swapQuadFace
     edges_[commonEdgeIndex[1]] = newEdges[1];
 
     // Fill-in mapping information
-    labelList mC(2, -1);
+    labelList mC(2, label(-1));
     mC[0] = c0; mC[1] = c1;
 
     forAll(mC, cellI)
@@ -1056,7 +1056,7 @@ const changeMap dynamicTopoFvMesh::swapQuadFace
     // Write out VTK files after change
     if (debug > 3)
     {
-        labelList cellHull(2, -1);
+        labelList cellHull(2, label(-1));
 
         cellHull[0] = c0;
         cellHull[1] = c1;
@@ -3080,7 +3080,7 @@ const changeMap dynamicTopoFvMesh::swap32
             newTriFace,
             newCellIndex[0],
             newCellIndex[1],
-            labelList(3, -1)
+            labelList(3, label(-1))
         )
     );
 
@@ -3099,8 +3099,8 @@ const changeMap dynamicTopoFvMesh::swap32
 
     // For 2-2 swaps, two faces are introduced
     label nE = 0, nBf = 0;
-    FixedList<label,2> nBE(0);
-    FixedList<labelList,2> bdyFaceEdges(labelList(3, -1));
+    FixedList<label,2> nBE(label(0));
+    FixedList<labelList,2> bdyFaceEdges(labelList(3, label(-1)));
 
     // Fill-in information for the two new cells,
     // and correct info on existing neighbouring cells
@@ -3111,14 +3111,14 @@ const changeMap dynamicTopoFvMesh::swap32
     // For a 2-2 swap on a boundary edge,
     // add two boundary faces and an edge
     label newEdgeIndex = -1;
-    labelList oldBdyFaceIndex(2, -1), newBdyFaceIndex(2, -1);
+    labelList oldBdyFaceIndex(2, label(-1)), newBdyFaceIndex(2, label(-1));
 
     if (edgePatch > -1)
     {
         // Temporary local variables
         label facePatch = -1;
         edge newEdge(-1, -1);
-        FixedList<label,2> nBEdge(0);
+        FixedList<label,2> nBEdge(label(0));
         FixedList<FixedList<label,2>,2> bdyEdges;
         FixedList<face,2> newBdyTriFace(face(3));
 
@@ -3204,7 +3204,7 @@ const changeMap dynamicTopoFvMesh::swap32
                 newBdyTriFace[0],
                 newCellIndex[1],
                 -1,
-                labelList(3, -1)
+                labelList(3, label(-1))
             )
         );
 
@@ -3220,7 +3220,7 @@ const changeMap dynamicTopoFvMesh::swap32
                 newBdyTriFace[1],
                 newCellIndex[0],
                 -1,
-                labelList(3, -1)
+                labelList(3, label(-1))
             )
         );
 
@@ -3232,7 +3232,7 @@ const changeMap dynamicTopoFvMesh::swap32
         newTetCell[1][nF1++] = newBdyFaceIndex[0];
 
         // Add an edgeFaces entry
-        labelList newBdyEdgeFaces(3, -1);
+        labelList newBdyEdgeFaces(3, label(-1));
         newBdyEdgeFaces[0] = newBdyFaceIndex[0];
         newBdyEdgeFaces[1] = newFaceIndex;
         newBdyEdgeFaces[2] = newBdyFaceIndex[1];

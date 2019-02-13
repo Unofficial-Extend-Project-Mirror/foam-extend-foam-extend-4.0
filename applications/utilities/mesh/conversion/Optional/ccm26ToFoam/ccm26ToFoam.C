@@ -131,7 +131,7 @@ void storeCellInZone
     const label cellI,
     const label cellType,
     Map<label>& typeToZone,
-    List<DynamicList<label> >& zoneCells
+    List<dynamicLabelList >& zoneCells
 )
 {
     if (cellType >= 0)
@@ -389,8 +389,8 @@ void ReadCells
     labelList& foamCellMap,
     labelList& foamCellType,
     Map<label>& prostarToFoamPatch,
-    DynamicList<label>& foamPatchSizes,
-    DynamicList<label>& foamPatchStarts,
+    dynamicLabelList& foamPatchSizes,
+    dynamicLabelList& foamPatchStarts,
     labelList& foamFaceMap,
     labelList& foamOwner,
     labelList& foamNeighbour,
@@ -599,8 +599,8 @@ int main(int argc, char *argv[])
 
     // Patching info
     Map<label> prostarToFoamPatch;
-    DynamicList<label> foamPatchSizes;
-    DynamicList<label> foamPatchStarts;
+    dynamicLabelList foamPatchSizes;
+    dynamicLabelList foamPatchStarts;
     // Face connectivity
     labelList foamFaceMap;
     labelList foamOwner;
@@ -1008,7 +1008,7 @@ int main(int argc, char *argv[])
         // From foamCellType physical region to Foam cellZone
         Map<label> typeToZone;
         // Storage for cell zones.
-        List<DynamicList<label> > zoneCells(0);
+        List<dynamicLabelList > zoneCells(0);
 
         forAll(foamCellType, cellI)
         {

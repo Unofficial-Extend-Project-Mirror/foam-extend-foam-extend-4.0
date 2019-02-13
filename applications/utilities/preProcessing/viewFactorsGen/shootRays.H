@@ -11,8 +11,8 @@ for (label procI = 0; procI < Pstream::nProcs(); procI++)
 
     DynamicField<point> start(coarseMesh.nFaces());
     DynamicField<point> end(start.size());
-    DynamicList<label> startIndex(start.size());
-    DynamicList<label> endIndex(start.size());
+    dynamicLabelList startIndex(start.size());
+    dynamicLabelList endIndex(start.size());
 
     const pointField& myFc = remoteCoarseCf[Pstream::myProcNo()];
     const vectorField& myArea = remoteCoarseSf[Pstream::myProcNo()];

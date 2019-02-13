@@ -55,7 +55,7 @@ Foam::radiation::wideBandAbsorptionEmission::wideBandAbsorptionEmission
     absorptionEmissionModel(dict, mesh),
     coeffsDict_((dict.subDict(typeName + "Coeffs"))),
     speciesNames_(0),
-    specieIndex_(0),
+    specieIndex_(label(0)),
     lookUpTable_
     (
         fileName(coeffsDict_.lookup("lookUpTableFileName")),
@@ -187,7 +187,7 @@ Foam::radiation::wideBandAbsorptionEmission::aCont(const label bandI) const
 
     forAll(a, i)
     {
-        const List<scalar>& species = lookUpTable_.lookUp(ft[i]);
+        const scalarList& species = lookUpTable_.lookUp(ft[i]);
 
         for (label n=0; n<nSpecies; n++)
         {

@@ -219,7 +219,7 @@ void Foam::fileFormats::OBJsurfaceFormat<Face>::write
 {
     const pointField& pointLst = surf.points();
     const List<Face>&  faceLst = surf.faces();
-    const List<label>& faceMap = surf.faceMap();
+    const labelList& faceMap = surf.faceMap();
 
     // for no zones, suppress the group name
     const List<surfZone>& zones =

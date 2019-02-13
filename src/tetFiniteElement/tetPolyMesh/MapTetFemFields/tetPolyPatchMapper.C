@@ -142,7 +142,7 @@ void Foam::tetPolyPatchMapper::calcAddressing() const
             }
             else
             {
-                addr[nAddr] = labelList(1, 0);
+                addr[nAddr] = labelList(1, label(0));
             }
 
             w[nAddr] = scalarList(1, 1.0);

@@ -151,7 +151,7 @@ Foam::fieldviewTopology::fieldviewTopology
     const cellModel& hex = *(cellModeller::lookup("hex"));
 
     // Pre calculate headers for cells not on walls
-    labelList notWallFlags(6, NOT_A_WALL);
+    List<int> notWallFlags(6, NOT_A_WALL);
     label tetNotWall = fv_encode_elem_header
     (
         FV_TET_ELEM_ID, notWallFlags.begin()
@@ -181,7 +181,7 @@ Foam::fieldviewTopology::fieldviewTopology
 
     const faceList& allFaces = mesh.faces();
 
-    labelList wallFlags(6);
+    List<int> wallFlags(6);
     forAll(cellShapes, celli)
     {
         const cellShape& cellShape = cellShapes[celli];

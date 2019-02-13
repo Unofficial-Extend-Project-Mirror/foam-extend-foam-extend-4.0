@@ -67,7 +67,7 @@ void Foam::IOdictionary::readFile(const bool masterOnly)
 
         const List<Pstream::commsStruct>& comms =
         (
-            (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+            (Pstream::nProcs() < Pstream::nProcsSimpleSum())
           ? Pstream::linearCommunication()
           : Pstream::treeCommunication()
         );

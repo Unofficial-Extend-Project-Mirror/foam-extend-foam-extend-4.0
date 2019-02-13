@@ -248,7 +248,7 @@ void Foam::ensightParts::writeData(Ostream& os) const
 void Foam::ensightParts::writeScalarField
 (
     ensightFile& os,
-    const List<scalar>& field,
+    const scalarList& field,
     bool useFaceData
 ) const
 {
@@ -270,9 +270,9 @@ void Foam::ensightParts::writeScalarField
 void Foam::ensightParts::writeVectorField
 (
     ensightFile& os,
-    const List<scalar>& field0,
-    const List<scalar>& field1,
-    const List<scalar>& field2,
+    const scalarList& field0,
+    const scalarList& field1,
+    const scalarList& field2,
     bool useFaceData
 ) const
 {

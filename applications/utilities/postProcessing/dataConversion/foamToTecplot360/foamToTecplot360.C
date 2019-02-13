@@ -125,7 +125,7 @@ labelList getSelectedPatches
     const List<wordRe>& excludePatches  //HashSet<word>& excludePatches
 )
 {
-    DynamicList<label> patchIDs(patches.size());
+    dynamicLabelList patchIDs(patches.size());
 
     Info<< "Combining patches:" << endl;
 

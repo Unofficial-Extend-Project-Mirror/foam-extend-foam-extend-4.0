@@ -56,7 +56,7 @@ string getLine(std::ifstream& is)
 // Read space-separated vertices (with optional '/' arguments)
 labelList parseVertices(const string& line)
 {
-    DynamicList<label> verts;
+    dynamicLabelList verts;
 
     // Assume 'l' is followed by space.
     string::size_type endNum = 1;

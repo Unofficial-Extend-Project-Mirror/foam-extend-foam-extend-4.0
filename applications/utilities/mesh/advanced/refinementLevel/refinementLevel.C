@@ -117,14 +117,14 @@ int main(int argc, char *argv[])
     SortableList<scalar> sortedVols(vols);
 
     // All cell labels, sorted per bin.
-    DynamicList<DynamicList<label> > bins;
+    DynamicList<dynamicLabelList > bins;
 
     // Lower/upper limits
     DynamicList<scalar> lowerLimits;
     DynamicList<scalar> upperLimits;
 
     // Create bin0. Have upperlimit as factor times lowerlimit.
-    bins.append(DynamicList<label>());
+    bins.append(dynamicLabelList());
     lowerLimits.append(sortedVols[0]);
     upperLimits.append(1.1*lowerLimits[lowerLimits.size()-1]);
 
@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
             // New value outside of current bin
 
             // Shrink old bin.
-            DynamicList<label>& bin = bins[bins.size()-1];
+            dynamicLabelList& bin = bins[bins.size()-1];
 
             bin.shrink();
 
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
                 << upperLimits[upperLimits.size()-1] << endl;
 
             // Create new bin.
-            bins.append(DynamicList<label>());
+            bins.append(dynamicLabelList());
             lowerLimits.append(sortedVols[i]);
             upperLimits.append(1.1*lowerLimits[lowerLimits.size()-1]);
 
@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
         }
 
         // Append to current bin.
-        DynamicList<label>& bin = bins[bins.size()-1];
+        dynamicLabelList& bin = bins[bins.size()-1];
 
         bin.append(sortedVols.indices()[i]);
     }
@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
     Info<< "Volume bins:" << nl;
     forAll(bins, binI)
     {
-        const DynamicList<label>& bin = bins[binI];
+        const dynamicLabelList& bin = bins[binI];
 
         cellSet cells(mesh, "vol" + name(binI), bin.size());
 
@@ -280,7 +280,7 @@ int main(int argc, char *argv[])
     // Set cell values
     forAll(bins, binI)
     {
-        const DynamicList<label>& bin = bins[binI];
+        const dynamicLabelList& bin = bins[binI];
 
         forAll(bin, i)
         {

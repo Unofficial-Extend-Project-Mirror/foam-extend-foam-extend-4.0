@@ -74,7 +74,7 @@ class pairPotentialList
 
         void readPairPotentialDict
         (
-            const List<word>& idList,
+            const wordList& idList,
             const dictionary& pairPotentialDict,
             const polyMesh& mesh
         );
@@ -95,7 +95,7 @@ public:
         //- Construct from idList and potental dictionaries
         pairPotentialList
         (
-            const List<word>& idList,
+            const wordList& idList,
             const dictionary& pairPotentialDict,
             const polyMesh& mesh
         );
@@ -110,7 +110,7 @@ public:
 
         void buildPotentials
         (
-            const List<word>& idList,
+            const wordList& idList,
             const dictionary& pairPotentialDict,
             const polyMesh& mesh
         );

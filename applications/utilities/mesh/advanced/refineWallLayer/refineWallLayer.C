@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
 
     // Mark cut edges.
 
-    DynamicList<label> allCutEdges(pp.nEdges());
+    dynamicLabelList allCutEdges(pp.nEdges());
 
     DynamicList<scalar> allCutEdgeWeights(pp.nEdges());
 

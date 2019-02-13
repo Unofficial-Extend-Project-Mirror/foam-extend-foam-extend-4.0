@@ -367,7 +367,7 @@ Foam::faMesh::faMesh
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        List<label>(0)
+        labelList(0)
     ),
     boundary_
     (
@@ -521,7 +521,7 @@ Foam::faMesh::faMesh
     {
         label curMeshEdge = meshEdges[edgeI];
 
-        labelList curEdgePatchIDs(2, -1);
+        labelList curEdgePatchIDs(2, label(-1));
 
         label patchI = -1;
 
@@ -1054,13 +1054,13 @@ void Foam::faMesh::addFaPatches(const List<faPatch*>& p)
 }
 
 
-Foam::label Foam::faMesh::comm() const
+int Foam::faMesh::comm() const
 {
     return comm_;
 }
 
 
-Foam::label& Foam::faMesh::comm()
+int& Foam::faMesh::comm()
 {
     return comm_;
 }

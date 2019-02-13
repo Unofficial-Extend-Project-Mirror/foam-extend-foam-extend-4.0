@@ -83,7 +83,7 @@ class searchableSurfacesQueries
             const labelList& surfacesToTest,
             const scalar initialDistSqr,
             List<vector>& p,
-            List<scalar>& y,
+            scalarList& y,
             vector& pSum,
             const label ihi,
             const scalar fac
@@ -101,7 +101,7 @@ class searchableSurfacesQueries
             const scalar convergenceDistSqr,
             const label maxIter,
             List<vector>& p,
-            List<scalar>& y
+            scalarList& y
         );
 
         //static void findAllIntersections

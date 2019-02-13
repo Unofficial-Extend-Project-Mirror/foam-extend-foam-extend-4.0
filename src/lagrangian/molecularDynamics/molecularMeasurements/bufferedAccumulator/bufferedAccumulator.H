@@ -66,7 +66,7 @@ class bufferedAccumulator
 
         label averagesTaken_;
 
-        List<label> bufferOffsets_;
+        labelList bufferOffsets_;
 
 
     // Private Member Functions
@@ -128,7 +128,7 @@ public:
 
             inline label bufferLength() const;
 
-            inline const List<label>& bufferOffsets() const;
+            inline const labelList& bufferOffsets() const;
 
 
         // Edit

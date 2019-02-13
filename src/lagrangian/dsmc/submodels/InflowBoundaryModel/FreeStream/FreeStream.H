@@ -57,7 +57,7 @@ class FreeStream
         labelList patches_;
 
         //- The molecule types to be introduced
-        List<label> moleculeTypeIds_;
+        labelList moleculeTypeIds_;
 
         //- The number density of the species in the inflow
         Field<scalar> numberDensities_;

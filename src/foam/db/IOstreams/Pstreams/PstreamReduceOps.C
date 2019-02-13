@@ -404,7 +404,7 @@ void Foam::reduce
 
 void Foam::reduce
 (
-    List<label>& Value,
+    labelList& Value,
     const minOp<List<label> >& bop,
     const int tag,
     const label comm
@@ -431,7 +431,7 @@ void Foam::reduce
         (
             "void Foam::reduce\n"
             "(\n"
-            "    List<label>& Value,\n"
+            "    labelList& Value,\n"
             "    const minOp<List<label> >& bop,\n"
             "    const int tag,\n"
             "    const label comm\n"
@@ -462,7 +462,7 @@ void Foam::reduce
 
 void Foam::reduce
 (
-    List<label>& Value,
+    labelList& Value,
     const maxOp<List<label> >& bop,
     const int tag,
     const label comm
@@ -489,7 +489,7 @@ void Foam::reduce
         (
             "void Foam::reduce\n"
             "(\n"
-            "    List<label>& Value,\n"
+            "    labelList& Value,\n"
             "    const maxOp<List<label> >& bop,\n"
             "    const int tag,\n"
             "    const label comm\n"
@@ -520,7 +520,7 @@ void Foam::reduce
 
 void Foam::reduce
 (
-    List<label>& Value,
+    labelList& Value,
     const sumOp<List<label> >& bop,
     const int tag,
     const label comm
@@ -547,7 +547,7 @@ void Foam::reduce
         (
             "void Foam::reduce\n"
             "(\n"
-            "    List<label>& Value,\n"
+            "    labelList& Value,\n"
             "    const sumOp<List<label> >& bop,\n"
             "    const int tag,\n"
             "    const label comm\n"

@@ -467,7 +467,7 @@ inline void zipOpenChain(DynList<edge>& bEdges)
 {
     //- close the chain if open
     DynList<label> chainVertices;
-    List<label> nAppearances;
+    labelList nAppearances;
     forAll(bEdges, eI)
     {
         const edge& e = bEdges[eI];
@@ -488,7 +488,7 @@ inline void zipOpenChain(DynList<edge>& bEdges)
     }
 
     bool closed(true);
-    DynList<label> openVertices(2);
+    DynList<label> openVertices(label(2));
     forAll(chainVertices, pI)
         if( nAppearances[pI] == 1 )
         {
