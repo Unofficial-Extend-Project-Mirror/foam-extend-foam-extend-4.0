@@ -140,4 +140,12 @@ bool Foam::postfixedSubRegistry::checkOut(regIOobject& io) const
 }
 
 
+bool Foam::postfixedSubRegistry::found(const word& objName) const
+{
+    word demangledName = objName;
+    demangledName = demangledName(objName.size() - name().size());
+    return HashTable<regIOobject*>::found(demangledName);
+}
+
+
 // ************************************************************************* //

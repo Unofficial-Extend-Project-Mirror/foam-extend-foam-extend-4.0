@@ -187,6 +187,9 @@ public:
             template<class Type>
             HashTable<Type*> lookupClass(const bool strict = false);
 
+            //- Is the object with name found?
+            virtual bool found(const word& name) const;
+
             //- Is the named Type found?
             template<class Type>
             bool foundObject(const word& name) const;

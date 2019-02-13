@@ -67,7 +67,7 @@ Foam::Ostream& Foam::operator<<
             // Write end delimiter
             os << token::END_BLOCK;
         }
-        else if (L.size() < 11 && contiguous<T>())
+        else if (L.size() <= 1 || (L.size() < 11 && contiguous<T>()))
         {
             // Write size and start delimiter
             os << L.size() << token::BEGIN_LIST;
