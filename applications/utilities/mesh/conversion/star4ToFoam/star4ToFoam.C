@@ -68,7 +68,6 @@ int main(int argc, char *argv[])
 
     argList args(argc, argv);
     Time runTime(args.rootPath(), args.caseName());
-    stringList const& params = args.additionalArgs();
 
     // default rescale from [mm] to [m]
     scalar scaleFactor = 0.001;
@@ -97,7 +96,7 @@ int main(int argc, char *argv[])
     IOstream::defaultPrecision(10);
 
     // remove extensions and/or trailing '.'
-    fileName prefix = fileName(params[0]).lessExt();
+    fileName prefix = fileName(args.additionalArgs()[0]).lessExt();
 
     meshReaders::STARCD reader(prefix, runTime, scaleFactor);
 

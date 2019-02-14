@@ -83,13 +83,12 @@ int main(int argc, char *argv[])
     argList::validOptions.insert("unsorted", "");
     argList::validOptions.insert("triFace", "");
 #   include "setRootCase.H"
-    const stringList& params = args.additionalArgs();
 
     scalar scaleFactor = 0;
     args.optionReadIfPresent("scale", scaleFactor);
 
-    fileName importName(params[0]);
-    fileName exportName(params[1]);
+    fileName importName(args.additionalArgs()[0]);
+    fileName exportName(args.additionalArgs()[1]);
 
     if (importName == exportName)
     {

@@ -85,9 +85,8 @@ int main(int argc, char *argv[])
 
     argList args(argc, argv);
     Time runTime(args.rootPath(), args.caseName());
-    const stringList& params = args.additionalArgs();
 
-    fileName exportName(params[0]);
+    fileName exportName(args.additionalArgs()[0]);
     word importName("default");
     args.optionReadIfPresent("name", importName);
 

@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
     argList::validOptions.insert("group", "");
 
     argList args(argc, argv);
-    const stringList& params = args.additionalArgs();
+    const stringList params = args.additionalArgs();
 
     fileName importName(params[0]);
     fileName exportName(params[1]);

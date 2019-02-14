@@ -81,10 +81,9 @@ int main(int argc, char *argv[])
 
     argList args(argc, argv);
     Time runTime(args.rootPath(), args.caseName());
-    const stringList& params = args.additionalArgs();
 
-    fileName importName(params[0]);
-    fileName exportName(params[1]);
+    fileName importName(args.additionalArgs()[0]);
+    fileName exportName(args.additionalArgs()[1]);
 
     // disable inplace editing
     if (importName == exportName)
