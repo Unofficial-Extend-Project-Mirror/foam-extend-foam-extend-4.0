@@ -57,7 +57,6 @@ namespace Foam
 class mapPolyMesh;
 
 // Forward declaration of friend functions and operators
-
 class faceZone;
 
 Ostream& operator<<(Ostream&, const faceZone&);

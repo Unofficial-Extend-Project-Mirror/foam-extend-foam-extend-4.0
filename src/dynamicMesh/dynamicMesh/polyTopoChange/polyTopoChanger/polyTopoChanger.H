@@ -50,7 +50,6 @@ class mapPolyMesh;
 class polyBoundaryMesh;
 
 // Forward declaration of friend functions and operators
-
 class polyTopoChanger;
 
 Ostream& operator<<(Ostream&, const polyTopoChanger&);

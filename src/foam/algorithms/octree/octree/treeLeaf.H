@@ -57,7 +57,6 @@ class Ostream;
 template<class Type> class octree;
 
 // Forward declaration of friend functions and operators
-
 template<class Type> class treeLeaf;
 
 template<class Type> Istream& operator>>(Istream&, treeLeaf<Type>&);

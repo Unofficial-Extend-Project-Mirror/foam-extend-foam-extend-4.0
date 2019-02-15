@@ -50,7 +50,6 @@ namespace Foam
 // Forward declaration of friend functions and operators
 
 Ostream& operator<<(Ostream&, const CoeffField<symmTensor>&);
-
 Ostream& operator<<(Ostream&, const tmp<CoeffField<symmTensor> >&);
 
 

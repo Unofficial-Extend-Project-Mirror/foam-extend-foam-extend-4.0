@@ -147,7 +147,6 @@ namespace Foam
 class boundBox;
 
 // Forward declaration of friend functions and operators
-
 class coordinateSystem;
 
 bool operator!=(const coordinateSystem&, const coordinateSystem&);

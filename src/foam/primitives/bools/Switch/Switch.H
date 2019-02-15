@@ -49,7 +49,6 @@ namespace Foam
 class dictionary;
 
 // Forward declaration of friend functions and operators
-
 class Switch;
 
 Istream& operator>>(Istream&, Switch&);

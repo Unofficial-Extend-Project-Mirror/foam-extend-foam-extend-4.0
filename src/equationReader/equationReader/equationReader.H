@@ -113,7 +113,6 @@ class equationOperation;
 
 // Forward declaration of friend functions and operators
 // *** Located in equationReaderIO.C ***
-
 class equationReader;
 
 Istream& operator>>(Istream&, equationReader&);

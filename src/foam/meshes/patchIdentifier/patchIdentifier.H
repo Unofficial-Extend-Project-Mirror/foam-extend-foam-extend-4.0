@@ -47,7 +47,6 @@ namespace Foam
 class dictionary;
 
 // Forward declaration of friend functions and operators
-
 class patchIdentifier;
 
 Ostream& operator<<(Ostream&, const patchIdentifier&);

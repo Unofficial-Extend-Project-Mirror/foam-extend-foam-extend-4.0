@@ -53,6 +53,7 @@ namespace Foam
 
 // Forward declaration of friend functions and operators
 class dictionaryEntry;
+
 Ostream& operator<<(Ostream&, const dictionaryEntry&);
 
 

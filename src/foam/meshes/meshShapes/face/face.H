@@ -64,7 +64,6 @@ template<class T, unsigned SizeInc, unsigned SizeMult, unsigned SizeDiv>
 class DynamicList;
 
 // Forward declaration of friend functions and operators
-
 class face;
 
 inline bool operator==(const face& a, const face& b);

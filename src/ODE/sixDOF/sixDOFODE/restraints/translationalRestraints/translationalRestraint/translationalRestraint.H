@@ -58,7 +58,6 @@ namespace Foam
 class sixDOFODE;
 
 // Forward declaration of friend functions and operators
-
 class translationalRestraint;
 
 Ostream& operator<<(Ostream&, const translationalRestraint&);

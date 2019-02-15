@@ -90,7 +90,6 @@ class mapDistributePolyMesh;
 class polyMesh;
 
 // Forward declaration of friend functions and operators
-
 class refinementHistory;
 
 Ostream& operator<<(Ostream&, const refinementHistory&);

@@ -55,7 +55,6 @@ class Istream;
 class Ostream;
 
 // Forward declaration of friend functions and operators
-
 class block;
 
 Ostream& operator<<(Ostream&, const block&);

@@ -47,7 +47,6 @@ namespace Foam
 class lduInterfaceField;
 
 // Forward declaration of friend functions and operators
-
 class procLduInterface;
 
 Ostream& operator<<(Ostream&, const procLduInterface&);

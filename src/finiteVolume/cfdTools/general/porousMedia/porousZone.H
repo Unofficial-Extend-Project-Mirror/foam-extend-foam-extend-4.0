@@ -84,7 +84,6 @@ namespace Foam
 class fvMesh;
 
 // Forward declaration of friend functions and operators
-
 class porousZone;
 
 Ostream& operator<<(Ostream&, const porousZone&);

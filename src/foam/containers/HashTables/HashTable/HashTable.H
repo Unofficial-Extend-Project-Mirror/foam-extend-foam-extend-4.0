@@ -60,7 +60,6 @@ template<class T> class List;
 template<class T> class UList;
 
 // Forward declaration of friend functions and operators
-
 template<class T, class Key, class Hash> class HashTable;
 template<class T, class Key, class Hash> class HashPtrTable;
 

@@ -55,7 +55,6 @@ template<class T> class SLList;
 
 
 // Forward declaration of friend functions and operators
-
 template<class T, unsigned Size> class FixedList;
 
 template<class T, unsigned Size>

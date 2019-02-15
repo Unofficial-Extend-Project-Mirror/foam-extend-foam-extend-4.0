@@ -57,7 +57,6 @@ namespace Foam
 template<class T> class List;
 
 // Forward declaration of friend functions and operators
-
 template<class T, class Key, class Hash> class StaticHashTable;
 
 template<class T, class Key, class Hash> Istream& operator>>

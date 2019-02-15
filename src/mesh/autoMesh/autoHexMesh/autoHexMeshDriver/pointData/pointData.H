@@ -54,7 +54,6 @@ class polyPatch;
 class polyMesh;
 
 // Forward declaration of friend functions and operators
-
 class pointData;
 
 Ostream& operator<<(Ostream&, const pointData&);

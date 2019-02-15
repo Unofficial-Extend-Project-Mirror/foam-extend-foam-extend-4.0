@@ -40,7 +40,6 @@ namespace Foam
 {
 
 // Forward declaration of friend functions and operators
-
 class boundBox;
 template<class T> class tmp;
 

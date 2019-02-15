@@ -52,7 +52,6 @@ class polyPatch;
 class polyMesh;
 
 // Forward declaration of friend functions and operators
-
 class wallNormalInfo;
 
 Ostream& operator<<(Ostream&, const wallNormalInfo&);

@@ -45,7 +45,6 @@ namespace Foam
 {
 
 // Forward declaration of friend functions and operators
-
 class hashedWordList;
 
 Istream& operator>>(Istream&, hashedWordList&);

@@ -52,7 +52,6 @@ class Istream;
 class Ostream;
 
 // Forward declaration of friend functions and operators
-
 template<class T, class BaseType> class CompactIOList;
 
 template<class T, class BaseType> Istream& operator>>

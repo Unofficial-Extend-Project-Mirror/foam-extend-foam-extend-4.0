@@ -70,7 +70,6 @@ class regExp;
 class SHA1Digest;
 
 // Forward declaration of friend functions and operators
-
 class dictionary;
 
 Istream& operator>>(Istream&, dictionary&);

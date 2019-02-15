@@ -63,7 +63,6 @@ template<class Type> class treeLeaf;
 
 
 // Forward declaration of friend functions and operators
-
 template<class Type> class treeNode;
 
 template<class Type> Istream& operator>>(Istream&, treeNode<Type>&);
