@@ -136,7 +136,7 @@ void meshOctree::setOctantVectorsAndPositions()
     //- set vrtLeavesPos_
     for(label vrtI=0;vrtI<8;++vrtI)
     {
-        FixedList<label, 3> vc(0);
+	FixedList<label, 3> vc(label(0));
 
         if( vrtI & 1 )
             vc[0] += 1;
