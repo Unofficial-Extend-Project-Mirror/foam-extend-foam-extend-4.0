@@ -58,12 +58,13 @@ namespace Foam
 {
 
 // class intersection;
-
 template<class Type> class octree;
 template<class Type> class treeLeaf;
-template<class Type> class treeNode;
+
 
 // Forward declaration of friend functions and operators
+
+template<class Type> class treeNode;
 
 template<class Type> Istream& operator>>(Istream&, treeNode<Type>&);
 template<class Type> Ostream& operator<<(Ostream&, const treeNode<Type>&);

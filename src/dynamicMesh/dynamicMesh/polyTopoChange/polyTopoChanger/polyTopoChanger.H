@@ -44,11 +44,17 @@ SourceFiles
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
+// Forward declaration of classes
 class polyMesh;
 class mapPolyMesh;
 class polyBoundaryMesh;
+
+// Forward declaration of friend functions and operators
+
+class polyTopoChanger;
+
+Ostream& operator<<(Ostream&, const polyTopoChanger&);
+
 
 /*---------------------------------------------------------------------------*\
                       Class polyTopoChanger Declaration

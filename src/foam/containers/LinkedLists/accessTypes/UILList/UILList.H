@@ -44,6 +44,7 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
 class Ostream;
 
 // Forward declaration of friend functions and operators

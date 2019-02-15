@@ -47,6 +47,17 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+
+Ostream& operator<<(Ostream&, const CoeffField<symmTensor4thOrder>&);
+
+Ostream& operator<<(Ostream&, const tmp<CoeffField<symmTensor4thOrder> >&);
+
+
+/*---------------------------------------------------------------------------*\
+              Class symmTensor4thOrderCoeffField Declaration
+\*---------------------------------------------------------------------------*/
+
 template<>
 class CoeffField<symmTensor4thOrder>
 :

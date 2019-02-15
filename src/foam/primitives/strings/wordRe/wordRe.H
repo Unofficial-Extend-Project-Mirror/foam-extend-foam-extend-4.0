@@ -59,10 +59,13 @@ SourceFiles
 namespace Foam
 {
 
-// Forward declaration of friend functions and operators
-class wordRe;
+// Forward declaration of classes
 class Istream;
 class Ostream;
+
+// Forward declaration of friend functions and operators
+
+class wordRe;
 
 Istream& operator>>(Istream&, wordRe&);
 Ostream& operator<<(Ostream&, const wordRe&);

@@ -65,13 +65,17 @@ SourceFiles
 namespace Foam
 {
 
-// Forward declaration of friend functions and operators
+// Forward declaration of classes
 class regExp;
-class dictionary;
 class SHA1Digest;
+
+// Forward declaration of friend functions and operators
+
+class dictionary;
 
 Istream& operator>>(Istream&, dictionary&);
 Ostream& operator<<(Ostream&, const dictionary&);
+
 
 /*---------------------------------------------------------------------------*\
                         Class dictionaryName Declaration

@@ -52,6 +52,12 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+class sixDOFqODE;
+
+Ostream& operator<<(Ostream&, const sixDOFqODE&);
+
+
 /*---------------------------------------------------------------------------*\
                          Class sixDOFqODE Declaration
 \*---------------------------------------------------------------------------*/

@@ -45,7 +45,15 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
 class trackedParticleCloud;
+
+// Forward declaration of friend functions and operators
+
+class trackedParticle;
+
+Ostream& operator<<(Ostream&, const trackedParticle&);
+
 
 /*---------------------------------------------------------------------------*\
                            Class trackedParticle Declaration

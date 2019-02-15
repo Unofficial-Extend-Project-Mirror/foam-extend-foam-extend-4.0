@@ -49,6 +49,11 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
+template<class T> class UList;
+template<class T> class SLList;
+
+
 // Forward declaration of friend functions and operators
 
 template<class T, unsigned Size> class FixedList;
@@ -58,9 +63,6 @@ Istream& operator>>(Istream&, FixedList<T, Size>&);
 
 template<class T, unsigned Size>
 Ostream& operator<<(Ostream&, const FixedList<T, Size>&);
-
-template<class T> class UList;
-template<class T> class SLList;
 
 
 /*---------------------------------------------------------------------------*\

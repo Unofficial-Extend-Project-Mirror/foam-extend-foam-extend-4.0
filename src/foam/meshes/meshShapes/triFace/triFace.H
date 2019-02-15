@@ -53,11 +53,13 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
 class face;
 
 // Forward declaration of friend functions and operators
 
 class triFace;
+
 inline bool operator==(const triFace&, const triFace&);
 inline bool operator!=(const triFace&, const triFace&);
 

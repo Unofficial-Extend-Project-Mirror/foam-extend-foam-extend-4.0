@@ -46,6 +46,7 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
 template<class Type> class wallPointData;
 
 // Forward declaration of friend functions and operators

@@ -47,12 +47,15 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
 class dictionary;
 
 // Forward declaration of friend functions and operators
 
 class surfZoneIdentifier;
+
 Ostream& operator<<(Ostream&, const surfZoneIdentifier&);
+
 
 /*---------------------------------------------------------------------------*\
                     Class surfZoneIdentifier Declaration

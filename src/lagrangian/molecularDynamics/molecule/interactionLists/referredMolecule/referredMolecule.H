@@ -43,6 +43,16 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+class referredMolecule;
+
+inline bool operator==(const referredMolecule& a, const referredMolecule& b);
+inline bool operator!=(const referredMolecule& a, const referredMolecule& b);
+
+Istream& operator>>(Istream&, referredMolecule&);
+Ostream& operator<<(Ostream&, const referredMolecule&);
+
+
 /*---------------------------------------------------------------------------*\
                       Class referredMolecule Declaration
 \*---------------------------------------------------------------------------*/

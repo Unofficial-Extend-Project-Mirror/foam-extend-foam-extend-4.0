@@ -143,8 +143,16 @@ SourceFiles
 namespace Foam
 {
 
-// Forward declaration of friend functions and operators
+// Forward declaration of classes
 class boundBox;
+
+// Forward declaration of friend functions and operators
+
+class coordinateSystem;
+
+bool operator!=(const coordinateSystem&, const coordinateSystem&);
+Ostream& operator<<(Ostream&, const coordinateSystem&);
+
 
 /*---------------------------------------------------------------------------*\
                      Class coordinateSystem Declaration

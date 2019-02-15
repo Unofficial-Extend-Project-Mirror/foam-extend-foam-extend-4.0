@@ -53,11 +53,13 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
 class mapPolyMesh;
 
 // Forward declaration of friend functions and operators
 
 class faceZone;
+
 Ostream& operator<<(Ostream&, const faceZone&);
 
 

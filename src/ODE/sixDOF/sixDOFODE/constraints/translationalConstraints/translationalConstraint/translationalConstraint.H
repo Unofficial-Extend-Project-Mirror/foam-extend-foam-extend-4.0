@@ -72,7 +72,15 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
 class sixDOFODE;
+
+// Forward declaration of friend functions and operators
+
+class translationalConstraint;
+
+Ostream& operator<<(Ostream&, const translationalConstraint&);
+
 
 /*---------------------------------------------------------------------------*\
                    Class translationalConstraint Declaration

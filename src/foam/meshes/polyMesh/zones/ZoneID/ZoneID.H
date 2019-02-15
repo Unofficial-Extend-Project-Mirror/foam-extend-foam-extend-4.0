@@ -44,6 +44,7 @@ Description
 namespace Foam
 {
 
+// Forward declaration of classes
 template<class ZoneType, class MeshType> class ZoneMesh;
 
 // Forward declaration of friend functions and operators

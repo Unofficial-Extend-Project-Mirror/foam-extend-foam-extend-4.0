@@ -49,9 +49,17 @@ SourceFiles
 namespace Foam
 {
 
-// Class forward declarations
+// Forward declaration of classes
 class polyPatch;
 class polyMesh;
+
+// Forward declaration of friend functions and operators
+
+class pointData;
+
+Ostream& operator<<(Ostream&, const pointData&);
+Istream& operator>>(Istream&, pointData&);
+
 
 /*---------------------------------------------------------------------------*\
                            Class pointData Declaration

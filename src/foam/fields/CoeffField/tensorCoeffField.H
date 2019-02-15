@@ -47,6 +47,17 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+
+Ostream& operator<<(Ostream&, const CoeffField<tensor>&);
+
+Ostream& operator<<(Ostream&, const tmp<CoeffField<tensor> >&);
+
+
+/*---------------------------------------------------------------------------*\
+                       Class tensorCoeffField Declaration
+\*---------------------------------------------------------------------------*/
+
 template<>
 class CoeffField<tensor>
 :

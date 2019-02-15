@@ -44,7 +44,8 @@ namespace Foam
 class boundBox;
 template<class T> class tmp;
 
-Ostream& operator<<(Ostream& os, const boundBox& b);
+Istream& operator>>(Istream& is, boundBox&);
+Ostream& operator<<(Ostream& os, const boundBox&);
 
 
 /*---------------------------------------------------------------------------*\

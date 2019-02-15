@@ -55,6 +55,13 @@ class polyTopoChanger;
 class polyTopoChange;
 class mapPolyMesh;
 
+// Forward declaration of friend functions and operators
+
+class polyMeshModifier;
+
+Ostream& operator<<(Ostream&, const polyMeshModifier&);
+
+
 /*---------------------------------------------------------------------------*\
                        Class polyMeshModifier Declaration
 \*---------------------------------------------------------------------------*/

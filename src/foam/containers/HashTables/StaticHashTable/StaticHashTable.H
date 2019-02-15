@@ -53,9 +53,11 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
+template<class T> class List;
+
 // Forward declaration of friend functions and operators
 
-template<class T> class List;
 template<class T, class Key, class Hash> class StaticHashTable;
 
 template<class T, class Key, class Hash> Istream& operator>>

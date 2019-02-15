@@ -50,7 +50,12 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
 class faBoundaryMesh;
+class faPatch;
+
+Ostream& operator<<(Ostream&, const faPatch&);
+
 
 /*---------------------------------------------------------------------------*\
                            Class faPatch Declaration
