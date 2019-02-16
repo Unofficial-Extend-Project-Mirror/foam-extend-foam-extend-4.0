@@ -29,8 +29,6 @@ Description
     matching processor boundaries and build a single combined mesh by
     matching processor patches to each other.
 
-    In order to
-
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
