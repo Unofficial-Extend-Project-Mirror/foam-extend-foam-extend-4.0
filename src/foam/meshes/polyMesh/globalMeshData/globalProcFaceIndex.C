@@ -35,7 +35,7 @@ void Foam::globalProcFaceIndex::calcFaceIndex()
 
     const polyBoundaryMesh& patches = mesh_.boundaryMesh();
 
-    // Assing unique face label to all master processor faces
+    // Assign unique face label to all master processor faces
 
     // Count faces and processor faces per processor
     forAll (patches, patchI)

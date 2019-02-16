@@ -33,7 +33,7 @@ Description
 
     Face offsets counts a number of unique faces on each processor,
     excluding slave processor patch faces, which are given master face index.
-    If needed, global face indes from all faces can be derived from this data
+    If needed, global face index from all faces can be derived from this data
 
     Currently, faces are ordered with internal faces first, followed by patch
     faces in patch order, excluding slave processor patches.
@@ -122,7 +122,7 @@ public:
 
         //- Return global face label for all faces of current mesh
         //  Sized to number of live faces in the mesh
-        const labelList globalLabel() const
+        const labelList& globalLabel() const
         {
             return globalLabel_;
         }
