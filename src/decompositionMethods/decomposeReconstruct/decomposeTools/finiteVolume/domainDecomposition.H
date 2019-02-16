@@ -83,6 +83,11 @@ class domainDecomposition
         //  Data is used when running decomposition in parallel
         labelListList patchNbrCellToProc_;
 
+        //- Face cells for neighbour cell for each processor boundary
+        //  Data is used for correct upper triangular (neighbour list) ordering
+        //  when running decomposition in parallel
+        labelListList patchNbrFaceCells_;
+
         //- Labels of points for each processor
         labelListList procPointAddressing_;
 
@@ -91,9 +96,9 @@ class domainDecomposition
         //  Only the processor boundary faces are affected: if the sign of the
         //  index is negative, the processor face is the reverse of the
         //  original face. In order to do this properly, all face
-        //   indices will be incremented by 1 and the decremented as
-        //  necessary t avoid the problem of face number zero having no
-        //  sign.  HJ, 5/Dec/2001
+        //  indices will be incremented by 1 and then decremented as
+        //  necessary to avoid the problem of face number zero having no
+        //  sign. HJ, 5/Dec/2001
         labelListList procFaceAddressing_;
 
         //- Number of internal faces for each processor

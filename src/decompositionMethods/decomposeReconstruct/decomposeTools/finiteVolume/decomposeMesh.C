@@ -38,6 +38,7 @@ Description
 #include "primitiveMesh.H"
 #include "processorPolyPatch.H"
 #include "cyclicPolyPatch.H"
+#include "SortableList.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -224,10 +225,10 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
         // When running the decomposition in parallel, it is assumed that
         // the result will be used in dynamic load balancing
         // For load balancing, the processor patches need to match in order for
-        // the patch-to-patch matching to work propely on mesh reconstruction
+        // the patch-to-patch matching to work properly on mesh reconstruction
         // Therefore, all processor patches need to be split into the matching
-        // and non-matching part be examining the cellToProc_ data on
-        // the neighbour side.  This has been prepared in patchNbrCellToProc_
+        // and non-matching part by examining the cellToProc_ data on
+        // the neighbour side. This has been prepared in patchNbrCellToProc_
         // HJ, 11/Apr/2018
 
         // The correct order of dumping the faces is to dump the
@@ -240,7 +241,6 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
         forAll (patches, patchI)
         {
             // Check the processor patch for which neighbour data exists
-            // VV Comment: do we need this check?
             if
             (
                 isA<processorPolyPatch>(patches[patchI])
@@ -275,7 +275,7 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
 
                         // If procI and procJ are the same, the processor face
                         // will be merged, meaning that it remains in the (old)
-                        // processor patch if procI and procJ are different,
+                        // processor patch. If procI and procJ are different,
                         // this will be a new processor boundary created from
                         // the existing processor face and added afterwards
                         if (ownerProc != neighbourProc)
@@ -299,27 +299,6 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                 } // End if this is slave processor
             } // End if this is a processor patch
         } // End for all patches
-
-        Pout<< "_________________________________________________" << endl;
-        Pout<< "SLAVE FINISHED" << endl;
-        forAll (interProcBoundaries, procI)
-        {
-            Pout<< "Inter processor boundary for proc: " << procI << nl
-                << "Neighbouring processors: ";
-            const SLList<label> nbrProcs = interProcBoundaries[procI];
-            for
-            (
-                SLList<label>::const_iterator iter = nbrProcs.cbegin();
-                iter != nbrProcs.cend();
-                ++iter
-            )
-            {
-                Pout<< iter() << ", ";
-            }
-            Pout<< endl;
-        }
-        Pout<< "_________________________________________________" << endl;
-
 
         // Internal mesh faces
         forAll (neighbour, faceI)
@@ -356,27 +335,6 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                 );
             }
         }
-
-        Pout<< "_________________________________________________" << endl;
-        Pout<< "INTERNAL FACES FINISHED" << endl;
-        forAll (interProcBoundaries, procI)
-        {
-            Pout<< "Inter processor boundary for proc: " << procI << nl
-                << "Neighbouring processors: ";
-            const SLList<label> nbrProcs = interProcBoundaries[procI];
-            for
-            (
-                SLList<label>::const_iterator iter = nbrProcs.cbegin();
-                iter != nbrProcs.cend();
-                ++iter
-            )
-            {
-                Pout<< iter() << ", ";
-            }
-            Pout<< endl;
-        }
-        Pout<< "_________________________________________________" << endl;
-
 
         // Dump current processor patch faces into new processor patches
         // that will be created in decomposition when running in parallel
@@ -440,27 +398,6 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
             } // End if this is a processor patch
         } // End for all patches
 
-        Pout<< "_________________________________________________" << endl;
-        Pout<< "MASTER FINISHED" << endl;
-        forAll (interProcBoundaries, procI)
-        {
-            Pout<< "Inter processor boundary for proc: " << procI << nl
-                << "Neighbouring processors: ";
-            const SLList<label> nbrProcs = interProcBoundaries[procI];
-            for
-            (
-                SLList<label>::const_iterator iter = nbrProcs.cbegin();
-                iter != nbrProcs.cend();
-                ++iter
-            )
-            {
-                Pout<< iter() << ", ";
-            }
-            Pout<< endl;
-        }
-        Pout<< "_________________________________________________" << endl;
-
-
         // Loop through patches. For cyclic boundaries detect inter-processor
         // faces; for all other, add faces to the face list and remember start
         // and size of all patches.
@@ -489,15 +426,54 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                 // are different, the face was already collected into a separate
                 // patch. HJ, 23/Apr/2018.
 
+                // Cast to processor patch
+                const processorPolyPatch& procPatch =
+                    refCast<const processorPolyPatch>(patches[patchI]);
+
+                // Is this slave processor?
+                const bool isSlave = !procPatch.master();
+
+                // Get face cells on this side
                 const unallocLabelList& fc = patches[patchI].faceCells();
+
+                // Get face cells on the other side (communicated during
+                // distributeCells() call)
+                const unallocLabelList& nfc = patchNbrFaceCells_[patchI];
 
                 // Get neighbour cellToProc addressing across the interface
                 const labelList& curNbrPtc = patchNbrCellToProc_[patchI];
 
+                // Note: in order to avoid upper triangular ordering errors for
+                // neighbours after the reconstruction, we need to make sure
+                // that the master processor inserts possibly multiple faces for
+                // a single owner cell in the correct order. For each owner
+                // cell with multiple faces, we need to collect neighbour cell
+                // indices on the other side and possibly swap the order of
+                // adding faces. The same "swapping" of insertion order needs to
+                // happend on the slave side, but now we sort on the remote
+                // (master) data and not on the local (slave) data as we do for
+                // master processor. VV, 16/Feb/2019.
+
+                // A map containing a list of patch faces and neighbour (owner)
+                // cells for master (slave) processor, for each owner cell (for
+                // master, neighbour cell for slave) (key). In the pair, first
+                // entry is the list of patch faces and the second one is the
+                // list of neigbhour (for master proc or owner for slave proc)
+                // cells. We'll sort the list of neighbouring cells and use the
+                // indices to add the patch faces in the correct order later
+                // on. There's probably a million other ways to write this in a
+                // better way, but I can't figure them out at the moment.
+                // VV, 16/Feb/2019.
+                Map<Pair<dynamicLabelList> > faceCellToNbrFaceCells(fc.size()/10);
+
                 forAll (fc, patchFaceI)
                 {
+                    // Get cell on this side: make a copy for swapping if this
+                    // is slave processor later on
+                    label ownCellI = fc[patchFaceI];
+
                     // Local owner proc is looked up using faceCells
-                    const label ownerProc = cellToProc_[fc[patchFaceI]];
+                    const label ownerProc = cellToProc_[ownCellI];
 
                     // Neighbour proc is looked up directly
                     const label neighbourProc = curNbrPtc[patchFaceI];
@@ -508,7 +484,106 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                     // HJ, 23/Apr/2018.
                     if (ownerProc == neighbourProc)
                     {
-                        // Add the face
+                        // Get the face cell on the other side: make a copy for
+                        // swapping if this is slave processor
+                        label neiCellI = nfc[patchFaceI];
+
+                        if (isSlave)
+                        {
+                            // This is slave, need to swap owner and neighbour
+                            const label tmpCellI = ownCellI;
+                            ownCellI = neiCellI;
+                            neiCellI = tmpCellI;
+                        }
+
+                        // Add into the map
+                        if (faceCellToNbrFaceCells.found(ownCellI))
+                        {
+                            // This owner cell has already been visited
+                            Pair<dynamicLabelList>& tll =
+                                faceCellToNbrFaceCells[ownCellI];
+
+                            // Insert patch face index into the first list
+                            tll.first().append(patchFaceI);
+
+                            // Insert neighbour into the second list
+                            tll.second().append(neiCellI);
+                        }
+                        else
+                        {
+                            // This owner cell has not been visited
+
+                            // Create dynamicList containing the patch face
+                            dynamicLabelList pfl(4);
+                            pfl.append(patchFaceI);
+
+                            // Create dynamicList containing the neighbour
+                            dynamicLabelList nl(4);
+                            nl.append(neiCellI);
+
+                            // Insert the pair of lists into the map
+                            faceCellToNbrFaceCells.insert
+                            (
+                                ownCellI,
+                                Pair<dynamicLabelList>(pfl, nl)
+                            );
+                        }
+                    } // End if owner and neighbour going to some processor
+                } // End for all patch faces
+
+                // Get sorted table of contents from the map to make sure that
+                // we insert faces in the correct order (on both sides, since
+                // for the slave processor, the map actually contains list of
+                // patch faces and owner cells (on my, slave side) for all
+                // neighbour cells (on the other, master side)
+                const labelList sortedOwn = faceCellToNbrFaceCells.sortedToc();
+
+                // Loop through ordered owner cells with faces on processor
+                // patch
+                forAll (sortedOwn, i)
+                {
+                    // Get current owner cell
+                    const label& ownCellI = sortedOwn[i];
+
+                    // The cell has not been handled yet and removed from
+                    // the map. Get the pair of lists
+                    Pair<dynamicLabelList>& patchFacesAndNeighbours =
+                        faceCellToNbrFaceCells[ownCellI];
+
+                    // Get the list of patch faces and list of neighbours
+                    dynamicLabelList& pfl = patchFacesAndNeighbours.first();
+                    dynamicLabelList& nl = patchFacesAndNeighbours.second();
+
+                    // Create sorted neighbour list.
+                    // Notes:
+                    // 1. Transfer the contents of the dynamic list,
+                    // 2. Sorted on construction
+                    SortableList<label> sortedNbrs(nl.xfer());
+
+                    // Get sorted indices for correct patch face insertion
+                    // order
+                    const labelList& sortedIndices = sortedNbrs.indices();
+
+                    // Loop through sorted indices
+                    forAll (sortedIndices, j)
+                    {
+                        // Get the sorted index into the patch face
+                        const label& sI = sortedIndices[j];
+
+                        // Get patch face index
+                        const label& patchFaceI = pfl[sI];
+
+                        // Get owner processor. Note: by definition/filtering
+                        // above, owner and neighbour proc are the same. In
+                        // order to avoid using cellToProc list for slave
+                        // processor (where ownCellI is actually found on the
+                        // other side), use curNbrPtc with patchFace indes
+                        const label& ownerProc = curNbrPtc[patchFaceI];
+
+                        // Add the patch face into the list in the correct
+                        // order for owner processor. Note: map contains
+                        // only faces where owner proc = neighbour proc, so
+                        // no need to double check
                         procFaceList[ownerProc].append(patchStart + patchFaceI);
 
                         // Increment the number of faces for this patch
@@ -652,26 +727,6 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
             }
         }
 
-        Pout<< "_________________________________________________" << endl;
-        Pout<< "CYCLICS FINISHED" << endl;
-        forAll (interProcBoundaries, procI)
-        {
-            Pout<< "Inter processor boundary for proc: " << procI << nl
-                << "Neighbouring processors: ";
-            const SLList<label> nbrProcs = interProcBoundaries[procI];
-            for
-            (
-                SLList<label>::const_iterator iter = nbrProcs.cbegin();
-                iter != nbrProcs.cend();
-                ++iter
-            )
-            {
-                Pout<< iter() << ", ";
-            }
-            Pout<< endl;
-        }
-        Pout<< "_________________________________________________" << endl;
-
         // Face zone treatment.  HJ, 27/Mar/2009
         // Face zones identified as global will be present on all CPUs
         List<SLList<label> > procZoneFaceList(nProcs_);
@@ -736,29 +791,8 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
             }
         }
 
-        Pout<< "_________________________________________________" << endl;
-        Pout<< "ALL STAGES FINISHED" << endl;
-        forAll (interProcBoundaries, procI)
-        {
-            Pout<< "Inter processor boundary for proc: " << procI << nl
-                << "Neighbouring processors: ";
-            const SLList<label> nbrProcs = interProcBoundaries[procI];
-            for
-            (
-                SLList<label>::const_iterator iter = nbrProcs.cbegin();
-                iter != nbrProcs.cend();
-                ++iter
-            )
-            {
-                Pout<< iter() << ", ";
-            }
-            Pout<< endl;
-        }
-        Pout<< "_________________________________________________" << endl;
-
         // Convert linked lists into normal lists
         // Add inter-processor boundaries and remember start indices
-
         forAll (procFaceList, procI)
         {
             // Get internal and regular boundary processor faces
@@ -920,6 +954,7 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
     } // End of memory management
 
     Info << "\nCalculating processor boundary addressing" << endl;
+
     // For every patch of processor boundary, find the index of the original
     // patch. Mis-alignment is caused by the fact that patches with zero size
     // are omitted. For processor patches, set index to -1.
@@ -989,6 +1024,7 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
     }
 
     Info << "\nDistributing points to processors" << endl;
+
     // For every processor, loop through the list of faces for the processor.
     // For every face, loop through the list of points and mark the point as
     // used for the processor. Collect the list of used points for the
