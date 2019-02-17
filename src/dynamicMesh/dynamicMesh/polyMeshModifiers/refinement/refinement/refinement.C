@@ -956,9 +956,11 @@ Foam::label Foam::refinement::faceConsistentUnrefinement
                     << "Try increasing nUnrefinementBufferLayers. "
                     << abort(FatalError);
             }
-
-            cellsToUnrefine[own] = false;
-            ++nRemCells;
+            else
+            {
+                cellsToUnrefine[own] = false;
+                ++nRemCells;
+            }
         }
         else if (neiLevel < (ownLevel - 1))
         {
@@ -984,9 +986,11 @@ Foam::label Foam::refinement::faceConsistentUnrefinement
                     << "Try increasing nUnrefinementBufferLayers. "
                     << abort(FatalError);
             }
-
-            cellsToUnrefine[nei] = false;
-            ++nRemCells;
+            else
+            {
+                cellsToUnrefine[nei] = false;
+                ++nRemCells;
+            }
         }
     }
 
@@ -1018,7 +1022,7 @@ Foam::label Foam::refinement::faceConsistentUnrefinement
 
         // Note: we are using more stringent 1:1 consistency across coupled
         // boundaries in order to simplify handling of edge based consistency
-        // checkes for parallel runs
+        // checks for parallel runs
         if (curOwnLevel < neiLevel[i])
         {
             // Owner level is smaller than neighbour level, we must not

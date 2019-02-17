@@ -2210,7 +2210,7 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
 
     // Note: if there is no dynamic load balancing, points at the boundary
     // cannot be split points by definition. However, in dynamic load balancing
-    // runs, it is possible that a split point end on processor boundary, in
+    // runs, it is possible that a split point ends on processor boundary, in
     // which case we will simply avoid (actually delay) unrefining until this
     // becomes internal point again. VV, 4/Jul/2018.
     const label nInternalFaces = mesh_.nInternalFaces();
@@ -2218,7 +2218,7 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
 
     for (label faceI = nInternalFaces; faceI < nFaces; ++faceI)
     {
-        // Get the face and make sure that the points are unarked
+        // Get the face and make sure that the points are unmarked
         const face& f = meshFaces[faceI];
 
         forAll (f, fpI)

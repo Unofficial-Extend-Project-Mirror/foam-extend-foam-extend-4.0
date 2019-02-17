@@ -2695,7 +2695,7 @@ void Foam::prismatic2DRefinement::setSplitPointsToUnrefine
     // 1. Has pointLevel_ > 0 (obviously),
     // 2. A point that has the same pointLevel_ as ALL of the points of its
     //    edges. In other words, for each point, we will look through all the
-    //    edges of the point. For each edges, we will visit both points and
+    //    edges of the point. For each edge, we will visit both points and
     //    check point levels. All point levels must be the same for this point
     //    candidate to be a split point. This is quite useful since there is no
     //    need to store the refinement history
@@ -2779,11 +2779,14 @@ void Foam::prismatic2DRefinement::setSplitPointsToUnrefine
 
         if (isA<processorPolyPatch>(patch))
         {
+            // Get patch start
+            const label startIndex = patch.start();
+
             // Loop through all the faces
             forAll (patch, i)
             {
                 // Get global face index and face
-                const label faceI = patch.size() + i;
+                const label faceI = startIndex + i;
                 const face& f = meshFaces[faceI];
 
                 // Make sure that we don't split around point at all points of
