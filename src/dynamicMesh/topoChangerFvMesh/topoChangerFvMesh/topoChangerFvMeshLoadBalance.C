@@ -139,7 +139,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
     // Prepare receiving side
 
     // Create the reconstructor
-    //
+
     // HR 21.12.18 : Use empty domainname to avoid auto-created of
     // fvSchemes/fvSolution
     processorMeshesReconstructor meshRecon("");
@@ -443,11 +443,9 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                     );
                 }
 
-                //HJ Insert clouds missing.  HJ, 12/Oct/2018
-                //
-                // HR 18.11.18 - Not missing. Step is trivial and is treated in
-                // Cloud<ParticleType>::split which is called in the constructor
-                // of CloudDistibute
+                // HR, 18.11.2018. Distribution of clouds is trivial and is
+                // treated in Cloud<ParticleType>::split, which is called in
+                // the constructor of CloudDistribute.
             }
         }
     }
@@ -959,8 +957,11 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
     // HR 13.12.18: Update the mesh objects
     meshObjectBase::allUpdateTopology<polyMesh>(*this, meshMap);
 
-    // Debug: remove?  HJ, 22/Oct/2018
-    // checkMesh(true);
+    if (debug)
+    {
+        Info<< "Checking reconstructed mesh after load balancing..." << endl;
+        checkMesh(true);
+    }
 
     return true;
 }
