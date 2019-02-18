@@ -1057,7 +1057,7 @@ Foam::label Foam::refinement::faceConsistentUnrefinement
                         << "This is probably because the refinement and "
                         << "unrefinement regions are very close." << nl
                         << "Try increasing nUnrefinementBufferLayers. "
-                        << abort(FatalError);
+                        << endl;
                 }
             }
             else
