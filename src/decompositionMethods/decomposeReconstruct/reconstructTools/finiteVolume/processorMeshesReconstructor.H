@@ -162,7 +162,7 @@ public:
             return meshes_;
         }
 
-        //- Return access to meshes
+        //- Return to global point index
         labelListList& globalPointIndex()
         {
             return globalPointIndex_;
