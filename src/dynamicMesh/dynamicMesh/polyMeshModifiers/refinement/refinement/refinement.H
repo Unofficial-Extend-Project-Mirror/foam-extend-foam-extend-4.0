@@ -189,8 +189,8 @@ protected:
                 const label nei
             ) const;
 
-            //- Modifies existing faceI for either new owner/neighbour or new face
-            //  points. Reverses if nessecary
+            //- Modifies existing faceI for either new owner/neighbour or new
+            //  face points. Reverses if nessecary
             void modifyFace
             (
                 polyTopoChange& ref,

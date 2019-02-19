@@ -2088,7 +2088,8 @@ void Foam::polyhedralRefinement::setCellsToRefine
 
 	if (debug)
         {
-            Info<< "Added " << nAddCells << " in iteration " << nIters << nl;
+            Info<< "Added " << nAddCells << " cells in iteration "
+                << nIters << nl;
         }
 
     } while (nAddCells > 0);
@@ -2375,7 +2376,8 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
 
         if (debug)
         {
-            Info<< "Removed " << nRemCells << " in iteration " << nIters << nl;
+            Info<< "Removed " << nRemCells << " cells in iteration "
+                << nIters << nl;
         }
 
     } while (nRemCells > 0);

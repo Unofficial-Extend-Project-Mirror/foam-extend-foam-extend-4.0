@@ -89,7 +89,6 @@ void Foam::topoChangerFvMesh::insertFields
         iter
     )
     {
-
         localFields[fI].set
         (
             Pstream::myProcNo(),

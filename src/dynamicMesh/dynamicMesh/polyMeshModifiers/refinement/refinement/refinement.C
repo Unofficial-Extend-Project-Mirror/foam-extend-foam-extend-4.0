@@ -1057,6 +1057,10 @@ Foam::label Foam::refinement::faceConsistentUnrefinement
                         << "This is probably because the refinement and "
                         << "unrefinement regions are very close." << nl
                         << "Try increasing nUnrefinementBufferLayers. "
+                        << nl
+                        << "Another possibility is that you are running "
+                        << "with Dynamic Load Balancing, in which case "
+                        << "this should be fine."
                         << endl;
                 }
             }
@@ -1443,20 +1447,6 @@ bool Foam::refinement::changeTopology() const
 
 void Foam::refinement::setRefinement(polyTopoChange& ref) const
 {
-    // Make sure that the point levels are updated across coupled patches before
-    // setting refinement and unrefinement. Note: not sure why the sync is not
-    // performed correctly if I do it in updateMesh. This is a temporary
-    // solution, need to investigate in detail, but I assume something is not
-    // updated yet in that case. VV, 31/Jan/2018.
-    syncTools::syncPointList
-    (
-        mesh_,
-        pointLevel_,
-        maxEqOp<label>(),
-        0,   // Null value
-        true // Apply separation for parallel cyclics
-    );
-
     // Set refinement and unrefinement
     this->setRefinementInstruction(ref);
     this->setUnrefinementInstruction(ref);
@@ -1610,10 +1600,21 @@ void Foam::refinement::updateMesh(const mapPolyMesh& map)
         }
     }
 
-    // Note: new point level is going to be synced at processor boundaries just
-    // before the next step in setRefinement. Need to investigate why the sync
-    // is not done properly if I put it here. Something is not updated yet.
-    // VV, 31/Jan/2018.
+    // Sync the new point level. Note: here, we assume that the call to
+    // updateMesh happened after polyBoundaryMesh::updateMesh where the
+    // processor data is fully rebuilt. If this is not the case, the point
+    // level will remain unsynced and will cause all kinds of trouble that
+    // are extremely difficult to spot. See the change in
+    // polyTopoChanger::changeMesh order of calling polyMesh::updateMesh and
+    // polyTopoChanger::update. VV, 19/Feb/2019.
+    syncTools::syncPointList
+    (
+        mesh_,
+        newPointLevel,
+        maxEqOp<label>(),
+        0,   // Null value
+        true // Apply separation for parallel cyclics
+    );
 
     // Transfer the new point level into the data member
     pointLevel_.transfer(newPointLevel);
