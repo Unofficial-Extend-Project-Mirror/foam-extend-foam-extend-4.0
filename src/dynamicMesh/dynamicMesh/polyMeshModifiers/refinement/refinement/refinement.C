@@ -1014,26 +1014,31 @@ Foam::label Foam::refinement::edgeConsistentUnrefinement
                     // unrefinement
                     if (!cellsToUnrefine[cellI])
                     {
-                        FatalErrorIn
-                        (
-                            "label refinement::"
-                            "edgeConsistentUnrefinement"
-                            "(boolList& cellsToUnrefine)"
-                        )   << "Cell not marked for unrefinement, indicating a"
-                            << " previous unnoticed problem with unrefinement."
-                            << nl
-                            << "cellI: " << cellI << ", cellJ: " << cellJ
-                            << nl
-                            << "Level of cellI: " << cellILevel
-                            << ", level of cellJ: " << cellJLevel << nl
-                            << "This is probably because the refinement and "
-                            << "unrefinement regions are very close." << nl
-                            << "Try increasing nUnrefinementBufferLayers. "
-                            << abort(FatalError);
+                        if (debug)
+                        {
+                            WarningIn
+                            (
+                                "label refinement::"
+                                "edgeConsistentUnrefinement"
+                                "(boolList& cellsToUnrefine)"
+                            )   << "Cell not marked for unrefinement, indicating a"
+                                << " previous unnoticed problem with unrefinement."
+                                << nl
+                                << "cellI: " << cellI << ", cellJ: " << cellJ
+                                << nl
+                                << "Level of cellI: " << cellILevel
+                                << ", level of cellJ: " << cellJLevel << nl
+                                << "This is probably because the refinement and "
+                                << "unrefinement regions are very close." << nl
+                                << "Try increasing nUnrefinementBufferLayers. "
+                                << endl;
+                        }
                     }
-
-                    cellsToUnrefine[cellI] = false;
-                    ++nRemCells;
+                    else
+                    {
+                        cellsToUnrefine[cellI] = false;
+                        ++nRemCells;
+                    }
                 }
                 else if (cellJLevel < cellILevel - 1)
                 {
@@ -1044,26 +1049,31 @@ Foam::label Foam::refinement::edgeConsistentUnrefinement
                     // unrefinement
                     if (!cellsToUnrefine[cellJ])
                     {
-                        FatalErrorIn
-                        (
-                            "label refinement::"
-                            "edgeConsistentUnrefinement"
-                            "(boolList& cellsToUnrefine)"
-                        )   << "Cell not marked for unrefinement, indicating a"
-                            << " previous unnoticed problem with unrefinement."
-                            << nl
-                            << "cellI: " << cellI << ", cellJ: " << cellJ
-                            << nl
-                            << "Level of cellI: " << cellILevel
-                            << ", level of cellJ: " << cellJLevel << nl
-                            << "This is probably because the refinement and "
-                            << "unrefinement regions are very close." << nl
-                            << "Try increasing nUnrefinementBufferLayers. "
-                            << abort(FatalError);
+                        if (debug)
+                        {
+                            WarningIn
+                            (
+                                "label refinement::"
+                                "edgeConsistentUnrefinement"
+                                "(boolList& cellsToUnrefine)"
+                            )   << "Cell not marked for unrefinement, indicating a"
+                                << " previous unnoticed problem with unrefinement."
+                                << nl
+                                << "cellI: " << cellI << ", cellJ: " << cellJ
+                                << nl
+                                << "Level of cellI: " << cellILevel
+                                << ", level of cellJ: " << cellJLevel << nl
+                                << "This is probably because the refinement and "
+                                << "unrefinement regions are very close." << nl
+                                << "Try increasing nUnrefinementBufferLayers. "
+                                << endl;
+                        }
                     }
-
-                    cellsToUnrefine[cellJ] = false;
-                    ++nRemCells;
+                    else
+                    {
+                        cellsToUnrefine[cellJ] = false;
+                        ++nRemCells;
+                    }
                 }
             }
         }
