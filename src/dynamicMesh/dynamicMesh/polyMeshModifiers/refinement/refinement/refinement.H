@@ -159,12 +159,6 @@ protected:
             //- Set file instance for cellLevel_ and pointLevel_
             void setInstance(const fileName& inst) const;
 
-            //- Extend marked cells across faces
-            void extendMarkedCellsAcrossFaces(boolList& markedCell) const;
-
-            //- Extend marked cells across points
-            void extendMarkedCellsAcrossPoints(boolList& markedCell) const;
-
 
         // Local topology modification functions (operate on cells/faces)
 

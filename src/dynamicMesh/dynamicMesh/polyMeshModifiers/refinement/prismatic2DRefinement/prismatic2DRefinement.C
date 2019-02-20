@@ -33,6 +33,7 @@ Author
 #include "emptyPolyPatch.H"
 #include "wedgePolyPatch.H"
 #include "addToRunTimeSelectionTable.H"
+#include "meshTools.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -2601,7 +2602,7 @@ void Foam::prismatic2DRefinement::setCellsToRefine
     // layers
     for (label i = 0; i < nRefinementBufferLayers_; ++i)
     {
-        extendMarkedCellsAcrossFaces(refineCell);
+        meshTools::extendMarkedCellsAcrossFaces(mesh_, refineCell);
     }
 
     // Remove all cells that exceed the maximum refinement level
@@ -2838,7 +2839,7 @@ void Foam::prismatic2DRefinement::setSplitPointsToUnrefine
     // unrefinement buffer layers
     for (label i = 0; i < nUnrefinementBufferLayers_; ++i)
     {
-        extendMarkedCellsAcrossPoints(protectedCell);
+        meshTools::extendMarkedCellsAcrossPoints(mesh_, protectedCell);
     }
 
     // Loop through all cells and if the cell should be protected, protect all

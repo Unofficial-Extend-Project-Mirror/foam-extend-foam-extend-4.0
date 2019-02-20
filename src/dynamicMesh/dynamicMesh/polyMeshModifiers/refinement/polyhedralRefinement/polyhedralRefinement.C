@@ -31,6 +31,7 @@ Author
 #include "faceSet.H"
 #include "pointSet.H"
 #include "addToRunTimeSelectionTable.H"
+#include "meshTools.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -2042,7 +2043,7 @@ void Foam::polyhedralRefinement::setCellsToRefine
     // layers
     for (label i = 0; i < nRefinementBufferLayers_; ++i)
     {
-        extendMarkedCellsAcrossFaces(refineCell);
+        meshTools::extendMarkedCellsAcrossFaces(mesh_, refineCell);
     }
 
     // Remove all cells that would exceed the maximum refinement level
@@ -2266,7 +2267,7 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
     // unrefinement buffer layers
     for (label i = 0; i < nUnrefinementBufferLayers_; ++i)
     {
-        extendMarkedCellsAcrossPoints(protectedCell);
+        meshTools::extendMarkedCellsAcrossPoints(mesh_, protectedCell);
     }
 
     // Loop through all cells and if the cell should be protected, protect all
