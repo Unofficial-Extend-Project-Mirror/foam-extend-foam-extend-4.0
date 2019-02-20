@@ -805,7 +805,11 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
     // Dump first valid mesh without checking
     {
         const label fvmId = firstValidMesh();
-        Pout<< "Dump mesh " << fvmId << endl;
+
+        if (debug)
+        {
+            Pout<< "Dump mesh " << fvmId << endl;
+        }
 
         cellOffset[fvmId] = 0;
 
@@ -1060,9 +1064,12 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
         else
         {
             // Valid mesh, combine it
-            Pout<< "Dump mesh " << procI
-                << " cell offset: " << cellOffset[procI]
-                << endl;
+            if (debug)
+            {
+                Pout<< "Dump mesh " << procI
+                    << " cell offset: " << cellOffset[procI]
+                    << endl;
+            }
 
             const polyMesh& curMesh = meshes_[procI];
             const polyBoundaryMesh& procPatches = curMesh.boundaryMesh();
@@ -1542,12 +1549,24 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
     // Mesh assembly completed
 
-    Info<< "Global mesh size (final): " << nl
-        << "    nPoints = " << reconPoints.size() << nl
-        << "    nFaces = " << reconFaces.size() << nl
-        << "    nCells = " << nReconCells << nl
-        << "    nPatches = " << reconPatchSizes.size() << nl
-        << "    nPatchFaces = " << reconPatchSizes << endl;
+    if (!Pstream::parRun())
+    {
+        Info<< "Global mesh size (final): " << nl
+            << "    nPoints = " << reconPoints.size() << nl
+            << "    nFaces = " << reconFaces.size() << nl
+            << "    nCells = " << nReconCells << nl
+            << "    nPatches = " << reconPatchSizes.size() << nl
+            << "    nPatchFaces = " << reconPatchSizes << endl;
+    }
+    else if (debug)
+    {
+        Pout<< "Local mesh size (final): " << nl
+            << "    nPoints = " << reconPoints.size() << nl
+            << "    nFaces = " << reconFaces.size() << nl
+            << "    nCells = " << nReconCells << nl
+            << "    nPatches = " << reconPatchSizes.size() << nl
+            << "    nPatchFaces = " << reconPatchSizes << endl;
+    }
 
     // Renumber the face-processor addressing list for all pieces
     // now that the number of internal faces is known

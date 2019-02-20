@@ -25,6 +25,11 @@ License
 
 #include "processorMeshesReconstructor.H"
 
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+defineTypeNameAndDebug(Foam::processorMeshesReconstructor, 0);
+
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 void Foam::processorMeshesReconstructor::readMeshes(PtrList<Time>& databases)

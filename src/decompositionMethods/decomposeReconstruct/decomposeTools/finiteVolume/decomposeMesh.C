@@ -123,7 +123,10 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
     // Distribute the cells according to the given processor label
 
     // Calculate the addressing information for the original mesh
-    Info<< "\nCalculating original mesh data" << endl;
+    if (debug)
+    {
+        Pout<< "\nCalculating original mesh data" << endl;
+    }
 
     // Set references to the original mesh
     const polyBoundaryMesh& patches = mesh_.boundaryMesh();
@@ -136,7 +139,10 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
     // loop through the list of processor labels for the cell and add the
     // cell shape to the list of cells for the appropriate processor
 
-    Info<< "\nDistributing cells to processors" << endl;
+    if (debug)
+    {
+        Pout<< "\nDistributing cells to processors" << endl;
+    }
 
     // Memory management
     {
@@ -164,7 +170,10 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
         }
     }
 
-    Info << "\nDistributing faces to processors" << endl;
+    if (debug)
+    {
+        Pout << "\nDistributing faces to processors" << endl;
+    }
 
     // Loop through internal faces and decide which processor they belong to
     // First visit all internal faces. If cells at both sides belong to the
@@ -753,8 +762,11 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                         << exit(FatalError);
                 }
 
-                Info<< "Preserving global face zone " << fzNames[nameI]
-                    << endl;
+                if (debug)
+                {
+                    Pout<< "Preserving global face zone " << fzNames[nameI]
+                        << endl;
+                }
 
                 const faceZone& curFz = fz[zoneID];
 
@@ -953,7 +965,10 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
         } // End for all processors
     } // End of memory management
 
-    Info << "\nCalculating processor boundary addressing" << endl;
+    if (debug)
+    {
+        Pout << "\nCalculating processor boundary addressing" << endl;
+    }
 
     // For every patch of processor boundary, find the index of the original
     // patch. Mis-alignment is caused by the fact that patches with zero size
@@ -1023,7 +1038,10 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
         curBoundaryAddressing.setSize(nPatches);
     }
 
-    Info << "\nDistributing points to processors" << endl;
+    if (debug)
+    {
+        Pout << "\nDistributing points to processors" << endl;
+    }
 
     // For every processor, loop through the list of faces for the processor.
     // For every face, loop through the list of points and mark the point as

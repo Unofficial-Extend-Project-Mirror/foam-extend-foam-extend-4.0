@@ -122,6 +122,10 @@ class processorMeshesReconstructor
 
 public:
 
+    //- Declare name of the class and its debug switch
+    ClassName("processorMeshesReconstructor");
+
+
     // Constructors
 
         //- Construct given name.  Set meshes later

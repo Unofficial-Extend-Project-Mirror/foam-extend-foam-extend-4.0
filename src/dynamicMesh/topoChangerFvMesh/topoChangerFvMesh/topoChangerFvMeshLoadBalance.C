@@ -105,7 +105,11 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
     // Now that each processor has filled in its own part, combine the data
     Pstream::gatherList(migratedCells);
     Pstream::scatterList(migratedCells);
-    Info<< "Migrated cells per processor: " << migratedCells << endl;
+
+    if (debug)
+    {
+        Info<< "Migrated cells per processor: " << migratedCells << endl;
+    }
 
     // Reading through second index now tells how many cells will arrive
     // from which processor
@@ -558,17 +562,20 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         }
     }
 
-    forAll (procMeshes, procI)
+    if (debug)
     {
-        if (procMeshes.set(procI))
+        forAll (procMeshes, procI)
         {
-            Pout<< "procMesh " << procI
-                << " points " << procMeshes[procI].nPoints()
-                << " faces: " << procMeshes[procI].nFaces()
-                << " internal: " << procMeshes[procI].nInternalFaces()
-                << " cells: " << procMeshes[procI].nCells()
-                << " patches: " << procMeshes[procI].boundary().size()
-                << endl;
+            if (procMeshes.set(procI))
+            {
+                Pout<< "procMesh " << procI
+                    << " points " << procMeshes[procI].nPoints()
+                    << " faces: " << procMeshes[procI].nFaces()
+                    << " internal: " << procMeshes[procI].nInternalFaces()
+                    << " cells: " << procMeshes[procI].nCells()
+                    << " patches: " << procMeshes[procI].boundary().size()
+                    << endl;
+            }
         }
     }
 
@@ -577,15 +584,18 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         meshRecon.reconstructMesh(dummyTime);
     fvMesh& reconMesh = reconstructedMeshPtr();
 
-    Pout<< "Reconstructed mesh stats: "
-        << " nCells: " << reconMesh.nCells()
-        << " nFaces: " << reconMesh.nFaces()
-        << " nIntFaces: " << reconMesh.nInternalFaces()
-        << " polyPatches: "
-        << reconMesh.boundaryMesh().size()
-        << " patches: "
-        << reconMesh.boundary().size()
-        << endl;
+    if (debug)
+    {
+        Pout<< "Reconstructed mesh stats: "
+            << " nCells: " << reconMesh.nCells()
+            << " nFaces: " << reconMesh.nFaces()
+            << " nIntFaces: " << reconMesh.nInternalFaces()
+            << " polyPatches: "
+            << reconMesh.boundaryMesh().size()
+            << " patches: "
+            << reconMesh.boundary().size()
+            << endl;
+    }
 
     // Apply changes to the local mesh:
     // - refactor the boundary to match new patches.  Note: processor

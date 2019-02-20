@@ -180,7 +180,10 @@ void Foam::topoChangerFvMesh::rebuildFields
 
         const PtrList<GeoField>& partFields = receivedFields[fieldI];
 
-        Pout<< "Rebuilding field " << masterField.name() << endl;
+        if (debug)
+        {
+            Pout<< "Rebuilding field " << masterField.name() << endl;
+        }
 
         // Check name match.  Note: there may be holes
         word partName;
@@ -266,11 +269,15 @@ void Foam::topoChangerFvMesh::rebuildFields
          != GeoField::GeoMeshType::size(masterField.mesh())
         )
         {
-            Pout<< "Resizing internal field: old size = "
-                << masterField.size()
-                << " new size = "
-                << GeoField::GeoMeshType::size(masterField.mesh())
-                << endl;
+            if (debug)
+            {
+                Pout<< "Resizing internal field: old size = "
+                    << masterField.size()
+                    << " new size = "
+                    << GeoField::GeoMeshType::size(masterField.mesh())
+                    << endl;
+            }
+
             masterField.setSize
             (
                 GeoField::GeoMeshType::size(masterField.mesh())
@@ -283,9 +290,12 @@ void Foam::topoChangerFvMesh::rebuildFields
 
         if (patchFields.size() != masterField.mesh().boundary().size())
         {
-            Pout<< "Resizing boundary field: "
+            if (debug)
+            {
+                Pout<< "Resizing boundary field: "
                     << masterField.mesh().boundary().size()
                     << endl;
+            }
 
             patchFields.setSize(masterField.mesh().boundary().size());
         }
@@ -296,9 +306,12 @@ void Foam::topoChangerFvMesh::rebuildFields
             if (meshMap.resetPatchFlag()[patchI])
             {
                 // Create a new constrained patch field
-                Pout<< "Inserting constrained patch field for patch "
-                    << masterField.mesh().boundary()[patchI].name()
-                    << endl;
+                if (debug)
+                {
+                    Pout<< "Inserting constrained patch field for patch "
+                        << masterField.mesh().boundary()[patchI].name()
+                        << endl;
+                }
 
                 patchFields.set
                 (
@@ -325,12 +338,15 @@ void Foam::topoChangerFvMesh::rebuildFields
             )
             {
                 // Resize patch field
-                Pout<< "Resizing patch field for patch "
-                    << masterField.mesh().boundary()[patchI].name()
-                    << " old size: " << patchFields[patchI].size()
-                    << " new size: "
-                    << masterField.mesh().boundary()[patchI].size()
-                    << endl;
+                if (debug)
+                {
+                    Pout<< "Resizing patch field for patch "
+                        << masterField.mesh().boundary()[patchI].name()
+                        << " old size: " << patchFields[patchI].size()
+                        << " new size: "
+                        << masterField.mesh().boundary()[patchI].size()
+                        << endl;
+                }
 
                 // Reset patch field size
                 patchFields[patchI].autoMap
@@ -349,7 +365,11 @@ void Foam::topoChangerFvMesh::rebuildFields
 
         // Increment field counter
         fieldI++;
-        Pout<< "... done" << endl;
+
+        if (debug)
+        {
+            Pout<< "... done" << endl;
+        }
     }
 
     // HR 14.12.18: We create new processor boundary faces from internal

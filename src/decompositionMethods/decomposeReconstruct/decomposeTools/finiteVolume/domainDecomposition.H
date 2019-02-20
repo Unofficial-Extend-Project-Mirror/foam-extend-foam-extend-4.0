@@ -163,6 +163,7 @@ public:
     // Declare name of the class and its debug switch
     ClassName("domainDecomposition");
 
+
     // Constructors
 
         //- Construct from mesh and dictionary
