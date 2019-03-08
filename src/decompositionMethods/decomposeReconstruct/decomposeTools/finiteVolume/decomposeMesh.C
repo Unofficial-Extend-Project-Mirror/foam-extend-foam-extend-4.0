@@ -470,10 +470,12 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                 // list of neigbhour (for master proc or owner for slave proc)
                 // cells. We'll sort the list of neighbouring cells and use the
                 // indices to add the patch faces in the correct order later
-                // on. There's probably a million other ways to write this in a
-                // better way, but I can't figure them out at the moment.
-                // VV, 16/Feb/2019.
-                Map<Pair<dynamicLabelList> > faceCellToNbrFaceCells(fc.size()/10);
+                // on. VV, 16/Feb/2019.
+                Map<Pair<dynamicLabelList> > faceCellToNbrFaceCells
+                (
+                    // Reasonable size estimate (minimum = 10)
+                    max(10, fc.size()/10)
+                );
 
                 forAll (fc, patchFaceI)
                 {

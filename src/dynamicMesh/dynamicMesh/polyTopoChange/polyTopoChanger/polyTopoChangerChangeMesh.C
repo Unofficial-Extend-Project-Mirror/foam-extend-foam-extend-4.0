@@ -2490,12 +2490,15 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh()
             topoChangeRequest()()
         );
 
+        // Mesh data needs to be updated before the update of polyMeshModifiers
+        // because polyMeshModifiers might need all the new polyMesh data (see
+        // below for further comments). VV, 19/Feb/2019
         mesh_.updateMesh(topoChangeMap());
 
         // Bugfix: call to polyTopoChanger::update must happen after
         // polyMesh::updateMesh where all the relevant mesh bits for parallel
         // comms are updated. First noticed when the syncying of pointLevel in
-        // refinement::updateMesh was syncying properly. VV, 19/Feb/2019
+        // refinement::updateMesh was not syncying properly. VV, 19/Feb/2019
         update(topoChangeMap());
 
         // Increment the morph index
