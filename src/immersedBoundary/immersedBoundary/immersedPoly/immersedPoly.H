@@ -26,7 +26,8 @@ Class
 
 Description
     immersedPoly holds basic data for immersed face/cell objects
-    Wet side is "inside", indicated by negative distance to surface
+    WET side is "inside", indicated by negative distance to surface.
+    Positive distance to surface is DRY.
 
 SourceFiles
     immersedPoly.C
@@ -67,9 +68,18 @@ public:
         //- Number of iterations in the iterative intersection
         static const debug::optimisationSwitch nIter_;
 
-        //- Tolerance for considering a point on surface. Used as a fraction
-        //  of edge length
+        //- Tolerance for considering a point on surface.
+        //  Used as a fraction of edge length
         static const debug::tolerancesSwitch tolerance_;
+
+        //- Live factor
+        //  Fraction of face/cell size within the IB for which the face/cell is
+        //  considered to be live
+        static const debug::tolerancesSwitch liveFactor_;
+
+        //- Bad cut factor
+        //  Fraction of face/cell size error that declares a bad cut
+        static const debug::tolerancesSwitch badCutFactor_;
 };
 
 

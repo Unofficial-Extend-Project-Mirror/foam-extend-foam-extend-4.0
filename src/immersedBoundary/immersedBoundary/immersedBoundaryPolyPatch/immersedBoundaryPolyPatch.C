@@ -54,14 +54,6 @@ namespace Foam
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 const Foam::debug::tolerancesSwitch
-Foam::immersedBoundaryPolyPatch::liveFactor_
-(
-    "immersedBoundaryLiveFactor",
-    1e-6
-);
-
-
-const Foam::debug::tolerancesSwitch
 Foam::immersedBoundaryPolyPatch::spanFactor_
 (
     "immersedBoundarySpanFactor",
@@ -261,7 +253,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
             // If the nearest triangle cannot be found within span than this is
             // most probably a tri surface search error. Mark unknown and check
             // later. (IG 22/Nov/2018)
-            if(tss.nearest(C[cellI], span/spanFactor_()).index() == -1)
+            if (tss.nearest(C[cellI], span/spanFactor_()).index() == -1)
             {
                 intersectedCell[cellI] = immersedPoly::UNKNOWN;
             }
@@ -329,7 +321,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
             {
                 // There are either no wet or dry negbours or there are both.
                 // This should not be possible. NOTE: the check is not
-                // parallelised and this can theoretically lead to failiures in
+                // parallelised and this can theoretically lead to failures in
                 // strange arrangaments.
                 // Issue a warning, mark CUT and hope for the best.
                 // (IG 22/Nov/2018)
@@ -433,60 +425,50 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
             }
             else
             {
-                // Real intesection.  Check cut
-                const scalar cellFactor = cutCell.wetVolume()/V[cellI];
+                // True intersection.  Cut the cell and store all
+                // derived data
 
-                if (cellFactor < liveFactor_())
+                // Note: volumetric check is not allowed because true
+                // intersection guarantees that the faces of the cell
+                // have been cut.  Therefore, the cell MUST be an IB cell.
+                // If the cut is invalid, Marooney Maneouvre shall correct
+                // the error in sum(Sf).  HJ, 12/Mar/2019
+
+                // Store ibFace with local points. Points merge will
+                // take place later
+                const face& cutFace = cutCell.faces()[0];
+
+                const pointField& cutPoints = cutCell.points();
+
+                // Collect the renumbered face, using the point labels
+                // from the unmergedPoints list
+                face renumberedFace(cutFace.size());
+
+                // Insert points and renumber the face
+                forAll (cutFace, cpI)
                 {
-                    // Thin cut: cell is dry
-                    intersectedCell[cellI] = immersedPoly::DRY;
+                    unmergedPoints.append(cutPoints[cutFace[cpI]]);
+                    renumberedFace[cpI] = nIbPoints;
+                    nIbPoints++;
                 }
-                else if (cellFactor > (1 - liveFactor_()))
-                {
-                    // Thick cut: cell is wet
-                    intersectedCell[cellI] = immersedPoly::WET;
-                }
-                else
-                {
-                    // True intersection.  Cut the cell and store all
-                    // derived data
 
-                    // Store ibFace with local points. Points merge will
-                    // take place later
-                    const face& cutFace = cutCell.faces()[0];
+                // Record the face
+                unmergedFaces[nIbCells] = renumberedFace;
 
-                    const pointField& cutPoints = cutCell.points();
+                // Collect cut cell index
+                ibCells[nIbCells] = cellI;
 
-                    // Collect the renumbered face, using the point labels
-                    // from the unmergedPoints list
-                    face renumberedFace(cutFace.size());
+                // Record the live centre
+                ibCellCentres[nIbCells] = cutCell.wetVolumeCentre();
 
-                    // Insert points and renumber the face
-                    forAll (cutFace, cpI)
-                    {
-                        unmergedPoints.append(cutPoints[cutFace[cpI]]);
-                        renumberedFace[cpI] = nIbPoints;
-                        nIbPoints++;
-                    }
+                // Record the live volume
+                ibCellVolumes[nIbCells] = cutCell.wetVolume();
 
-                    // Record the face
-                    unmergedFaces[nIbCells] = renumberedFace;
+                // Record the nearest triangle to the face centre
+                nearestTri[nIbCells] =
+                    tss.nearest(cutFace.centre(cutPoints), span).index();
 
-                    // Collect cut cell index
-                    ibCells[nIbCells] = cellI;
-
-                    // Record the live centre
-                    ibCellCentres[nIbCells] = cutCell.wetVolumeCentre();
-
-                    // Record the live volume
-                    ibCellVolumes[nIbCells] = cutCell.wetVolume();
-
-                    // Record the nearest triangle to the face centre
-                    nearestTri[nIbCells] =
-                        tss.nearest(cutFace.centre(cutPoints), span).index();
-
-                    nIbCells++;
-                }
+                nIbCells++;
             }
         }
     }
@@ -1079,36 +1061,24 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                 }
                 else
                 {
-                    // Real intesection.  Check cut
+                    // Real intesection.  Check cut. Rejection on thin cut is
+                    // performed by ImmersedFace.  HJ, 13/Mar/2019
                     const scalar faceFactor =
                         cutFace.wetAreaMag()/mag(S[faceI]);
 
-                    if (faceFactor < liveFactor_())
-                    {
-                        // Thin cut: face is dry
-                        intersectedFace[faceI] = immersedPoly::DRY;
-                    }
-                    else if (faceFactor > (1 - liveFactor_()))
-                    {
-                        // Thick cut: face is wet
-                        intersectedFace[faceI] = immersedPoly::WET;
-                    }
-                    else
-                    {
-                        // True intersection.  Collect data
-                        intersectedFace[faceI] = immersedPoly::CUT;
+                    // True intersection.  Collect data
+                    intersectedFace[faceI] = immersedPoly::CUT;
 
-                        // Get intersected face index
-                        ibFaces[nIbFaces] = faceI;
+                    // Get intersected face index
+                    ibFaces[nIbFaces] = faceI;
 
-                        // Get wet centre
-                        ibFaceCentres[nIbFaces] = cutFace.wetAreaCentre();
+                    // Get wet centre
+                    ibFaceCentres[nIbFaces] = cutFace.wetAreaCentre();
 
-                        // Get wet area, preserving original normal direction
-                        ibFaceAreas[nIbFaces] = faceFactor*S[faceI];
+                    // Get wet area, preserving original normal direction
+                    ibFaceAreas[nIbFaces] = faceFactor*S[faceI];
 
-                        nIbFaces++;
-                    }
+                    nIbFaces++;
                 }
             }
         }
@@ -1260,41 +1230,55 @@ void Foam::immersedBoundaryPolyPatch::calcCorrectedGeometry() const
     // by the Marooney Maneouvre, where the face sum imbalance is compensated
     // in the cut face.  HJ, 11/Dec/2017
 
-    vectorField sumSf(mesh.nCells(), vector::zero);
-
-    // Get face addressing
     const labelList& owner = mesh.faceOwner();
-    const labelList& neighbour = mesh.faceNeighbour();
-
-    forAll (owner, faceI)
-    {
-        sumSf[owner[faceI]] += Sf[faceI];
-    }
-
-    forAll (neighbour, faceI)
-    {
-        sumSf[neighbour[faceI]] -= Sf[faceI];
-    }
 
     forAll (cutCells, cutCellI)
     {
         const label ccc = cutCells[cutCellI];
-        if
-        (
-            mag(sumSf[ccc]) > 1e-12
-            // The below criteria is still not firmly established, potential
-            // place for cutting errors (IG 19/Dec/2018)
-         && mag(sumSf[ccc] + ibSf[cutCellI])/cutCellVolumes[cutCellI] > 1e-6
-        )
-        {
-            // Info<< "Marooney Maneouvre for cell " << ccc
-            //     << " error: " << mag(sumSf[ccc] + ibSf[cutCellI]) << " "
-            //     << mag(sumSf[ccc] + ibSf[cutCellI])/cutCellVolumes[cutCellI]
-            //     << " " << sumSf[ccc] << " "
-            //     << " V: " << cutCellVolumes[cutCellI]
-            //     << " Sf: " << ibSf[cutCellI] << endl;
 
-            ibSf[cutCellI] = -sumSf[ccc];
+        // Calculate sum Sf and sumMagSf for the cell
+        const cell& curCell = mesh.cells()[ccc];
+
+        vector curSumSf = vector::zero;
+        scalar curSumMagSf = 0;
+
+        // Collect from regular faces
+        forAll (curCell, cfI)
+        {
+            const vector& curSf = Sf[curCell[cfI]];
+
+            // Check owner/neighbour
+            if (owner[curCell[cfI]] == ccc)
+            {
+                curSumSf += curSf;
+            }
+            else
+            {
+                curSumSf -= curSf;
+            }
+
+            curSumMagSf += mag(curSf);
+        }
+
+        // Add cut face only into mag.  The second part is handled in the
+        // if-statement
+        curSumMagSf += mag(ibSf[cutCellI]);
+
+        // Adjustment is peformed when the openness is greater than a certain
+        // fraction of surface area.  Criterion by IG, 13/Mar/2019
+        // Switched to using absolute check from primitiveMeshCheck.
+        // HJ, 13/Mar/2019
+        // if (mag(curSumSf + ibSf[cutCellI]) > 1e-6*curSumMagSf)
+        if (mag(curSumSf + ibSf[cutCellI]) > primitiveMesh::closedThreshold_)
+        {
+            Info<< "Marooney Maneouvre for cell " << ccc
+                << " error: " << mag(curSumSf + ibSf[cutCellI]) << " "
+                << " S: " << curSumMagSf
+                << " V: " << cutCellVolumes[cutCellI]
+                << " Sf: " << ibSf[cutCellI] << endl;
+
+            // Create IB face to ideally close the cell
+            ibSf[cutCellI] = -curSumSf;
         }
     }
 }

@@ -65,12 +65,14 @@ void Foam::ImmersedFace<Distance>::createSubfaces
         const scalar edgeLength = curEdge.mag(localPoints);
 
         // Check if there is a legitimate cut to be found
+        // Note: synced tolerances in ImmersedCell and ImmersedFace
+        // HJ, 13/Mar/2019
         if
         (
             depth[start]*depth[end] < 0
          && edgeLength > SMALL
-         && mag(depth[start]) > edgeLength*tolerance_()
-         && mag(depth[end]) > edgeLength*tolerance_()
+         && mag(depth[start]) > edgeLength*immersedPoly::tolerance_()
+         && mag(depth[end]) > edgeLength*immersedPoly::tolerance_()
         )
         {
             // Prepare a new point to insert and determine its location
@@ -177,8 +179,8 @@ void Foam::ImmersedFace<Distance>::createSubfaces
 
     // Analyse new depth
 
-    // For each point, determine if it is submerged(=-1), dry(=1) or
-    // on the surface (=0)
+    // For each point, determine if it is submerged( = -1), dry( = 1) or
+    // on the surface ( = 0)
     labelField isSubmerged(newDepth.size());
 
     forAll (newDepth, pointI)
@@ -270,19 +272,19 @@ void Foam::ImmersedFace<Distance>::createSubfaces
         {
             drySubface_.setSize(nDry);
 
-            // Check area: if it is very small, reset the face
-            if
-            (
-                drySubface_.mag(facePointsAndIntersections_)
-              < immersedPoly::tolerance_()*
-                localFace.mag(facePointsAndIntersections_)
-            )
-            {
-                // The face is practically wet
-                isAllWet_ = true;
+            // // Check area: if it is very small, reset the face
+            // if
+            // (
+            //     drySubface_.mag(facePointsAndIntersections_)
+            //   < immersedPoly::liveFactor_()*
+            //     localFace.mag(facePointsAndIntersections_)
+            // )
+            // {
+            //     // The face is practically wet
+            //     isAllWet_ = true;
 
-                drySubface_.clear();
-            }
+            //     drySubface_.clear();
+            // }
         }
 
         if (nWet < 3)
@@ -297,21 +299,21 @@ void Foam::ImmersedFace<Distance>::createSubfaces
         {
             wetSubface_.setSize(nWet);
 
-            // Check area: if it is very small, reset the face
-            // Note: must use relative tolerance, ie divide with original face
-            // area magnitude.  HJ, 30/Aug/2018
-            if
-            (
-                wetSubface_.mag(facePointsAndIntersections_)
-              < immersedPoly::tolerance_()*
-                localFace.mag(facePointsAndIntersections_)
-            )
-            {
-                // The face is practically dry
-                isAllDry_ = true;
+            // // Check area: if it is very small, reset the face
+            // // Note: must use relative tolerance, ie divide with original face
+            // // area magnitude.  HJ, 30/Aug/2018
+            // if
+            // (
+            //     wetSubface_.mag(facePointsAndIntersections_)
+            //   < immersedPoly::liveFactor_()*
+            //     localFace.mag(facePointsAndIntersections_)
+            // )
+            // {
+            //     // The face is practically dry
+            //     isAllDry_ = true;
 
-                wetSubface_.clear();
-            }
+            //     wetSubface_.clear();
+            // }
         }
     }
 }

@@ -35,6 +35,21 @@ Implementation
     The class builds a primitiveMesh with the local point, face and cell list
     which is then manipulated as needed.
 
+Note
+    The new immersed boundary algorithm requires that a valid intersection
+    is calculated for the cell even if no such intersection exists, eg there
+    are only 1 or 2 faces protruding through the surface.
+
+    The reason for this is thta due to the Marooney Maneouvre correction,
+    the cell cut status is determined based on the face cut status:
+    if there are properly cut faces in the cell, a valid cell intersection
+    needs to be provided.
+    It is expected that such errors will happen only under extreme
+    circumstances.
+
+    Further, the ImmersedCell class is enhanced by the capacity to detect
+    bad intersections, eg. two detached corners of a single cells are cut off.
+
 SourceFiles
     ImmersedCell.C
 
@@ -79,7 +94,7 @@ class ImmersedCell
         //- Point field with original cell points and intersection points
         pointField cellPointsAndIntersections_;
 
-        //- Minimum edge length in cell
+        //- Edge length tolerance based on minimum edge length in cell
         scalar absTol_;
 
         //- All wet
@@ -87,6 +102,9 @@ class ImmersedCell
 
         //- All dry
         bool isAllDry_;
+
+        //- Bad cut
+        bool isBadCut_;
 
 
         // Primitive mesh data for two cell mesh
@@ -113,13 +131,12 @@ class ImmersedCell
         //- Copied from class geomCellLooper
         void getBase(const vector& n, vector& e0, vector& e1) const;
 
-        //- Create points where the water surface intersects face edges
-        //  Return number of inserted points
-        //  and if so, insert additional points into points_ and adjust depth
-        label insertIntersectionPoints();
+        //- Create points where the surface intersects face edges.
+        //  Insert additional points into points_ and adjust depth
+        void insertIntersectionPoints();
 
         //- Make an internal face out of the intersection points
-        face createInternalFace(const label nIntersections) const;
+        face createInternalFace() const;
 
 
 public:
@@ -186,6 +203,12 @@ public:
             return isAllDry_;
         }
 
+        //- Does the cell have a bad cut
+        inline bool isBadCut() const
+        {
+            return isBadCut_;
+        }
+
         //- Return center of the cell's wet part
         inline point wetVolumeCentre() const
         {
@@ -212,7 +235,17 @@ public:
             }
             else
             {
-                return this->cellVolumes()[WET];
+                // Handle possible bad cut: cut volume must be between zero
+                // and original cell volume
+                return Foam::max
+                (
+                    scalar(0),
+                    Foam::min
+                    (
+                        mesh_.cellVolumes()[cellID_],
+                        this->cellVolumes()[WET]
+                    )
+                );
             }
         }
 };

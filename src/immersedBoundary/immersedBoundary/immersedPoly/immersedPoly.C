@@ -31,7 +31,7 @@ const Foam::debug::optimisationSwitch
 Foam::immersedPoly::nIter_
 (
     "immersedPolyNIter",
-    10
+    3
 );
 
 
@@ -39,7 +39,23 @@ const Foam::debug::tolerancesSwitch
 Foam::immersedPoly::tolerance_
 (
     "immersedPolyTolerance",
-    1e-7
+    1e-4
+);
+
+
+const Foam::debug::tolerancesSwitch
+Foam::immersedPoly::liveFactor_
+(
+    "immersedPolyLiveFactor",
+    1e-6
+);
+
+
+const Foam::debug::tolerancesSwitch
+Foam::immersedPoly::badCutFactor_
+(
+    "immersedPolyBadCutFactor",
+    0.01
 );
 
 

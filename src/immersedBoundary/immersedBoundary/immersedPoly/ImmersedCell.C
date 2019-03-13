@@ -74,7 +74,7 @@ void Foam::ImmersedCell<Distance>::getBase
 
 
 template<class Distance>
-Foam::label Foam::ImmersedCell<Distance>::insertIntersectionPoints()
+void Foam::ImmersedCell<Distance>::insertIntersectionPoints()
 {
     // Get list of edges
     const edgeList& edges = this->edges();
@@ -99,16 +99,19 @@ Foam::label Foam::ImmersedCell<Distance>::insertIntersectionPoints()
         const scalar edgeLength = mag(points_[end] - points_[start]);
 
         // Check if there is a legitimate cut to be found
+        // Note: synced tolerances in ImmersedCell and ImmersedFace
+        // HJ, 13/Mar/2019
         if
         (
             depth_[start]*depth_[end] < 0
          && edgeLength > SMALL
-         && mag(depth_[start]) > absTol_
-         && mag(depth_[end]) > absTol_
+         && mag(depth_[start]) > edgeLength*immersedPoly::tolerance_()
+         && mag(depth_[end]) > edgeLength*immersedPoly::tolerance_()
         )
         {
             // Prepare a new point to insert
             point cutPoint;
+            scalar depthAtCut = 0;
 
             // Intersection is along the edge length (pf[end] - pf[start])
             // times the ratio of the depth at start and the difference
@@ -131,14 +134,14 @@ Foam::label Foam::ImmersedCell<Distance>::insertIntersectionPoints()
                 scalar d1 = depth_[end];
 
                 // Convergence criterion is the depth at newP
-                scalar depthAtCut = dist_.distance(cutPoint);
+                depthAtCut = dist_.distance(cutPoint);
 
                 // initialize loop counter
                 label iters = 0;
 
                 while
                 (
-                    (mag(depthAtCut) > absTol_)
+                    (mag(depthAtCut) > immersedPoly::tolerance_())
                  && (iters < immersedPoly::nIter_())
                 )
                 {
@@ -184,7 +187,7 @@ Foam::label Foam::ImmersedCell<Distance>::insertIntersectionPoints()
                 // Count points added to new face
                 label nfp = 0;
 
-                // Loop throuhg old face.  If this edge is found, add the
+                // Loop through old face.  If this edge is found, add the
                 // cut point label into the edge
                 forAll (oldFace, fpI)
                 {
@@ -210,7 +213,8 @@ Foam::label Foam::ImmersedCell<Distance>::insertIntersectionPoints()
                 // Debug: check if point insertion was successful
                 if (nfp < newFace.size())
                 {
-                    FatalErrorIn("badInsertion")
+                    FatalErrorInFunction
+                        << "badInsertion"
                         << abort(FatalError);
                 }
 
@@ -228,41 +232,42 @@ Foam::label Foam::ImmersedCell<Distance>::insertIntersectionPoints()
     // Extra depths are all zero
     depth_.setSize(nPoints);
 
+    // For all cut points set depth to exactly zero
     for (label i = oldSize; i < depth_.size(); i++)
     {
         depth_[i] = 0;
     }
-
-    // Check for successful intersection: more than 3 added points
-    // can form an internal face
-    return nPoints - oldSize;
 }
 
 
 template<class Distance>
-Foam::face Foam::ImmersedCell<Distance>::createInternalFace
-(
-    const label nIntersections
-) const
+Foam::face Foam::ImmersedCell<Distance>::createInternalFace() const
 {
-    // Sanity check: Do we have at least 3 intersection points?
-    if (nIntersections < 3)
+    // Declare internal face with mixed-up point ordering
+    face unorderedInternalFace(points_.size());
+
+    // Collect all points with zero distance to surface
+    label nPif = 0;
+
+    forAll (depth_, pointI)
     {
-         FatalErrorIn
-         (
-             "ImmersedCell::createInternalFace(const label nIntersections)"
-         )   << "Less than 3 intersection points between cell and free surface"
-             << abort(FatalError);
+        if (mag(depth_[pointI]) < absTol_)
+        {
+            // Found point on zero plane
+            unorderedInternalFace[nPif] = pointI;
+            nPif++;
+        }
     }
 
-    // Declare internal face with mixed-up point ordering
-    face unorderedInternalFace(nIntersections);
+    unorderedInternalFace.setSize(nPif);
 
-    forAll (unorderedInternalFace, i)
+    // Sanity check: Do we have at least 3 points at zero distance?
+    if (nPif < 3)
     {
-        label pointID = points_.size() - nIntersections + i;
-
-        unorderedInternalFace[i] = pointID;
+         FatalErrorInFunction
+             << "Less than 3 intersection points in cell on free surface." << nl
+             << "depth: " << depth_
+             << abort(FatalError);
     }
 
     // Order points, so that they form a polygon
@@ -308,7 +313,8 @@ Foam::face Foam::ImmersedCell<Distance>::createInternalFace
     if (pointID == -1)
     {
         // All intersection points are colinear
-        FatalErrorIn("Colinear points in cut")
+        FatalErrorInFunction
+            << "Colinear points in cut"
             << abort(FatalError);
     }
 
@@ -373,12 +379,10 @@ Foam::face Foam::ImmersedCell<Distance>::createInternalFace
         }
     }
 
-    if(nUndecided == depth_.size())
+    if (nUndecided == depth_.size())
     {
-         FatalErrorIn
-         (
-             "ImmersedCell::createInternalFace(const label nIntersections)"
-         )   << "All points lay on the tri surface, zero volume cell?"
+         FatalErrorInFunction
+             << "All points lay on the tri surface, zero volume cell?"
              << nl << "Points: " << points_
              << abort(FatalError);
     }
@@ -427,6 +431,7 @@ Foam::ImmersedCell<Distance>::ImmersedCell
     absTol_(0),
     isAllWet_(false),
     isAllDry_(false),
+    isBadCut_(false),
     // Initialize points_ with  points from cell
     points_(mesh_.cells()[cellID_].points(mesh_.faces(), mesh_.points())),
     faces_(),
@@ -435,14 +440,14 @@ Foam::ImmersedCell<Distance>::ImmersedCell
     faceNeighbour_(),
     depth_(dist.distance(points_))
 {
-    const cell& origCell = mesh.cells()[cellID];
+    const cell& origCell = mesh_.cells()[cellID];
 
     // Build a valid 1-cell mesh in local addressing
 
     // Create hash table that maps points on global mesh to local point list
     HashTable<label, label, Hash<label> > pointMapTable(points_.size());
 
-    labelList origCellPointLabels = origCell.labels(mesh.faces());
+    labelList origCellPointLabels = origCell.labels(mesh_.faces());
 
     forAll (points_, pointI)
     {
@@ -458,11 +463,11 @@ Foam::ImmersedCell<Distance>::ImmersedCell
     forAll (origCell, faceI)
     {
         // Get old point list of faceI
-        face origFace(mesh.faces()[origCell[faceI]]);
+        face origFace(mesh_.faces()[origCell[faceI]]);
 
         // Make sure that all faces point outward,
         // since they are going to be outside cells
-        if (!(mesh.faceOwner()[origCell[faceI]] == cellID))
+        if (!(mesh_.faceOwner()[origCell[faceI]] == cellID))
         {
             // Cell is not owner of face, revert face orientation
             // for the use in a 1-cell mesh
@@ -536,9 +541,11 @@ Foam::ImmersedCell<Distance>::ImmersedCell
     // Created expanded point and face lists
 
     // Insert intersection points and adjust depth for intersections
-    // This will add further points into the intersected face
-    // Depth at intersectin will be zero.  HJ, 5/Dec/2017
-    label nIntersections = insertIntersectionPoints();
+    // This will add further points into the intersected face if needed
+    // Depth at intersection will be zero.  HJ, 5/Dec/2017
+    // Note that it is possible to have the cut face even if no new points
+    // have been introduced.  HJ, 13/Mar/2019
+    insertIntersectionPoints();
 
     // Update primitiveMesh parameters
     this->reset
@@ -558,7 +565,18 @@ Foam::ImmersedCell<Distance>::ImmersedCell
     // At this point, a 1-cell mesh with faces enriched for intersections
     // is valid.  HJ, 5/Dec/2017
 
-    // Recheck, if there has been a successful cut at all
+    // Check if there has been a successful cut at all
+    // For a good cut there should be at least 3 points at zero level
+    label nIntersections = 0;
+
+    forAll (depth_, pointI)
+    {
+        if (mag(depth_[pointI]) < absTol_)
+        {
+            nIntersections++;
+        }
+    }
+
     if (nIntersections < 3)
     {
         // Check if cell centre is wet or dry, depending on greatest distance
@@ -581,7 +599,6 @@ Foam::ImmersedCell<Distance>::ImmersedCell
             return;
         }
     }
-
     // From here on, there exists a valid intersection
 
     // Resize the face list.  Each face can be split into two, with one
@@ -599,7 +616,7 @@ Foam::ImmersedCell<Distance>::ImmersedCell
     // with one point or edge, insert internal face that
     // connects all intersection points
     // create internal face, which gets inserted at front of faces_ list
-    faces_[0] = createInternalFace(nIntersections);
+    faces_[0] = createInternalFace();
 
     // Internal face points out of the wet cell.  Make the wet cell its owner
     faceOwner_[0] = WET;
@@ -611,8 +628,11 @@ Foam::ImmersedCell<Distance>::ImmersedCell
     // For all faces with inserted points, do face splitting
     forAll (enrichedFaces, oldFaceI)
     {
-        const face& oldFace = mesh.faces()[origCell[oldFaceI]];
+        const face& oldFace = mesh_.faces()[origCell[oldFaceI]];
         const face& newFace = enrichedFaces[oldFaceI];
+
+        // Calculate old face area locally to avoid triggering polyMesh
+        const scalar oldFaceArea = mag(mesh_.faceAreas()[origCell[oldFaceI]]);
 
         // If a face has been modified, it will have extra points
         if (newFace.size() != oldFace.size())
@@ -637,13 +657,13 @@ Foam::ImmersedCell<Distance>::ImmersedCell
                     dryFace[nDry] = newFace[pointI];
                     nDry++;
                 }
-                else if (depth_[newFace[pointI]] < 0)
+                else if (depth_[newFace[pointI]] < -absTol_)
                 {
                     // Point is submerged, add to wetFace
                     wetFace[nWet] = newFace[pointI];
                     nWet++;
                 }
-                else
+                else // depth_[newFace[pointI]] > absTol_
                 {
                     // Otherwise point must be dry, add to dryFace
                     dryFace[nDry] = newFace[pointI];
@@ -660,6 +680,23 @@ Foam::ImmersedCell<Distance>::ImmersedCell
                 faceOwner_[nFaces] = WET;
 
                 nFaces++;
+
+                // Check for bad wet face cut
+                if
+                (
+                    wetFace.mag(points_)
+                  > (1 + immersedPoly::badCutFactor_())*oldFaceArea
+                )
+                {
+                    // Wet face area is greater than original face area
+                    // This is a bad cut
+                    Info<< "Bad cell face cut: wet = ("
+                        << wetFace.mag(points_) << " "
+                        << oldFaceArea
+                        << ")" << endl;
+
+                    isBadCut_ = true;
+                }
             }
 
             if (nDry >= 3)
@@ -670,6 +707,23 @@ Foam::ImmersedCell<Distance>::ImmersedCell
                 faceOwner_[nFaces] = DRY;
 
                 nFaces++;
+
+                // Check for bad dry face cut
+                if
+                (
+                    dryFace.mag(points_)
+                  > (1 + immersedPoly::badCutFactor_())*oldFaceArea
+                )
+                {
+                    // Dry face area is greater than original face area
+                    // This is a bad cut
+                    Info<< "Bad cell face cut: dry = ("
+                        << dryFace.mag(points_) << " "
+                        << oldFaceArea
+                        << ")" << endl;
+
+                    isBadCut_ = true;
+                }
             }
         }
         else
@@ -685,7 +739,13 @@ Foam::ImmersedCell<Distance>::ImmersedCell
             // Create face depth distance as a subset
             scalarField faceDepth(depth_, newFace);
 
-            if (mag(min(faceDepth)) > mag(max(faceDepth)))
+            // Since the face has not been cut, all faceDepth should have the
+            // same sign.  Otherwise, the face should straddle the immersed
+            // surface. Check on minimum.
+            // Note: this is a very precise check on purpose: there is no cut
+            // and the face belongs either to a wet cell or a dry cell
+            // HJ, 12/Mar/2019
+            if (min(faceDepth) < scalar(0))
             {
                 // Negative distance: wet face
                 faceOwner_[nFaces] = WET;
@@ -721,20 +781,45 @@ Foam::ImmersedCell<Distance>::ImmersedCell
         << "depth: " << depth_ << endl;
 #   endif
 
-    // Recheck, if the cut cell has significant volume.  If not, reset it
-    scalar wetCut = cellVolumes()[WET]/mesh_.cellVolumes()[cellID_];
+    const scalar oldCellVolume = mesh_.cellVolumes()[cellID_];
 
-    if (wetCut > 1 - immersedPoly::tolerance_())
+    // Note: is it legal to cut a zero volume cell?  HJ, 11/Mar/2019
+
+    scalar wetCut = cellVolumes()[WET]/oldCellVolume;
+
+    scalar dryCut = cellVolumes()[DRY]/oldCellVolume;
+
+    // Check for bad cell cut based on volume
+    if
+    (
+        wetCut < -immersedPoly::badCutFactor_()
+     || wetCut > (1 + immersedPoly::badCutFactor_())
+     || dryCut < -immersedPoly::badCutFactor_()
+     || dryCut > (1 + immersedPoly::badCutFactor_())
+    )
     {
-        // The cell is practically wet
-        isAllWet_ = true;
+        isBadCut_ = true;
     }
 
-    if (wetCut < immersedPoly::tolerance_())
+    if (isBadCut_)
     {
-        // The cell is practically dry
-        isAllDry_ = true;
+        Info<< "Bad cell cut: volume = (" << wetCut << " " << dryCut
+            << ") = " << wetCut + dryCut << nl
+            // << "Points: " << nl << this->points() << nl
+            // << "Faces: " << nl << this->faces() << nl
+            // << "Owner: " << nl << this->faceOwner() << nl
+            // << "Neighbour: " << nl << this->faceNeighbour() << nl
+            // << "Cut (wet dry) = (" << isAllWet_ << " " << isAllDry_ << ")"
+            << endl;
     }
+
+    // Correction on cutting is not allowed, as it results in an open cell
+    // if faces are cut and the cell is not.
+    // Previous check confirmed more than 3 valid cut points in the cell,
+    // which means that some of the faces were cut.
+    // Cutting tolerances for the cell and face have been adjusted to make sure
+    // identical cut has been produced.
+    // HJ, 11/Mar/2019
 }
 
 

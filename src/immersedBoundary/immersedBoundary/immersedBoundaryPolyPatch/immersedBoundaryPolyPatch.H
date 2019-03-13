@@ -86,11 +86,6 @@ class immersedBoundaryPolyPatch
 
     // Static data
 
-        //- Live volume factor
-        //  Fraction of face/cell size within the IB for which the face/cell is
-        //  considered to be live
-        static const debug::tolerancesSwitch liveFactor_;
-
         //- Search span factor
         //  Factor used to multiply the span of the cell to get the tri-seach
         //  span
