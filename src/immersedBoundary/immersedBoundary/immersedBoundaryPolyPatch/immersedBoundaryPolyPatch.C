@@ -1232,6 +1232,8 @@ void Foam::immersedBoundaryPolyPatch::calcCorrectedGeometry() const
 
     const labelList& owner = mesh.faceOwner();
 
+    label nMarooneyCells = 0;
+    
     forAll (cutCells, cutCellI)
     {
         const label ccc = cutCells[cutCellI];
@@ -1271,14 +1273,29 @@ void Foam::immersedBoundaryPolyPatch::calcCorrectedGeometry() const
         // if (mag(curSumSf + ibSf[cutCellI]) > 1e-6*curSumMagSf)
         if (mag(curSumSf + ibSf[cutCellI]) > primitiveMesh::closedThreshold_)
         {
-            Info<< "Marooney Maneouvre for cell " << ccc
-                << " error: " << mag(curSumSf + ibSf[cutCellI]) << " "
-                << " S: " << curSumMagSf
-                << " V: " << cutCellVolumes[cutCellI]
-                << " Sf: " << ibSf[cutCellI] << endl;
+            // Info<< "Marooney Maneouvre for cell " << ccc
+            //     << " error: " << mag(curSumSf + ibSf[cutCellI]) << " "
+            //     << " S: " << curSumMagSf
+            //     << " V: " << cutCellVolumes[cutCellI]
+            //     << " Sf: " << ibSf[cutCellI] << endl;
 
+            nMarooneyCells++;
+            
             // Create IB face to ideally close the cell
             ibSf[cutCellI] = -curSumSf;
+        }
+    }
+
+    if (debug)
+    {
+        if (nMarooneyCells > 0)
+        {
+            InfoIn
+            (
+                "void immersedBoundaryPolyPatch::calcCorrectedGeometry() const"
+            )   << "Marooney Maneouvre used for " << nMarooneyCells
+                << " out of " << cutCells.size()
+                << endl;
         }
     }
 }
