@@ -658,6 +658,12 @@ tensor hinv(const tensor& t)
             zeroInv += tensor(sqr(eigVecs.y()));
         }
 
+        if (det(t + zeroInv) < VSMALL)
+        {
+            // Determinant is still zero.  Return zero inverse
+            return tensor::zero;
+        }
+
         return inv(t + zeroInv) - zeroInv;
     }
 }
@@ -703,6 +709,12 @@ symmTensor hinv(const symmTensor& t)
         if (mag(eig.z()) > hinvLarge*mag(eig.y()))
         {
             zeroInv += sqr(eigVecs.y());
+        }
+
+        if (det(t + zeroInv) < VSMALL)
+        {
+            // Determinant is still zero.  Return zero inverse
+            return symmTensor::zero;
         }
 
         return inv(t + zeroInv) - zeroInv;
