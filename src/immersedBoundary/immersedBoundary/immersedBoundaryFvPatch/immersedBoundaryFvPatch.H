@@ -120,6 +120,9 @@ protected:
 
         // Discretisation correction functions
 
+            //- Make patch face - neighbour cell distances
+            virtual void makeDeltaCoeffs(fvsPatchScalarField&) const;
+
             //- Make patch face non-orthogonality correction vectors
             virtual void makeCorrVecs(fvsPatchVectorField&) const;
 
@@ -168,6 +171,16 @@ public:
 
             //- Return faceCells next to the IB surface
             virtual const unallocLabelList& faceCells() const;
+
+
+        // Access functions for geometrical data
+
+            //- Return face normals
+            virtual tmp<vectorField> nf() const;
+
+
+            //- Return cell-centre to face-centre vector
+            virtual tmp<vectorField> delta() const;
 
 
         // Access to immersed boundary components
