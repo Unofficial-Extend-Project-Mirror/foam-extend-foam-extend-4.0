@@ -88,11 +88,11 @@ reconstruct
         surfaceSum((mesh.Sf()/mesh.magSf())*ssf);
 
     // Note: hinv inverse must be used to stabilise the inverse on bad meshes
-    // but it gives strange failures
+    // but it gives strange failures.  Fixed hinv.  HJ, 22/Mar/2019
     // HJ, 19/Aug/2015
     reconField.internalField() =
     (
-        inv
+        hinv
         (
             surfaceSum(sqr(mesh.Sf())/mesh.magSf())().internalField()
         )
