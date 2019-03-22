@@ -60,28 +60,10 @@ void Foam::immersedBoundaryFvPatch::makeCf(slicedSurfaceVectorField& Cf) const
     // Insert the patch data for the immersed boundary
     // Note: use the face centres from the stand-alone patch within the IB
     // HJ, 30/Nov/2017
-    // NOTE: Loop though all ib boundaries in order to update the fields
-    // overwritten by reset. Needed for multiple IB patches (IG 2/Nov/2018)
-    const fvMesh& mesh = boundaryMesh().mesh();
-    forAll(mesh.boundary(), patchI)
-    {
-        if(isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
-        {
-            const immersedBoundaryFvPatch& curIbPatch = refCast
-            <
-                const immersedBoundaryFvPatch
-            >(mesh.boundary()[patchI]);
-
-            Cf.boundaryField()[patchI].UList::operator=
-                (
-                    vectorField::subField
-                    (
-                        curIbPatch.ibPolyPatch().ibPatch().faceCentres(),
-                        curIbPatch.size()
-                    )
-                );
-        }
-    }
+    Cf.boundaryField()[index()].UList::operator=
+    (
+        vectorField::subField(ibPolyPatch_.ibPatch().faceCentres(), size())
+    );
 }
 
 
@@ -94,28 +76,10 @@ void Foam::immersedBoundaryFvPatch::makeSf(slicedSurfaceVectorField& Sf) const
     // Note: use the corrected face areas from immersed boundary instead of
     // the stand-alone patch areas within the IB
     // HJ, 30/Nov/2017
-    // NOTE: Loop though all ib boundaries in order to update the fields
-    // overwritten by reset. Needed for multiple IB patches (IG 2/Nov/2018)
-    const fvMesh& mesh = boundaryMesh().mesh();
-    forAll(mesh.boundary(), patchI)
-    {
-        if(isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
-        {
-            const immersedBoundaryFvPatch& curIbPatch = refCast
-            <
-                const immersedBoundaryFvPatch
-            >(mesh.boundary()[patchI]);
-
-            Sf.boundaryField()[patchI].UList::operator=
-                (
-                    vectorField::subField
-                    (
-                        curIbPatch.ibPolyPatch().correctedIbPatchFaceAreas(),
-                        curIbPatch.size()
-                    )
-                );
-        }
-    }
+    Sf.boundaryField()[index()].UList::operator=
+    (
+        vectorField::subField(ibPolyPatch_.correctedIbPatchFaceAreas(), size())
+    );
 }
 
 
@@ -131,28 +95,10 @@ void Foam::immersedBoundaryFvPatch::makeC(slicedVolVectorField& C) const
     // Insert the patch data for the immersed boundary
     // Note: use the face centres from the stand-alone patch within the IB
     // HJ, 30/Nov/2017
-    // NOTE: Loop though all ib boundaries in order to update the fields
-    // overwritten by reset. Needed for multiple IB patches (IG 2/Nov/2018)
-    const fvMesh& mesh = boundaryMesh().mesh();
-    forAll(mesh.boundary(), patchI)
-    {
-        if(isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
-        {
-            const immersedBoundaryFvPatch& curIbPatch = refCast
-            <
-                const immersedBoundaryFvPatch
-            >(mesh.boundary()[patchI]);
-
-            C.boundaryField()[patchI].UList::operator=
-                (
-                    vectorField::subField
-                    (
-                        curIbPatch.ibPolyPatch().ibPatch().faceCentres(),
-                        curIbPatch.size()
-                    )
-                );
-        }
-    }
+    C.boundaryField()[index()].UList::operator=
+    (
+        vectorField::subField(ibPolyPatch_.ibPatch().faceCentres(), size())
+    );
 }
 
 
@@ -285,10 +231,10 @@ void Foam::immersedBoundaryFvPatch::updatePhi
             scalar corrOldVol = newVols[cellI] - divPhi[cellI]*deltaT;
 
             // Info<< "Flux maneouvre for cell " << cellI << ": "
+            //     << " error: " << magDivPhi[cellI]
             //     << " V: " << newVols[cellI]
             //     << " V0: " << oldVols[cellI]
-            //     << " divPhi: " << divPhi[cellI]
-            //     << " error: " << magDivPhi[cellI];
+            //     << " divPhi: " << divPhi[cellI];
 
             if (corrOldVol < SMALL)
             {
@@ -302,6 +248,17 @@ void Foam::immersedBoundaryFvPatch::updatePhi
             }
         }
     }
+}
+
+
+void Foam::immersedBoundaryFvPatch::makeDeltaCoeffs
+(
+    fvsPatchScalarField& dc
+) const
+{
+    const vectorField d = delta();
+
+    dc = 1.0/max((nf() & d), 0.05*mag(d));
 }
 
 
@@ -380,6 +337,24 @@ const Foam::unallocLabelList&
 Foam::immersedBoundaryFvPatch::faceCells() const
 {
     return ibPolyPatch_.ibCells();
+}
+
+
+Foam::tmp<Foam::vectorField> Foam::immersedBoundaryFvPatch::nf() const
+{
+    // The algorithm has been changed because basic IB patch information
+    // (nf and delta) is used in assembly of derived information
+    // (eg. deltaCoeffs) and circular dependency needs to be avoided.
+    // nf and delta vectors shall be calculated directly from the intersected
+    // patch.  HJ, 21/Mar/2019
+
+    return ibPolyPatch_.ibPatch().faceNormals();
+}
+
+
+Foam::tmp<Foam::vectorField> Foam::immersedBoundaryFvPatch::delta() const
+{
+    return ibPolyPatch_.ibPatch().faceCentres() - Cn();
 }
 
 
