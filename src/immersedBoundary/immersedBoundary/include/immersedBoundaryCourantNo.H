@@ -36,7 +36,7 @@ scalar velMag = 0.0;
 
 if (mesh.nInternalFaces())
 {
-    surfaceScalarField magPhi = mag(sGamma*phi);
+    surfaceScalarField magPhi = pos(sGamma - 0.5)*mag(phi);
 
     surfaceScalarField SfUfbyDelta =
         mesh.surfaceInterpolation::deltaCoeffs()*magPhi;
