@@ -277,7 +277,7 @@ public:
             const scalarField& magSf() const;
 
             //- Return face normals
-            tmp<vectorField> nf() const;
+            virtual tmp<vectorField> nf() const;
 
             //- Return cell-centre to face-centre vector
             //  except for coupled patches for which the cell-centre
