@@ -135,7 +135,7 @@ void Foam::immersedBoundaryFvPatch::updatePhi
     scalarField& phiIn = phi.internalField();
 
     const labelList& deadFaces = ibPolyPatch_.deadFaces();
-    forAll(deadFaces, dfI)
+    forAll (deadFaces, dfI)
     {
         const label faceI = deadFaces[dfI];
         if (mesh.isInternalFace(faceI))
@@ -145,7 +145,7 @@ void Foam::immersedBoundaryFvPatch::updatePhi
     }
  
     const labelList& cutFaces = ibPolyPatch_.ibFaces();
-    forAll(cutFaces, cfI)
+    forAll (cutFaces, cfI)
     {
         const label faceI = cutFaces[cfI];
         if (mesh.isInternalFace(faceI))
@@ -225,7 +225,8 @@ void Foam::immersedBoundaryFvPatch::updatePhi
     // HJ, 22/Dec/2017
     forAll (magDivPhi, cellI)
     {
-        if (magDivPhi[cellI] > SMALL)
+        // if (magDivPhi[cellI] > SMALL)
+        if (magDivPhi[cellI] > 1e-40)
         {
             // Attempt to correct via old volume
             scalar corrOldVol = newVols[cellI] - divPhi[cellI]*deltaT;
