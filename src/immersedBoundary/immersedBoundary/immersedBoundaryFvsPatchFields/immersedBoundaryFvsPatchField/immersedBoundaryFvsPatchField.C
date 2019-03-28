@@ -180,8 +180,8 @@ void immersedBoundaryFvsPatchField<Type>::write(Ostream& os) const
 {
     fvsPatchField<Type>::write(os);
     // The value entry needs to be written with zero size
-    // Field<Type>::null().writeEntry("value", os);
-    this->writeEntry("value", os);
+    Field<Type>::null().writeEntry("value", os);
+    // this->writeEntry("value", os);
 }
 
 
