@@ -189,7 +189,10 @@ void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::updateCoeffs()
         scalarField phip =
             p.patchField<surfaceScalarField, scalar>(fvc::meshPhi(U));
 
-        vectorField n = p.nf();
+        // Warning: cannot use patch normal but the real face normal
+        // THEY MAY NOT BE THE SAME!  HJ, 28/Mar/2019
+        vectorField n = p.Sf()/(p.magSf());
+
         const scalarField& magSf = p.magSf();
         scalarField Un = phip/(magSf + VSMALL);
 
