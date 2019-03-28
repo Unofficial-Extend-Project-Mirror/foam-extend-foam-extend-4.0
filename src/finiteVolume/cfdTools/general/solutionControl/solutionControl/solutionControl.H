@@ -104,6 +104,20 @@ protected:
             label corrNonOrtho_;
 
 
+        // Fields necessary for time and under-relaxation consistency
+
+            //- A coeff (A^~) arising from consistency formulation. Note: we can
+            //  have multiple pressure/velocity systems, hence the PtrList
+            mutable PtrList<surfaceScalarField> aCoeffPtrs_;
+
+            //- Face velocity needed for consistent formulation. Note: we can
+            //  have multiple pressure/velocity systems, hence the PtrList
+            mutable PtrList<surfaceVectorField> faceUPtrs_;
+
+            //- Hash Table containing indices of PtrLists for given names
+            mutable HashTable<label> indices_;
+
+
     // Protected Member Functions
 
         //- Read controls from fvSolution dictionary
@@ -193,22 +207,6 @@ protected:
 
 
 private:
-
-    // Private data
-
-        // Fields necessary for time and under-relaxation consistency
-
-            //- A coeff (A^~) arising from consistency formulation. Note: we can
-            //  have multiple pressure/velocity systems, hence the PtrList
-            mutable PtrList<surfaceScalarField> aCoeffPtrs_;
-
-            //- Face velocity needed for consistent formulation. Note: we can
-            //  have multiple pressure/velocity systems, hence the PtrList
-            mutable PtrList<surfaceVectorField> faceUPtrs_;
-
-            //- Hash Table containing indices of PtrLists for given names
-            mutable HashTable<label> indices_;
-
 
     // Private member functions
 
