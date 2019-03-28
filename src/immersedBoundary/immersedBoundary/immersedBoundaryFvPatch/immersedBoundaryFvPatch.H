@@ -176,8 +176,11 @@ public:
         // Access functions for geometrical data
 
             //- Return face normals
+            //  Note: n is calculated from the intersected primitive patch,
+            //  while Sf is fixed by Marooney Maneouvre.
+            //  They may not be parallel.  Reconsider
+            //  HJ, 28/Mar/2019
             virtual tmp<vectorField> nf() const;
-
 
             //- Return cell-centre to face-centre vector
             virtual tmp<vectorField> delta() const;
