@@ -69,7 +69,8 @@ class immersedBoundaryFvsPatchField
     // Private Member Functions
 
         //- Update field size to match the patch
-        void updateSize();
+        //  Return true if size has changed
+        bool updateSize();
 
 
 public:

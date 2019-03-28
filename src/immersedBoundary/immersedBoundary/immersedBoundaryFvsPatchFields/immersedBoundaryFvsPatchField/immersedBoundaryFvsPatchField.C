@@ -35,11 +35,18 @@ namespace Foam
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
-void immersedBoundaryFvsPatchField<Type>::updateSize()
+bool immersedBoundaryFvsPatchField<Type>::updateSize()
 {
     if (this->patch().size() != this->size())
     {
         this->setSize(this->patch().size());
+
+        // Size has changed
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
@@ -140,7 +147,14 @@ void immersedBoundaryFvsPatchField<Type>::rmap
 template<class Type>
 void immersedBoundaryFvsPatchField<Type>::updateOnMotion()
 {
-    this->updateSize();
+    if (this->updateSize())
+    {
+        // Size changed: must reset values.  HJ, 28/Mar/2019
+        Field<Type>::operator=
+        (
+            Field<Type>(this->patch().size(), pTraits<Type>::zero)
+        );
+    }
 }
 
 
@@ -150,12 +164,14 @@ void immersedBoundaryFvsPatchField<Type>::evaluate
     const Pstream::commsTypes
 )
 {
-    this->updateSize();
-
-    Field<Type>::operator=
-    (
-        Field<Type>(this->patch().size(), pTraits<Type>::zero)
-    );
+    if (this->updateSize())
+    {
+        // Size changed: must reset values.  HJ, 28/Mar/2019
+        Field<Type>::operator=
+        (
+            Field<Type>(this->patch().size(), pTraits<Type>::zero)
+        );
+    }
 }
 
 
@@ -164,8 +180,8 @@ void immersedBoundaryFvsPatchField<Type>::write(Ostream& os) const
 {
     fvsPatchField<Type>::write(os);
     // The value entry needs to be written with zero size
-    Field<Type>::null().writeEntry("value", os);
-    // this->writeEntry("value", os);
+    // Field<Type>::null().writeEntry("value", os);
+    this->writeEntry("value", os);
 }
 
 
