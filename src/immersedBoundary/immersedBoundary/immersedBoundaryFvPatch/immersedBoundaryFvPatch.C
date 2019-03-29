@@ -186,14 +186,14 @@ void Foam::immersedBoundaryFvPatch::updatePhi
     const unallocLabelList& owner = mesh.owner();
     const unallocLabelList& neighbour = mesh.neighbour();
 
-    forAll(owner, faceI)
+    forAll (owner, faceI)
     {
         divPhi[owner[faceI]] += phiIn[faceI];
         divPhi[neighbour[faceI]] -= phiIn[faceI];
     }
 
     // Add the mesh motion fluxes from all patches including immersed boundary
-    forAll(mesh.boundary(), patchI)
+    forAll (mesh.boundary(), patchI)
     {
         const unallocLabelList& pFaceCells =
             mesh.boundary()[patchI].faceCells();
@@ -235,7 +235,8 @@ void Foam::immersedBoundaryFvPatch::updatePhi
             //     << " error: " << magDivPhi[cellI]
             //     << " V: " << newVols[cellI]
             //     << " V0: " << oldVols[cellI]
-            //     << " divPhi: " << divPhi[cellI];
+            //     << " divPhi: " << divPhi[cellI]
+            //     << endl;
 
             if (corrOldVol < SMALL)
             {
