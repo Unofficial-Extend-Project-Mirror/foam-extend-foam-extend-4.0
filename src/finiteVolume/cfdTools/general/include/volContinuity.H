@@ -49,7 +49,7 @@ if (mesh.moving())
     Info<< "volume continuity errors : "
         << "V = " << sumV
         << ", V0 = " << sumV0
-	<< ", deltaVol = " << gSum(mag(V - V0))
+        << ", deltaVol = " << gSum(mag(V - V0))
         << ", max error = " << maxMotionError
         << ", sum local = " << sumLocalContErr
         << ", global = " << globalContErr << endl;
