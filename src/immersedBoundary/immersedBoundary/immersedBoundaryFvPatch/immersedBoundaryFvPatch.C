@@ -356,6 +356,7 @@ Foam::tmp<Foam::vectorField> Foam::immersedBoundaryFvPatch::nf() const
 
 Foam::tmp<Foam::vectorField> Foam::immersedBoundaryFvPatch::delta() const
 {
+    // Not strictly needed: this is for debug only.  HJ, 5/Apr/2019
     return ibPolyPatch_.ibPatch().faceCentres() - Cn();
 }
 
