@@ -39,7 +39,7 @@ const Foam::debug::tolerancesSwitch
 Foam::immersedPoly::tolerance_
 (
     "immersedPolyTolerance",
-    1e-2
+    1e-4
 );
 
 
@@ -47,7 +47,7 @@ const Foam::debug::tolerancesSwitch
 Foam::immersedPoly::liveFactor_
 (
     "immersedPolyLiveFactor",
-    1e-4
+    0.01
 );
 
 
