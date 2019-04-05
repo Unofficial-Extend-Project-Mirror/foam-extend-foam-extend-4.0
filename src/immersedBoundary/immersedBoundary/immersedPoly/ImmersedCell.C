@@ -801,7 +801,22 @@ Foam::ImmersedCell<Distance>::ImmersedCell
         isBadCut_ = true;
     }
 
-    if (isBadCut_)
+    //  If the cut is not bad, adjust the cell for thin cell cut
+    if (!isBadCut_)
+    {
+        if (mag(wetCut) < immersedPoly::liveFactor_())
+        {
+            // Cell is dry; reset
+            isAllDry_ = true;
+        }
+
+        if (mag(dryCut) < immersedPoly::liveFactor_())
+        {
+            // Cell is wet; reset
+            isAllWet_ = true;
+        }
+    }
+    else
     {
         Info<< "Bad cell cut: volume = (" << wetCut << " " << dryCut
             << ") = " << wetCut + dryCut << nl
