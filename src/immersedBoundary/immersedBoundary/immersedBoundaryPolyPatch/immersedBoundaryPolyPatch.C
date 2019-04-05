@@ -270,21 +270,22 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
     // the tri surface. The cause of this can either be a stl that is not
     // perfect or ther was an error in the inside/outside tri-search for other
     // reasons. Look at the neigbours that are not CUT and assign their status.
-    const cellList& meshCells = mesh.cells();
+    const cellList& cells = mesh.cells();
+
     forAll (intersectedCell, cellI)
     {
         if (intersectedCell[cellI] == immersedPoly::UNKNOWN)
         {
             // Check the neigbours
-            const cell& curCell = meshCells[cellI];
+            const cell& curCell = cells[cellI];
             Switch foundWetNei = false;
             Switch foundDryNei = false;
 
             forAll (curCell, faceI)
             {
                 // Only do the check for internal faces. If the face is boundary
-                // face then there is nothing to do. NOTE: parallelisation
-                // needed?
+                // face then there is nothing to do.
+                // NOTE: parallelisation needed?
                 if (mesh.isInternalFace(curCell[faceI]))
                 {
                     label own = intersectedCell[owner[curCell[faceI]]];
@@ -403,7 +404,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                 tss,
                 2*span,
                 internalFlow(),
-                false               // iterate intersection
+                true               // iterate intersection
             );
 
             // Calculate the intersection
@@ -727,7 +728,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
     // Check tri addressing
     if (min(nearestTri) == -1)
     {
-        FatalErrorIn("immersedBoundaryPolyPatch::calcImmersedBoundary() const")
+        FatalErrorInFunction
             << "Cannot find nearestTri for all points"
             << abort(FatalError);
     }
@@ -857,6 +858,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
     // Internal faces
     forAll (neighbour, faceI)
     {
+        // Wet on wet
         if
         (
             intersectedCell[owner[faceI]] == immersedPoly::WET
@@ -866,6 +868,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
             intersectedFace[faceI] = immersedPoly::WET;
         }
 
+        // Dry on dry
         if
         (
             intersectedCell[owner[faceI]] == immersedPoly::DRY
@@ -873,6 +876,23 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
         )
         {
             intersectedFace[faceI] = immersedPoly::DRY;
+        }
+
+        // Wet on cut face must remain wet.  Error in cut cell is fixed
+        // by the Marooney Maneouvre.  HJ, 5/Apr/2019
+        if
+        (
+            (
+                intersectedCell[owner[faceI]] == immersedPoly::WET
+             && intersectedCell[neighbour[faceI]] == immersedPoly::CUT
+            )
+         || (
+                intersectedCell[owner[faceI]] == immersedPoly::CUT
+             && intersectedCell[neighbour[faceI]] == immersedPoly::WET
+            )
+        )
+        {
+            intersectedFace[faceI] = immersedPoly::WET;
         }
 
         // Special check for directly cut faces
@@ -922,6 +942,51 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
 
             forAll (curOwnCut, patchFaceI)
             {
+                // Wet on wet
+                if
+                (
+                    intersectedCell[patchFaceI] == immersedPoly::WET
+                 && intersectedCell[patchFaceI] == immersedPoly::WET
+                )
+                {
+                    intersectedFace[patchStart + patchFaceI] =
+                        immersedPoly::WET;
+                }
+
+                // Dry on dry
+                if
+                (
+                    intersectedCell[patchFaceI] == immersedPoly::DRY
+                 && intersectedCell[patchFaceI] == immersedPoly::DRY
+                )
+                {
+                    intersectedFace[patchStart + patchFaceI] =
+                        immersedPoly::DRY;
+                }
+
+                // Wet on cut face must remain wet.  Error in cut cell is fixed
+                // by the Marooney Maneouvre.  HJ, 5/Apr/2019
+                if
+                (
+                    (
+                        intersectedCell[patchFaceI] == immersedPoly::WET
+                     && intersectedCell[patchFaceI] == immersedPoly::CUT
+                    )
+                 || (
+                        intersectedCell[patchFaceI] == immersedPoly::CUT
+                     && intersectedCell[patchFaceI] == immersedPoly::WET
+                    )
+                )
+                {
+                    intersectedFace[patchStart + patchFaceI] =
+                        immersedPoly::WET;
+                }
+
+                // Special check for directly cut faces
+                // Wet-to-dry and dry-to-wet is a direct face cut
+                // Dry-to-cut or cut-to-dry are cutting errors.  They will be
+                // corrected later in corrected face areas, based on closed cell
+                // tolerance.  HJ, 11/Dec/2017
                 if
                 (
                     (
@@ -1040,7 +1105,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                     tss,
                     span,
                     internalFlow(),
-                    false               // iterate intersection
+                    true               // iterate intersection
                 );
 
                 // Calculate the intersection
@@ -1233,7 +1298,19 @@ void Foam::immersedBoundaryPolyPatch::calcCorrectedGeometry() const
     const labelList& owner = mesh.faceOwner();
 
     label nMarooneyCells = 0;
-    
+
+    // Get valid directions to avoid round-off errors in 2-D cases
+    const Vector<label> dirs = mesh.geometricD();
+    vector validDirs = vector::zero;
+
+    for (direction cmpt = 0; cmpt < Vector<label>::nComponents; cmpt++)
+    {
+        if (dirs[cmpt] > 0)
+        {
+            validDirs[cmpt] = 1;
+        }
+    }
+
     forAll (cutCells, cutCellI)
     {
         const label ccc = cutCells[cutCellI];
@@ -1274,15 +1351,15 @@ void Foam::immersedBoundaryPolyPatch::calcCorrectedGeometry() const
         if (mag(curSumSf + ibSf[cutCellI]) > primitiveMesh::closedThreshold_)
         {
             // Info<< "Marooney Maneouvre for cell " << ccc
-            //     << " error: " << mag(curSumSf + ibSf[cutCellI]) << " "
-            //     << " S: " << curSumMagSf
+            //     << " error: " << curSumSf + ibSf[cutCellI] << " "
             //     << " V: " << cutCellVolumes[cutCellI]
-            //     << " Sf: " << ibSf[cutCellI] << endl;
+            //     << " Sf: " << ibSf[cutCellI]
+            //     << " corr S: " << curSumSf << endl;
 
             nMarooneyCells++;
-            
+
             // Create IB face to ideally close the cell
-            ibSf[cutCellI] = -curSumSf;
+            ibSf[cutCellI] = cmptMultiply(validDirs, -curSumSf);
         }
     }
 
@@ -1297,6 +1374,15 @@ void Foam::immersedBoundaryPolyPatch::calcCorrectedGeometry() const
                 << " out of " << cutCells.size()
                 << endl;
         }
+    }
+
+    if (min(mag(ibSf)) < SMALL)
+    {
+        WarningInFunction
+            << "Minimum IB face area for patch " << name()
+            << ": " << min(mag(ibSf)) << ".  Possible cutting error.  "
+            << "Review immersed boundary tolerances."
+            << endl;
     }
 }
 
