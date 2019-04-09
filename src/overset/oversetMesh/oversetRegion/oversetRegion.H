@@ -327,6 +327,9 @@ public:
                 return zone();
             }
 
+            //- Return overset fringe algorithm for this region
+            const oversetFringe& fringe() const;
+
             //- Return list of donor region indices
             const labelList& donorRegions() const;
 
