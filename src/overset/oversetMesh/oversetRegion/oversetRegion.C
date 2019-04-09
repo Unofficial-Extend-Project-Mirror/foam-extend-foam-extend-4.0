@@ -1730,6 +1730,20 @@ Foam::oversetRegion::~oversetRegion()
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
+const Foam::oversetFringe& Foam::oversetRegion::fringe() const
+{
+    if (fringePtr_.empty())
+    {
+        FatalErrorIn("const oversetFringe& oversetRegion::fringe() const")
+            << "Fringe pointer not allocated. It should have been initialized"
+            << " properly at construction. Something went wrong..."
+            << abort(FatalError);
+    }
+
+    return fringePtr_();
+}
+
+
 const Foam::labelList& Foam::oversetRegion::donorRegions() const
 {
     if (!donorRegionsPtr_)
