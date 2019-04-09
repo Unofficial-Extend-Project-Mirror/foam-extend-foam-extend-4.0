@@ -53,6 +53,7 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
 template<class T> class List;
 typedef List<word> wordList;
 

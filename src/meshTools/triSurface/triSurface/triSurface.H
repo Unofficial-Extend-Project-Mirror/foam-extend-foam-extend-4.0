@@ -48,8 +48,16 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
 class Time;
 class IFstream;
+
+// Forward declaration of friend functions and operators
+
+class triSurface;
+
+Ostream& operator<<(Ostream&, const triSurface&);
+
 
 /*---------------------------------------------------------------------------*\
                            Class triSurface Declaration

@@ -45,6 +45,12 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+class surfacePatch;
+
+Ostream& operator<<(Ostream&, const surfacePatch&);
+
+
 /*---------------------------------------------------------------------------*\
                            Class surfacePatch Declaration
 \*---------------------------------------------------------------------------*/

@@ -49,6 +49,16 @@ Author
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+class decayingVorton;
+
+bool operator==(const decayingVorton&, const decayingVorton&);
+bool operator!=(const decayingVorton&, const decayingVorton&);
+
+Ostream& operator<<(Ostream& s, const decayingVorton& vt);
+Istream& operator>>(Istream& s, decayingVorton& vt);
+
+
 /*---------------------------------------------------------------------------*\
                         Class decayingVorton Declaration
 \*---------------------------------------------------------------------------*/

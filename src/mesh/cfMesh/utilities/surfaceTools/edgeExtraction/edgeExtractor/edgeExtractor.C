@@ -29,8 +29,6 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "objectRegistry.H"
-#include "foamTime.H"
 #include "polyMeshGenModifier.H"
 #include "edgeExtractor.H"
 #include "meshSurfaceEngine.H"
@@ -1529,7 +1527,7 @@ bool edgeExtractor::checkConcaveEdgeCells()
 
                         DynList<label, 2> nFacesInPatch;
                         nFacesInPatch.setSize(2);
-                        nFacesInPatch = 0;
+			nFacesInPatch = label(0);
 
                         DynList<bool, 2> hasPatchPoints;
                         hasPatchPoints.setSize(2);

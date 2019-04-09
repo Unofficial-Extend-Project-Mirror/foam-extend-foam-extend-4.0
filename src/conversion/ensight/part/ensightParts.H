@@ -46,6 +46,12 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+class ensightParts;
+
+ensightGeoFile& operator<<(ensightGeoFile&, const ensightParts&);
+
+
 /*---------------------------------------------------------------------------*\
                        Class ensightParts Declaration
 \*---------------------------------------------------------------------------*/

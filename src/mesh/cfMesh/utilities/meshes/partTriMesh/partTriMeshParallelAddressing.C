@@ -354,7 +354,7 @@ void partTriMesh::createBufferLayers()
         {
             const parTriFace& tri = receivedTrias[i];
 
-            DynList<label, 3> triPointLabels(3);
+	    DynList<label, 3> triPointLabels(label(3));
             for(label j=0;j<3;++j)
             {
                 const label gpI = tri.globalLabelOfPoint(j);

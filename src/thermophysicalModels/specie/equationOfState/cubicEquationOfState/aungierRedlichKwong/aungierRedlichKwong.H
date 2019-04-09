@@ -55,6 +55,12 @@ Germany
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+class aungierRedlichKwong;
+
+Ostream& operator<<(Ostream&, const aungierRedlichKwong&);
+
+
 /*---------------------------------------------------------------------------*\
                            Class aungierRedlichKwong Declaration
 \*---------------------------------------------------------------------------*/

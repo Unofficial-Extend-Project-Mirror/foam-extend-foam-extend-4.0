@@ -57,17 +57,19 @@ SourceFiles
 namespace Foam
 {
 
-// Forward declaration of friend functions and operators
-
-class face;
+// Forward declaration of classes
 class triFace;
 
 template<class T, unsigned SizeInc, unsigned SizeMult, unsigned SizeDiv>
 class DynamicList;
 
+// Forward declaration of friend functions and operators
+class face;
+
 inline bool operator==(const face& a, const face& b);
 inline bool operator!=(const face& a, const face& b);
 inline Istream& operator>>(Istream&, face&);
+
 
 /*---------------------------------------------------------------------------*\
                            Class face Declaration

@@ -44,6 +44,12 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+class boundaryPatch;
+
+Ostream& operator<<(Ostream&, const boundaryPatch&);
+
+
 /*---------------------------------------------------------------------------*\
                            Class boundaryPatch Declaration
 \*---------------------------------------------------------------------------*/

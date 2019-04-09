@@ -46,6 +46,10 @@ namespace Foam
 {
 
 // Forward declaration of classes
+// Forward declaration of friend functions and operators
+class surfacePatchIOList;
+
+Ostream& operator<<(Ostream&, const surfacePatchIOList&);
 
 /*---------------------------------------------------------------------------*\
                            Class surfacePatchIOList Declaration

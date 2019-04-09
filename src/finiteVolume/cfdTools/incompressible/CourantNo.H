@@ -61,7 +61,11 @@ else
 
     const scalar deltaX = Foam::cbrt(mesh.V()[0]);
 
-    velMag = mag(U[0]);
+    // recover velocity field in a more general way
+    const volVectorField& URef
+	    = mesh.db().lookupObject<const volVectorField>("U");
+
+    velMag = mag(URef[0]);
 
     CoNum = velMag*deltaT/deltaX;
 
