@@ -70,7 +70,12 @@ Foam::fvSchemes::fvSchemes(const objectRegistry& obr)
             "fvSchemes",
             obr.time().system(),
             obr,
-            IOobject::READ_IF_PRESENT_IF_MODIFIED,  // Allow default dictionary creation
+             (
+                obr.readOpt() == IOobject::MUST_READ
+             || obr.readOpt() == IOobject::READ_IF_PRESENT
+              ? IOobject::MUST_READ_IF_MODIFIED
+              : obr.readOpt()
+            ),
             IOobject::NO_WRITE
         )
     ),
@@ -168,21 +173,17 @@ Foam::fvSchemes::fvSchemes(const objectRegistry& obr)
     fluxRequired_(),  // Do not read flux required option
     defaultFluxRequired_(false)
 {
-    if (!headerOk())
+    // HR 21.12.18 : Writing a default fvSchemes is not useful in PLB. Please
+    // specify MUST_READ on obr if you need this.
+    if
+    (
+        readOpt() == IOobject::MUST_READ
+     || readOpt() == IOobject::MUST_READ_IF_MODIFIED
+     || (readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+    )
     {
-        if (debug)
-        {
-            InfoIn
-            (
-                "fvSchemes::fvSchemes(const objectRegistry& obr)"
-            )   << "fvSchemes dictionary not found.  Creating default."
-                << endl;
-        }
-
-        regIOobject::write();
+        read();
     }
-
-    read();
 }
 
 

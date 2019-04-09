@@ -33,6 +33,7 @@ License
 #include "addToRunTimeSelectionTable.H"
 #include "cloud.H"
 #include "cloudDistribute.H"
+#include "meshObjectBase.H"
 
 #include "IFstream.H"
 #include "OFstream.H"
@@ -107,7 +108,11 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
     // Now that each processor has filled in its own part, combine the data
     Pstream::gatherList(migratedCells);
     Pstream::scatterList(migratedCells);
-    Info<< "Migrated cells per processor: " << migratedCells << endl;
+
+    if (debug)
+    {
+        Info<< "Migrated cells per processor: " << migratedCells << endl;
+    }
 
     // Reading through second index now tells how many cells will arrive
     // from which processor
@@ -141,10 +146,14 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
     // Prepare receiving side
 
     // Create the reconstructor
-    processorMeshesReconstructor meshRecon("reconstructed");
+
+    // HR 21.12.18 : Use empty domainname to avoid auto-created of
+    // fvSchemes/fvSolution
+    processorMeshesReconstructor meshRecon("");
 
     PtrList<fvMesh>& procMeshes = meshRecon.meshes();
     procMeshes.setSize(meshDecomp.nProcs());
+    meshRecon.globalPointIndex().setSize(meshDecomp.nProcs());
 
     // Collect local fields for decomposition
     clearOut();
@@ -245,6 +254,29 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         }
     }
 
+    // HR 14.12.18: Create dummy database pointing into the non-parallel case
+    // directory and disable the runTimeModifiable switch.  dummyTime is used
+    // for decomposed, received and reconstructed fvMeshes (ie. before its data
+    // is moved into *this).
+    //
+    // The pointing into the non-parallel case directory is somewhat a hack to
+    // prevent auto-creation of fvSchemes and fvSolution (they exist in the root
+    // case). This is potentially dangerous if we write anything, but fvMeshes
+    // derived from this database are NO_WRITE so we should be fine. Making if
+    // non-runTimeModifiable prevents registration of fvSolution with the
+    // fileMonitor (addWatch). Not all processors will necessarily receive a
+    // mesh and watches will then cause dead-locks!
+    Time dummyTime
+    (
+        time().rootPath(),
+        time().globalCaseName(),
+        "system",
+        "constant",
+        false
+    );
+
+    const_cast<Switch&>(dummyTime.runTimeModifiable()) = false;
+
     for (label procI = 0; procI < meshDecomp.nProcs(); procI++)
     {
         // Check if there is a mesh to send
@@ -256,8 +288,9 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
             autoPtr<fvMesh> procMeshPtr = meshDecomp.processorMesh
             (
                 procI,
-                time(),
-                "processorPart" + Foam::name(procI),
+                dummyTime,
+                "",     // HR 21.12.18 : Use empty domainname to avoid
+                        // auto-created offvSchemes/fvSolution
                 true    // Create passive processor patches
             );
             fvMesh& procMesh = procMeshPtr();
@@ -289,6 +322,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
 
                 // Send the mesh and fields to target processor
                 toProc << procMesh << nl;
+                toProc << meshDecomp.globalPointIndex(procI) << nl;
 
                 // Send fields
                 sendFields(volScalarFields, fieldDecomposer, toProc);
@@ -344,6 +378,9 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                     procI,
                     procMeshPtr
                 );
+
+                meshRecon.globalPointIndex()[procI] =
+                    meshDecomp.globalPointIndex(procI);
 
                 // Set local fields
                 // Note: first index is field index and second index is procI
@@ -413,7 +450,9 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                     );
                 }
 
-                //HJ Insert clouds missing.  HJ, 12/Oct/2018
+                // HR, 18.11.2018. Distribution of clouds is trivial and is
+                // treated in Cloud<ParticleType>::split, which is called in
+                // the constructor of CloudDistribute.
             }
         }
     }
@@ -450,9 +489,9 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                     (
                         IOobject
                         (
-                            "processorPart" + Foam::name(procI),
-                            time().timeName(),
-                            time(),
+                            "", // "processorPart" + Foam::name(procI),
+                            dummyTime.timeName(),
+                            dummyTime,
                             IOobject::NO_READ,
                             IOobject::NO_WRITE
                         ),
@@ -460,6 +499,10 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                         false             // Do not sync
                     )
                 );
+
+                // Receive the global points addr
+                labelList gppi(fromProc);
+                meshRecon.globalPointIndex()[procI] = gppi;
 
                 // Receive fields
                 // Note: first index is field index and second index is procI
@@ -524,34 +567,40 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         }
     }
 
-    forAll (procMeshes, procI)
+    if (debug)
     {
-        if (procMeshes.set(procI))
+        forAll (procMeshes, procI)
         {
-            Pout<< "procMesh " << procI
-                << " points " << procMeshes[procI].nPoints()
-                << " faces: " << procMeshes[procI].nFaces()
-                << " internal: " << procMeshes[procI].nInternalFaces()
-                << " cells: " << procMeshes[procI].nCells()
-                << " patches: " << procMeshes[procI].boundary().size()
-                << endl;
+            if (procMeshes.set(procI))
+            {
+                Pout<< "procMesh " << procI
+                    << " points " << procMeshes[procI].nPoints()
+                    << " faces: " << procMeshes[procI].nFaces()
+                    << " internal: " << procMeshes[procI].nInternalFaces()
+                    << " cells: " << procMeshes[procI].nCells()
+                    << " patches: " << procMeshes[procI].boundary().size()
+                    << endl;
+            }
         }
     }
 
     // Create the reconstructed mesh
     autoPtr<fvMesh> reconstructedMeshPtr =
-        meshRecon.reconstructMesh(time());
+        meshRecon.reconstructMesh(dummyTime);
     fvMesh& reconMesh = reconstructedMeshPtr();
 
-    Pout<< "Reconstructed mesh stats: "
-        << " nCells: " << reconMesh.nCells()
-        << " nFaces: " << reconMesh.nFaces()
-        << " nIntFaces: " << reconMesh.nInternalFaces()
-        << " polyPatches: "
-        << reconMesh.boundaryMesh().size()
-        << " patches: "
-        << reconMesh.boundary().size()
-        << endl;
+    if (debug)
+    {
+        Pout<< "Reconstructed mesh stats: "
+            << " nCells: " << reconMesh.nCells()
+            << " nFaces: " << reconMesh.nFaces()
+            << " nIntFaces: " << reconMesh.nInternalFaces()
+            << " polyPatches: "
+            << reconMesh.boundaryMesh().size()
+            << " patches: "
+            << reconMesh.boundary().size()
+            << endl;
+    }
 
     // Apply changes to the local mesh:
     // - refactor the boundary to match new patches.  Note: processor
@@ -920,8 +969,14 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         );
     }
 
-    // Debug: remove?  HJ, 22/Oct/2018
-    // checkMesh(true);
+    // HR 13.12.18: Update the mesh objects
+    meshObjectBase::allUpdateTopology<polyMesh>(*this, meshMap);
+
+    if (debug)
+    {
+        Info<< "Checking reconstructed mesh after load balancing..." << endl;
+        checkMesh(true);
+    }
 
     return true;
 }

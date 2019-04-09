@@ -89,7 +89,6 @@ void Foam::topoChangerFvMesh::insertFields
         iter
     )
     {
-
         localFields[fI].set
         (
             Pstream::myProcNo(),
@@ -126,7 +125,7 @@ void Foam::topoChangerFvMesh::receiveFields
     receivedFields.setSize(nScalarFields);
 
     fromProc.readBegin("topoChangerFvMeshReceiveFields");
-    
+
     forAll (receivedFields, fI)
     {
         word fieldName(fromProc);
@@ -181,7 +180,10 @@ void Foam::topoChangerFvMesh::rebuildFields
 
         const PtrList<GeoField>& partFields = receivedFields[fieldI];
 
-        Pout<< "Rebuilding field " << masterField.name() << endl;
+        if (debug)
+        {
+            Pout<< "Rebuilding field " << masterField.name() << endl;
+        }
 
         // Check name match.  Note: there may be holes
         word partName;
@@ -263,15 +265,19 @@ void Foam::topoChangerFvMesh::rebuildFields
         // Resize internal field
         if
         (
-            masterField.internalField().size()
+            masterField.size()
          != GeoField::GeoMeshType::size(masterField.mesh())
         )
         {
-            Pout<< "Resizing internal field: old size = "
-                << masterField.internalField().size()
-                << " new size = "
-                << GeoField::GeoMeshType::size(masterField.mesh())
-                << endl;
+            if (debug)
+            {
+                Pout<< "Resizing internal field: old size = "
+                    << masterField.size()
+                    << " new size = "
+                    << GeoField::GeoMeshType::size(masterField.mesh())
+                    << endl;
+            }
+
             masterField.setSize
             (
                 GeoField::GeoMeshType::size(masterField.mesh())
@@ -280,13 +286,16 @@ void Foam::topoChangerFvMesh::rebuildFields
 
         // Resize boundary (number of patches)
         typename GeoField::GeometricBoundaryField& patchFields =
-                masterField.boundaryField();
+            masterField.boundaryFieldNoStoreOldTimes();
 
         if (patchFields.size() != masterField.mesh().boundary().size())
         {
-            Pout<< "Resizing boundary field: "
+            if (debug)
+            {
+                Pout<< "Resizing boundary field: "
                     << masterField.mesh().boundary().size()
                     << endl;
+            }
 
             patchFields.setSize(masterField.mesh().boundary().size());
         }
@@ -297,9 +306,12 @@ void Foam::topoChangerFvMesh::rebuildFields
             if (meshMap.resetPatchFlag()[patchI])
             {
                 // Create a new constrained patch field
-                Pout<< "Inserting constrained patch field for patch "
-                    << masterField.mesh().boundary()[patchI].name()
-                    << endl;
+                if (debug)
+                {
+                    Pout<< "Inserting constrained patch field for patch "
+                        << masterField.mesh().boundary()[patchI].name()
+                        << endl;
+                }
 
                 patchFields.set
                 (
@@ -326,12 +338,15 @@ void Foam::topoChangerFvMesh::rebuildFields
             )
             {
                 // Resize patch field
-                Pout<< "Resizing patch field for patch "
-                    << masterField.mesh().boundary()[patchI].name()
-                    << " old size: " << patchFields[patchI].size()
-                    << " new size: "
-                    << masterField.mesh().boundary()[patchI].size()
-                    << endl;
+                if (debug)
+                {
+                    Pout<< "Resizing patch field for patch "
+                        << masterField.mesh().boundary()[patchI].name()
+                        << " old size: " << patchFields[patchI].size()
+                        << " new size: "
+                        << masterField.mesh().boundary()[patchI].size()
+                        << endl;
+                }
 
                 // Reset patch field size
                 patchFields[patchI].autoMap
@@ -350,7 +365,27 @@ void Foam::topoChangerFvMesh::rebuildFields
 
         // Increment field counter
         fieldI++;
-        Pout<< "... done" << endl;
+
+        if (debug)
+        {
+            Pout<< "... done" << endl;
+        }
+    }
+
+    // HR 14.12.18: We create new processor boundary faces from internal
+    // faces. The values on these faces could be initialised by interpolation.
+    // Instead we choose to fix the values by evaluating the boundaries.
+    // I tried to execute evaluateCoupled() at the end of
+    // fvFieldReconstructor::reconstructField, but this fails in a strange way.
+    forAllConstIter
+    (
+        typename HashTable<const GeoField*>,
+        geoFields,
+        iter
+    )
+    {
+        GeoField& masterField = const_cast<GeoField&>(*iter());
+        masterField.boundaryField().evaluateCoupled();
     }
 }
 

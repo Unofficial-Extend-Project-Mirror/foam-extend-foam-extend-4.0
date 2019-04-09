@@ -29,8 +29,6 @@ Description
     matching processor boundaries and build a single combined mesh by
     matching processor patches to each other.
 
-    In order to
-
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
@@ -71,6 +69,9 @@ class processorMeshesReconstructor
 
         //- List of processor meshes
         PtrList<fvMesh> meshes_;
+
+        //- global point index per sub-mesh
+        labelListList globalPointIndex_;
 
         //- List of processor point addressing lists
         PtrList<labelIOList> pointProcAddressing_;
@@ -121,6 +122,10 @@ class processorMeshesReconstructor
 
 public:
 
+    //- Declare name of the class and its debug switch
+    ClassName("processorMeshesReconstructor");
+
+
     // Constructors
 
         //- Construct given name.  Set meshes later
@@ -159,6 +164,12 @@ public:
         PtrList<fvMesh>& meshes()
         {
             return meshes_;
+        }
+
+        //- Return to global point index
+        labelListList& globalPointIndex()
+        {
+            return globalPointIndex_;
         }
 
         //- Return point-processor addressing arrays

@@ -290,6 +290,9 @@ public:
                 const PtrList<labelIOList>& faceProcAddressing
             );
 
+            //- Count and return number of particles per cell
+            virtual labelList nParticlesPerCell() const;
+
 
         // Read
 

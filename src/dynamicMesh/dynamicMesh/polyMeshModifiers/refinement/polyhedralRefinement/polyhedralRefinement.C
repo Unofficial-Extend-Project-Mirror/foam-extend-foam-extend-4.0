@@ -31,6 +31,7 @@ Author
 #include "faceSet.H"
 #include "pointSet.H"
 #include "addToRunTimeSelectionTable.H"
+#include "meshTools.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -2042,7 +2043,16 @@ void Foam::polyhedralRefinement::setCellsToRefine
     // layers
     for (label i = 0; i < nRefinementBufferLayers_; ++i)
     {
-        extendMarkedCellsAcrossFaces(refineCell);
+        meshTools::extendMarkedCellsAcrossFaces(mesh_, refineCell);
+    }
+
+    // Remove all cells that would exceed the maximum refinement level
+    forAll (refineCell, cellI)
+    {
+        if (refineCell[cellI] && (cellLevel_[cellI] + 1 > maxRefinementLevel_))
+        {
+            refineCell[cellI] = false;
+        }
     }
 
     // Remove all cells that would exceed the maximum refinement level
@@ -2085,6 +2095,12 @@ void Foam::polyhedralRefinement::setCellsToRefine
         // Increment number of iterations and total number of added cells
         ++nIters;
         nTotalAddCells += nAddCells;
+
+	if (debug)
+        {
+            Info<< "Added " << nAddCells << " cells in iteration "
+                << nIters << nl;
+        }
 
     } while (nAddCells > 0);
 
@@ -2205,7 +2221,7 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
 
     // Note: if there is no dynamic load balancing, points at the boundary
     // cannot be split points by definition. However, in dynamic load balancing
-    // runs, it is possible that a split point end on processor boundary, in
+    // runs, it is possible that a split point ends on processor boundary, in
     // which case we will simply avoid (actually delay) unrefining until this
     // becomes internal point again. VV, 4/Jul/2018.
     const label nInternalFaces = mesh_.nInternalFaces();
@@ -2213,7 +2229,7 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
 
     for (label faceI = nInternalFaces; faceI < nFaces; ++faceI)
     {
-        // Get the face and make sure that the points are unarked
+        // Get the face and make sure that the points are unmarked
         const face& f = meshFaces[faceI];
 
         forAll (f, fpI)
@@ -2260,7 +2276,7 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
     // unrefinement buffer layers
     for (label i = 0; i < nUnrefinementBufferLayers_; ++i)
     {
-        extendMarkedCellsAcrossPoints(protectedCell);
+        meshTools::extendMarkedCellsAcrossPoints(mesh_, protectedCell);
     }
 
     // Loop through all cells and if the cell should be protected, protect all
@@ -2367,6 +2383,12 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
         // Increment number of iterations and number of total removed cells
         ++nIters;
         nTotalRemCells += nRemCells;
+
+        if (debug)
+        {
+            Info<< "Removed " << nRemCells << " cells in iteration "
+                << nIters << nl;
+        }
 
     } while (nRemCells > 0);
 

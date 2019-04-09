@@ -127,7 +127,7 @@ bool immersedBoundaryDynamicRefineSolidBodyMotionFvMesh::update()
     {
         hasChanged = loadBalance(refinementDict());
     }
-    
+
     // Execute dummy mesh motion for the background mesh
     const pointField oldPoints = allPoints();
     fvMesh::movePoints(oldPoints);

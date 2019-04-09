@@ -153,7 +153,7 @@ immersedBoundaryKqRWallFunctionFvPatchField
     (
         ptf.ibPatch(),
         ptf.setDeadValue(),
-        ptf.deadValue()        
+        ptf.deadValue()
     )
 {
     this->setPatchType(ptf);

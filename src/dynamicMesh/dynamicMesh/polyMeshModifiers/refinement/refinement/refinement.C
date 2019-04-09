@@ -66,130 +66,6 @@ void Foam::refinement::setInstance(const fileName& inst) const
 }
 
 
-void Foam::refinement::extendMarkedCellsAcrossFaces
-(
-    boolList& markedCell
-) const
-{
-    // Mark all faces for all marked cells
-    const label nFaces = mesh_.nFaces();
-    boolList markedFace(nFaces, false);
-
-    // Get mesh cells
-    const cellList& meshCells = mesh_.cells();
-
-    // Loop through all cells
-    forAll (markedCell, cellI)
-    {
-        if (markedCell[cellI])
-        {
-            // This cell is marked, get its faces
-            const cell& cFaces = meshCells[cellI];
-
-            forAll (cFaces, i)
-            {
-                markedFace[cFaces[i]] = true;
-            }
-        }
-    }
-
-    // Snyc the face list across processor boundaries
-    syncTools::syncFaceList(mesh_, markedFace, orEqOp<bool>(), false);
-
-    // Get necessary mesh data
-    const label nInternalFaces = mesh_.nInternalFaces();
-    const labelList& owner = mesh_.faceOwner();
-    const labelList& neighbour = mesh_.faceNeighbour();
-
-    // Internal faces
-    for (label faceI = 0; faceI < nInternalFaces; ++faceI)
-    {
-        if (markedFace[faceI])
-        {
-            // Face is marked, mark both owner and neighbour if the maximum
-            // refinement level is not exceeded
-            const label& own = owner[faceI];
-            const label& nei = neighbour[faceI];
-
-            // Mark owner and neighbour cells
-            markedCell[own] = true;
-            markedCell[nei] = true;
-        }
-    }
-
-    // Boundary faces
-    for (label faceI = nInternalFaces; faceI < nFaces; ++faceI)
-    {
-        if (markedFace[faceI])
-        {
-            // Face is marked, mark owner if the maximum refinement level is not
-            // exceeded
-            const label& own = owner[faceI];
-
-            // Mark owner
-            markedCell[own] = true;
-        }
-    }
-}
-
-
-void Foam::refinement::extendMarkedCellsAcrossPoints
-(
-    boolList& markedCell
-) const
-{
-    // Mark all points for all marked cells
-    const label nPoints = mesh_.nPoints();
-    boolList markedPoint(nPoints, false);
-
-    // Get cell points
-    const labelListList& meshCellPoints = mesh_.cellPoints();
-
-    // Loop through all cells
-    forAll (markedCell, cellI)
-    {
-        if (markedCell[cellI])
-        {
-            // This cell is marked, get its points
-            const labelList& cPoints = meshCellPoints[cellI];
-
-            forAll (cPoints, i)
-            {
-                markedPoint[cPoints[i]] = true;
-            }
-        }
-    }
-
-    // Snyc point list across processor boundaries
-    syncTools::syncPointList
-    (
-        mesh_,
-        markedPoint,
-        orEqOp<bool>(),
-        true, // Default value
-        true  // Apply separation for parallel cyclics
-    );
-
-    // Get point cells
-    const labelListList& meshPointCells = mesh_.pointCells();
-
-    // Loop through all points
-    forAll (markedPoint, pointI)
-    {
-        if (markedPoint[pointI])
-        {
-            // This point is marked, mark all of its cells
-            const labelList& pCells = meshPointCells[pointI];
-
-            forAll (pCells, i)
-            {
-                markedCell[pCells[i]] = true;
-            }
-        }
-    }
-}
-
-
 Foam::label Foam::refinement::addFace
 (
     polyTopoChange& ref,
@@ -797,7 +673,14 @@ Foam::label Foam::refinement::faceConsistentRefinement
         // Note: we are using more stringent 1:1 consistency across coupled
         // boundaries in order to simplify handling of edge based consistency
         // checks for parallel runs
-        if (neiLevel[i] > curOwnLevel)
+        // Bugfix related to PLB: Check whether owner is already marked for
+        // refinement. Will allow 2:1 consistency across certain processor faces
+        // where we have a new processor boundary. VV, 23/Jan/2019.
+        if
+        (
+            (neiLevel[i] > curOwnLevel)
+         && !cellsToRefine[own]
+        )
         {
             // Neighbour level is higher than owner level, owner must be
             // marked for refinement
@@ -949,9 +832,11 @@ Foam::label Foam::refinement::faceConsistentUnrefinement
                     << "Try increasing nUnrefinementBufferLayers. "
                     << abort(FatalError);
             }
-
-            cellsToUnrefine[own] = false;
-            ++nRemCells;
+            else
+            {
+                cellsToUnrefine[own] = false;
+                ++nRemCells;
+            }
         }
         else if (neiLevel < (ownLevel - 1))
         {
@@ -977,9 +862,11 @@ Foam::label Foam::refinement::faceConsistentUnrefinement
                     << "Try increasing nUnrefinementBufferLayers. "
                     << abort(FatalError);
             }
-
-            cellsToUnrefine[nei] = false;
-            ++nRemCells;
+            else
+            {
+                cellsToUnrefine[nei] = false;
+                ++nRemCells;
+            }
         }
     }
 
@@ -1011,7 +898,7 @@ Foam::label Foam::refinement::faceConsistentUnrefinement
 
         // Note: we are using more stringent 1:1 consistency across coupled
         // boundaries in order to simplify handling of edge based consistency
-        // checkes for parallel runs
+        // checks for parallel runs
         if (curOwnLevel < neiLevel[i])
         {
             // Owner level is smaller than neighbour level, we must not
@@ -1046,7 +933,11 @@ Foam::label Foam::refinement::faceConsistentUnrefinement
                         << "This is probably because the refinement and "
                         << "unrefinement regions are very close." << nl
                         << "Try increasing nUnrefinementBufferLayers. "
-                        << abort(FatalError);
+                        << nl
+                        << "Another possibility is that you are running "
+                        << "with Dynamic Load Balancing, in which case "
+                        << "this should be fine."
+                        << endl;
                 }
             }
             else
@@ -1123,26 +1014,31 @@ Foam::label Foam::refinement::edgeConsistentUnrefinement
                     // unrefinement
                     if (!cellsToUnrefine[cellI])
                     {
-                        FatalErrorIn
-                        (
-                            "label refinement::"
-                            "edgeConsistentUnrefinement"
-                            "(boolList& cellsToUnrefine)"
-                        )   << "Cell not marked for unrefinement, indicating a"
-                            << " previous unnoticed problem with unrefinement."
-                            << nl
-                            << "cellI: " << cellI << ", cellJ: " << cellJ
-                            << nl
-                            << "Level of cellI: " << cellILevel
-                            << ", level of cellJ: " << cellJLevel << nl
-                            << "This is probably because the refinement and "
-                            << "unrefinement regions are very close." << nl
-                            << "Try increasing nUnrefinementBufferLayers. "
-                            << abort(FatalError);
+                        if (debug)
+                        {
+                            WarningIn
+                            (
+                                "label refinement::"
+                                "edgeConsistentUnrefinement"
+                                "(boolList& cellsToUnrefine)"
+                            )   << "Cell not marked for unrefinement, indicating a"
+                                << " previous unnoticed problem with unrefinement."
+                                << nl
+                                << "cellI: " << cellI << ", cellJ: " << cellJ
+                                << nl
+                                << "Level of cellI: " << cellILevel
+                                << ", level of cellJ: " << cellJLevel << nl
+                                << "This is probably because the refinement and "
+                                << "unrefinement regions are very close." << nl
+                                << "Try increasing nUnrefinementBufferLayers. "
+                                << endl;
+                        }
                     }
-
-                    cellsToUnrefine[cellI] = false;
-                    ++nRemCells;
+                    else
+                    {
+                        cellsToUnrefine[cellI] = false;
+                        ++nRemCells;
+                    }
                 }
                 else if (cellJLevel < cellILevel - 1)
                 {
@@ -1153,26 +1049,31 @@ Foam::label Foam::refinement::edgeConsistentUnrefinement
                     // unrefinement
                     if (!cellsToUnrefine[cellJ])
                     {
-                        FatalErrorIn
-                        (
-                            "label refinement::"
-                            "edgeConsistentUnrefinement"
-                            "(boolList& cellsToUnrefine)"
-                        )   << "Cell not marked for unrefinement, indicating a"
-                            << " previous unnoticed problem with unrefinement."
-                            << nl
-                            << "cellI: " << cellI << ", cellJ: " << cellJ
-                            << nl
-                            << "Level of cellI: " << cellILevel
-                            << ", level of cellJ: " << cellJLevel << nl
-                            << "This is probably because the refinement and "
-                            << "unrefinement regions are very close." << nl
-                            << "Try increasing nUnrefinementBufferLayers. "
-                            << abort(FatalError);
+                        if (debug)
+                        {
+                            WarningIn
+                            (
+                                "label refinement::"
+                                "edgeConsistentUnrefinement"
+                                "(boolList& cellsToUnrefine)"
+                            )   << "Cell not marked for unrefinement, indicating a"
+                                << " previous unnoticed problem with unrefinement."
+                                << nl
+                                << "cellI: " << cellI << ", cellJ: " << cellJ
+                                << nl
+                                << "Level of cellI: " << cellILevel
+                                << ", level of cellJ: " << cellJLevel << nl
+                                << "This is probably because the refinement and "
+                                << "unrefinement regions are very close." << nl
+                                << "Try increasing nUnrefinementBufferLayers. "
+                                << endl;
+                        }
                     }
-
-                    cellsToUnrefine[cellJ] = false;
-                    ++nRemCells;
+                    else
+                    {
+                        cellsToUnrefine[cellJ] = false;
+                        ++nRemCells;
+                    }
                 }
             }
         }
@@ -1442,7 +1343,7 @@ void Foam::refinement::setRefinement(polyTopoChange& ref) const
         mesh_,
         pointLevel_,
         maxEqOp<label>(),
-        label(0), // Null value
+        0,   // Null value
         true // Apply separation for parallel cyclics
     );
 
@@ -1599,10 +1500,21 @@ void Foam::refinement::updateMesh(const mapPolyMesh& map)
         }
     }
 
-    // Note: new point level is going to be synced at processor boundaries just
-    // before the next step in setRefinement. Need to investigate why the sync
-    // is not done properly if I put it here. Something is not updated yet.
-    // VV, 31/Jan/2018.
+    // Sync the new point level. Note: here, we assume that the call to
+    // updateMesh happened after polyBoundaryMesh::updateMesh where the
+    // processor data is fully rebuilt. If this is not the case, the point
+    // level will remain unsynced and will cause all kinds of trouble that
+    // are extremely difficult to spot. See the change in
+    // polyTopoChanger::changeMesh order of calling polyMesh::updateMesh and
+    // polyTopoChanger::update. VV, 19/Feb/2019.
+    syncTools::syncPointList
+    (
+        mesh_,
+        newPointLevel,
+        maxEqOp<label>(),
+        0,   // Null value
+        true // Apply separation for parallel cyclics
+    );
 
     // Transfer the new point level into the data member
     pointLevel_.transfer(newPointLevel);

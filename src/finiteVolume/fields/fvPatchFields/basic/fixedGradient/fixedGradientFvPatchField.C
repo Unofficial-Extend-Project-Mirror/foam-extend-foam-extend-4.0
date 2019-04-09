@@ -67,11 +67,11 @@ fixedGradientFvPatchField<Type>::fixedGradientFvPatchField
     const dictionary& dict
 )
 :
-    fvPatchField<Type>(p, iF, dict),
+    // HR 15.12.18: Must not call evaluate during construction. Read value
+    // instead. This is needed for PLB.
+    fvPatchField<Type>(p, iF, dict, true),
     gradient_("gradient", dict, p.size())
-{
-    evaluate();
-}
+{}
 
 
 template<class Type>

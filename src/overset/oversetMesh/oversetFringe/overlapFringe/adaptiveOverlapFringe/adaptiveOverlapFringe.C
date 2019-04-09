@@ -95,8 +95,8 @@ void Foam::adaptiveOverlapFringe::suitabilityFractionSlope
     forAllConstIter(FIFOStack<iterationData>, iterHist, it)
     {
         n += (it().iteration() - iterMean)*
-            (it().suitability() - suitabilityMean);
-        d += sqr(it().iteration() - iterMean);
+             (it().suitability() - suitabilityMean);
+        d += Foam::sqr((it().iteration() - iterMean));
     }
 
     reduce(n, sumOp<scalar>());
@@ -389,9 +389,9 @@ Foam::adaptiveOverlapFringe::adaptiveOverlapFringe
 )
 :
     oversetFringe(mesh, region, dict),
-    fringeHolesPtr_(nullptr),
-    acceptorsPtr_(nullptr),
-    finalDonorAcceptorsPtr_(nullptr),
+    fringeHolesPtr_(NULL),
+    acceptorsPtr_(NULL),
+    finalDonorAcceptorsPtr_(NULL),
 
     holesZoneName_(dict.lookupOrDefault<word>("holes", word())),
     initPatchNames_

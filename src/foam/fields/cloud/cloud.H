@@ -101,7 +101,9 @@ public:
             //- Return size of the cloud
             virtual label size() const;
 
-    
+            //- Count and return number of particles per cell
+            virtual labelList nParticlesPerCell() const;
+
         // Edit
 
             //- Remap the cells of particles corresponding to the

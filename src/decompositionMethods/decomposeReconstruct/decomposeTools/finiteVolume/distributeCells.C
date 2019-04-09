@@ -184,6 +184,7 @@ void Foam::domainDecomposition::distributeCells()
     {
         const fvBoundaryMesh& patches = mesh_.boundary();
 
+        // Send cellToProc data
         forAll (patches, patchI)
         {
             if (isA<processorFvPatch>(patches[patchI]))
@@ -212,7 +213,43 @@ void Foam::domainDecomposition::distributeCells()
                     cpPatch.internalFieldTransfer
                     (
                         Pstream::blocking,
-                        cellToProc_
+                        cellToProc_ // Dummy argument
+                    );
+            }
+        }
+
+        // Send face cells for correct ordering of faces in parallel load
+        // balancing when certain processor faces become internal faces on a
+        // given processor
+        forAll (patches, patchI)
+        {
+            if (isA<processorFvPatch>(patches[patchI]))
+            // if (patches[patchI].coupled())
+            {
+                const lduInterface& cpPatch =
+                    refCast<const lduInterface>(patches[patchI]);
+
+                cpPatch.initTransfer
+                (
+                    Pstream::blocking,
+                    patches[patchI].faceCells()
+                );
+            }
+        }
+
+        forAll (patches, patchI)
+        {
+            if (isA<processorFvPatch>(patches[patchI]))
+            // if (patches[patchI].coupled())
+            {
+                const lduInterface& cpPatch =
+                    refCast<const lduInterface>(patches[patchI]);
+
+                patchNbrFaceCells_[patchI] =
+                    cpPatch.transfer
+                    (
+                        Pstream::blocking,
+                        patches[patchI].faceCells() // Dummy argument
                     );
             }
         }

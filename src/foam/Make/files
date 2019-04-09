@@ -447,6 +447,7 @@ $(globalMeshData)/globalMeshData.C
 $(globalMeshData)/globalPoints.C
 $(globalMeshData)/globalIndex.C
 $(globalMeshData)/globalProcFaceIndex.C
+$(globalMeshData)/globalProcPointIndex.C
 
 $(polyMesh)/syncTools/syncTools.C
 

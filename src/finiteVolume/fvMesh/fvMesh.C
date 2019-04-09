@@ -424,6 +424,9 @@ void Foam::fvMesh::resetFvPrimitives
     // Reset fvPatches  HJ, 16/Apr/2018
     boundary_.resetFvPatches(resetFvPatchFlag);
 
+    // HR 14.12.18: Indicate that the mesh is changing to e.g. nearWallDist
+    polyMesh::changing(true);
+
     // Clear all mesh data
     clearOut();
 }

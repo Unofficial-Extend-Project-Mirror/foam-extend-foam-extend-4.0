@@ -22,18 +22,14 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::globalProcFaceIndex
+    Foam::globalProcPointIndex
 
 Description
-    The class creates a unique global face index for each processor face (pair)
-    in the mesh.  Master and slave processor face carry the same index.
+    The class creates a unique global point index for each processor points
+    (pair) in the mesh. Master and slave processor points carry the same index.
 
-    The data is presented as a labelListList, which is set only for
-    processor patches.
-
-    Face offsets counts a number of unique faces on each processor,
-    excluding slave processor patch faces, which are given master face index.
-    If needed, global face index from all faces can be derived from this data
+    Point offsets counts a number of unique points on each processor,
+    excluding slave processor patch points and global points.
 
     Currently, faces are ordered with internal faces first, followed by patch
     faces in patch order, excluding slave processor patches.
@@ -41,15 +37,15 @@ Description
     to facilitate parallel I/O.  HJ, 4/May/2018
 
 Author
-    Hrvoje Jasak, Wikki Ltd.
+    Henrik Rusche, Wikki GmbH
 
 SourceFiles
-    globalProcFaceIndex.C
+    globalProcPointIndex.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef globalProcFaceIndex_H
-#define globalProcFaceIndex_H
+#ifndef globalProcPointIndex_H
+#define globalProcPointIndex_H
 
 #include "polyMesh.H"
 #include "labelList.H"
@@ -62,37 +58,37 @@ namespace Foam
 // Forward declaration of classes
 
 /*---------------------------------------------------------------------------*\
-                      Class globalProcFaceIndex Declaration
+                      Class globalProcPointIndex Declaration
 \*---------------------------------------------------------------------------*/
 
-class globalProcFaceIndex
+class globalProcPointIndex
 {
     // Private data
 
         //- Mesh reference
         const polyMesh& mesh_;
 
-        //- Number of unique faces per processor
-        labelList nUniqueFaces_;
+        //- Processor point index offset
+        labelList procPointOffset_;
 
-        //- Processor face index offset
-        labelList procFaceOffset_;
+        //- point index offset for patches in local mesh
+        labelList patchPointOffset_;
 
-        //- Global face label for all faces of current mesh
-        //  Sized to number of live faces in the mesh
+        //- Global poins label for all points of current mesh
+        //  Sized to number of live points in the mesh
         labelList globalLabel_;
 
 
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        globalProcFaceIndex(const globalProcFaceIndex&);
+        globalProcPointIndex(const globalProcPointIndex&);
 
         //- Disallow default bitwise assignment
-        void operator=(const globalProcFaceIndex&);
+        void operator=(const globalProcPointIndex&);
 
-        //- Calculate face index
-        void calcFaceIndex();
+        //- Calculate point index
+        void calcPointIndex();
 
 
 public:
@@ -100,7 +96,7 @@ public:
     // Constructors
 
         //- Construct from mesh
-        globalProcFaceIndex(const polyMesh&);
+        globalProcPointIndex(const polyMesh&);
 
 
     //- Destructor - default
@@ -108,21 +104,20 @@ public:
 
     // Member Functions
 
-        //- Return number of unique faces per processor
-        inline const labelList& nUniqueFaces() const
+        //- Return point index offset per processor
+        inline const labelList& procPointOffset() const
         {
-            return nUniqueFaces_;
+            return procPointOffset_;
         }
 
-        //- Return face index offset per processor
-        inline const labelList& procFaceOffset() const
+        inline const labelList& patchPointOffset() const
         {
-            return procFaceOffset_;
+            return patchPointOffset_;
         }
 
-        //- Return global face label for all faces of current mesh
-        //  Sized to number of live faces in the mesh
-        const labelList& globalLabel() const
+        //- Return global point label for all points of current mesh
+        //  Sized to number of live points in the mesh
+        const labelList globalLabel() const
         {
             return globalLabel_;
         }
