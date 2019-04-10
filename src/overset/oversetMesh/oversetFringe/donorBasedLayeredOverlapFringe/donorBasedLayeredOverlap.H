@@ -29,13 +29,13 @@ Description
     until the final donor/acceptor assembly has been performed for all regions
     whose donor region is this region. Then, all donors are collected and the
     acceptors are cells neighbouring the donors nLayers towards the interior.
-    Interior is defined either by a user-specified point or as a centre of
-    volume of the donor cells.
+    Interior is defined either by user-specified points for each region or as a
+    centre of volume of the donor cells in particular region.
 
     This fringe algorithm is intended to be used along with the faceCells fringe
     on the other side, where the cell sizes are not significantly different from
-    each other (e.g. 10:1 cell ratio will probably be problematic to correctly
-    set-up).
+    each other (e.g. 10:1 cell ratio, where the finer cells are found on the
+    background mesh will probably be problematic to correctly set-up).
 
 Author
     Vuko Vukcevic, Wikki Ltd.  All rights reserved.
@@ -72,8 +72,8 @@ class donorBasedLayeredOverlapFringe
 
         //- Optional list of points representing a rough estimate of the centre
         //  for each underlying connected region. If these are not provided, the
-        //  centre is calculated as the centre of volume of all donors for a
-        //  given connected region
+        //  centre is calculated as the centre of all donors for a given
+        //  connected region
         pointList regionCentrePoints_;
 
         //- How many layers to move away from connected region donors to define
@@ -88,6 +88,13 @@ class donorBasedLayeredOverlapFringe
 
         //- Final donor/acceptor pairs for this region (fringe)
         mutable donorAcceptorList* finalDonorAcceptorsPtr_;
+
+
+    // Private static data
+
+        //- Distance tolerance to determine propagation direction. Note:
+        //  absolute value, default = 0. Might be useful is some strange cases
+        static const debug::tolerancesSwitch distTol_;
 
 
     // Private Member Functions
