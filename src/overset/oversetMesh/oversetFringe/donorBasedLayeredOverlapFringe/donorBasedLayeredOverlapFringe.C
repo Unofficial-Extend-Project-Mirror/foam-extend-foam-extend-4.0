@@ -331,6 +331,10 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
             const unallocLabelList& owner = mesh.faceOwner();
             const unallocLabelList& neighbour = mesh.faceNeighbour();
 
+            // Get bounding box of this region for additional check when marking
+            // acceptors
+            const boundBox& bb = allRegions[regionID].globalBounds();
+
             // Mark cells that are eligible to be acceptors (not donors)
             boolList eligibleCells(mesh.nCells(), true);
             forAllConstIter (labelHashSet, donors, iter)
@@ -372,9 +376,14 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
 
                         if
                         (
-                            faceCentreToRegionCentreDist
-                          - donorCentreToRegionCentreDist
-                          < distTol_
+                            // First, distance based criterium
+                            (
+                                faceCentreToRegionCentreDist
+                              - donorCentreToRegionCentreDist
+                              < distTol_
+                            )
+                            // Second, bounding box based criterium
+                         && (bb.contains(faceCentre))
                         )
                         {
                             // Face is closer to the centre point than cell: we
@@ -680,6 +689,27 @@ Foam::donorBasedLayeredOverlapFringe::donorBasedLayeredOverlapFringe
             << nl
             << "The number should be greater than 0."
             << abort(FatalError);
+    }
+
+    // Recommendation: use at least two layers in order to avoid going defining
+    // acceptors on the wrong side and filling in the whole region with holes
+    if (nLayers_ == 1)
+    {
+        WarningIn 
+        (
+            "donorBasedLayeredOverlapFringe::"
+            "donorBasedLayeredOverlapFringe\n"
+            "(\n"
+            "    const fvMesh& mesh,\n"
+            "    const oversetRegion& region,\n"
+            "    const dictionary& dict\n"
+            ")"
+        )   << "It is recommended to use at least 2 layers (nLayers = 2) in"
+            << " order to avoid defining acceptor cells on the wrong side"
+            << " of the region."
+            << nl
+            << "Be sure to check the fringe layer for this region."
+            << endl;
     }
 }
 

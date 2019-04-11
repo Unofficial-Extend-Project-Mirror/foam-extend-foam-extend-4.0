@@ -37,6 +37,13 @@ Description
     each other (e.g. 10:1 cell ratio, where the finer cells are found on the
     background mesh will probably be problematic to correctly set-up).
 
+    Note: based on distance tolerance (see distTol_ member), specified number of
+    layers and the bounding box of the connected donor region, it is possible
+    that acceptors end also on the wrong side (from the region centre as opposed
+    to towards the region centre). I do all I can to prevent this by looking at
+    the bounding box and hinting that at least 2 layers should be used. Be sure
+    to check the overset assembly for this region using calcOverset utility.
+
 Author
     Vuko Vukcevic, Wikki Ltd.  All rights reserved.
 
