@@ -30,7 +30,6 @@ License
 #include "oversetRegion.H"
 #include "addToRunTimeSelectionTable.H"
 #include "syncTools.H"
-#include "dynamicFvMesh.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -56,6 +55,88 @@ Foam::donorBasedLayeredOverlapFringe::distTol_
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
+void Foam::donorBasedLayeredOverlapFringe::init() const
+{
+    // Set size of the list containing IDs
+    connectedRegionIDs_.setSize(connectedRegionNames_.size());
+
+    // Get list of all overset regions
+    const PtrList<oversetRegion>& allRegions =
+        this->region().overset().regions();
+
+    // Create list of all region names for easy lookup
+    wordList allRegionNames(allRegions.size());
+    forAll (allRegionNames, arI)
+    {
+        allRegionNames[arI] = allRegions[arI].name();
+    }
+
+    // Loop through all regions and check whether the overlap has been found
+    forAll (connectedRegionNames_, crI)
+    {
+        // Get name of this connected region
+        const word& crName = connectedRegionNames_[crI];
+
+        // Find this region in the list of all regions
+        const label regionID = findIndex(allRegionNames, crName);
+
+        if (regionID == -1)
+        {
+            FatalErrorIn("void donorBasedLayeredOverlapFringe::init() const")
+                << "Region " << crName << " not found in list of regions."
+                << "List of overset regions: " << allRegionNames
+                << abort(FatalError);
+        }
+
+        // Collect the region index in the list
+        connectedRegionIDs_[crI] = regionID;
+
+        // Sanity check: if the specified connected donor region has more than 1
+        // donor regions, this fringe algorithm is attempted to be used for
+        // something that's not intended. Issue an error
+        if (allRegions[regionID].donorRegions().size() != 1)
+        {
+            FatalErrorIn("void donorBasedLayeredOverlapFringe::init() const")
+                << "Region " << crName << " specified as connected region, but"
+                << " that region has "
+                << allRegions[regionID].donorRegions().size()
+                << " donor regions."
+                << abort(FatalError);
+        }
+
+        // Sanity check whether the donor region of connected region is actually
+        // this region
+        if (allRegions[regionID].donorRegions()[0] != this->region().index())
+        {
+            FatalErrorIn("void donorBasedLayeredOverlapFringe::init() const")
+                << "The donor region of region " << crName
+                << " should be only region " << this->region().name()
+                << abort(FatalError);
+        }
+    }
+
+    // Sanity check: number of (optionally) specified centre points must be
+    // equal to the number of connected regions
+    if
+    (
+        !regionCentrePoints_.empty()
+     && (regionCentrePoints_.size() != connectedRegionIDs_.size())
+    )
+    {
+        FatalErrorIn("void donorBasedLayeredOverlapFringe::init() const")
+            << "You have specified "
+            << regionCentrePoints_.size()
+            << " regionCentrePoints, while specifying "
+            << connectedRegionIDs_.size()
+            << " connectedRegions."
+            << nl
+            << "If you'd like to avoid using automatic centre point detection,"
+            << " make sure to specify centre points for all connected regions."
+            << abort(FatalError);
+    }
+}
+
+
 void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
 {
     // Make sure that either acceptorsPtr is unnalocated or if it is allocated,
@@ -67,6 +148,13 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
             "void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const"
         )   << "Addressing already calculated"
             << abort(FatalError);
+    }
+
+    if (!isInitialized_)
+    {
+        // This is the first call, initialize the data and set flag to true
+        init();
+        isInitialized_ = true;
     }
 
     // Get list of all overset regions
@@ -118,6 +206,9 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
 
     if (allFringesReady)
     {
+        Info<< "All dependent fringes are ready. Starting donor based layered"
+            << " overlap assembly..." << endl;
+
         // Loop through connected regions
         forAll (connectedRegionIDs_, crI)
         {
@@ -217,8 +308,16 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
                 const label nUniqueDonors =
                     returnReduce(donors.size(), sumOp<label>());
 
-                // Calculate the final centre point by finding the arithmetic mean
+                // Calculate the final centre point by finding the arithmetic
+                // mean
                 centrePoint /= nUniqueDonors;
+            }
+
+            if (debug)
+            {
+                Info<< "Centre point for donors for region "
+                    << allRegions[regionID].name() << " is : " << centrePoint
+                    << endl;
             }
 
             // We now have a collection of all donors for this connected region
@@ -348,8 +447,8 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
                     }
                 }
 
-                // Special treatment for last iteration
-                if (i == nLayers_ - 1)
+                // Special treatment for all non-final iterations
+                if (i < nLayers_ - 1)
                 {
                     // This is not the last iteration, transfer acceptors into
                     // donors
@@ -364,13 +463,14 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
             // all cells that are ineligible (either donor or acceptor). The
             // remaining thing to do is to mark the interior holes
 
-            // Create a hash set containing fringe holes, initialized with
-            // acceptors in order to avoid having special conditions in the loop
-            // below for the first pass
+            // Create a hash set that will contain fringe holes
             labelHashSet fringeHoles(10*acceptors.size());
 
-            // Collect holes until there are no holes to collect
+            // Collect holes until there are no holes to collect. Note: for the
+            // first iteration, we will start with acceptors, otherwise, we will
+            // start from all fringe holes
             label nAddedHoles;
+            bool firstIteration = true;
             do
             {
                 // Reset number of newly added holes
@@ -379,10 +479,26 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
                 // Face markup for propagation
                 boolList propagateFace(mesh.nFaces(), false);
 
-                // Loop through all acceptors and mark faces that are pointing
-                // towards the centre point and have eligible neighbour (not an
-                // acceptor or donor)
-                forAllConstIter (labelHashSet, fringeHoles, iter)
+                // Get collection of cells from which to start the search:
+                // acceptors for the first iteration and fringe holes otherwise
+                labelHashSet* curSetPtr = nullptr;
+                if (firstIteration)
+                {
+                    // Point current set to acceptors and switch off the flag
+                    curSetPtr = &acceptors;
+                    firstIteration = false;
+                }
+                else
+                {
+                    // Point current set to fringe holes
+                    curSetPtr = &fringeHoles;
+                }
+                const labelHashSet& curSet = *curSetPtr;
+
+                // Loop through all cells in the set and mark faces that are
+                // pointing towards the centre point and have eligible neighbour
+                // (not an acceptor or donor).
+                forAllConstIter (labelHashSet, curSet, iter)
                 {
                     // Get the cell index and the cell
                     const label& cellI = iter.key();
@@ -499,8 +615,15 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
         // Connected fringes are not ready, allocate empty lists for acceptors
         // and holes, which will be deleted when asked for again from the
         // iterative procedure (see candidateAcceptors() and fringeHoles())
-        acceptorsPtr_ = new labelList(0);
-        fringeHolesPtr_ = new labelList(0);
+        acceptorsPtr_ = new labelList;
+        fringeHolesPtr_ = new labelList;
+    }
+
+    if (debug)
+    {
+        Info<< "In donorBasedLayeredOverlapFringe::calcAddressing() const" << nl
+            << "Found " << acceptorsPtr_->size() << " acceptors." << nl
+            << "Found " << fringeHolesPtr_->size() << " fringe holes." << endl;
     }
 }
 
@@ -524,6 +647,7 @@ Foam::donorBasedLayeredOverlapFringe::donorBasedLayeredOverlapFringe
 )
 :
     oversetFringe(mesh, region, dict),
+    connectedRegionNames_(dict.lookup("connectedRegions")),
     connectedRegionIDs_(),
     regionCentrePoints_
     (
@@ -536,7 +660,8 @@ Foam::donorBasedLayeredOverlapFringe::donorBasedLayeredOverlapFringe
     nLayers_(readLabel(dict.lookup("nLayers"))),
     fringeHolesPtr_(nullptr),
     acceptorsPtr_(nullptr),
-    finalDonorAcceptorsPtr_(nullptr)
+    finalDonorAcceptorsPtr_(nullptr),
+    isInitialized_(false)
 {
     // Sanity check number of layers: must be greater than 0
     if (nLayers_ < 1)
@@ -555,147 +680,6 @@ Foam::donorBasedLayeredOverlapFringe::donorBasedLayeredOverlapFringe
             << nl
             << "The number should be greater than 0."
             << abort(FatalError);
-    }
-
-    // Read names of connected regions
-    const wordList connectedRegionNames(dict.lookup("connectedRegions"));
-
-    // Set size of the list containing IDs
-    connectedRegionIDs_.setSize(connectedRegionNames.size());
-
-    // Get list of all overset regions
-    const PtrList<oversetRegion>& allRegions =
-        this->region().overset().regions();
-
-    // Create list of all region names for easy lookup
-    wordList allRegionNames(allRegions.size());
-    forAll (allRegionNames, arI)
-    {
-        allRegionNames[arI] = allRegions[arI].name();
-    }
-
-    // Loop through all regions and check whether the overlap has been found
-    forAll (connectedRegionNames, crI)
-    {
-        // Get name of this connected region
-        const word& crName = connectedRegionNames[crI];
-
-        // Find this region in the list of all regions
-        const label regionID = findIndex(allRegionNames, crName);
-
-        if (regionID == -1)
-        {
-            FatalErrorIn
-            (
-                "donorBasedLayeredOverlapFringe::"
-                "donorBasedLayeredOverlapFringe\n"
-                "(\n"
-                "    const fvMesh& mesh,\n"
-                "    const oversetRegion& region,\n"
-                "    const dictionary& dict\n"
-                ")"
-            )   << "Region " << crName << " not found in list of regions."
-                << "List of overset regions: " << allRegionNames
-                << abort(FatalError);
-        }
-
-        // Collect the region index in the list
-        connectedRegionIDs_[crI] = regionID;
-
-        // Sanity check: if the specified connected donor region has more than 1
-        // donor regions, this fringe algorithm is attempted to be used for
-        // something that's not intended. Issue an error
-        if (allRegions[regionID].donorRegions().size() != 1)
-        {
-            FatalErrorIn
-            (
-                "donorBasedLayeredOverlapFringe::"
-                "donorBasedLayeredOverlapFringe\n"
-                "(\n"
-                "    const fvMesh& mesh,\n"
-                "    const oversetRegion& region,\n"
-                "    const dictionary& dict\n"
-                ")"
-            )   << "Region " << crName << " specified as connected region, but"
-                << " that region has "
-                << allRegions[regionID].donorRegions().size() << " donor regions."
-                << abort(FatalError);
-        }
-
-        // Sanity check whether the donor region of connected region is actually
-        // this region
-        if (regionID != this->region().index())
-        {
-            FatalErrorIn
-            (
-                "donorBasedLayeredOverlapFringe::"
-                "donorBasedLayeredOverlapFringe\n"
-                "(\n"
-                "    const fvMesh& mesh,\n"
-                "    const oversetRegion& region,\n"
-                "    const dictionary& dict\n"
-                ")"
-            )   << "The donor region of region " << crName
-                << " should be only region " << this->region().name()
-                << abort(FatalError);
-        }
-    }
-
-    // Sanity check: number of (optionally) specified centre points must be
-    // equal to the number of connected regions
-    if
-    (
-        !regionCentrePoints_.empty()
-     && (regionCentrePoints_.size() != connectedRegionIDs_.size())
-    )
-    {
-        // The list is not empty and the size of the list is not the same as the
-        // size of the connected regions. This is a problem
-        FatalErrorIn
-        (
-            "donorBasedLayeredOverlapFringe::"
-            "donorBasedLayeredOverlapFringe\n"
-            "(\n"
-            "    const fvMesh& mesh,\n"
-            "    const oversetRegion& region,\n"
-            "    const dictionary& dict\n"
-            ")"
-        )   << "You have specified "
-            << regionCentrePoints_.size()
-            << " regionCentrePoints, while specifying "
-            << connectedRegionIDs_.size()
-            << " connectedRegions."
-            << nl
-            << "If you'd like to avoid using automatic centre point detection,"
-            << " make sure to specify centre points for all connected regions."
-            << abort(FatalError);
-    }
-
-    // Sanity check: if the user has specified centre points, dynamic mesh
-    // simulations may be problematic. Issue a warning
-    if
-    (
-        !regionCentrePoints_.empty()
-     && isA<dynamicFvMesh>(this->mesh())
-    )
-    {
-        WarningIn
-        (
-            "donorBasedLayeredOverlapFringe::"
-            "donorBasedLayeredOverlapFringe\n"
-            "(\n"
-            "    const fvMesh& mesh,\n"
-            "    const oversetRegion& region,\n"
-            "    const dictionary& dict\n"
-            ")"
-        )   << "You have specified regionCentrePoints for a dynamic mesh"
-            << " simulation."
-            << nl
-            << "Make sure that the centre points always remain in/near the"
-            << " centre of donors in connected regions!"
-            << nl
-            << "Proceed with care!"
-            << endl;
     }
 }
 
@@ -730,15 +714,28 @@ bool Foam::donorBasedLayeredOverlapFringe::updateIteration
             << abort(FatalError);
     }
 
-    // Allocate the list by reusing the argument list
-    finalDonorAcceptorsPtr_ = new donorAcceptorList
+    if
     (
-        donorAcceptorRegionData,
-        true
-    );
-
-    // Set the flag to true and return
-    updateSuitableOverlapFlag(true);
+        fringeHolesPtr_ && acceptorsPtr_
+     && !fringeHolesPtr_->empty() && !acceptorsPtr_->empty()
+    )
+    {
+        // Allocate the list by reusing the argument list
+        finalDonorAcceptorsPtr_ = new donorAcceptorList
+        (
+            donorAcceptorRegionData,
+            true
+        );
+    
+        // Set the flag to true
+        updateSuitableOverlapFlag(true);
+    }
+    else
+    {
+        // Delete fringeHolesPtr and acceptorsPtr to trigger calculation of
+        // addressing, this time with other fringes up-to-date
+    }
+    // else suitable overlap has not been found and there's nothing to do
 
     return foundSuitableOverlap();
 }
@@ -759,13 +756,16 @@ const Foam::labelList& Foam::donorBasedLayeredOverlapFringe::fringeHoles() const
         // See calcAddressing() for details
         deleteDemandDrivenData(fringeHolesPtr_);
         deleteDemandDrivenData(acceptorsPtr_);
+
+        calcAddressing();
     }
 
     return *fringeHolesPtr_;
 }
 
 
-const Foam::labelList& Foam::donorBasedLayeredOverlapFringe::candidateAcceptors() const
+const Foam::labelList&
+Foam::donorBasedLayeredOverlapFringe::candidateAcceptors() const
 {
     if (!acceptorsPtr_)
     {
@@ -780,20 +780,23 @@ const Foam::labelList& Foam::donorBasedLayeredOverlapFringe::candidateAcceptors(
         // See calcAddressing() for details
         deleteDemandDrivenData(fringeHolesPtr_);
         deleteDemandDrivenData(acceptorsPtr_);
+
+        calcAddressing();
     }
 
     return *acceptorsPtr_;
 }
 
 
-Foam::donorAcceptorList& Foam::donorBasedLayeredOverlapFringe::finalDonorAcceptors() const
+Foam::donorAcceptorList&
+Foam::donorBasedLayeredOverlapFringe::finalDonorAcceptors() const
 {
     if (!finalDonorAcceptorsPtr_)
     {
         FatalErrorIn("donorBasedLayeredOverlapFringe::finalDonorAcceptors()")
-            << "finalDonorAcceptorPtr_ not allocated. Make sure you have "
-            << "called donorBasedLayeredOverlapFringe::updateIteration() before asking for "
-            << "final set of donor/acceptor pairs."
+            << "finalDonorAcceptorPtr_ not allocated. Make sure you have"
+            << " called donorBasedLayeredOverlapFringe::updateIteration() before"
+            << " asking for final set of donor/acceptor pairs."
             << abort(FatalError);
     }
 

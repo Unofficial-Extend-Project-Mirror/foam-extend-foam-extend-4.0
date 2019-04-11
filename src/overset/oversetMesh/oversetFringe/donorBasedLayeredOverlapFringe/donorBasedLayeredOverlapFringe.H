@@ -65,9 +65,14 @@ class donorBasedLayeredOverlapFringe
 {
     // Private data
 
+        //- Names of connected regions. Looked up on construction
+        wordList connectedRegionNames_;
+
         //- Regions IDs from which the donors will be collected as a starting
-        //  point
-        labelList connectedRegionIDs_;
+        //  point. Note: initialized in init private member function because we
+        //  cannot initialize it in constructor. This is because certain overset
+        //  regions (and their fringes) may not be initialized at this point.
+        mutable labelList connectedRegionIDs_;
 
         //- Optional list of points representing a rough estimate of the centre
         //  for each underlying connected region. If these are not provided, the
@@ -88,6 +93,9 @@ class donorBasedLayeredOverlapFringe
         //- Final donor/acceptor pairs for this region (fringe)
         mutable donorAcceptorList* finalDonorAcceptorsPtr_;
 
+        //- Initialization helper
+        mutable bool isInitialized_;
+
 
     // Private static data
 
@@ -98,17 +106,13 @@ class donorBasedLayeredOverlapFringe
 
     // Private Member Functions
 
-        //- Disallow default bitwise copy construct
-        donorBasedLayeredOverlapFringe(const donorBasedLayeredOverlapFringe&);
+        //- Initialization
+        void init() const;
 
-        //- Disallow default bitwise assignment
-        void operator=(const donorBasedLayeredOverlapFringe&);
-
-
-        // Calculate hole and acceptor addressing
+        //- Calculate hole and acceptor addressing
         void calcAddressing() const;
 
-        // Clear addressing
+        //- Clear addressing
         void clearAddressing() const;
 
 
@@ -127,6 +131,15 @@ public:
             const oversetRegion& region,
             const dictionary& dict
         );
+
+        //- Disallow default bitwise copy construct
+        donorBasedLayeredOverlapFringe
+        (
+            const donorBasedLayeredOverlapFringe&
+        ) = delete;
+
+        //- Disallow default bitwise assignment
+        void operator=(const donorBasedLayeredOverlapFringe&) = delete;
 
 
     // Destructor
