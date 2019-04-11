@@ -24,10 +24,13 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "donorBasedLayeredOverlapFringe.H"
+#include "oversetMesh.H"
+#include "oversetRegion.H"
 #include "faceCellsFringe.H"
 #include "oversetRegion.H"
 #include "addToRunTimeSelectionTable.H"
 #include "syncTools.H"
+#include "dynamicFvMesh.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -46,7 +49,7 @@ namespace Foam
 const Foam::debug::tolerancesSwitch
 Foam::donorBasedLayeredOverlapFringe::distTol_
 (
-    "donorBasedLayeredOverlapDistanceTolerance"
+    "donorBasedLayeredOverlapDistanceTolerance",
     0.0
 );
 
@@ -97,7 +100,7 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
                 << " with faceCells fringe as a connected region fringe."
                 << nl
                 << "Connected overset region " << region.name()
-                << " has " << fringe.type() " fringe type. "
+                << " has " << fringe.type() << " fringe type. "
                 << nl
                 << "Proceed with care!"
                 << endl;
@@ -109,6 +112,7 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
     }
 
     // Sets containing all acceptors and all holes for all connected regions
+    const polyMesh& mesh = this->mesh();
     labelHashSet allAcceptors(0.02*mesh.nCells());
     labelHashSet allFringeHoles(0.02*mesh.nCells());
 
@@ -175,9 +179,9 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
                     }
 
                     // Loop through extended donor cells
-                    donorAcceptor::DynamicLabelList& extDonors =
+                    const donorAcceptor::DynamicLabelList& extDonors =
                         daPair.extendedDonorCells();
-                    donorAcceptor::DynamicPointList& extDonorPoints =
+                    const donorAcceptor::DynamicPointList& extDonorPoints =
                         daPair.extendedDonorPoints();
 
                     forAll (extDonors, i)
@@ -210,7 +214,8 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
                 // User did not specify centre points and the centre point holds
                 // the sum of all the points. Reduce the data
                 reduce(centrePoint, sumOp<vector>());
-                nUniqueDonors = returnReduce(donors.size(), sumOp<label>());
+                const label nUniqueDonors =
+                    returnReduce(donors.size(), sumOp<label>());
 
                 // Calculate the final centre point by finding the arithmetic mean
                 centrePoint /= nUniqueDonors;
@@ -221,7 +226,6 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
             labelHashSet acceptors(donors.size()); // Reasonable size estimate
 
             // Get necessary mesh data (from polyMesh/primitiveMesh)
-            const polyMesh& mesh = this->mesh();
             const vectorField& cc = mesh.cellCentres();
             const vectorField& fc = mesh.faceCentres();
             const cellList& meshCells = mesh.cells();
@@ -247,7 +251,7 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
                 {
                     // Get the cell index and the cell
                     const label& cellI = iter.key();
-                    const label& cell = meshCells[cellI];
+                    const cell& cFaces = meshCells[cellI];
 
                     // Get cell centre of this donor and calculate distance to
                     // centre point
@@ -382,7 +386,7 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
                 {
                     // Get the cell index and the cell
                     const label& cellI = iter.key();
-                    const label& cell = meshCells[cellI];
+                    const cell& cFaces = meshCells[cellI];
 
                     // Note: there's no need to check for the distance here
                     // because there's always at least one "buffer" layer
@@ -496,7 +500,7 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
         // and holes, which will be deleted when asked for again from the
         // iterative procedure (see candidateAcceptors() and fringeHoles())
         acceptorsPtr_ = new labelList(0);
-        holesPtr_ = new labelList(0);
+        fringeHolesPtr_ = new labelList(0);
     }
 }
 
@@ -523,7 +527,11 @@ Foam::donorBasedLayeredOverlapFringe::donorBasedLayeredOverlapFringe
     connectedRegionIDs_(),
     regionCentrePoints_
     (
-        dict.lookupOrDefault<pointList>("regionCentrePoints", pointList(0))
+        dict.lookupOrDefault<List<point> >
+        (
+            "regionCentrePoints",
+            List<point>(0)
+        )
     ),
     nLayers_(readLabel(dict.lookup("nLayers"))),
     fringeHolesPtr_(nullptr),
@@ -543,7 +551,7 @@ Foam::donorBasedLayeredOverlapFringe::donorBasedLayeredOverlapFringe
             "    const dictionary& dict\n"
             ")",
             dict
-        )   << "Invalid number of layers specified, nLayers = " nLayers_
+        )   << "Invalid number of layers specified, nLayers = " << nLayers_
             << nl
             << "The number should be greater than 0."
             << abort(FatalError);
@@ -573,7 +581,7 @@ Foam::donorBasedLayeredOverlapFringe::donorBasedLayeredOverlapFringe
         const word& crName = connectedRegionNames[crI];
 
         // Find this region in the list of all regions
-        const label regionID = findIndex(allRegions, crName);
+        const label regionID = findIndex(allRegionNames, crName);
 
         if (regionID == -1)
         {
@@ -732,7 +740,7 @@ bool Foam::donorBasedLayeredOverlapFringe::updateIteration
     // Set the flag to true and return
     updateSuitableOverlapFlag(true);
 
-    return foundSuitablaOverlap();
+    return foundSuitableOverlap();
 }
 
 
@@ -803,16 +811,14 @@ Foam::donorAcceptorList& Foam::donorBasedLayeredOverlapFringe::finalDonorAccepto
 
 void Foam::donorBasedLayeredOverlapFringe::update() const
 {
-    if (updateFringe_)
-    {
-        Info<< "donorBasedLayeredOverlapFringe::update() const" << endl;
+    Info<< "donorBasedLayeredOverlapFringe::update() const" << endl;
 
-        // Clear out
-        clearAddressing();
-    }
+    // Clear out
+    clearAddressing();
 
     // Set flag to false and clear final donor/acceptors only
     deleteDemandDrivenData(finalDonorAcceptorsPtr_);
+    updateSuitableOverlapFlag(false);
 }
 
 

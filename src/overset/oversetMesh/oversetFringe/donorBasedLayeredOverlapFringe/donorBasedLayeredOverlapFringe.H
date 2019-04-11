@@ -49,7 +49,6 @@ SourceFiles
 #define donorBasedLayeredOverlapFringe_H
 
 #include "oversetFringe.H"
-#include "pointList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -68,13 +67,13 @@ class donorBasedLayeredOverlapFringe
 
         //- Regions IDs from which the donors will be collected as a starting
         //  point
-        labelList connectedRegionsIDs_;
+        labelList connectedRegionIDs_;
 
         //- Optional list of points representing a rough estimate of the centre
         //  for each underlying connected region. If these are not provided, the
         //  centre is calculated as the centre of all donors for a given
         //  connected region
-        pointList regionCentrePoints_;
+        List<point> regionCentrePoints_;
 
         //- How many layers to move away from connected region donors to define
         //  acceptor (and holes)
