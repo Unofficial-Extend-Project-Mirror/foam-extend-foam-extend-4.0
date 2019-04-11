@@ -731,7 +731,8 @@ bool Foam::donorBasedLayeredOverlapFringe::updateIteration
 {
     // If the donorAcceptor list has been allocated, something went wrong with
     // the iteration procedure (not-updated flag): this function has been called
-    // more than once, which should not happen for donorBasedLayeredOverlapFringe
+    // more than once, which should not happen for
+    // donorBasedLayeredOverlapFringe
     if (finalDonorAcceptorsPtr_)
     {
         FatalErrorIn
@@ -740,7 +741,8 @@ bool Foam::donorBasedLayeredOverlapFringe::updateIteration
             "updateIteration(donorAcceptorList&) const"
         )   << "finalDonorAcceptorPtr_ already allocated. Something went "
             << "wrong with the iteration procedure (flag was not updated)."
-            << nl << "This should not happen for donorBasedLayeredOverlapFringe."
+            << nl
+            << "This should not happen for donorBasedLayeredOverlapFringe."
             << abort(FatalError);
     }
 
