@@ -204,10 +204,16 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
     labelHashSet allAcceptors(0.02*mesh.nCells());
     labelHashSet allFringeHoles(0.02*mesh.nCells());
 
+    // Communicate state across processors
+    reduce(allFringesReady, andOp<bool>());
+
     if (allFringesReady)
     {
-        Info<< "All dependent fringes are ready. Starting donor based layered"
-            << " overlap assembly..." << endl;
+        if (debug)
+        {
+            Info<< "All dependent fringes are ready."
+                << " Starting donor based layered overlap assembly..." << endl;
+        }
 
         // Loop through connected regions
         forAll (connectedRegionIDs_, crI)
@@ -223,73 +229,104 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
             const donorAcceptorList& crDonorAcceptorPairs =
                 fringe.finalDonorAcceptors();
 
+            // Need to gather/scatter the donor-acceptor pairs across all
+            // processors because these pairs only represent acceptors found on
+            // my processor. It would be possible to optimize this a bit using
+            // the mapDistribute tool, but I don't think it will represent a big
+            // overhead, especially since it's done once.
+            List<donorAcceptorList> allDonorAcceptorPairs(Pstream::nProcs());
+
+            // Fill in my part and communicate
+            allDonorAcceptorPairs[Pstream::myProcNo()] = crDonorAcceptorPairs;
+            Pstream::gatherList(allDonorAcceptorPairs);
+            Pstream::scatterList(allDonorAcceptorPairs);
+
+            // Count approximate number of acceptors to guess the size for the
+            // hash set containing donors
+            label nAllAcceptors = 0;
+            forAll (allDonorAcceptorPairs, procI)
+            {
+                nAllAcceptors += allDonorAcceptorPairs[procI].size();
+            }
+
             // Hash set containing donors
-            labelHashSet donors(6*crDonorAcceptorPairs.size());
+            labelHashSet donors(6*nAllAcceptors);
 
             // Initialize centre of the donors of this connected region in order
             // to search in a given direction
             vector centrePoint(vector::zero);
 
-            // Loop through all donor/acceptors
-            forAll (crDonorAcceptorPairs, daI)
+            // Loop through all processors
+            forAll (allDonorAcceptorPairs, procI)
             {
-                // Get this donor/acceptor pair
-                const donorAcceptor& daPair = crDonorAcceptorPairs[daI];
+                // Get all donor/acceptor pairs found on this processor
+                const donorAcceptorList& procDonorAcceptorPairs =
+                    allDonorAcceptorPairs[procI];
 
-                // Check whether all donors have been found
-                if (!daPair.donorFound())
+                // Loop through all donor/acceptors
+                forAll (procDonorAcceptorPairs, daI)
                 {
-                    FatalErrorIn
-                    (
-                        "donorBasedLayeredOverlapFringe::"
-                        "updateIteration(donorAcceptorList&) const"
-                    )   << "Donor not found for donor/acceptor pair " << daI
-                        << nl
-                        << "Donor/acceptor data: " << daPair
-                        << nl
-                        << "In connected region: " << allRegions[regionID].name()
-                        << abort(FatalError);
-                }
+                    // Get this donor/acceptor pair
+                    const donorAcceptor& daPair = procDonorAcceptorPairs[daI];
 
-                // Mark donors on my processor from this connected region. Note
-                // that the check has been made in constructor to make sure that
-                // this region is the only donor region for the connected region
-                if (daPair.donorProcNo() == Pstream::myProcNo())
-                {
-                    // Get donor index
-                    const label& dI = daPair.donorCell();
-
-                    // Insert donor into the hash set
-                    if (donors.insert(dI))
+                    // Check whether all donors have been found
+                    if (!daPair.donorFound())
                     {
-                        // Donor has been inserted (not previously found in the
-                        // hash set), add donor point to centre point (the
-                        // centre point will be calculated later on as
-                        // arithmetic mean)
-                        centrePoint += daPair.donorPoint();
+                        FatalErrorIn
+                        (
+                            "donorBasedLayeredOverlapFringe::"
+                            "updateIteration(donorAcceptorList&) const"
+                        )   << "Donor not found for donor/acceptor pair " << daI
+                            << nl
+                            << "Donor/acceptor data: " << daPair
+                            << nl
+                            << "In connected region: "
+                            << allRegions[regionID].name()
+                            << abort(FatalError);
                     }
 
-                    // Loop through extended donor cells
-                    const donorAcceptor::DynamicLabelList& extDonors =
-                        daPair.extendedDonorCells();
-                    const donorAcceptor::DynamicPointList& extDonorPoints =
-                        daPair.extendedDonorPoints();
-
-                    forAll (extDonors, i)
+                    // Mark donors on my processor from this connected region.
+                    // Note that the check has been made in constructor to make
+                    // sure that this region is the only donor region for the
+                    // connected region
+                    if (daPair.donorProcNo() == Pstream::myProcNo())
                     {
                         // Get donor index
-                        const label& edI = extDonors[i];
+                        const label& dI = daPair.donorCell();
 
-                        // Inser extended donor into the hash set
-                        if (donors.insert(edI))
+                        // Insert donor into the hash set
+                        if (donors.insert(dI))
                         {
                             // Donor has been inserted (not previously found in
-                            // the hash set), add extended donor point as well
-                            centrePoint += extDonorPoints[i];
+                            // the hash set), add donor point to centre point
+                            // (the centre point will be calculated later on as
+                            // arithmetic mean)
+                            centrePoint += daPair.donorPoint();
                         }
-                    } // End for all extended donors
-                } // End if this donor is on my processor
-            } // End for all (master) donor cells
+
+                        // Loop through extended donor cells
+                        const donorAcceptor::DynamicLabelList& extDonors =
+                            daPair.extendedDonorCells();
+                        const donorAcceptor::DynamicPointList& extDonorPoints =
+                            daPair.extendedDonorPoints();
+
+                        forAll (extDonors, i)
+                        {
+                            // Get donor index
+                            const label& edI = extDonors[i];
+
+                            // Inser extended donor into the hash set
+                            if (donors.insert(edI))
+                            {
+                                // Donor has been inserted (not previously found
+                                // in the hash set), add extended donor point as
+                                // well
+                                centrePoint += extDonorPoints[i];
+                            }
+                        } // End for all extended donors
+                    } // End if this donor is on my processor
+                } // End for all (master) donor cells
+            } // End for all processors
 
             // Use the centre point as specified by the user if it was specified
             // (if the regionCentrePoints_ list is not empty). This avoids
@@ -695,7 +732,7 @@ Foam::donorBasedLayeredOverlapFringe::donorBasedLayeredOverlapFringe
     // acceptors on the wrong side and filling in the whole region with holes
     if (nLayers_ == 1)
     {
-        WarningIn 
+        WarningIn
         (
             "donorBasedLayeredOverlapFringe::"
             "donorBasedLayeredOverlapFringe\n"
@@ -758,7 +795,7 @@ bool Foam::donorBasedLayeredOverlapFringe::updateIteration
             donorAcceptorRegionData,
             true
         );
-    
+
         // Set the flag to true
         updateSuitableOverlapFlag(true);
     }
