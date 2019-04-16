@@ -340,14 +340,10 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
             else
             {
                 // User did not specify centre points and the centre point holds
-                // the sum of all the points. Reduce the data
+                // the sum of all the points. Reduce centre point and divide it
+                // with global number of unique donors
                 reduce(centrePoint, sumOp<vector>());
-                const label nUniqueDonors =
-                    returnReduce(donors.size(), sumOp<label>());
-
-                // Calculate the final centre point by finding the arithmetic
-                // mean
-                centrePoint /= nUniqueDonors;
+                centrePoint /= returnReduce(donors.size(), sumOp<label>());
             }
 
             if (debug)
@@ -640,6 +636,10 @@ void Foam::donorBasedLayeredOverlapFringe::calcAddressing() const
                     }
                 }
 
+                // Need to reduce nAddedHoles in order to have synced loops in
+                // parallel
+                reduce(nAddedHoles, sumOp<label>());
+
                 // We moved one layer "inside" the fringe. Keep going until
                 // there are no more holes to add
 
@@ -786,9 +786,13 @@ bool Foam::donorBasedLayeredOverlapFringe::updateIteration
     if
     (
         fringeHolesPtr_ && acceptorsPtr_
-     && !fringeHolesPtr_->empty() && !acceptorsPtr_->empty()
+     && returnReduce(!acceptorsPtr_->empty(), orOp<bool>())
     )
     {
+        // Note: we first check whether fringeHoles and acceptors pointers are
+        // allocated. If they are, there must be at least one processor with
+        // more than 0 acceptors in order for this fringe to be valid.
+
         // Allocate the list by reusing the argument list
         finalDonorAcceptorsPtr_ = new donorAcceptorList
         (
@@ -796,15 +800,17 @@ bool Foam::donorBasedLayeredOverlapFringe::updateIteration
             true
         );
 
-        // Set the flag to true
+        // Set the flag to true (for all processors due to reduction in the if
+        // statement)
         updateSuitableOverlapFlag(true);
     }
     else
     {
         // Delete fringeHolesPtr and acceptorsPtr to trigger calculation of
         // addressing, this time with other fringes up-to-date
+        deleteDemandDrivenData(fringeHolesPtr_);
+        deleteDemandDrivenData(acceptorsPtr_);
     }
-    // else suitable overlap has not been found and there's nothing to do
 
     return foundSuitableOverlap();
 }
@@ -812,20 +818,12 @@ bool Foam::donorBasedLayeredOverlapFringe::updateIteration
 
 const Foam::labelList& Foam::donorBasedLayeredOverlapFringe::fringeHoles() const
 {
+    // Note: updateIteration deletes fringeHolesPtr if the suitable overlap is
+    // not found, thus preparing it for the next iteration when the other
+    // fringes should be ready
+
     if (!fringeHolesPtr_)
     {
-        calcAddressing();
-    }
-    else if (fringeHolesPtr_->empty())
-    {
-        // Fringe holes pointer is empty, delete both acceptorPtr_ and
-        // fringeHolesPtr_ and calculate addressing. Since this fringe strategy
-        // depends on other fringes, we need to have a special control in the
-        // iterative algorithm that will start only when all the others are done
-        // See calcAddressing() for details
-        deleteDemandDrivenData(fringeHolesPtr_);
-        deleteDemandDrivenData(acceptorsPtr_);
-
         calcAddressing();
     }
 
@@ -836,20 +834,12 @@ const Foam::labelList& Foam::donorBasedLayeredOverlapFringe::fringeHoles() const
 const Foam::labelList&
 Foam::donorBasedLayeredOverlapFringe::candidateAcceptors() const
 {
+    // Note: updateIteration deletes acceptorsPtr if the suitable overlap is
+    // not found, thus preparing it for the next iteration when the other
+    // fringes should be ready
+
     if (!acceptorsPtr_)
     {
-        calcAddressing();
-    }
-    else if (acceptorsPtr_->empty())
-    {
-        // Acceptors pointer is empty, delete both acceptorPtr_ and
-        // fringeHolesPtr_ and calculate addressing. Since this fringe strategy
-        // depends on other fringes, we need to have a special control in the
-        // iterative algorithm that will start only when all the others are done
-        // See calcAddressing() for details
-        deleteDemandDrivenData(fringeHolesPtr_);
-        deleteDemandDrivenData(acceptorsPtr_);
-
         calcAddressing();
     }
 
