@@ -59,7 +59,7 @@ void Foam::oversetAdjustPhi
     const unallocLabelList& neighbour = mesh.neighbour();
 
     // Get region split to identify separate mesh components
-    const labelList& regionID = om.regionID();
+    const scalarField& regionID = om.regionID().internalField();
 
     // Sum up incoming and outgoing flux
     scalar fringeIn = 0;
@@ -80,8 +80,12 @@ void Foam::oversetAdjustPhi
         {
             // Internal face
 
-            // Debug check
-            if (regionID[owner[curFace]] != regionID[neighbour[curFace]])
+            // Debug check. Note: use notEqual since we are comparing two
+            // scalars
+            if
+            (
+                notEqual(regionID[owner[curFace]], regionID[neighbour[curFace]])
+            )
             {
                 FatalErrorIn
                 (

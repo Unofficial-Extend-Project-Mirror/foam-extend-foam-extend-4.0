@@ -27,6 +27,7 @@ License
 #include "surfaceFields.H"
 #include "volFields.H"
 #include "polyPatchID.H"
+#include "oversetFvPatchFields.H"
 #include "demandDrivenData.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -190,24 +191,52 @@ void Foam::oversetMesh::calcDomainMarkup() const
         }
     }
 
-    // Region ID
-    regionIDPtr_ = new labelList(mesh().nCells(), -1);
-    labelList& rID = *regionIDPtr_;
+    // Region ID, initialized with -1 for sanity check later on
+    regionIDPtr_ = new volScalarField
+    (
+        IOobject
+        (
+            "regionIndex",
+            mesh().time().timeName(),
+            mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh(),
+        dimensionedScalar("minusOne", dimless, -1.0),
+        "zeroGradient"
+    );
+    volScalarField& regionID = *regionIDPtr_;
+    scalarField& regionIDIn = regionID.internalField();
 
-    // Mark regions
-
+    // Mark regions (internal field)
     forAll (regions_, regionI)
     {
         const labelList& curCells = regions_[regionI].zone();
 
         forAll (curCells, curCellI)
         {
-            rID[curCells[curCellI]] = regionI;
+            regionIDIn[curCells[curCellI]] = regionI;
+        }
+    }
+
+    // Update boundary values, making sure that we skip the overset patch
+    volScalarField::GeometricBoundaryField& regionIDb =
+        regionID.boundaryField();
+
+    forAll (regionIDb, patchI)
+    {
+        // Get the patch field
+        fvPatchScalarField& ripf = regionIDb[patchI];
+
+        if (!isA<oversetFvPatchScalarField>(ripf))
+        {
+            ripf = ripf.patchInternalField();
         }
     }
 
     // Check regions
-    if (min(rID) < 0)
+    if (min(regionID).value() < 0)
     {
         FatalErrorIn("void oversetMesh::calcDomainMarkup() const")
             << "Found cells without region ID.  Please check overset setup"
@@ -1166,7 +1195,7 @@ const Foam::volScalarField& Foam::oversetMesh::oversetTypes() const
 }
 
 
-const Foam::labelList& Foam::oversetMesh::regionID() const
+const Foam::volScalarField& Foam::oversetMesh::regionID() const
 {
     if (!regionIDPtr_)
     {
