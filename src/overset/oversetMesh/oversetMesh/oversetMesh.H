@@ -121,8 +121,9 @@ private:
             //- Return overset type indicator field
             mutable volScalarField* oversetTypesPtr_;
 
-            //- Region ID: region index for each cell
-            mutable labelList* regionIDPtr_;
+            //- Region ID: region index for each cell as a volScalarField for
+            //  visualization. VV, 15/Apr/2019
+            mutable volScalarField* regionIDPtr_;
 
 
         // Overset discretisation support
@@ -286,7 +287,7 @@ public:
             const volScalarField& oversetTypes() const;
 
             //- Return region indicator
-            const labelList& regionID() const;
+            const volScalarField& regionID() const;
 
 
         // Overset discretisation support
