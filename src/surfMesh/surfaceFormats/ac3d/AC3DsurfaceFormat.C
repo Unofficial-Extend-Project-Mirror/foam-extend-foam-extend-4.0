@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -102,8 +102,8 @@ bool Foam::fileFormats::AC3DsurfaceFormat<Face>::read
 
     DynamicList<point> dynPoints;
     DynamicList<Face>  dynFaces;
-    List<word>         names(nZones);
-    List<label>        sizes(nZones, 0);
+    wordList         names(nZones);
+    labelList        sizes(nZones, 0);
 
     for (label zoneI = 0; zoneI < nZones; ++zoneI)
     {
@@ -206,7 +206,7 @@ bool Foam::fileFormats::AC3DsurfaceFormat<Face>::read
 
                     label nVert = parse<int>(args);
 
-                    List<label> verts(nVert);
+                    labelList verts(nVert);
                     forAll(verts, vertI)
                     {
                         is.getLine(line);

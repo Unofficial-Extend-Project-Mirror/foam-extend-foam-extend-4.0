@@ -1,1 +1,1 @@
-The exmaple demonstrates usage of subsets for refinement, and how to set up boundary layer properties.
+The exmaple demonstrates usage of subsets for refinement, and how to set up boundary layer properties. To generate the mesh please run cartesianMesh or tetMesh.

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -1928,10 +1928,10 @@ Foam::faceCoupleInfo::faceCoupleInfo
     const bool perfectMatch
 )
 :
-    masterPatchPtr_(NULL),
-    slavePatchPtr_(NULL),
+    masterPatchPtr_(nullptr),
+    slavePatchPtr_(nullptr),
     cutPoints_(0),
-    cutFacesPtr_(NULL),
+    cutFacesPtr_(nullptr),
     cutToMasterFaces_(0),
     masterToCutPoints_(0),
     cutToSlaveFaces_(0),
@@ -2039,7 +2039,7 @@ Foam::faceCoupleInfo::faceCoupleInfo
         )
     ),
     cutPoints_(0),
-    cutFacesPtr_(NULL),
+    cutFacesPtr_(nullptr),
     cutToMasterFaces_(0),
     masterToCutPoints_(0),
     cutToSlaveFaces_(0),

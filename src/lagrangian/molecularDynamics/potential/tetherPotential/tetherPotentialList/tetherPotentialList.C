@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -29,15 +29,15 @@ License
 
 void Foam::tetherPotentialList::readTetherPotentialDict
 (
-    const List<word>& siteIdList,
+    const wordList& siteIdList,
     const dictionary& tetherPotentialDict,
-    const List<word>& tetherSiteIdList
+    const wordList& tetherSiteIdList
 )
 {
 
     Info<< nl << "Building tether potentials." << endl;
 
-    idMap_ = List<label>(siteIdList.size(), -1);
+    idMap_ = labelList(siteIdList.size(), -1);
 
     label tetherMapIndex = 0;
 
@@ -92,9 +92,9 @@ Foam::tetherPotentialList::tetherPotentialList()
 
 Foam::tetherPotentialList::tetherPotentialList
 (
-    const List<word>& siteIdList,
+    const wordList& siteIdList,
     const dictionary& tetherPotentialDict,
-    const List<word>& tetherSiteIdList
+    const wordList& tetherSiteIdList
 )
 :
     PtrList<tetherPotential>(),
@@ -114,9 +114,9 @@ Foam::tetherPotentialList::~tetherPotentialList()
 
 void Foam::tetherPotentialList::buildPotentials
 (
-    const List<word>& siteIdList,
+    const wordList& siteIdList,
     const dictionary& tetherPotentialDict,
-    const List<word>& tetherSiteIdList
+    const wordList& tetherSiteIdList
 )
 {
     setSize(tetherSiteIdList.size());

@@ -16,7 +16,7 @@
             if(valves_[valveI].poppetPatchID().active() && valves_[valveI].isOpen())
             {
 
-                List<bool> valveTopPoint(newPoints.size(), false);
+                boolList valveTopPoint(newPoints.size(), false);
 
 //                label layeringVPtsIndex = pointZones().findZoneID("movingPointsTopZoneV"+ Foam::name(valveI+1));
 //                const labelList& layeringVPoints = pointZones()[layeringVPtsIndex];

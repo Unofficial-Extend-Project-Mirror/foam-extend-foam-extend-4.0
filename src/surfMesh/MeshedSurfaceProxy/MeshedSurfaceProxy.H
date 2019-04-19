@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ class MeshedSurfaceProxy
 
         const List<surfZone>& zones_;
 
-        const List<label>& faceMap_;
+        const labelList& faceMap_;
 
 
 public:
@@ -98,7 +98,7 @@ public:
             const pointField&,
             const List<Face>&,
             const List<surfZone>& = List<surfZone>(),
-            const List<label>& faceMap = List<label>()
+            const labelList& faceMap = labelList()
         );
 
 
@@ -151,7 +151,7 @@ public:
             }
 
             //- Const access to the faceMap, zero-sized when unused
-            inline const List<label>& faceMap() const
+            inline const labelList& faceMap() const
             {
                 return faceMap_;
             }

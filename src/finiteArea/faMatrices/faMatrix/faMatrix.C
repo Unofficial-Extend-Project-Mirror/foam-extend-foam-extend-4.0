@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -200,7 +200,7 @@ faMatrix<Type>::faMatrix
     source_(psi.size(), pTraits<Type>::zero),
     internalCoeffs_(psi.mesh().boundary().size()),
     boundaryCoeffs_(psi.mesh().boundary().size()),
-    faceFluxCorrectionPtr_(NULL)
+    faceFluxCorrectionPtr_(nullptr)
 {
     if (debug)
     {
@@ -254,7 +254,7 @@ faMatrix<Type>::faMatrix(const faMatrix<Type>& fam)
     source_(fam.source_),
     internalCoeffs_(fam.internalCoeffs_),
     boundaryCoeffs_(fam.boundaryCoeffs_),
-    faceFluxCorrectionPtr_(NULL)
+    faceFluxCorrectionPtr_(nullptr)
 {
     if (debug)
     {
@@ -287,7 +287,7 @@ faMatrix<Type>::faMatrix
     source_(is),
     internalCoeffs_(psi.mesh().boundary().size()),
     boundaryCoeffs_(psi.mesh().boundary().size()),
-    faceFluxCorrectionPtr_(NULL)
+    faceFluxCorrectionPtr_(nullptr)
 {
     if (debug)
     {

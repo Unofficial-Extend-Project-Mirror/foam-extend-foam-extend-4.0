@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -148,22 +148,22 @@ GGIInterpolation<MasterPatch, SlavePatch>::GGIInterpolation
     slaveNonOverlapFaceTol_(slaveNonOverlapFaceTol),
     rescaleGGIWeightingFactors_(rescaleGGIWeightingFactors),
     reject_(reject),
-    masterAddrPtr_(NULL),
-    masterWeightsPtr_(NULL),
-    masterPointAddressingPtr_(NULL),
-    masterPointWeightsPtr_(NULL),
-    masterPointDistancePtr_(NULL),
-    slaveAddrPtr_(NULL),
-    slaveWeightsPtr_(NULL),
-    slavePointAddressingPtr_(NULL),
-    slavePointWeightsPtr_(NULL),
-    slavePointDistancePtr_(NULL),
-    uncoveredMasterAddrPtr_(NULL),
-    partiallyUncoveredMasterAddrPtr_(NULL),
-    masterFaceUncoveredFractionsPtr_(NULL),
-    uncoveredSlaveAddrPtr_(NULL),
-    partiallyUncoveredSlaveAddrPtr_(NULL),
-    slaveFaceUncoveredFractionsPtr_(NULL)
+    masterAddrPtr_(nullptr),
+    masterWeightsPtr_(nullptr),
+    masterPointAddressingPtr_(nullptr),
+    masterPointWeightsPtr_(nullptr),
+    masterPointDistancePtr_(nullptr),
+    slaveAddrPtr_(nullptr),
+    slaveWeightsPtr_(nullptr),
+    slavePointAddressingPtr_(nullptr),
+    slavePointWeightsPtr_(nullptr),
+    slavePointDistancePtr_(nullptr),
+    uncoveredMasterAddrPtr_(nullptr),
+    partiallyUncoveredMasterAddrPtr_(nullptr),
+    masterFaceUncoveredFractionsPtr_(nullptr),
+    uncoveredSlaveAddrPtr_(nullptr),
+    partiallyUncoveredSlaveAddrPtr_(nullptr),
+    slaveFaceUncoveredFractionsPtr_(nullptr)
 {
     // Check size of transform.  They should be equal to slave patch size
     // if the transform is not constant

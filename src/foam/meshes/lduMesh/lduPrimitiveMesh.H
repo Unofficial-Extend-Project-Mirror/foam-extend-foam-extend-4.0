@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ class lduPrimitiveMesh
         lduSchedule patchSchedule_;
 
         //- Communicator to use for parallel communication
-        const label comm_;
+        const int comm_;
 
 
     // Private Member Functions
@@ -93,7 +93,7 @@ public:
             const label nCells,
             const unallocLabelList& l,
             const unallocLabelList& u,
-            const label comm
+            const int comm
         )
         :
             lduAddressing(nCells),
@@ -109,7 +109,7 @@ public:
             const label nCells,
             labelList& l,
             labelList& u,
-            const label comm,
+            const int comm,
             bool reUse
         )
         :
@@ -203,7 +203,7 @@ public:
             }
 
             //- Return communicator used for parallel communication
-            virtual label comm() const
+            virtual int comm() const
             {
                 return comm_;
             }

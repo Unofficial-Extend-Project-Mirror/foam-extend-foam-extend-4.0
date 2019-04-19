@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -53,11 +53,11 @@ Contributor
 
 Giving credit where credit is due:
     1: Hakan Nilsson from the Chalmers University of Technology came up with
-        the initial idea of using a combination of 2 GGI interfaces sharing a
-        common single-face 360 degree ribbons patch in order to compute the
-        circumferential average of fields. This implementation of the
-        mixingPlane interpolation algorithm is an exploration of this simple
-        but rather powerful idea.
+       the initial idea of using a combination of 2 GGI interfaces sharing a
+       common single-face 360 degree ribbons patch in order to compute the
+       circumferential average of fields. This implementation of the
+       mixingPlane interpolation algorithm is an exploration of this simple
+       but rather powerful idea.
 
     2: Maryse Page from Hydro-Quebec provided many test cases and many
        simulation runs for testing this interpolation algorithm. Testing is
@@ -240,7 +240,7 @@ class MixingPlaneInterpolation
         //- Interpolation profile
         //  This list of points defines the profile generating the 'n'
         //  circular bands we are going to use for
-        //  the circumferential averaging algorithm. For for 'n'
+        //  the circumferential averaging algorithm. For 'n'
         //  circular bands, we need 'n + 1' points.
         mutable pointField interpolationProfile_;
 

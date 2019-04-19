@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -42,9 +42,12 @@ namespace Foam
     const label SIBS::nSeq_[iMaxX_] = {2, 6, 10, 14, 22, 34, 50, 70};
 
     const scalar
-        SIBS::safe1 = 0.25, SIBS::safe2 = 0.7,
-        SIBS::redMax = 1.0e-5, SIBS::redMin = 0.0, SIBS::scaleMX = 0.1;
-};
+        SIBS::safe1 = 0.25,
+        SIBS::safe2 = 0.7,
+        SIBS::redMax = 1.0e-5,
+        SIBS::redMin = 0.7,
+        SIBS::scaleMX = 0.1;
+}
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -64,7 +67,8 @@ Foam::SIBS::SIBS(ODE& ode)
     dfdx_(ode_.nEqns()),
     dfdy_(ode_.nEqns(), ode_.nEqns()),
     first_(1),
-    epsOld_(-1.0)
+    epsOld_(-1.0),
+    xNew_(0.0)
 {}
 
 
@@ -125,7 +129,7 @@ void Foam::SIBS::solve
         kMax_ = kOpt_;
     }
 
-    label k=0;
+    label k = 0;
     scalar h = hTry;
     yTemp_ = y;
 

@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     4.0                                |
+|  \\    /   O peration     | Version:     4.1                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -20,7 +20,7 @@ FoamFile
     inlet
     {
         type            patch;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 20
 (
 2321
@@ -50,7 +50,7 @@ FoamFile
     outlet
     {
         type            patch;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 20
 (
 2459
@@ -80,7 +80,7 @@ FoamFile
     bound
     {
         type            symmetryPlane;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 120
 (
 2320
@@ -208,5 +208,6 @@ FoamFile
         ngbPolyPatchIndex 1;
     }
 )
+
 
 // ************************************************************************* //

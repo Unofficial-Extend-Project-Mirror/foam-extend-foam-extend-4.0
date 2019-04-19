@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -43,6 +43,7 @@ SourceFiles
 #define RosinRammler_H
 
 #include "pdf.H"
+#include "scalarList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -65,9 +66,9 @@ class RosinRammler
         scalar minValue_;
         scalar maxValue_;
 
-        List<scalar> d_;
-        List<scalar> n_;
-        List<scalar> ls_;
+        scalarList d_;
+        scalarList n_;
+        scalarList ls_;
 
         scalar range_;
 

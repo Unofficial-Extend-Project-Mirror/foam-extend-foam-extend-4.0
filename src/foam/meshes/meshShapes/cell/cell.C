@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -25,6 +25,7 @@ License
 
 #include "cell.H"
 #include "pyramidPointFaceRef.H"
+#include "boolList.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -293,7 +294,7 @@ bool Foam::operator==(const cell& a, const cell& b)
         return false;
     }
 
-    List<bool> fnd(a.size(), false);
+    boolList fnd(a.size(), false);
 
     forAll (b, bI)
     {

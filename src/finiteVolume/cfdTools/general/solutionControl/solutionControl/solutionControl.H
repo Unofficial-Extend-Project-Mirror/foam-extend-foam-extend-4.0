@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -39,6 +39,7 @@ Description
 #include "fvsPatchField.H"
 #include "fvMatrices.H"
 #include "wordRe.H"
+#include "MRFZones.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -183,6 +184,13 @@ protected:
                 const volVectorField& U
             ) const;
 
+            void correctBoundaryFlux
+            (
+                surfaceScalarField& phi,
+                const volVectorField& U,
+                const surfaceScalarField& meshPhi
+            ) const;
+
 
 private:
 
@@ -284,6 +292,20 @@ public:
             (
                 surfaceScalarField& phi,
                 const volVectorField& U
+            ) const;
+
+            void calcSteadyConsistentFlux
+            (
+                surfaceScalarField& phi,
+                const volVectorField& U,
+                const surfaceScalarField& meshPhi
+            ) const;
+
+            void calcSteadyMRFConsistentFlux
+            (
+                surfaceScalarField& phi,
+                const volVectorField& U,
+                const MRFZones& mrfZones
             ) const;
 
             //- Reconstruct velocity for transient solvers (after pressure

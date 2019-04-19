@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -929,6 +929,15 @@ int main(int argc, char *argv[])
         if (owner[faceI] > -1)
         {
             label curCell = owner[faceI];
+
+            if (curCell >= nCells)
+            {
+                FatalErrorIn(args.executable())
+                    << "Trying to create face " << faceI
+                    << " whose owner cell index is greater than "
+                    << "the number of cells: " << nCells
+                    << abort(FatalError);
+            }
 
             if (nFacesInCell[curCell] >= cellFaces[curCell].size())
             {

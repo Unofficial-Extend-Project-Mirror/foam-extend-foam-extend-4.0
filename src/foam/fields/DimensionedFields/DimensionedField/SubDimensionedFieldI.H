@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ SubDimensionedField<Type, GeoMesh>::null()
 {
     // Dangerous, but no null constructor.  Reconsider.  HJ, 10/Apr/2013
     SubDimensionedField<Type, GeoMesh>* nullPtr
-        = reinterpret_cast<SubDimensionedField<Type, GeoMesh>*>(NULL);
+        = reinterpret_cast<SubDimensionedField<Type, GeoMesh>*>(nullptr);
 
     return *nullPtr;
 }

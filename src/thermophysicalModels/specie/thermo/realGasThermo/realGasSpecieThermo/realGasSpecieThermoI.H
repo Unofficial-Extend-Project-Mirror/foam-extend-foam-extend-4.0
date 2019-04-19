@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ inline void Foam::realGasSpecieThermo<thermo>::T
         {
             //CL: using a stabilizing newton solver
             //CL: if the solve is diverging, the step is reduced until the solver converges
-            Tnew = Test - ((this->*F)(rho, Test) - f)/(this->*dFdT)(rho, Test)/(pow(2, i));
+            Tnew = Test - ((this->*F)(rho, Test) - f)/(this->*dFdT)(rho, Test)/(pow(2.0, i));
             i++;
         } while
         (
@@ -89,7 +89,7 @@ inline void Foam::realGasSpecieThermo<thermo>::T
             )
         );
 
-        if (iter++ > maxIter_)
+        if (iter++ > maxIter_())
         {
             FatalErrorIn
             (

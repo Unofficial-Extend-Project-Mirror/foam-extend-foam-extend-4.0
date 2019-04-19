@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ class hierarchGeomDecomp
         //- Find index of t in list inbetween indices left and right
         static label findLower
         (
-            const List<scalar>&,
+            const scalarList&,
             const scalar t,
             const label left,
             const label right
@@ -112,7 +112,7 @@ class hierarchGeomDecomp
         static void findBinary
         (
             const label sizeTol,        // Acceptable size difference
-            const List<scalar>&,
+            const scalarList&,
             const label leftIndex,      // index of previous value
             const scalar leftValue,     // value at leftIndex
             const scalar maxValue,      // global max of values
@@ -127,8 +127,8 @@ class hierarchGeomDecomp
         static void findBinary
         (
             const label sizeTol,        // Acceptable size difference
-            const List<scalar>& sortedWeightedSizes,
-            const List<scalar>&,
+            const scalarList& sortedWeightedSizes,
+            const scalarList&,
             const label leftIndex,      // index of previous value
             const scalar leftValue,     // value at leftIndex
             const scalar maxValue,      // global max of values

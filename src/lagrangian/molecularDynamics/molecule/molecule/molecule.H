@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -81,15 +81,15 @@ public:
 
             Field<vector> siteReferencePositions_;
 
-            List<scalar> siteMasses_;
+            scalarList siteMasses_;
 
-            List<scalar> siteCharges_;
+            scalarList siteCharges_;
 
-            List<label> siteIds_;
+            labelList siteIds_;
 
-            List<bool> pairPotentialSites_;
+            boolList pairPotentialSites_;
 
-            List<bool> electrostaticSites_;
+            boolList electrostaticSites_;
 
             diagTensor momentOfInertia_;
 
@@ -101,8 +101,8 @@ public:
 
             void setInteracionSiteBools
             (
-                const List<word>& siteIds,
-                const List<word>& pairPotSiteIds
+                const wordList& siteIds,
+                const wordList& pairPotSiteIds
             );
 
             bool linearMoleculeTest() const;
@@ -119,19 +119,19 @@ public:
 
         inline const Field<vector>& siteReferencePositions() const;
 
-        inline const List<scalar>& siteMasses() const;
+        inline const scalarList& siteMasses() const;
 
-        inline const List<scalar>& siteCharges() const;
+        inline const scalarList& siteCharges() const;
 
-        inline const List<label>& siteIds() const;
+        inline const labelList& siteIds() const;
 
-        inline List<label>& siteIds();
+        inline labelList& siteIds();
 
-        inline const List<bool>& pairPotentialSites() const;
+        inline const boolList& pairPotentialSites() const;
 
         inline bool pairPotentialSite(label sId) const;
 
-        inline const List<bool>& electrostaticSites() const;
+        inline const boolList& electrostaticSites() const;
 
         inline bool electrostaticSite(label sId) const;
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -362,7 +362,7 @@ void topoPatchMapper::calcAddressing() const
                 if (isA<processorPolyPatch>(patch_.patch()))
                 {
                     // Artificially map from face[0] of this patch.
-                    addr[faceI] = labelList(1, 0);
+                    addr[faceI] = labelList(1, label(0));
 
                     continue;
                 }
@@ -602,14 +602,14 @@ topoPatchMapper::topoPatchMapper
     direct_(false),
     sizeBeforeMapping_(0),
     conservative_(false),
-    directAddrPtr_(NULL),
-    interpolationAddrPtr_(NULL),
-    weightsPtr_(NULL),
-    insertedFaceLabelsPtr_(NULL),
-    insertedFaceIndexMapPtr_(NULL),
-    insertedFaceAddressingPtr_(NULL),
-    areasPtr_(NULL),
-    centresPtr_(NULL)
+    directAddrPtr_(nullptr),
+    interpolationAddrPtr_(nullptr),
+    weightsPtr_(nullptr),
+    insertedFaceLabelsPtr_(nullptr),
+    insertedFaceIndexMapPtr_(nullptr),
+    insertedFaceAddressingPtr_(nullptr),
+    areasPtr_(nullptr),
+    centresPtr_(nullptr)
 {
     // Compute sizeBeforeMapping.
     // - This needs to be done before insertedObjects

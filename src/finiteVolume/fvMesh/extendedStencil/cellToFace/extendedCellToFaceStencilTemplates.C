@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -120,7 +120,7 @@ Foam::extendedCellToFaceStencil::weightedSum
     for (label faceI = 0; faceI < mesh.nInternalFaces(); faceI++)
     {
         const List<Type>& stField = stencilFld[faceI];
-        const List<scalar>& stWeight = stencilWeights[faceI];
+        const scalarList& stWeight = stencilWeights[faceI];
 
         forAll(stField, i)
         {
@@ -144,7 +144,7 @@ Foam::extendedCellToFaceStencil::weightedSum
             forAll(pSfCorr, i)
             {
                 const List<Type>& stField = stencilFld[faceI];
-                const List<scalar>& stWeight = stencilWeights[faceI];
+                const scalarList& stWeight = stencilWeights[faceI];
 
                 forAll(stField, j)
                 {

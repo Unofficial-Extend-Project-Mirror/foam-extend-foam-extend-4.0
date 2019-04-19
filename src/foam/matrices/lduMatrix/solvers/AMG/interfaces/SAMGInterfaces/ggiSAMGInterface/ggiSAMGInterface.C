@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -240,7 +240,7 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
     procMasterFaces_(),
     comm_(fineGgiInterface_.comm()),
     tag_(fineGgiInterface_.tag()),
-    mapPtr_(NULL),
+    mapPtr_(nullptr),
     lTime_()
 {
     // New algorithm will assemble local clusters on the master side and
@@ -453,8 +453,8 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
     label nAgglomPairs = 0;
 
     // Switching prolongation matrices
-    const crMatrix* masterP = NULL;
-    const crMatrix* neighbourP = NULL;
+    const crMatrix* masterP = nullptr;
+    const crMatrix* neighbourP = nullptr;
 
     if (fineGgiInterface_.master())
     {
@@ -1003,7 +1003,7 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
 
         // For each new global face created on master proc,
         // record its index under the slave proc array
-        List<DynamicList<label> > procMasterFacesLL(Pstream::nProcs());
+        List<dynamicLabelList > procMasterFacesLL(Pstream::nProcs());
 
         // Note: zone addressing will be assembled only for local clusters
         // using the coarseGlobalFaceOffset

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -198,7 +198,7 @@ private:
         static DynamicList<List<int> > procIDs_;
 
         //- List of parent communicators
-        static DynamicList<label> parentCommunicator_;
+        static dynamicLabelList parentCommunicator_;
 
         //- Structure for linear communications
         static DynamicList<List<commsStruct> > linearCommunication_;

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -1248,7 +1248,7 @@ void mesquiteMotionSolver::initArrays()
     label nCellPoints = 0, nFacePoints = 0;
 
     // Construct shape recognizers
-    FixedList<label, 4> nTypes(0);
+    FixedList<label, 4> nTypes(label(0));
     FixedList<autoPtr<cellMatcher>, 4> matcher;
     FixedList<Mesquite::EntityTopology, 4> cellType;
 
@@ -1281,9 +1281,9 @@ void mesquiteMotionSolver::initArrays()
         matcher[0].set(new tetMatcher());
         cellType[0] = Mesquite::TETRAHEDRON;
 
-        matcher[1].set(NULL);
-        matcher[2].set(NULL);
-        matcher[3].set(NULL);
+        matcher[1].set(nullptr);
+        matcher[2].set(nullptr);
+        matcher[3].set(nullptr);
     }
 
     const faceList& meshFaces = mesh().faces();
@@ -2245,7 +2245,7 @@ void mesquiteMotionSolver::initParallelSurfaceSmoothing()
         (
             bufPoints,
             recvField,
-            List<scalar>(bufPoints.size(), tol),
+            scalarList(bufPoints.size(), tol),
             false,
             pointMap
         );
@@ -2440,9 +2440,9 @@ void mesquiteMotionSolver::initMesquiteParallelArrays()
         matcher[0].set(new tetMatcher());
         cellType[0] = Mesquite::TETRAHEDRON;
 
-        matcher[1].set(NULL);
-        matcher[2].set(NULL);
-        matcher[3].set(NULL);
+        matcher[1].set(nullptr);
+        matcher[2].set(nullptr);
+        matcher[3].set(nullptr);
     }
 
     const cellList& cells = mesh().cells();
@@ -2513,7 +2513,7 @@ void mesquiteMotionSolver::initMesquiteParallelArrays()
         nSharedPoints[pI] = nProcPoints;
 
         // Initialize type sizes
-        FixedList<label, 4> nTypes(0);
+        FixedList<label, 4> nTypes(label(0));
 
         // Set an initial capacity for cell types
         myTypes[pI].setCapacity(50);
@@ -3444,7 +3444,7 @@ void mesquiteMotionSolver::applyBCs
     {
         if (Foam::min(bdy_) > vector(0.5,0.5,0.5))
         {
-            Random randomizer(std::time(NULL));
+            Random randomizer(std::time(nullptr));
 
             label nFix = 0; //(field.size()*5)/100;
 
@@ -4707,7 +4707,7 @@ void mesquiteMotionSolver::solve()
         nCells_,                   // Number of elements
         mixedTypes_.begin(),       // Array with all Element types
         cellToNode_.begin(),       // Connectivity
-        NULL,                      // Element offset connectivity
+        nullptr,                      // Element offset connectivity
         false                      // Fortran-style array indexing
     );
 

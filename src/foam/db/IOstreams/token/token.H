@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -213,7 +213,6 @@ public:
 
     //- A templated class for holding compound tokens
 
-#ifndef SWIG
     template<class T>
     class Compound
     :
@@ -240,7 +239,7 @@ public:
             operator<<(os, static_cast<const T&>(*this));
         }
     };
-#endif
+
 
     //- Static undefined token
     static token undefinedToken;

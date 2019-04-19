@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -72,10 +72,10 @@ bool Foam::scalarRanges::selected(const scalar& value) const
 
 Foam::List<bool> Foam::scalarRanges::selected
 (
-    const List<scalar>& values
+    const scalarList& values
 ) const
 {
-    List<bool> lst(values.size(), false);
+    boolList lst(values.size(), false);
 
     // check ranges
     forAll(values, i)
@@ -119,7 +119,7 @@ Foam::List<bool> Foam::scalarRanges::selected
 
 Foam::List<Foam::scalar> Foam::scalarRanges::select
 (
-    const List<scalar>& values
+    const scalarList& values
 ) const
 {
     return subset(selected(values), values);
@@ -128,7 +128,7 @@ Foam::List<Foam::scalar> Foam::scalarRanges::select
 
 void Foam::scalarRanges::inplaceSelect
 (
-    List<scalar>& values
+    scalarList& values
 ) const
 {
     inplaceSubset(selected(values), values);

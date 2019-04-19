@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -641,14 +641,14 @@ Foam::ggiPolyPatch::ggiPolyPatch
     reject_(ggiZoneInterpolation::BB_OCTREE),
     shadowIndex_(-1),
     zoneIndex_(-1),
-    patchToPatchPtr_(NULL),
-    zoneAddressingPtr_(NULL),
-    remoteZoneAddressingPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL),
-    localParallelPtr_(NULL),
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    remoteZoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
     comm_(Pstream::worldComm),
     tag_(Pstream::msgType()),
-    mapPtr_(NULL)
+    mapPtr_(nullptr)
 {}
 
 
@@ -672,14 +672,14 @@ Foam::ggiPolyPatch::ggiPolyPatch
     reject_(reject),
     shadowIndex_(-1),
     zoneIndex_(-1),
-    patchToPatchPtr_(NULL),
-    zoneAddressingPtr_(NULL),
-    remoteZoneAddressingPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL),
-    localParallelPtr_(NULL),
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    remoteZoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
     comm_(Pstream::worldComm),
     tag_(Pstream::msgType()),
-    mapPtr_(NULL)
+    mapPtr_(nullptr)
 {}
 
 
@@ -698,14 +698,14 @@ Foam::ggiPolyPatch::ggiPolyPatch
     reject_(ggiZoneInterpolation::BB_OCTREE),
     shadowIndex_(-1),
     zoneIndex_(-1),
-    patchToPatchPtr_(NULL),
-    zoneAddressingPtr_(NULL),
-    remoteZoneAddressingPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL),
-    localParallelPtr_(NULL),
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    remoteZoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
     comm_(Pstream::worldComm),
     tag_(Pstream::msgType()),
-    mapPtr_(NULL)
+    mapPtr_(nullptr)
 {
     if (dict.found("quickReject"))
     {
@@ -717,31 +717,7 @@ Foam::ggiPolyPatch::ggiPolyPatch
 }
 
 
-Foam::ggiPolyPatch::ggiPolyPatch
-(
-    const ggiPolyPatch& pp,
-    const polyBoundaryMesh& bm
-)
-:
-    coupledPolyPatch(pp, bm),
-    shadowName_(pp.shadowName_),
-    zoneName_(pp.zoneName_),
-    bridgeOverlap_(pp.bridgeOverlap_),
-    reject_(pp.reject_),
-    shadowIndex_(-1),
-    zoneIndex_(-1),
-    patchToPatchPtr_(NULL),
-    zoneAddressingPtr_(NULL),
-    remoteZoneAddressingPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL),
-    localParallelPtr_(NULL),
-    comm_(pp.comm_),
-    tag_(pp.tag_),
-    mapPtr_(NULL)
-{}
-
-
-//- Construct as copy, resetting the face list and boundary mesh data
+// Construct as copy, resetting the face list and boundary mesh data
 Foam::ggiPolyPatch::ggiPolyPatch
 (
     const ggiPolyPatch& pp,
@@ -758,14 +734,61 @@ Foam::ggiPolyPatch::ggiPolyPatch
     reject_(pp.reject_),
     shadowIndex_(-1),
     zoneIndex_(-1),
-    patchToPatchPtr_(NULL),
-    zoneAddressingPtr_(NULL),
-    remoteZoneAddressingPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL),
-    localParallelPtr_(NULL),
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    remoteZoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
     comm_(pp.comm_),
     tag_(pp.tag_),
-    mapPtr_(NULL)
+    mapPtr_(nullptr)
+{}
+
+
+Foam::ggiPolyPatch::ggiPolyPatch
+(
+    const ggiPolyPatch& pp
+)
+:
+    coupledPolyPatch(pp),
+    shadowName_(pp.shadowName_),
+    zoneName_(pp.zoneName_),
+    bridgeOverlap_(pp.bridgeOverlap_),
+    reject_(pp.reject_),
+    shadowIndex_(-1),
+    zoneIndex_(-1),
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    remoteZoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    comm_(pp.comm_),
+    tag_(pp.tag_),
+    mapPtr_(nullptr)
+{}
+
+
+Foam::ggiPolyPatch::ggiPolyPatch
+(
+    const ggiPolyPatch& pp,
+    const polyBoundaryMesh& bm
+)
+:
+    coupledPolyPatch(pp, bm),
+    shadowName_(pp.shadowName_),
+    zoneName_(pp.zoneName_),
+    bridgeOverlap_(pp.bridgeOverlap_),
+    reject_(pp.reject_),
+    shadowIndex_(-1),
+    zoneIndex_(-1),
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    remoteZoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    comm_(pp.comm_),
+    tag_(pp.tag_),
+    mapPtr_(nullptr)
 {}
 
 

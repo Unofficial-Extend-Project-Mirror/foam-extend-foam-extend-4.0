@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
-     \\/     M anipulation  |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied wrranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -63,28 +62,28 @@ Foam::oversetMesh::oversetMesh(const fvMesh& mesh)
     ),
     curTimeIndex_(-1),
 
-    acceptorCellsPtr_(NULL),
-    donorCellsPtr_(NULL),
-    holeCellsPtr_(NULL),
+    acceptorCellsPtr_(nullptr),
+    donorCellsPtr_(nullptr),
+    holeCellsPtr_(nullptr),
 
-    oversetTypesPtr_(NULL),
-    regionIDPtr_(NULL),
+    oversetTypesPtr_(nullptr),
+    regionIDPtr_(nullptr),
 
-    gammaPtr_(NULL),
-    gammaExtPtr_(NULL),
-    sGammaPtr_(NULL),
+    gammaPtr_(nullptr),
+    gammaExtPtr_(nullptr),
+    sGammaPtr_(nullptr),
 
-    fringeFacesPtr_(NULL),
-    fringeFaceCellsPtr_(NULL),
-    fringeFaceFlipsPtr_(NULL),
-    holeFacesPtr_(NULL),
-    holeFaceCellsPtr_(NULL),
-    holeFaceFlipsPtr_(NULL),
-    holeInternalFacesPtr_(NULL),
-    acceptorInternalFacesPtr_(NULL),
+    fringeFacesPtr_(nullptr),
+    fringeFaceCellsPtr_(nullptr),
+    fringeFaceFlipsPtr_(nullptr),
+    holeFacesPtr_(nullptr),
+    holeFaceCellsPtr_(nullptr),
+    holeFaceFlipsPtr_(nullptr),
+    holeInternalFacesPtr_(nullptr),
+    acceptorInternalFacesPtr_(nullptr),
 
-    mapPtr_(NULL),
-    remoteDonorToLocalAcceptorAddrPtr_(NULL),
+    mapPtr_(nullptr),
+    remoteDonorToLocalAcceptorAddrPtr_(nullptr),
 
     interpolationDict_(dict_.subDict("interpolation")),
     interpolationNames_

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ inline label bufferedAccumulator<Type>::bufferLength() const
 
 
 template<class Type>
-inline const List<label>& bufferedAccumulator<Type>::bufferOffsets() const
+inline const labelList& bufferedAccumulator<Type>::bufferOffsets() const
 {
     return bufferOffsets_;
 }

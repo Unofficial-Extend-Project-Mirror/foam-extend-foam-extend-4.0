@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -56,8 +56,8 @@ inline Foam::molecule::constantProperties::constantProperties
 
     setInteracionSiteBools
     (
-        List<word>(dict.lookup("siteIds")),
-        List<word>(dict.lookup("pairPotentialSiteIds"))
+        wordList(dict.lookup("siteIds")),
+        wordList(dict.lookup("pairPotentialSiteIds"))
     );
 
     mass_ = sum(siteMasses_);
@@ -273,8 +273,8 @@ inline void Foam::molecule::constantProperties::checkSiteListSizes() const
 
 inline void Foam::molecule::constantProperties::setInteracionSiteBools
 (
-    const List<word>& siteIds,
-    const List<word>& pairPotSiteIds
+    const wordList& siteIds,
+    const wordList& pairPotSiteIds
 )
 {
     pairPotentialSites_.setSize(siteIds_.size());

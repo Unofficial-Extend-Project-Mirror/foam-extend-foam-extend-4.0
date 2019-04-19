@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -78,8 +78,8 @@ Foam::radiation::radiationModel::radiationModel(const volScalarField& T)
     radiation_(false),
     coeffs_(dictionary::null),
     solverFreq_(0),
-    absorptionEmission_(NULL),
-    scatter_(NULL)
+    absorptionEmission_(nullptr),
+    scatter_(nullptr)
 {}
 
 
@@ -106,7 +106,7 @@ Foam::radiation::radiationModel::radiationModel
     radiation_(lookup("radiation")),
     coeffs_(subDict(type + "Coeffs")),
     solverFreq_(readLabel(lookup("solverFreq"))),
-    absorptionEmission_(NULL),
+    absorptionEmission_(nullptr),
     scatter_(scatterModel::New(*this, mesh_))
 {
     initialise();
@@ -139,8 +139,8 @@ Foam::radiation::radiationModel::radiationModel
     coeffs_(subOrEmptyDict(type + "Coeffs")),
     solverFreq_(1),
     firstIter_(true),
-    absorptionEmission_(NULL),
-    scatter_(NULL)
+    absorptionEmission_(nullptr),
+    scatter_(nullptr)
 
 {
     initialise();

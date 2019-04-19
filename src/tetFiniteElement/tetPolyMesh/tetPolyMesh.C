@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -79,10 +79,10 @@ tetPolyMesh::tetPolyMesh(const polyMesh& pMesh)
     nPoints_(-1),
     nEdges_(-1),
     nTets_(-1),
-    lduPtr_(NULL),
+    lduPtr_(nullptr),
     maxNPointsForCell_(-1),
-    parPointsPtr_(NULL),
-    parEdgesPtr_(NULL)
+    parPointsPtr_(nullptr),
+    parEdgesPtr_(nullptr)
 {
     if (debug)
     {
@@ -116,13 +116,13 @@ tetPolyMesh::~tetPolyMesh()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::label Foam::tetPolyMesh::comm() const
+int Foam::tetPolyMesh::comm() const
 {
     return comm_;
 }
 
 
-Foam::label& Foam::tetPolyMesh::comm()
+int& Foam::tetPolyMesh::comm()
 {
     return comm_;
 }

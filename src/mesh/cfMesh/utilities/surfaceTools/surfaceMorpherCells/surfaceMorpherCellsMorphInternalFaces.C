@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -116,7 +119,7 @@ void surfaceMorpherCells::findBoundaryVertices()
                 //- send the list of other processor
                 OPstream toOtherProc
                 (
-                    Pstream::blocking,
+                    Pstream::commsTypes::blocking,
                     procBoundaries[patchI].neiProcNo(),
                     bndVertsToSend.byteSize()
                 );
@@ -130,7 +133,7 @@ void surfaceMorpherCells::findBoundaryVertices()
                 labelList receivedBndNodes;
                 IPstream fromOtherProc
                 (
-                    Pstream::blocking,
+                    Pstream::commsTypes::blocking,
                     procBoundaries[patchI].neiProcNo()
                 );
                 fromOtherProc >> receivedBndNodes;
@@ -531,7 +534,8 @@ bool surfaceMorpherCells::morphInternalFaces()
         //- remove faces which do not exist any more
         boolList removeFace(faces.size(), false);
         bool removeFaces(false);
-        for(register label faceI=0;faceI<nIntFaces;++faceI)
+
+        for(label faceI=0;faceI<nIntFaces;++faceI)
             if( faces[faceI].size() < 3 )
             {
                 removeFace[faceI] = true;

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -34,21 +34,47 @@ License
 #if defined(darwin) && defined(__clang__)
 #ifndef DUMMY_SCALAR_FUNCTIONS
 #define DUMMY_SCALAR_FUNCTIONS
-inline float j0f(float x) { return float(j0(double(x)));}
-inline float j1f(float x) { return float(j1(double(x)));}
-inline float y0f(float x) { return float(y0(double(x)));}
-inline float y1f(float x) { return float(y1(double(x)));}
+inline float j0f(float x) { return float(j0(double(x))); }
+inline float j1f(float x) { return float(j1(double(x))); }
+inline float y0f(float x) { return float(y0(double(x))); }
+inline float y1f(float x) { return float(y1(double(x))); }
 inline float jnf(const int n, const float s) { return float(jn(n, double(s))); }
 inline float ynf(const int n, const float s) { return float(yn(n, double(s))); }
 
-inline long double j0l(float x) { return double(j0(double(x)));}
-inline long double j1l(float x) { return double(j1(double(x)));}
-inline long double y0l(float x) { return double(y0(double(x)));}
-inline long double y1l(float x) { return double(y1(double(x)));}
+inline long double j0l(float x) { return double(j0(double(x))); }
+inline long double j1l(float x) { return double(j1(double(x))); }
+inline long double y0l(float x) { return double(y0(double(x))); }
+inline long double y1l(float x) { return double(y1(double(x))); }
 inline long double jnl(const int n, const float s) { return double(jn(n, double(s))); }
 inline long double ynl(const int n, const float s) { return double(yn(n, double(s))); }
 #endif
 #endif // darwin
+
+#if defined(mingw)
+#ifndef DUMMY_SCALAR_FUNCTIONS
+#define DUMMY_SCALAR_FUNCTIONS
+inline float j0f(float x) { return _j0(x); }
+inline float j1f(float x) { return _j1(x); }
+inline float y0f(float x) { return _y0(x); }
+inline float y1f(float x) { return _y1(x); }
+inline float jnf(const int n, float s) { return _jn(n, s); }
+inline float ynf(const int n, float s) { return _yn(n, s); }
+
+inline double j0(double x) { return _j0(x); }
+inline double j1(double x) { return _j1(x); }
+inline double y0(double x) { return _y0(x); }
+inline double y1(double x) { return _y1(x); }
+inline double jn(const int n, double s) { return _jn(n, s); }
+inline double yn(const int n, double s) { return _yn(n, s); }
+
+inline long double j0l(long double x) { return _j0(x); }
+inline long double j1l(long double x) { return _j1(x); }
+inline long double y0l(long double x) { return _y0(x); }
+inline long double y1l(long double x) { return _y1(x); }
+inline long double jnl(const int n, long double s) { return _jn(n, s); }
+inline long double ynl(const int n, long double s) { return _yn(n, s); }
+#endif
+#endif // mingw
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

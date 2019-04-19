@@ -25,13 +25,15 @@ coupledKOmegaSST/coupledKOmegaSST.C
 wallFunctions = derivedFvPatchFields/wallFunctions
 
 nutWallFunctions = $(wallFunctions)/nutWallFunctions
-$(nutWallFunctions)/nutkWallFunction/nutkWallFunctionFvPatchScalarField.C
 $(nutWallFunctions)/nutWallFunction/nutWallFunctionFvPatchScalarField.C
-$(nutWallFunctions)/nutRoughWallFunction/nutRoughWallFunctionFvPatchScalarField.C
-$(nutWallFunctions)/nutSpalartAllmarasWallFunction/nutSpalartAllmarasWallFunctionFvPatchScalarField.C
+$(nutWallFunctions)/nutLowReWallFunction/nutLowReWallFunctionFvPatchScalarField.C
+$(nutWallFunctions)/nutkWallFunction/nutkWallFunctionFvPatchScalarField.C
+$(nutWallFunctions)/nutkRoughWallFunction/nutkRoughWallFunctionFvPatchScalarField.C
+$(nutWallFunctions)/nutUWallFunction/nutUWallFunctionFvPatchScalarField.C
+$(nutWallFunctions)/nutURoughWallFunction/nutURoughWallFunctionFvPatchScalarField.C
 $(nutWallFunctions)/nutSpalartAllmarasStandardWallFunction/nutSpalartAllmarasStandardWallFunctionFvPatchScalarField.C
 $(nutWallFunctions)/nutSpalartAllmarasStandardRoughWallFunction/nutSpalartAllmarasStandardRoughWallFunctionFvPatchScalarField.C
-$(nutWallFunctions)/nutLowReWallFunction/nutLowReWallFunctionFvPatchScalarField.C
+$(nutWallFunctions)/nutSpalartAllmarasWallFunction/nutSpalartAllmarasWallFunctionFvPatchScalarField.C
 $(nutWallFunctions)/nutCWTWallFunction/nutCWTWallFunctionFvPatchScalarField.C
 $(nutWallFunctions)/nutMEWTWallFunction/nutMEWTWallFunctionFvPatchScalarField.C
 

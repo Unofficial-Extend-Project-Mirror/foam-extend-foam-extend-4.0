@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -65,10 +65,10 @@ constraint<Type>::constraint
     value_(value),
     fixedComponents_(fixedCmpts),
     matrixCoeffsSet_(false),
-    upperCoeffsOwnerPtr_(NULL),
-    upperCoeffsNeighbourPtr_(NULL),
-    lowerCoeffsOwnerPtr_(NULL),
-    lowerCoeffsNeighbourPtr_(NULL)
+    upperCoeffsOwnerPtr_(nullptr),
+    upperCoeffsNeighbourPtr_(nullptr),
+    lowerCoeffsOwnerPtr_(nullptr),
+    lowerCoeffsNeighbourPtr_(nullptr)
 {}
 
 
@@ -87,10 +87,10 @@ constraint<Type>::constraint
     value_(value),
     fixedComponents_(fixedCmpts),
     matrixCoeffsSet_(false),
-    upperCoeffsOwnerPtr_(NULL),
-    upperCoeffsNeighbourPtr_(NULL),
-    lowerCoeffsOwnerPtr_(NULL),
-    lowerCoeffsNeighbourPtr_(NULL)
+    upperCoeffsOwnerPtr_(nullptr),
+    upperCoeffsNeighbourPtr_(nullptr),
+    lowerCoeffsOwnerPtr_(nullptr),
+    lowerCoeffsNeighbourPtr_(nullptr)
 {
     setMatrix(matrix);
 }
@@ -104,10 +104,10 @@ constraint<Type>::constraint(const constraint& e)
     value_(e.value_),
     fixedComponents_(e.fixedComponents_),
     matrixCoeffsSet_(false),
-    upperCoeffsOwnerPtr_(NULL),
-    upperCoeffsNeighbourPtr_(NULL),
-    lowerCoeffsOwnerPtr_(NULL),
-    lowerCoeffsNeighbourPtr_(NULL)
+    upperCoeffsOwnerPtr_(nullptr),
+    upperCoeffsNeighbourPtr_(nullptr),
+    lowerCoeffsOwnerPtr_(nullptr),
+    lowerCoeffsNeighbourPtr_(nullptr)
 {}
 
 
@@ -119,10 +119,10 @@ constraint<Type>::constraint(Istream& is)
     value_(is),
     fixedComponents_(is),
     matrixCoeffsSet_(false),
-    upperCoeffsOwnerPtr_(NULL),
-    upperCoeffsNeighbourPtr_(NULL),
-    lowerCoeffsOwnerPtr_(NULL),
-    lowerCoeffsNeighbourPtr_(NULL)
+    upperCoeffsOwnerPtr_(nullptr),
+    upperCoeffsNeighbourPtr_(nullptr),
+    lowerCoeffsOwnerPtr_(nullptr),
+    lowerCoeffsNeighbourPtr_(nullptr)
 {}
 
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ Foam::TimeFunction1<Type>::TimeFunction1(const Time& t, const word& name)
 :
     time_(t),
     name_(name),
-    entry_(NULL)
+    entry_(nullptr)
 {}
 
 

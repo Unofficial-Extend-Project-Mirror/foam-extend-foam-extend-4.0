@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ Foam::autoPtr<Foam::crMatrix> Foam::lduInterface::prolongationTransfer
     );
 
     // Dummy return to make the compiler happy
-    return autoPtr<crMatrix>(new crMatrix(1, 1, labelList(1, 0)));
+    return autoPtr<crMatrix>(NULL);
 }
 
 

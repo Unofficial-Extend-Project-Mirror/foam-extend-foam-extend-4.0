@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -135,7 +135,7 @@ void mapLagrangian(const meshToMesh& meshToMeshInterp)
             label sourceParticleI = 0;
 
             // Indices of source particles that get added to targetParcels
-            DynamicList<label> addParticles(sourceParcels.size());
+            dynamicLabelList addParticles(sourceParcels.size());
 
             // Unmapped particles
             labelHashSet unmappedSource(sourceParcels.size());

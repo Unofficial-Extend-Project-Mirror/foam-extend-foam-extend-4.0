@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -46,10 +46,10 @@ Foam::extendedLeastSquaresVectors::extendedLeastSquaresVectors
 :
     MeshObject<fvMesh, extendedLeastSquaresVectors>(mesh),
     minDet_(minDet),
-    pVectorsPtr_(NULL),
-    nVectorsPtr_(NULL),
-    additionalCellsPtr_(NULL),
-    additionalVectorsPtr_(NULL)
+    pVectorsPtr_(nullptr),
+    nVectorsPtr_(nullptr),
+    additionalCellsPtr_(nullptr),
+    additionalVectorsPtr_(nullptr)
 {}
 
 

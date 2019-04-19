@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -384,7 +384,7 @@ int main(int argc, char *argv[])
 
     // Construct the tetPoint fields
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~
-    tetPolyMesh* tetMeshPtr = NULL;
+    tetPolyMesh* tetMeshPtr = nullptr;
 
     PtrList<tetPointScalarField> tetPointScalarFields;
     PtrList<tetPointVectorField> tetPointVectorFields;
@@ -491,7 +491,7 @@ int main(int argc, char *argv[])
                 new List<SLList<indexedParticle*>*>
                 (
                     mesh.nCells(),
-                    static_cast<SLList<indexedParticle*>*>(NULL)
+                    static_cast<SLList<indexedParticle*>*>(nullptr)
                 )
             );
 
@@ -641,7 +641,7 @@ int main(int argc, char *argv[])
             rm(timeDir/"nut.gz");
         }
 
-        // read the mesh
+        // Read the mesh
         fvMesh procMesh
         (
             IOobject
@@ -651,7 +651,6 @@ int main(int argc, char *argv[])
                 processorDb
             )
         );
-        procMesh.syncUpdateMesh();
 
         labelIOList pointProcAddressing
         (
@@ -753,7 +752,7 @@ int main(int argc, char *argv[])
          || pointTensorFields.size()
         )
         {
-            const pointMesh& procPMesh = pointMesh::New(procMesh);
+            const pointMesh& procPMesh = pointMesh::New(procMesh, true);
 
             pointFieldDecomposer fieldDecomposer
             (
@@ -896,7 +895,7 @@ int main(int argc, char *argv[])
     if (tetMeshPtr)
     {
         delete tetMeshPtr;
-        tetMeshPtr = NULL;
+        tetMeshPtr = nullptr;
     }
 
 

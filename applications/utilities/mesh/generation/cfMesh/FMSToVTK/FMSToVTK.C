@@ -1,28 +1,31 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
-    cfMesh utility to convert a surface file to VTK multiblock dataset
+    foam-extend utility to convert a surface file to VTK multiblock dataset
     format, including the patches, feature edges and surface features.
 
 Author
@@ -45,7 +48,7 @@ using namespace Foam;
 void writePointsToVTK
 (
     const fileName& fn,
-    const string& title,
+    const string& /*title*/,
     const UList<point>& points
 )
 {
@@ -78,7 +81,7 @@ void writePointsToVTK
     const fileName& fn,
     const string& title,
     const UList<point>& points,
-    unallocLabelList& addr
+    UList<label>& addr
 )
 {
     // Create subaddressed points
@@ -102,7 +105,7 @@ void writePointsToVTK
 void writeEdgesToVTK
 (
     const fileName& fn,
-    const string& title,
+    const string& /*title*/,
     const UList<point>& points,
     const LongList<edge>& edges
 )
@@ -158,7 +161,7 @@ void writeEdgesToVTK
     const string& title,
     const UList<point>& points,
     const LongList<edge>& edges,
-    const unallocLabelList& addr
+    const UList<label>& addr
 )
 {
     // Remove unused points and create subaddressed edges
@@ -201,7 +204,7 @@ void writeEdgesToVTK
 void writeFacetsToVTK
 (
     const fileName& fn,
-    const string& title,
+    const string& /*title*/,
     const UList<point>& points,
     const LongList<labelledTri>& facets
 )
@@ -274,7 +277,7 @@ void writeFacetsToVTK
     const string& title,
     const pointField& points,
     const LongList<labelledTri>& facets,
-    const unallocLabelList& addr
+    const UList<label>& addr
 )
 {
     // Remove unused points and create subaddressed facets
@@ -397,7 +400,7 @@ int main(int argc, char *argv[])
 
     // Write patches
     // Create patch addressing
-    List<DynamicList<label> > patchAddr(patches.size());
+    List<dynamicLabelList > patchAddr(patches.size());
 
     forAll(facets, faceI)
     {

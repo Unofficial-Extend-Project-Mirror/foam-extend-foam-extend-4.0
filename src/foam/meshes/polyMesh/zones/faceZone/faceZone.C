@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -271,11 +271,11 @@ Foam::faceZone::faceZone
     flipMap_(fm),
     index_(index),
     zoneMesh_(zm),
-    patchPtr_(NULL),
-    masterCellsPtr_(NULL),
-    slaveCellsPtr_(NULL),
-    mePtr_(NULL),
-    faceLookupMapPtr_(NULL)
+    patchPtr_(nullptr),
+    masterCellsPtr_(nullptr),
+    slaveCellsPtr_(nullptr),
+    mePtr_(nullptr),
+    faceLookupMapPtr_(nullptr)
 {
     checkAddressing();
 }
@@ -295,11 +295,11 @@ Foam::faceZone::faceZone
     flipMap_(fm),
     index_(index),
     zoneMesh_(zm),
-    patchPtr_(NULL),
-    masterCellsPtr_(NULL),
-    slaveCellsPtr_(NULL),
-    mePtr_(NULL),
-    faceLookupMapPtr_(NULL)
+    patchPtr_(nullptr),
+    masterCellsPtr_(nullptr),
+    slaveCellsPtr_(nullptr),
+    mePtr_(nullptr),
+    faceLookupMapPtr_(nullptr)
 {
     checkAddressing();
 }
@@ -319,11 +319,11 @@ Foam::faceZone::faceZone
     flipMap_(dict.lookup("flipMap")),
     index_(index),
     zoneMesh_(zm),
-    patchPtr_(NULL),
-    masterCellsPtr_(NULL),
-    slaveCellsPtr_(NULL),
-    mePtr_(NULL),
-    faceLookupMapPtr_(NULL)
+    patchPtr_(nullptr),
+    masterCellsPtr_(nullptr),
+    slaveCellsPtr_(nullptr),
+    mePtr_(nullptr),
+    faceLookupMapPtr_(nullptr)
 {
     checkAddressing();
 }
@@ -345,11 +345,11 @@ Foam::faceZone::faceZone
     flipMap_(fm),
     index_(index),
     zoneMesh_(zm),
-    patchPtr_(NULL),
-    masterCellsPtr_(NULL),
-    slaveCellsPtr_(NULL),
-    mePtr_(NULL),
-    faceLookupMapPtr_(NULL)
+    patchPtr_(nullptr),
+    masterCellsPtr_(nullptr),
+    slaveCellsPtr_(nullptr),
+    mePtr_(nullptr),
+    faceLookupMapPtr_(nullptr)
 {
     checkAddressing();
 }
@@ -369,11 +369,11 @@ Foam::faceZone::faceZone
     flipMap_(fm),
     index_(index),
     zoneMesh_(zm),
-    patchPtr_(NULL),
-    masterCellsPtr_(NULL),
-    slaveCellsPtr_(NULL),
-    mePtr_(NULL),
-    faceLookupMapPtr_(NULL)
+    patchPtr_(nullptr),
+    masterCellsPtr_(nullptr),
+    slaveCellsPtr_(nullptr),
+    mePtr_(nullptr),
+    faceLookupMapPtr_(nullptr)
 {
     checkAddressing();
 }

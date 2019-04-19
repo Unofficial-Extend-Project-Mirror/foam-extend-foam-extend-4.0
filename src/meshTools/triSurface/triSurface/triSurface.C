@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -609,8 +609,8 @@ Foam::triSurface::triSurface()
 :
     ParentType(List<Face>(), pointField()),
     patches_(0),
-    sortedEdgeFacesPtr_(NULL),
-    edgeOwnerPtr_(NULL)
+    sortedEdgeFacesPtr_(nullptr),
+    edgeOwnerPtr_(nullptr)
 {}
 
 
@@ -624,8 +624,8 @@ Foam::triSurface::triSurface
 :
     ParentType(triangles, points),
     patches_(patches),
-    sortedEdgeFacesPtr_(NULL),
-    edgeOwnerPtr_(NULL)
+    sortedEdgeFacesPtr_(nullptr),
+    edgeOwnerPtr_(nullptr)
 {}
 
 
@@ -639,8 +639,8 @@ Foam::triSurface::triSurface
 :
     ParentType(triangles, points, reUse),
     patches_(patches),
-    sortedEdgeFacesPtr_(NULL),
-    edgeOwnerPtr_(NULL)
+    sortedEdgeFacesPtr_(nullptr),
+    edgeOwnerPtr_(nullptr)
 {}
 
 
@@ -652,8 +652,8 @@ Foam::triSurface::triSurface
 :
     ParentType(triangles, points),
     patches_(),
-    sortedEdgeFacesPtr_(NULL),
-    edgeOwnerPtr_(NULL)
+    sortedEdgeFacesPtr_(nullptr),
+    edgeOwnerPtr_(nullptr)
 {
     setDefaultPatches();
 }
@@ -667,8 +667,8 @@ Foam::triSurface::triSurface
 :
     ParentType(convertToTri(triangles, 0), points),
     patches_(),
-    sortedEdgeFacesPtr_(NULL),
-    edgeOwnerPtr_(NULL)
+    sortedEdgeFacesPtr_(nullptr),
+    edgeOwnerPtr_(nullptr)
 {
     setDefaultPatches();
 }
@@ -678,8 +678,8 @@ Foam::triSurface::triSurface(const fileName& name)
 :
     ParentType(List<Face>(), pointField()),
     patches_(),
-    sortedEdgeFacesPtr_(NULL),
-    edgeOwnerPtr_(NULL)
+    sortedEdgeFacesPtr_(nullptr),
+    edgeOwnerPtr_(nullptr)
 {
     word ext = name.ext();
 
@@ -693,8 +693,8 @@ Foam::triSurface::triSurface(Istream& is)
 :
     ParentType(List<Face>(), pointField()),
     patches_(),
-    sortedEdgeFacesPtr_(NULL),
-    edgeOwnerPtr_(NULL)
+    sortedEdgeFacesPtr_(nullptr),
+    edgeOwnerPtr_(nullptr)
 {
     read(is);
 
@@ -706,8 +706,8 @@ Foam::triSurface::triSurface(const Time& d)
 :
     ParentType(List<Face>(), pointField()),
     patches_(),
-    sortedEdgeFacesPtr_(NULL),
-    edgeOwnerPtr_(NULL)
+    sortedEdgeFacesPtr_(nullptr),
+    edgeOwnerPtr_(nullptr)
 {
     fileName foamFile(d.caseName() + ".ftr");
 
@@ -725,8 +725,8 @@ Foam::triSurface::triSurface(const triSurface& ts)
 :
     ParentType(ts, ts.points()),
     patches_(ts.patches()),
-    sortedEdgeFacesPtr_(NULL),
-    edgeOwnerPtr_(NULL)
+    sortedEdgeFacesPtr_(nullptr),
+    edgeOwnerPtr_(nullptr)
 {}
 
 

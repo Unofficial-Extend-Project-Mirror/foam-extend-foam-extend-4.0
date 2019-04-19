@@ -6,5 +6,6 @@
 cleanCase
 \rm -f *.dat
 
+\rm -rf postProcessing forces
 \rm -rf 0
 \rm -f constant/polyMesh/boundary

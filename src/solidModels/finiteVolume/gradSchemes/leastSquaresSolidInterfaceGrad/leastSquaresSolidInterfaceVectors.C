@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -44,8 +44,8 @@ Foam::leastSquaresSolidInterfaceVectors::leastSquaresSolidInterfaceVectors
 (const fvMesh& mesh)
 :
     MeshObject<fvMesh, leastSquaresSolidInterfaceVectors>(mesh),
-    pVectorsPtr_(NULL),
-    nVectorsPtr_(NULL)
+    pVectorsPtr_(nullptr),
+    nVectorsPtr_(nullptr)
 {}
 
 

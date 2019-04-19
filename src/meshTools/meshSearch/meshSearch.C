@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -436,9 +436,9 @@ Foam::meshSearch::meshSearch(const polyMesh& mesh, const bool faceDecomp)
     mesh_(mesh),
     faceDecomp_(faceDecomp),
     cloud_(mesh_, IDLList<passiveParticle>()),
-    boundaryTreePtr_(NULL),
-    cellTreePtr_(NULL),
-    cellCentreTreePtr_(NULL)
+    boundaryTreePtr_(nullptr),
+    cellTreePtr_(nullptr),
+    cellCentreTreePtr_(nullptr)
 {
     // HR 29.11.17: Might register multiple times. Therefore do not register.
     cloud_.regIOobject::checkOut();

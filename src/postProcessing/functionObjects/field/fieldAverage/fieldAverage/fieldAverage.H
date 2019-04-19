@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -120,6 +120,8 @@ SourceFiles
 #include "volFieldsFwd.H"
 #include "Switch.H"
 #include "pointFieldFwd.H"
+#include "labelList.H"
+#include "scalarList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -130,8 +132,6 @@ namespace Foam
 class objectRegistry;
 class dictionary;
 class fieldAverageItem;
-template<class Type>
-class List;
 class polyMesh;
 class mapPolyMesh;
 
@@ -173,10 +173,10 @@ protected:
         // Counters
 
             //- Iteration steps counter
-            List<label> totalIter_;
+            labelList totalIter_;
 
             //- Total time counter
-            List<scalar> totalTime_;
+            scalarList totalTime_;
 
 
     // Private Member Functions

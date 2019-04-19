@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -70,8 +70,8 @@ Foam::fieldValues::fieldValueDelta::fieldValueDelta
     loadFromFiles_(loadFromFiles),
     log_(true),
     operation_(opSubtract),
-    source1Ptr_(NULL),
-    source2Ptr_(NULL)
+    source1Ptr_(nullptr),
+    source2Ptr_(nullptr)
 {
     read(dict);
 }

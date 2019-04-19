@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -125,10 +125,10 @@ class PointEdgeWave
         label nChangedEdges_;
 
         //- Number of cyclic patches
-        bool nCyclicPatches_;
+        label nCyclicPatches_;
 
         //- Number of cyclic patches
-        bool nGgiPatches_;
+        label nGgiPatches_;
 
         //- For every cyclic patch two primitivePatches
         PtrList<primitivePatch> cycHalves_;
@@ -152,7 +152,7 @@ class PointEdgeWave
         (
             const polyPatch& meshPatch,
             const primitivePatch& patch,
-            const List<label>& patchPointLabels,
+            const labelList& patchPointLabels,
             List<Type>& pointInfo
         ) const;
 
@@ -161,7 +161,7 @@ class PointEdgeWave
         (
             const polyPatch& meshPatch,
             const primitivePatch& patch,
-            const List<label>& patchPointLabels,
+            const labelList& patchPointLabels,
             List<Type>& pointInfo
         ) const;
 

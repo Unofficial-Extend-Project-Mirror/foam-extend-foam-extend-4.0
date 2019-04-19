@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ void sammMesh::readBoundary()
     labelList pointLabels(4);
     labelList pointLabelsTri(3);
 
-    labelList patchLabels(1000, -1);
+    labelList patchLabels(1000, label(-1));
 
     word patchType;
     patchTypes_.setSize(1000);

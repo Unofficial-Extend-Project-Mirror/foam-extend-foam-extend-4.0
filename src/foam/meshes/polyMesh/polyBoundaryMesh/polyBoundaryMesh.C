@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ Foam::polyBoundaryMesh::polyBoundaryMesh
     polyPatchList(),
     regIOobject(io),
     mesh_(mesh),
-    neighbourEdgesPtr_(NULL)
+    neighbourEdgesPtr_(nullptr)
 {
     if (readOpt() == IOobject::MUST_READ)
     {
@@ -107,7 +107,7 @@ Foam::polyBoundaryMesh::polyBoundaryMesh
     polyPatchList(size),
     regIOobject(io),
     mesh_(pm),
-    neighbourEdgesPtr_(NULL)
+    neighbourEdgesPtr_(nullptr)
 {}
 
 
@@ -121,7 +121,7 @@ Foam::polyBoundaryMesh::polyBoundaryMesh
     polyPatchList(),
     regIOobject(io),
     mesh_(mesh),
-    neighbourEdgesPtr_(NULL)
+    neighbourEdgesPtr_(nullptr)
 {
     polyPatchList& patches = *this;
     token firstToken(is);
@@ -515,7 +515,7 @@ Foam::labelList Foam::polyBoundaryMesh::findIndices
     const bool usePatchGroups
 ) const
 {
-    DynamicList<label> indices;
+    dynamicLabelList indices;
 
     if (!key.empty())
     {
@@ -1026,12 +1026,14 @@ bool Foam::polyBoundaryMesh::writeData(Ostream& os) const
 
     os  << patches.size() << nl << token::BEGIN_LIST << incrIndent << nl;
 
+    // Note: careful write: endl is not allowed because it flushes a stream
+    // HJ, 24/Oct/2018
     forAll (patches, patchi)
     {
         os  << indent << patches[patchi].name() << nl
             << indent << token::BEGIN_BLOCK << nl
             << incrIndent << patches[patchi] << decrIndent
-            << indent << token::END_BLOCK << endl;
+            << indent << token::END_BLOCK << nl;
     }
 
     os  << decrIndent << token::END_LIST << endl;

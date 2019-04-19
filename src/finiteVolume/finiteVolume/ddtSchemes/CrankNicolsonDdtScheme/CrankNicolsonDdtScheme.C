@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -1201,7 +1201,7 @@ CrankNicolsonDdtScheme<Type>::fvcDdtConsistentPhiCorr
           - offCentre_(faceUDdt0())
         );
     }
-    
+
     // Calculate old time flux
     fluxFieldType oldTimeFlux =
         rAUf*rDtCoef_(faceUDdt0)*(mesh().Sf() & faceU.oldTime());

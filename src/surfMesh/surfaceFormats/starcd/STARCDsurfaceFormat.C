@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ bool Foam::fileFormats::STARCDsurfaceFormat<Face>::read
     fileName baseName = filename.lessExt();
 
     // STAR-CD index of points
-    List<label> pointId;
+    labelList pointId;
 
     // read points from .vrt file
     readPoints
@@ -224,7 +224,7 @@ void Foam::fileFormats::STARCDsurfaceFormat<Face>::write
 {
     const pointField& pointLst = surf.points();
     const List<Face>&  faceLst = surf.faces();
-    const List<label>& faceMap = surf.faceMap();
+    const labelList& faceMap = surf.faceMap();
 
     const List<surfZone>& zones =
     (

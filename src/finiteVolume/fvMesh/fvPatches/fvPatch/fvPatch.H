@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -149,7 +149,6 @@ public:
 
     // Declare run-time constructor selection tables
 
-#ifndef SWIG
         declareRunTimeSelectionTable
         (
             autoPtr,
@@ -158,7 +157,6 @@ public:
             (const polyPatch& patch, const fvBoundaryMesh& bm),
             (patch, bm)
         );
-#endif
 
 
     // Constructors
@@ -193,10 +191,16 @@ public:
                 return polyPatch_.name();
             }
 
-            //- Return size
+            //- Return patch size
             virtual label size() const
             {
                 return polyPatch_.size();
+            }
+
+            //- Return patch slice size.  Immersed boundary support
+            virtual label sliceSize() const
+            {
+                return size();
             }
 
             //- Return true if this patch is coupled
@@ -235,11 +239,12 @@ public:
             {
                 return typename List<T>::subList
                 (
-                    l, size(),
+                    l, sliceSize(),
                     polyPatch_.start()
                 );
             }
 
+            //- Slice list to patch
             template<class T>
             const typename Field<T>::subField patchSlice
             (
@@ -248,7 +253,7 @@ public:
             {
                 return typename Field<T>::subField
                 (
-                    l, size(),
+                    l, sliceSize(),
                     polyPatch_.start()
                 );
             }
@@ -272,7 +277,7 @@ public:
             const scalarField& magSf() const;
 
             //- Return face normals
-            tmp<vectorField> nf() const;
+            virtual tmp<vectorField> nf() const;
 
             //- Return cell-centre to face-centre vector
             //  except for coupled patches for which the cell-centre
@@ -313,8 +318,8 @@ public:
             const typename GeometricField::PatchFieldType& lookupPatchField
             (
                 const word& name,
-                const GeometricField* = NULL,
-                const Type* = NULL
+                const GeometricField* = nullptr,
+                const Type* = nullptr
             ) const;
 };
 

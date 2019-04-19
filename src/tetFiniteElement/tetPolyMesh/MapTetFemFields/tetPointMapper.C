@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -286,12 +286,12 @@ Foam::tetPointMapper::tetPointMapper
     faceMap_(fMapper),
     cellMap_(cMapper),
     size_(mesh().nPoints() + mesh().nFaces() + mesh().nCells()),
-    directPtr_(NULL),
-    directAddrPtr_(NULL),
-    interpolationAddrPtr_(NULL),
-    weightsPtr_(NULL),
-    insertedObjectsPtr_(NULL),
-    insertedObjectLabelsPtr_(NULL)
+    directPtr_(nullptr),
+    directAddrPtr_(nullptr),
+    interpolationAddrPtr_(nullptr),
+    weightsPtr_(nullptr),
+    insertedObjectsPtr_(nullptr),
+    insertedObjectLabelsPtr_(nullptr)
 {}
 
 

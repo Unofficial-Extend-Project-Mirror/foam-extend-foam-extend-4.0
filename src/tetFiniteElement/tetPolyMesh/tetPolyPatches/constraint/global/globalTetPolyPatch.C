@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -65,16 +65,16 @@ globalTetPolyPatch::globalTetPolyPatch
     meshCutEdges_(meshCutEdges),
     meshCutEdgeMask_(meshCutEdgeMask),
     boundaryIndex_(index),
-    localEdgeIndicesPtr_(NULL),
-    cutEdgeIndicesPtr_(NULL),
-    cutEdgeOwnerIndicesPtr_(NULL),
-    cutEdgeOwnerStartPtr_(NULL),
-    cutEdgeNeighbourIndicesPtr_(NULL),
-    cutEdgeNeighbourStartPtr_(NULL),
+    localEdgeIndicesPtr_(nullptr),
+    cutEdgeIndicesPtr_(nullptr),
+    cutEdgeOwnerIndicesPtr_(nullptr),
+    cutEdgeOwnerStartPtr_(nullptr),
+    cutEdgeNeighbourIndicesPtr_(nullptr),
+    cutEdgeNeighbourStartPtr_(nullptr),
     doubleCutEdgeIndicesPtr_(new labelList(0)),
     doubleCutOwnerPtr_(new labelList(0)),
     doubleCutNeighbourPtr_(new labelList(0)),
-    ownNeiDoubleMaskPtr_(NULL)
+    ownNeiDoubleMaskPtr_(nullptr)
 {}
 
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -149,11 +149,11 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
     zoneIndex_(-1),
     rotationAxis_(vector(0, 0, 1)),
     nCopies_(0),
-    expandedMasterPtr_(NULL),
-    expandedSlavePtr_(NULL),
-    patchToPatchPtr_(NULL),
-    localParallelPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    expandedMasterPtr_(nullptr),
+    expandedSlavePtr_(nullptr),
+    patchToPatchPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr)
 {}
 
 
@@ -178,11 +178,11 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
     zoneIndex_(-1),
     rotationAxis_(axis),
     nCopies_(nCopies),
-    expandedMasterPtr_(NULL),
-    expandedSlavePtr_(NULL),
-    patchToPatchPtr_(NULL),
-    localParallelPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    expandedMasterPtr_(nullptr),
+    expandedSlavePtr_(nullptr),
+    patchToPatchPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr)
 {}
 
 
@@ -202,11 +202,57 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
     zoneIndex_(-1),
     rotationAxis_(dict.lookup("rotationAxis")),
     nCopies_(readScalar(dict.lookup("nCopies"))),
-    expandedMasterPtr_(NULL),
-    expandedSlavePtr_(NULL),
-    patchToPatchPtr_(NULL),
-    localParallelPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    expandedMasterPtr_(nullptr),
+    expandedSlavePtr_(nullptr),
+    patchToPatchPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr)
+{}
+
+
+// Construct as copy, resetting the face list and boundary mesh data
+Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
+(
+    const overlapGgiPolyPatch& pp,
+    const polyBoundaryMesh& bm,
+    const label index,
+    const label newSize,
+    const label newStart
+)
+:
+    coupledPolyPatch(pp, bm, index, newSize, newStart),
+    shadowName_(pp.shadowName_),
+    zoneName_(pp.zoneName_),
+    shadowIndex_(-1),
+    zoneIndex_(-1),
+    rotationAxis_(pp.rotationAxis_),
+    nCopies_(pp.nCopies_),
+    expandedMasterPtr_(nullptr),
+    expandedSlavePtr_(nullptr),
+    patchToPatchPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr)
+{}
+
+
+// Construct as copy, resetting the boundary mesh
+Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
+(
+    const overlapGgiPolyPatch& pp
+)
+:
+    coupledPolyPatch(pp),
+    shadowName_(pp.shadowName_),
+    zoneName_(pp.zoneName_),
+    shadowIndex_(-1),
+    zoneIndex_(-1),
+    rotationAxis_(pp.rotationAxis_),
+    nCopies_(pp.nCopies_),
+    expandedMasterPtr_(nullptr),
+    expandedSlavePtr_(nullptr),
+    patchToPatchPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr)
 {}
 
 
@@ -224,36 +270,11 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
     zoneIndex_(-1),
     rotationAxis_(pp.rotationAxis_),
     nCopies_(pp.nCopies_),
-    expandedMasterPtr_(NULL),
-    expandedSlavePtr_(NULL),
-    patchToPatchPtr_(NULL),
-    localParallelPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
-{}
-
-
-//- Construct as copy, resetting the face list and boundary mesh data
-Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
-(
-    const overlapGgiPolyPatch& pp,
-    const polyBoundaryMesh& bm,
-    const label index,
-    const label newSize,
-    const label newStart
-)
-:
-    coupledPolyPatch(pp, bm, index, newSize, newStart),
-    shadowName_(pp.shadowName_),
-    zoneName_(pp.zoneName_),
-    shadowIndex_(-1),
-    zoneIndex_(-1),
-    rotationAxis_(pp.rotationAxis_),
-    nCopies_(pp.nCopies_),
-    expandedMasterPtr_(NULL),
-    expandedSlavePtr_(NULL),
-    patchToPatchPtr_(NULL),
-    localParallelPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    expandedMasterPtr_(nullptr),
+    expandedSlavePtr_(nullptr),
+    patchToPatchPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr)
 {}
 
 

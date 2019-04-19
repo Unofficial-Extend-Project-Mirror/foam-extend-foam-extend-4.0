@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     4.0                                |
+|  \\    /   O peration     | Version:     4.1                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -21,43 +21,43 @@ FoamFile
     {
         type            symmetryPlane;
         physicalType    symmetryPlane;
-        nFaces          30;
-        startFace       1930;
+        nFaces          35;
+        startFace       2815;
     }
     right
     {
         type            patch;
         physicalType    tractionAdiabatic;
-        nFaces          30;
-        startFace       1960;
+        nFaces          35;
+        startFace       2850;
     }
     down
     {
         type            symmetryPlane;
         physicalType    symmetryPlane;
-        nFaces          30;
-        startFace       1990;
+        nFaces          35;
+        startFace       2885;
     }
     up
     {
         type            patch;
         physicalType    tractionAdiabatic;
-        nFaces          30;
-        startFace       2020;
+        nFaces          35;
+        startFace       2920;
     }
     hole
     {
         type            patch;
         physicalType    tractionAdiabatic;
-        nFaces          20;
-        startFace       2050;
+        nFaces          30;
+        startFace       2955;
     }
     frontAndBack
     {
         type            empty;
         physicalType    empty;
-        nFaces          2000;
-        startFace       2070;
+        nFaces          2900;
+        startFace       2985;
     }
 )
 

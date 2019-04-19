@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -32,15 +32,12 @@ Author
 #include "fvPatchFieldMapper.H"
 #include "volFields.H"
 #include "fvMatrices.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
+#include "magLongDelta.H"
+#include "basicThermo.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-chtRegionCoupleBase::chtRegionCoupleBase
+Foam::chtRegionCoupleBase::chtRegionCoupleBase
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF
@@ -50,7 +47,7 @@ chtRegionCoupleBase::chtRegionCoupleBase
 {}
 
 
-chtRegionCoupleBase::chtRegionCoupleBase
+Foam::chtRegionCoupleBase::chtRegionCoupleBase
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
@@ -61,7 +58,7 @@ chtRegionCoupleBase::chtRegionCoupleBase
 {}
 
 
-chtRegionCoupleBase::chtRegionCoupleBase
+Foam::chtRegionCoupleBase::chtRegionCoupleBase
 (
     const chtRegionCoupleBase& ptf,
     const fvPatch& p,
@@ -73,7 +70,7 @@ chtRegionCoupleBase::chtRegionCoupleBase
 {}
 
 
-chtRegionCoupleBase::chtRegionCoupleBase
+Foam::chtRegionCoupleBase::chtRegionCoupleBase
 (
     const chtRegionCoupleBase& ptf,
     const DimensionedField<scalar, volMesh>& iF
@@ -86,8 +83,8 @@ chtRegionCoupleBase::chtRegionCoupleBase
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 // Return a named shadow patch field
-const chtRegionCoupleBase&
-chtRegionCoupleBase::shadowPatchField() const
+const Foam::chtRegionCoupleBase&
+Foam::chtRegionCoupleBase::shadowPatchField() const
 {
     return dynamic_cast<const chtRegionCoupleBase&>
     (
@@ -96,35 +93,102 @@ chtRegionCoupleBase::shadowPatchField() const
 }
 
 
-void chtRegionCoupleBase::initEvaluate
+// Return a named shadow patch field
+Foam::tmp<Foam::scalarField> Foam::chtRegionCoupleBase::forig() const
+{
+    if
+    (
+        dimensionedInternalField().dimensions()
+     == dimensionSet(1, -1, -1, 0, 0)
+    )
+    {
+        const fvPatch& p = patch();
+
+        const basicThermo& thermo = db().lookupObject<basicThermo>
+        (
+            "thermophysicalProperties"
+        );
+
+        const scalarField Tw =
+            p.lookupPatchField<volScalarField, scalar>("T");
+
+        return originalPatchField()*thermo.Cp(Tw, p.index());
+    }
+    else
+    {
+        return originalPatchField();
+    }
+}
+
+
+// Return a named shadow patch field
+Foam::tmp<Foam::scalarField> Foam::chtRegionCoupleBase::korig() const
+{
+    const fvPatch& p = patch();
+    const magLongDelta& mld = magLongDelta::New(p.boundaryMesh().mesh());
+
+    return forig()/(1 - p.weights())/mld.magDelta(p.index());
+}
+
+
+// Return a named shadow patch field
+Foam::tmp<Foam::scalarField> Foam::chtRegionCoupleBase::kw() const
+{
+    if
+    (
+        dimensionedInternalField().dimensions()
+     == dimensionSet(1, -1, -1, 0, 0, 0, 0)
+    )
+    {
+        const fvPatch& p = patch();
+
+        const basicThermo& thermo = db().lookupObject<basicThermo>
+        (
+            "thermophysicalProperties"
+        );
+
+        const scalarField Tw =
+            p.lookupPatchField<volScalarField, scalar>("T");
+
+        return *this*thermo.Cp(Tw, p.index());
+    }
+    else
+    {
+        return *this;
+    }
+}
+
+
+Foam::tmp<Foam::scalarField>
+Foam::chtRegionCoupleBase::calcThermalDiffusivity
+(
+    const chtRegionCoupleBase& owner,
+    const chtRegionCoupleBase& neighbour,
+    const chtRcTemperatureFvPatchScalarField& TwOwn
+) const
+{
+    return shadowPatchField().calcThermalDiffusivity(owner, neighbour, TwOwn);
+}
+
+
+Foam::tmp<Foam::scalarField>
+Foam::chtRegionCoupleBase::calcTemperature
+(
+    const chtRcTemperatureFvPatchScalarField& TwOwn,
+    const chtRcTemperatureFvPatchScalarField& neighbour,
+    const chtRegionCoupleBase& ownerK
+) const
+{
+    return shadowPatchField().calcTemperature(TwOwn, neighbour, ownerK);
+}
+
+
+void Foam::chtRegionCoupleBase::initEvaluate
 (
     const Pstream::commsTypes commsType
 )
 {
     updateCoeffs();
-}
-
-
-void
-Foam::chtRegionCoupleBase::calcThermalDiffusivity
-(
-    chtRegionCoupleBase& owner,
-    const chtRegionCoupleBase& neighbour
-) const
-{
-    shadowPatchField().calcThermalDiffusivity(owner, neighbour);
-}
-
-
-void
-Foam::chtRegionCoupleBase::calcTemperature
-(
-    chtRcTemperatureFvPatchScalarField& owner,
-    const chtRcTemperatureFvPatchScalarField& neighbour,
-    const chtRegionCoupleBase& ownerK
-) const
-{
-    shadowPatchField().calcTemperature(owner, neighbour, ownerK);
 }
 
 
@@ -136,13 +200,16 @@ Foam::chtRegionCoupleBase::initInterfaceMatrixUpdate
     const lduMatrix&,
     const scalarField&,
     const direction,
-    const Pstream::commsTypes
+    const Pstream::commsTypes,
+    const bool switchToLhs
 ) const
 {
     FatalErrorIn
     (
         "chtRegionCoupleBase::initInterfaceMatrixUpdate"
-    )   << abort(FatalError);
+    )   << "Undefined function: this patch field cannot be used "
+        << "on active variables"
+        << abort(FatalError);
 }
 
 
@@ -154,17 +221,23 @@ Foam::chtRegionCoupleBase::updateInterfaceMatrix
     const lduMatrix&,
     const scalarField&,
     const direction,
-    const Pstream::commsTypes
+    const Pstream::commsTypes,
+    const bool switchToLhs
 ) const
 {
     FatalErrorIn
     (
         "chtRegionCoupleBase::updateInterfaceMatrix"
-    )   << abort(FatalError);
+    )   << "Undefined function: this patch field cannot be used "
+        << "on active variables"
+        << abort(FatalError);
 }
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
 
 makePatchTypeField
 (

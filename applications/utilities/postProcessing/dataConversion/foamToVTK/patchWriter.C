@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -94,8 +94,8 @@ Foam::patchWriter::patchWriter
     os_ << "CELLS " << nFaces_ << ' ' << nFaceVerts
         << std::endl;
 
-    DynamicList<label> vertLabels(nFaceVerts);
-    DynamicList<label> faceTypes(nFaceVerts);
+    dynamicLabelList vertLabels(nFaceVerts);
+    dynamicLabelList faceTypes(nFaceVerts);
 
     label offset = 0;
 

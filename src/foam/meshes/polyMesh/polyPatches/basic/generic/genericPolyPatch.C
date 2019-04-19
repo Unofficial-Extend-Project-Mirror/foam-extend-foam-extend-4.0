@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -69,10 +69,24 @@ Foam::genericPolyPatch::genericPolyPatch
 Foam::genericPolyPatch::genericPolyPatch
 (
     const genericPolyPatch& pp,
-    const polyBoundaryMesh& bm
+    const polyBoundaryMesh& bm,
+    const label index,
+    const label newSize,
+    const label newStart
 )
 :
-    polyPatch(pp, bm),
+    polyPatch(pp, bm, index, newSize, newStart),
+    actualTypeName_(pp.actualTypeName_),
+    dict_(pp.dict_)
+{}
+
+
+Foam::genericPolyPatch::genericPolyPatch
+(
+    const genericPolyPatch& pp
+)
+:
+    polyPatch(pp),
     actualTypeName_(pp.actualTypeName_),
     dict_(pp.dict_)
 {}
@@ -81,13 +95,10 @@ Foam::genericPolyPatch::genericPolyPatch
 Foam::genericPolyPatch::genericPolyPatch
 (
     const genericPolyPatch& pp,
-    const polyBoundaryMesh& bm,
-    const label index,
-    const label newSize,
-    const label newStart
+    const polyBoundaryMesh& bm
 )
 :
-    polyPatch(pp, bm, index, newSize, newStart),
+    polyPatch(pp, bm),
     actualTypeName_(pp.actualTypeName_),
     dict_(pp.dict_)
 {}

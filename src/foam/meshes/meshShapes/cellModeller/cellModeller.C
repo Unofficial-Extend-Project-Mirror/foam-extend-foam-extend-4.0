@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ Foam::cellModeller::cellModeller()
     }
 
     modelPtrs_.setSize(maxIndex + 1);
-    modelPtrs_ = NULL;
+    modelPtrs_ = nullptr;
 
     // For all the words in the wordlist, set the details of the model
     // to those specified by the word name and the other parameters
@@ -98,7 +98,7 @@ const Foam::cellModel* Foam::cellModeller::lookup(const word& name)
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 }
 

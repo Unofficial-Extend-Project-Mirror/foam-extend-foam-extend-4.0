@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ bool Foam::fileFormats::FTRsurfaceFormat<Face>::read
     List< Keyed<triFace> > facesRead(is);
 
     List<Face>  faceLst(facesRead.size());
-    List<label> zoneIds(facesRead.size());
+    labelList zoneIds(facesRead.size());
 
     // disentangle faces/keys - already triangulated
     forAll(facesRead, faceI)

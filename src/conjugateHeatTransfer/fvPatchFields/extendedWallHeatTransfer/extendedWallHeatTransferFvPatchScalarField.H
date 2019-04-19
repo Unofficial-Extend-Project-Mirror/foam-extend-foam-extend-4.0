@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -68,13 +68,13 @@ class extendedWallHeatTransferFvPatchScalarField
         //- Tinf [K]
         scalar Tinf_;
 
-        //- thermal conductance [W/m^2/K]
+        //- Thermal conductance [W/m^2/K]
         scalar hc_;
 
-        //- heat transfer coefficient [W/m^2/K]
+        //- Heat transfer coefficient [W/m^2/K]
         scalar alpha_;
 
-        //- list of radiative sources
+        //- List of radiative sources
         PtrList<externalRadiationSource> radSources_;
 
         //- Name of thermal conductivity field
@@ -162,7 +162,6 @@ public:
                 return radiation_;
             }
 
-        // Mapping functions
 
         // Evaluation functions
 

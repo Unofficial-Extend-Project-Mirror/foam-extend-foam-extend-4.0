@@ -19,7 +19,7 @@
 
                     {
 
-                        List<bool> valveTopPoint(newPoints.size(), false);
+                        boolList valveTopPoint(newPoints.size(), false);
 
                         label valveTopPtsIndex = pointZones().findZoneID("movingPointsTopZoneV"+ Foam::name(valveI+1));
                         const labelList& valveTopPoints = pointZones()[valveTopPtsIndex];

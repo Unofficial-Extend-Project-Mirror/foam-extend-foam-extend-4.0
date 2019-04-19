@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -92,20 +92,7 @@ Foam::passiveProcessorPolyPatch::passiveProcessorPolyPatch
     polyPatch(name, dict, index, bm),
     myProcNo_(readLabel(dict.lookup("myProcNo"))),
     neighbProcNo_(readLabel(dict.lookup("neighbProcNo"))),
-    globalFaceIndex_(dict.lookup("globalFaceIndex"))
-{}
-
-
-Foam::passiveProcessorPolyPatch::passiveProcessorPolyPatch
-(
-    const passiveProcessorPolyPatch& pp,
-    const polyBoundaryMesh& bm
-)
-:
-    polyPatch(pp, bm),
-    myProcNo_(pp.myProcNo_),
-    neighbProcNo_(pp.neighbProcNo_),
-    globalFaceIndex_(pp.size(), -1)
+    globalFaceIndex_("globalFaceIndex", dict, size())
 {}
 
 
@@ -125,6 +112,31 @@ Foam::passiveProcessorPolyPatch::passiveProcessorPolyPatch
 {}
 
 
+Foam::passiveProcessorPolyPatch::passiveProcessorPolyPatch
+(
+    const passiveProcessorPolyPatch& pp
+)
+:
+    polyPatch(pp),
+    myProcNo_(pp.myProcNo_),
+    neighbProcNo_(pp.neighbProcNo_),
+    globalFaceIndex_(pp.size(), -1)
+{}
+
+
+Foam::passiveProcessorPolyPatch::passiveProcessorPolyPatch
+(
+    const passiveProcessorPolyPatch& pp,
+    const polyBoundaryMesh& bm
+)
+:
+    polyPatch(pp, bm),
+    myProcNo_(pp.myProcNo_),
+    neighbProcNo_(pp.neighbProcNo_),
+    globalFaceIndex_(pp.size(), -1)
+{}
+
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 Foam::passiveProcessorPolyPatch::~passiveProcessorPolyPatch()
@@ -140,7 +152,6 @@ void Foam::passiveProcessorPolyPatch::write(Ostream& os) const
         << token::END_STATEMENT << nl;
     os.writeKeyword("neighbProcNo") << neighbProcNo_
         << token::END_STATEMENT << nl;
-
     globalFaceIndex_.writeEntry("globalFaceIndex", os);
 }
 

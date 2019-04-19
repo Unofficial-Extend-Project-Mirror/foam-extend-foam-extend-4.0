@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -159,9 +159,9 @@ Foam::sampledSurface::sampledSurface
     name_(name),
     mesh_(mesh),
     interpolate_(interpolate),
-    SfPtr_(NULL),
-    magSfPtr_(NULL),
-    CfPtr_(NULL),
+    SfPtr_(nullptr),
+    magSfPtr_(nullptr),
+    CfPtr_(nullptr),
     area_(-1)
 {}
 
@@ -177,9 +177,9 @@ Foam::sampledSurface::sampledSurface
     name_(name),
     mesh_(mesh),
     interpolate_(dict.lookupOrDefault("interpolate", false)),
-    SfPtr_(NULL),
-    magSfPtr_(NULL),
-    CfPtr_(NULL),
+    SfPtr_(nullptr),
+    magSfPtr_(nullptr),
+    CfPtr_(nullptr),
     area_(-1)
 {
     dict.readIfPresent("name", name_);
@@ -247,7 +247,7 @@ Foam::tmp<Foam::scalarField> Foam::sampledSurface::sample
 ) const
 {
     notImplemented("tmp<Foam::scalarField> sampledSurface::sample");
-    return tmp<scalarField>(NULL);
+    return tmp<scalarField>(nullptr);
 }
 
 
@@ -257,7 +257,7 @@ Foam::tmp<Foam::vectorField> Foam::sampledSurface::sample
 ) const
 {
     notImplemented("tmp<Foam::vectorField> sampledSurface::sample");
-    return tmp<vectorField>(NULL);
+    return tmp<vectorField>(nullptr);
 }
 
 
@@ -267,7 +267,7 @@ Foam::tmp<Foam::sphericalTensorField> Foam::sampledSurface::sample
 ) const
 {
     notImplemented("tmp<Foam::sphericalTensorField> sampledSurface::sample");
-    return tmp<sphericalTensorField>(NULL);
+    return tmp<sphericalTensorField>(nullptr);
 }
 
 
@@ -277,7 +277,7 @@ Foam::tmp<Foam::symmTensorField> Foam::sampledSurface::sample
 ) const
 {
     notImplemented("tmp<Foam::symmTensorField> sampledSurface::sample");
-    return tmp<symmTensorField>(NULL);
+    return tmp<symmTensorField>(nullptr);
 }
 
 
@@ -287,7 +287,7 @@ Foam::tmp<Foam::tensorField> Foam::sampledSurface::sample
 ) const
 {
     notImplemented("tmp<Foam::tensorField> sampledSurface::sample");
-    return tmp<tensorField>(NULL);
+    return tmp<tensorField>(nullptr);
 }
 
 

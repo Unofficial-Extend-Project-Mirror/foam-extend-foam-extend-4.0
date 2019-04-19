@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -36,7 +36,7 @@ defineTypeNameAndDebug(Foam::lduMesh, 0);
 const Foam::objectRegistry& Foam::lduMesh::thisDb() const
 {
     notImplemented("lduMesh::thisDb() const");
-    const objectRegistry* orPtr_ = NULL;
+    const objectRegistry* orPtr_ = nullptr;
     return *orPtr_;
 }
 

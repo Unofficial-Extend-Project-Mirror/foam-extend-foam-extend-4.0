@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -170,6 +170,28 @@ tmp<Field<Type> > cyclicFvPatchField<Type>::patchNeighbourField() const
             pnf[facei] = iField[faceCells[facei + sizeby2]];
             pnf[facei + sizeby2] = iField[faceCells[facei]];
         }
+    }
+
+    return tpnf;
+}
+
+
+template<class Type>
+tmp<scalarField>
+cyclicFvPatchField<Type>::untransformedInterpolate(const direction cmpt) const
+{
+    const Field<Type>& iField = this->internalField();
+    const unallocLabelList& faceCells = cyclicPatch_.faceCells();
+
+    tmp<scalarField> tpnf(new scalarField(this->size()));
+    scalarField& pnf = tpnf();
+
+    label sizeby2 = this->size()/2;
+
+    for (label facei = 0; facei < sizeby2; facei++)
+    {
+        pnf[facei] = component(iField[faceCells[facei + sizeby2]], cmpt);
+        pnf[facei + sizeby2] = component(iField[faceCells[facei]], cmpt);
     }
 
     return tpnf;

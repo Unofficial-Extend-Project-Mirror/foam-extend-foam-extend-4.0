@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -178,24 +178,24 @@ MixingPlaneInterpolation
     reverseT_(),
     forwardSep_(),
 
-    transformedMasterPatchPtr_(NULL),
-    transformedShadowPatchPtr_(NULL),
-    mixingPlanePatchPtr_(NULL),
+    transformedMasterPatchPtr_(nullptr),
+    transformedShadowPatchPtr_(nullptr),
+    mixingPlanePatchPtr_(nullptr),
 
-    masterPatchToProfileTPtr_(NULL),
-    masterProfileToPatchTPtr_(NULL),
-    slavePatchToProfileTPtr_(NULL),
-    slaveProfileToPatchTPtr_(NULL),
+    masterPatchToProfileTPtr_(nullptr),
+    masterProfileToPatchTPtr_(nullptr),
+    slavePatchToProfileTPtr_(nullptr),
+    slaveProfileToPatchTPtr_(nullptr),
 
-    masterPatchToProfileAddrPtr_(NULL),
-    masterProfileToPatchAddrPtr_(NULL),
-    masterPatchToProfileWeightsPtr_(NULL),
-    masterProfileToPatchWeightsPtr_(NULL),
+    masterPatchToProfileAddrPtr_(nullptr),
+    masterProfileToPatchAddrPtr_(nullptr),
+    masterPatchToProfileWeightsPtr_(nullptr),
+    masterProfileToPatchWeightsPtr_(nullptr),
 
-    slavePatchToProfileAddrPtr_(NULL),
-    slaveProfileToPatchAddrPtr_(NULL),
-    slavePatchToProfileWeightsPtr_(NULL),
-    slaveProfileToPatchWeightsPtr_(NULL)
+    slavePatchToProfileAddrPtr_(nullptr),
+    slaveProfileToPatchAddrPtr_(nullptr),
+    slavePatchToProfileWeightsPtr_(nullptr),
+    slaveProfileToPatchWeightsPtr_(nullptr)
 
 {
     // Check size of transform.  They should be equal to slave patch size

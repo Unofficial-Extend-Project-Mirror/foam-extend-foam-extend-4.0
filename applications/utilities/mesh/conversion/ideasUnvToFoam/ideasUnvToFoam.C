@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -185,7 +185,7 @@ void readPoints
 (
     IFstream& is,
     DynamicList<point>& points,     // coordinates
-    DynamicList<label>& unvPointID  // unv index
+    dynamicLabelList& unvPointID  // unv index
 )
 {
     Sout<< "Starting reading points at line " << is.lineNumber() << '.' << endl;
@@ -210,7 +210,7 @@ void readPoints
             IOWarningIn
             (
                 "readPoints(IFstream&, label&, DynamicList<point>"
-                ", DynamicList<label>&)",
+                ", dynamicLabelList&)",
                 is
             )   << "Points not in order starting at point " << pointI
                 //<< " at line " << is.lineNumber()
@@ -242,8 +242,8 @@ void readCells
 (
     IFstream& is,
     DynamicList<cellShape>& cellVerts,
-    DynamicList<label>& cellMaterial,
-    DynamicList<label>& boundaryFaceIndices,
+    dynamicLabelList& cellMaterial,
+    dynamicLabelList& boundaryFaceIndices,
     DynamicList<face>& boundaryFaces
 )
 {
@@ -514,7 +514,7 @@ void readDOFS
         << " trying to read vertex indices."
         << endl;
 
-    DynamicList<label> vertices;
+    dynamicLabelList vertices;
     while (true)
     {
         string line;
@@ -604,14 +604,14 @@ int main(int argc, char *argv[])
     // Points
     DynamicList<point> points;
     // Original unv point label
-    DynamicList<label> unvPointID;
+    dynamicLabelList unvPointID;
 
     // Cells
     DynamicList<cellShape> cellVerts;
-    DynamicList<label> cellMat;
+    dynamicLabelList cellMat;
 
     // Boundary faces
-    DynamicList<label> boundaryFaceIndices;
+    dynamicLabelList boundaryFaceIndices;
     DynamicList<face> boundaryFaces;
 
     // Patch names and patchFace indices.

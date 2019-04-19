@@ -158,6 +158,7 @@ $(derivedFvPatchFields)/partialSlip/partialSlipFvPatchFields.C
 $(derivedFvPatchFields)/pressureDirectedInletOutletVelocity/pressureDirectedInletOutletVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/pressureNormalInletOutletVelocity/pressureNormalInletOutletVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/pressureDirectedInletVelocity/pressureDirectedInletVelocityFvPatchVectorField.C
+$(derivedFvPatchFields)/swirlInletVelocity/swirlInletVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/timeVaryingMappedPressureDirectedInletVelocity/timeVaryingMappedPressureDirectedInletVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/pressureInletOutletVelocity/pressureInletOutletVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/pressureInletUniformVelocity/pressureInletUniformVelocityFvPatchVectorField.C
@@ -187,6 +188,8 @@ $(derivedFvPatchFields)/pulseFixedValue/pulseFixedValueFvPatchFields.C
 $(derivedFvPatchFields)/waveTransmissiveInlet/waveTransmissiveInletFvPatchFields.C
 $(derivedFvPatchFields)/noSlipWall/noSlipWallFvPatchVectorField.C
 $(derivedFvPatchFields)/noSlipMovingWall/noSlipMovingWallFvPatchVectorField.C
+
+$(derivedFvPatchFields)/blockSymmPlane/blockSymmPlaneFvPatchVectorField.C
 
 fvsPatchFields = fields/fvsPatchFields
 $(fvsPatchFields)/fvsPatchField/fvsPatchFields.C
@@ -236,6 +239,8 @@ $(interpolation)/interpolationCellPoint/makeInterpolationCellPoint.C
 $(interpolation)/interpolationCellPointFace/makeInterpolationCellPointFace.C
 $(interpolation)/interpolationCellPointWallModified/cellPointWeightWallModified/cellPointWeightWallModified.C
 $(interpolation)/interpolationCellPointWallModified/makeInterpolationCellPointWallModified.C
+$(interpolation)/interpolationPointMVC/pointMVCWeight.C
+$(interpolation)/interpolationPointMVC/makeInterpolationPointMVC.C
 
 volPointInterpolation = interpolation/volPointInterpolation
 $(volPointInterpolation)/pointPatchInterpolation/pointPatchInterpolation.C
@@ -281,13 +286,14 @@ $(schemes)/cubicUpwindFit/cubicUpwindFit.C
 $(schemes)/quadraticLinearPureUpwindFit/quadraticLinearPureUpwindFit.C
 */
 $(schemes)/linearPureUpwindFit/linearPureUpwindFit.C
+$(schemes)/linearUpwind/linearUpwind.C
+$(schemes)/linearUpwind/linearUpwindV.C
+$(schemes)/LUST/LUST.C
 
 limitedSchemes = $(surfaceInterpolation)/limitedSchemes
 $(limitedSchemes)/limitedSurfaceInterpolationScheme/limitedSurfaceInterpolationSchemes.C
 $(limitedSchemes)/upwind/upwind.C
 $(limitedSchemes)/blended/blended.C
-$(limitedSchemes)/linearUpwind/linearUpwind.C
-$(limitedSchemes)/linearUpwind/linearUpwindV.C
 $(limitedSchemes)/reconCentral/reconCentral.C
 $(limitedSchemes)/Gamma/Gamma.C
 $(limitedSchemes)/SFCD/SFCD.C

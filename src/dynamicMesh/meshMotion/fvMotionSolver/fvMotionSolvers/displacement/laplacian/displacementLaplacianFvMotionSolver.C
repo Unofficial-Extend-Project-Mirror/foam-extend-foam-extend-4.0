@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ Foam::displacementLaplacianFvMotionSolver::displacementLaplacianFvMotionSolver
         ),
         cellMotionBoundaryTypes<vector>(pointDisplacement_.boundaryField())
     ),
-    pointLocation_(NULL),
+    pointLocation_(nullptr),
     diffusivityPtr_
     (
         motionDiffusivity::New(*this, lookup("diffusivity"))
@@ -244,7 +244,7 @@ void Foam::displacementLaplacianFvMotionSolver::updateMesh
 
     // Update diffusivity. Note two stage to make sure old one is de-registered
     // before creating/registering new one.
-    diffusivityPtr_.reset(NULL);
+    diffusivityPtr_.reset(nullptr);
     diffusivityPtr_ = motionDiffusivity::New(*this, lookup("diffusivity"));
 }
 

@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -40,32 +43,32 @@ defineTypeNameAndDebug(polyMeshGenAddressing, 0);
 polyMeshGenAddressing::polyMeshGenAddressing(const polyMeshGenCells& mesh)
 :
     mesh_(mesh),
-    edgesPtr_(NULL),
-    ccPtr_(NULL),
-    ecPtr_(NULL),
-    pcPtr_(NULL),
-    efPtr_(NULL),
-    pfPtr_(NULL),
+    edgesPtr_(nullptr),
+    ccPtr_(nullptr),
+    ecPtr_(nullptr),
+    pcPtr_(nullptr),
+    efPtr_(nullptr),
+    pfPtr_(nullptr),
 
-    cePtr_(NULL),
-    fePtr_(NULL),
-    pePtr_(NULL),
-    ppPtr_(NULL),
-    cpPtr_(NULL),
-    cellCentresPtr_(NULL),
-    faceCentresPtr_(NULL),
-    cellVolumesPtr_(NULL),
-    faceAreasPtr_(NULL),
-    globalPointLabelPtr_(NULL),
-    globalFaceLabelPtr_(NULL),
-    globalCellLabelPtr_(NULL),
-    globalEdgeLabelPtr_(NULL),
-    pProcsPtr_(NULL),
-    globalToLocalPointAddressingPtr_(NULL),
-    pointNeiProcsPtr_(NULL),
-    eProcsPtr_(NULL),
-    globalToLocalEdgeAddressingPtr_(NULL),
-    edgeNeiProcsPtr_(NULL)
+    cePtr_(nullptr),
+    fePtr_(nullptr),
+    pePtr_(nullptr),
+    ppPtr_(nullptr),
+    cpPtr_(nullptr),
+    cellCentresPtr_(nullptr),
+    faceCentresPtr_(nullptr),
+    cellVolumesPtr_(nullptr),
+    faceAreasPtr_(nullptr),
+    globalPointLabelPtr_(nullptr),
+    globalFaceLabelPtr_(nullptr),
+    globalCellLabelPtr_(nullptr),
+    globalEdgeLabelPtr_(nullptr),
+    pProcsPtr_(nullptr),
+    globalToLocalPointAddressingPtr_(nullptr),
+    pointNeiProcsPtr_(nullptr),
+    eProcsPtr_(nullptr),
+    globalToLocalEdgeAddressingPtr_(nullptr),
+    edgeNeiProcsPtr_(nullptr)
 {}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -72,14 +72,14 @@ class parMetisDecomp
 
         label decompose
         (
-            Field<int>& xadj,
-            Field<int>& adjncy,
+            Field<label>& xadj,
+            Field<label>& adjncy,
             const pointField& cellCentres,
-            Field<int>& cellWeights,
-            Field<int>& faceWeights,
-            const List<int>& options,
+            Field<label>& cellWeights,
+            Field<label>& faceWeights,
+            const labelList& options,
 
-            List<int>& finalDecomp
+            labelList& finalDecomp
         );
 
 

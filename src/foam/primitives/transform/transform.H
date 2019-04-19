@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -67,6 +67,12 @@ inline tmp<tensorField> rotationTensor
         (n1 & n2)*I
       + (1 - (n1 & n2))*sqr(n1 ^ n2)/(magSqr(n1 ^ n2) + VSMALL)
       + (n2*n1 - n1*n2);
+}
+
+
+inline label transform(const tensor&, const bool i)
+{
+    return i;
 }
 
 

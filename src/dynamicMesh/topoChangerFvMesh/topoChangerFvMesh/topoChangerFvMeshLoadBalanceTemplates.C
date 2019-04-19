@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -36,10 +36,10 @@ void Foam::topoChangerFvMesh::sendFields
 ) const
 {
     // Send number of fields
-    toProc<< geoFields.size() << nl;
+    toProc<< geoFields.size() << nl << token::BEGIN_LIST << nl;
 
     label fI = 0;
-    
+
     forAllConstIter
     (
         typename HashTable<const GeoField*>,
@@ -57,6 +57,7 @@ void Foam::topoChangerFvMesh::sendFields
 
         fI++;
     }
+    toProc<< token::END_LIST << nl << nl;
 }
 
 
@@ -88,7 +89,7 @@ void Foam::topoChangerFvMesh::insertFields
         iter
     )
     {
-        
+
         localFields[fI].set
         (
             Pstream::myProcNo(),
@@ -124,6 +125,8 @@ void Foam::topoChangerFvMesh::receiveFields
 
     receivedFields.setSize(nScalarFields);
 
+    fromProc.readBegin("topoChangerFvMeshReceiveFields");
+    
     forAll (receivedFields, fI)
     {
         word fieldName(fromProc);
@@ -148,6 +151,8 @@ void Foam::topoChangerFvMesh::receiveFields
             )
         );
     }
+
+    fromProc.readEnd("topoChangerFvMeshReceiveFields");
 }
 
 
@@ -164,7 +169,7 @@ void Foam::topoChangerFvMesh::rebuildFields
 
     // Make an fvMesh mapper
     const fvMeshMapper mapper(*this, meshMap);
-    
+
     forAllConstIter
     (
         typename HashTable<const GeoField*>,

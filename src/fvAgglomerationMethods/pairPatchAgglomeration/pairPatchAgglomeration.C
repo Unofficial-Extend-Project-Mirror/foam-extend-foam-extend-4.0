@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -524,9 +524,9 @@ void Foam::pairPatchAgglomeration::combineLevels(const label curLevel)
     }
 
     // Delete the restrictAddressing for the coarser level
-    restrictAddressing_.set(curLevel, NULL);
+    restrictAddressing_.set(curLevel, nullptr);
 
-    patchLevels_.set(prevLevel, patchLevels_.set(curLevel, NULL));
+    patchLevels_.set(prevLevel, patchLevels_.set(curLevel, nullptr));
 }
 
 

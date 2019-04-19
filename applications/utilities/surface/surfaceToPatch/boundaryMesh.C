@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -193,7 +193,7 @@ void Foam::boundaryMesh::markEdges
     const label edgeI,
     const label distance,
     labelList& minDistance,
-    DynamicList<label>& visited
+    dynamicLabelList& visited
 ) const
 {
     if (distance < maxDistance)
@@ -434,7 +434,7 @@ void Foam::boundaryMesh::markZone
 // Null constructor
 Foam::boundaryMesh::boundaryMesh()
 :
-    meshPtr_(NULL),
+    meshPtr_(nullptr),
     patches_(),
     meshFace_(),
     featurePoints_(),
@@ -460,7 +460,7 @@ void Foam::boundaryMesh::clearOut()
     {
         delete meshPtr_;
 
-        meshPtr_ = NULL;
+        meshPtr_ = nullptr;
     }
 }
 
@@ -865,8 +865,8 @@ Foam::labelList Foam::boundaryMesh::getNearest
     // Divide faces into two bins acc. to normal
     // - left of splitNormal
     // - right ,,
-    DynamicList<label> leftFaces(mesh().size()/2);
-    DynamicList<label> rightFaces(mesh().size()/2);
+    dynamicLabelList leftFaces(mesh().size()/2);
+    dynamicLabelList rightFaces(mesh().size()/2);
 
     forAll(mesh(), bFaceI)
     {
@@ -1253,7 +1253,7 @@ void Foam::boundaryMesh::patchify
 
     if (newPatchPtrList.size())
     {
-        List<DynamicList<label> > patchFaces(nNewPatches);
+        List<dynamicLabelList > patchFaces(nNewPatches);
 
         // Give reasonable estimate for size of patches
         label nAvgFaces =
@@ -1516,7 +1516,7 @@ void Foam::boundaryMesh::setExtraEdges(const label edgeI)
     labelList minDistance(mesh().nEdges(), -1);
 
     // All edge labels encountered
-    DynamicList<label> visitedEdges;
+    dynamicLabelList visitedEdges;
 
     // Floodfill from edgeI starting from distance 0. Stop at distance.
     markEdges(8, edgeI, 0, minDistance, visitedEdges);

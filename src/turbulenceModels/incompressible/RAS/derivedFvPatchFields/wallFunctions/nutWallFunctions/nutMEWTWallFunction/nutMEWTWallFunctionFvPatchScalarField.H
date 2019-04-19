@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -39,6 +39,18 @@ Description
         year = {2017},
     }
 
+Usage
+    Example of the boundary condition specification:
+    \verbatim
+    <patchName>
+    {
+        type            nutCWTWallFunction;
+    }
+    \endverbatim
+
+See also
+    Foam::nutkWallFunctionFvPatchScalarField
+
 SourceFiles
     nutMEWTWallFunctionFvPatchScalarField.C
 
@@ -50,7 +62,7 @@ Author
 #ifndef nutMEWTWallFunctionFvPatchScalarField_H
 #define nutMEWTWallFunctionFvPatchScalarField_H
 
-#include "fixedValueFvPatchFields.H"
+#include "nutkWallFunctionFvPatchScalarField.H"
 #include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -68,18 +80,12 @@ namespace RASModels
 
 class nutMEWTWallFunctionFvPatchScalarField
 :
-    public fixedValueFvPatchScalarField
+    public nutkWallFunctionFvPatchScalarField
 {
+    // Private Data Members
 
-    // Private static data member
-
-        //- Tolerance for the A dimensionless parameter
+        //- Static tolerance for the A dimensionless parameter
         static const debug::tolerancesSwitch dimlessAFactorTol_;
-
-
-protected:
-
-    // Protected data
 
         //- Name of velocity field
         word UName_;
@@ -90,29 +96,10 @@ protected:
         //- Name of eddy viscosity field
         word nutName_;
 
-        //- Name of omega field
-        word omegaName_;
 
-        //- Cmu coefficient
-        scalar Cmu_;
+protected:
 
-        //- Von Karman constant
-        scalar kappa_;
-
-        //- E coefficient
-        scalar E_;
-
-        //- Y+ at the edge of the laminar sublayer
-        scalar yPlusLam_;
-
-
-    // Protected member functions
-
-        //- Check the type of the patch
-        virtual void checkType();
-
-        //- Calculate the Y+ at the edge of the laminar sublayer
-        virtual scalar calcYPlusLam(const scalar kappa, const scalar E) const;
+    // Protected Member Functions
 
         //- Calculate the turbulence viscosity
         virtual tmp<scalarField> calcNut() const;
@@ -144,8 +131,7 @@ public:
             const dictionary&
         );
 
-        //- Construct by mapping given
-        //  nutMEWTWallFunctionFvPatchScalarField
+        //- Construct by mapping given nutMEWTWallFunctionFvPatchScalarField
         //  onto a new patch
         nutMEWTWallFunctionFvPatchScalarField
         (
@@ -188,23 +174,6 @@ public:
                 new nutMEWTWallFunctionFvPatchScalarField(*this, iF)
             );
         }
-
-
-    // Member functions
-
-        // Evaluation functions
-
-            //- Calculate and return the yPlus at the boundary
-            virtual tmp<scalarField> yPlus() const;
-
-            //- Update the coefficients associated with the patch field
-            virtual void updateCoeffs();
-
-
-        // I-O
-
-            //- Write
-            virtual void write(Ostream&) const;
 };
 
 

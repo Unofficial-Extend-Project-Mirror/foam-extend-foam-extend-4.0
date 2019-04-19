@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -50,11 +50,7 @@ namespace Foam
 
 class IOobjectList
 :
-#ifndef SWIG
     public HashPtrTable<IOobject>
-#else
-    public HashPtrTable<IOobject, word, string_hash>
-#endif
 {
     // Private Member Functions
 
@@ -97,7 +93,7 @@ public:
         //- Remove an IOobject from the list
         bool remove(IOobject&);
 
-        //- Lookup a given name and return IOobject ptr if found else NULL
+        //- Lookup a given name and return IOobject ptr if found else nullptr
         IOobject* lookup(const word& name) const;
 
         //- Return the list for all IOobects whose name matches name

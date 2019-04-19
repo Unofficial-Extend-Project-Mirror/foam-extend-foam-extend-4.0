@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -63,8 +63,8 @@ protected:
         static void calcCSR
         (
             const labelListList& globalCellCells,
-            List<int>& adjncy,
-            List<int>& xadj
+            labelList& adjncy,
+            labelList& xadj
         );
 
         //- Helper: convert local connectivity from the mesh
@@ -73,8 +73,8 @@ protected:
         static void calcCSR
         (
             const polyMesh& mesh,
-            List<int>& adjncy,
-            List<int>& xadj
+            labelList& adjncy,
+            labelList& xadj
         );
 
         //- Helper: convert mesh connectivity into distributed CSR
@@ -82,8 +82,8 @@ protected:
         static void calcDistributedCSR
         (
             const polyMesh&,
-            List<int>& adjncy,
-            List<int>& xadj
+            labelList& adjncy,
+            labelList& xadj
         );
 
         //- Helper: determine (non-parallel) cellCells from mesh

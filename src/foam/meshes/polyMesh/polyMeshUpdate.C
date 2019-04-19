@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -75,9 +75,12 @@ void Foam::polyMesh::updateMesh(const mapPolyMesh& mpm)
     geometricD_ = Vector<label>::zero;
     solutionD_ = Vector<label>::zero;
 
-    // Update all function objects
+    // Update all mesh objects
     // Moved from fvMesh.C in 1.6.x merge.  HJ, 29/Aug/2010
     meshObjectBase::allUpdateTopology<polyMesh>(*this, mpm);
+
+    // Update all function objects
+    const_cast<Time&>(time()).functionObjects().updateMesh(mpm);
 }
 
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ Foam::edgeMesh::edgeMesh(const fileName& fname)
 :
     points_(0),
     edges_(0),
-    pointEdgesPtr_(NULL)
+    pointEdgesPtr_(nullptr)
 {
     IFstream is(fname);
 
@@ -56,7 +56,7 @@ Foam::edgeMesh::edgeMesh(Istream& is)
 :
     points_(is),
     edges_(is),
-    pointEdgesPtr_(NULL)
+    pointEdgesPtr_(nullptr)
 {
     // Check state of Istream
     is.check("edgeMesh::edgeMesh(Istream&)");

@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     DynList
@@ -73,10 +76,14 @@ Istream& operator>>
 
 template<class T, label staticSize = 16>
 class DynList
-:
-    public UList<T>
 {
     // Private data
+        //- pointer to the data
+        T* dataPtr_;
+
+        //- size of the allocated data
+        label nAllocated_;
+
         //- statically allocated data (used for short lists)
         T staticData_[staticSize];
 
@@ -84,11 +91,20 @@ class DynList
         label nextFree_;
 
     // Private member functions
+        //- access to the data pointer
+        inline T* data();
+
+        //- const access to the data pointer
+        inline const T* data() const;
+
         //- allocate list size
         inline void allocateSize(const label);
 
         //- check if index is inside the scope (used for debugging only)
         inline void checkIndex(const label) const;
+
+        //- check if nAllocated_ is greater or equal to nextFree_
+        inline void checkAllocation() const;
 
 public:
 
@@ -99,6 +115,11 @@ public:
 
         //- Construct given size
         explicit inline DynList(const label);
+
+#if WM_LABEL_SIZE == 64
+        //- Construct given size
+        explicit inline DynList(const int);
+#endif
 
         //- Construct from given size and defualt value
         explicit inline DynList(const label, const T&);
@@ -204,6 +225,10 @@ public:
         //- Copy of another list type
         template<class ListType>
         inline void operator=(const ListType&);
+
+        //- Compare the list with the another one
+        inline bool operator==(const DynList<T, staticSize>&) const;
+        inline bool operator!=(const DynList<T, staticSize>&) const;
 
 
     // IOstream operators

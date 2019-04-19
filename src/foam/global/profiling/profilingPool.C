@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ License
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-Foam::profilingPool* Foam::profilingPool::thePool_(NULL);
+Foam::profilingPool* Foam::profilingPool::thePool_(nullptr);
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -84,7 +84,7 @@ void Foam::profilingPool::stopProfiling(
     if (thePool_ && (&owner)==&(thePool_->owner()))
     {
         delete thePool_;
-        thePool_=NULL;
+        thePool_=nullptr;
     }
 }
 
@@ -100,7 +100,7 @@ Foam::profilingInfo &Foam::profilingPool::getInfo(const string& name)
     profilingStack& stack = thePool_->stack();
     mapType& map = thePool_->map();
 
-    profilingInfo* found = NULL;
+    profilingInfo* found = nullptr;
 
     for
     (

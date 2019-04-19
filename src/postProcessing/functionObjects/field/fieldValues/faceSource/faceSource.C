@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -102,9 +102,9 @@ void Foam::fieldValues::faceSource::setFaceZoneFaces()
 
     const faceZone& fZone = mesh().faceZones()[zoneId];
 
-    DynamicList<label> faceIds(fZone.size());
-    DynamicList<label> facePatchIds(fZone.size());
-    DynamicList<label> faceSigns(fZone.size());
+    dynamicLabelList faceIds(fZone.size());
+    dynamicLabelList facePatchIds(fZone.size());
+    dynamicLabelList faceSigns(fZone.size());
 
     forAll(fZone, i)
     {
@@ -502,7 +502,7 @@ void Foam::fieldValues::faceSource::initialise(const dictionary& dict)
         }
     }
 
-    List<word> orientedFields;
+    wordList orientedFields;
     if (dict.readIfPresent("orientedFields", orientedFields))
     {
         orientedFieldsStart_ = fields_.size();
@@ -646,7 +646,7 @@ Foam::fieldValues::faceSource::faceSource
 )
 :
     fieldValue(name, obr, dict, typeName, loadFromFiles),
-    surfaceWriterPtr_(NULL),
+    surfaceWriterPtr_(nullptr),
     source_(sourceTypeNames_.read(dict.lookup("source"))),
     operation_(operationTypeNames_.read(dict.lookup("operation"))),
     weightFieldName_("none"),

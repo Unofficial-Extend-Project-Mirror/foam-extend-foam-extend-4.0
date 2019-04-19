@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ void Foam::potential::setSiteIdList(const IOdictionary& moleculePropertiesDict)
 
         const dictionary& molDict(moleculePropertiesDict.subDict(id));
 
-        List<word> siteIdNames = molDict.lookup("siteIds");
+        wordList siteIdNames = molDict.lookup("siteIds");
 
         forAll(siteIdNames, sI)
         {
@@ -58,7 +58,7 @@ void Foam::potential::setSiteIdList(const IOdictionary& moleculePropertiesDict)
             }
         }
 
-        List<word> pairPotSiteIds = molDict.lookup("pairPotentialSiteIds");
+        wordList pairPotSiteIds = molDict.lookup("pairPotentialSiteIds");
 
         forAll(pairPotSiteIds, sI)
         {
@@ -110,7 +110,7 @@ void Foam::potential::potential::readPotentialDict()
         )
     );
 
-    idList_ = List<word>(idListDict.lookup("idList"));
+    idList_ = wordList(idListDict.lookup("idList"));
 
     IOdictionary moleculePropertiesDict
     (
@@ -127,7 +127,7 @@ void Foam::potential::potential::readPotentialDict()
 
     setSiteIdList(moleculePropertiesDict);
 
-    List<word> pairPotentialSiteIdList
+    wordList pairPotentialSiteIdList
     (
         SubList<word>(siteIdList_, nPairPotIds_)
     );
@@ -137,11 +137,11 @@ void Foam::potential::potential::readPotentialDict()
         << pairPotentialSiteIdList
         << endl;
 
-    List<word> tetherSiteIdList(0);
+    wordList tetherSiteIdList(0);
 
     if (idListDict.found("tetherSiteIdList"))
     {
-        tetherSiteIdList = List<word>(idListDict.lookup("tetherSiteIdList"));
+        tetherSiteIdList = wordList(idListDict.lookup("tetherSiteIdList"));
     }
 
     IOdictionary potentialDict
@@ -163,7 +163,7 @@ void Foam::potential::potential::readPotentialDict()
 
     if (potentialDict.found("removalOrder"))
     {
-        List<word> remOrd = potentialDict.lookup("removalOrder");
+        wordList remOrd = potentialDict.lookup("removalOrder");
 
         removalOrder_.setSize(remOrd.size());
 
@@ -277,7 +277,7 @@ void Foam::potential::potential::readMdInitialiseDict
             mdInitialiseDict.toc()[zone]
         );
 
-        List<word> latticeIds
+        wordList latticeIds
         (
             zoneDict.lookup("latticeIds")
         );
@@ -302,7 +302,7 @@ void Foam::potential::potential::readMdInitialiseDict
             }
         }
 
-        List<word> tetherSiteIds
+        wordList tetherSiteIds
         (
             zoneDict.lookup("tetherSiteIds")
         );
@@ -322,7 +322,7 @@ void Foam::potential::potential::readMdInitialiseDict
 
                 const word& id = latticeIds[i];
 
-                List<word> siteIds
+                wordList siteIds
                 (
                     moleculePropertiesDict.subDict(id).lookup("siteIds")
                 );

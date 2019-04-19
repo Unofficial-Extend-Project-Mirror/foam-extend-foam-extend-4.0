@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ cellShape extrudedQuadCellShape
     faceList& frontAndBackFaces
 )
 {
-    const static cellModel* hexModelPtr_ = NULL;
+    const static cellModel* hexModelPtr_ = nullptr;
 
     if (!hexModelPtr_)
     {

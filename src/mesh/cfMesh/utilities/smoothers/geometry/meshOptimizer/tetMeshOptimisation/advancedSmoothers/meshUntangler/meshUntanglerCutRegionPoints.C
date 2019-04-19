@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -58,7 +61,7 @@ bool meshUntangler::cutRegion::findNewVertices
     const DynList<point, 64>& points = *pointsPtr_;
 
     newVertexLabel_.setSize(points.size());
-    newVertexLabel_ = -1;
+    newVertexLabel_ = label(-1);
 
     vertexDistance_.setSize(points.size());
 
@@ -118,7 +121,7 @@ void meshUntangler::cutRegion::removeCoincidentVertices()
     DynList<edge, 128>& edges = *edgesPtr_;
     DynList<label, 64> newLabelForPoint;
     newLabelForPoint.setSize(points.size());
-    newLabelForPoint = -1;
+    newLabelForPoint = label(-1);
 
     bool found(false);
     forAll(points, pI)
@@ -150,7 +153,7 @@ void meshUntangler::cutRegion::removeCoincidentVertices()
     }
 
     //- remove edges which contain the same vertex
-    newEdgeLabel_ = -1;
+    newEdgeLabel_ = label(-1);
     label edgeLabel(0);
 
     cEdgesPtr_ = new DynList<edge, 128>();
@@ -163,7 +166,7 @@ void meshUntangler::cutRegion::removeCoincidentVertices()
 
     deleteDemandDrivenData(edgesPtr_);
     edgesPtr_ = cEdgesPtr_;
-    cEdgesPtr_ = NULL;
+    cEdgesPtr_ = nullptr;
 
     //- renumber faces
     const DynList<DynList<label, 8>, 64>& faces = *facesPtr_;
@@ -186,7 +189,7 @@ void meshUntangler::cutRegion::removeCoincidentVertices()
 
     deleteDemandDrivenData(facesPtr_);
     facesPtr_ = cFacesPtr_;
-    cFacesPtr_ = NULL;
+    cFacesPtr_ = nullptr;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

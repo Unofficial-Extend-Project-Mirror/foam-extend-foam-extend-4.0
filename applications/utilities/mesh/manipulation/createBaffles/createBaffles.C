@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
     fZone.checkParallelSync(true);
 
     // Patches to put baffles into
-    DynamicList<label> newPatches(1);
+    dynamicLabelList newPatches(1);
 
     word patchName(args.additionalArgs()[1]);
     newPatches.append(findPatchID(mesh, patchName));

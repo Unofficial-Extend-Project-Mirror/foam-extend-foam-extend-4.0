@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ pid_t Foam::pgid()
 
 bool Foam::env(const word& envName)
 {
-    return getenv(envName.c_str()) != NULL;
+    return getenv(envName.c_str()) != nullptr;
 }
 
 
@@ -158,7 +158,7 @@ Foam::string Foam::userName()
 {
     struct passwd* pw = getpwuid(getuid());
 
-    if (pw != NULL)
+    if (pw != nullptr)
     {
         return pw->pw_name;
     }
@@ -179,7 +179,7 @@ Foam::fileName Foam::home()
 {
     char* env = getenv("HOME");
 
-    if (env != NULL)
+    if (env != nullptr)
     {
         return fileName(env);
     }
@@ -187,7 +187,7 @@ Foam::fileName Foam::home()
     {
         struct passwd* pw = getpwuid(getuid());
 
-        if (pw != NULL)
+        if (pw != nullptr)
         {
             return pw->pw_dir;
         }
@@ -211,7 +211,7 @@ Foam::fileName Foam::home(const string& userName)
     {
         char* env = getenv("HOME");
 
-        if (env != NULL)
+        if (env != nullptr)
         {
             return fileName(env);
         }
@@ -219,7 +219,7 @@ Foam::fileName Foam::home(const string& userName)
         pw = getpwuid(getuid());
     }
 
-    if (pw != NULL)
+    if (pw != nullptr)
     {
         return pw->pw_dir;
     }
@@ -670,7 +670,7 @@ Foam::fileNameList Foam::readDir
     label nEntries = 0;
 
     // Attempt to open directory and set the structure pointer
-    if ((source = opendir(directory.c_str())) == NULL)
+    if ((source = opendir(directory.c_str())) == nullptr)
     {
         dirEntries.setSize(0);
 
@@ -683,7 +683,7 @@ Foam::fileNameList Foam::readDir
     else
     {
         // Read and parse all the entries in the directory
-        while ((list = readdir(source)) != NULL)
+        while ((list = readdir(source)) != nullptr)
         {
             fileName fName(list->d_name);
 
@@ -976,7 +976,7 @@ bool Foam::rmDir(const fileName& directory)
     struct dirent *list;
 
     // Attempt to open directory and set the structure pointer
-    if ((source = opendir(directory.c_str())) == NULL)
+    if ((source = opendir(directory.c_str())) == nullptr)
     {
         WarningInFunction
             << "cannot open directory " << directory << endl;
@@ -986,7 +986,7 @@ bool Foam::rmDir(const fileName& directory)
     else
     {
         // Read and parse all the entries in the directory
-        while ((list = readdir(source)) != NULL)
+        while ((list = readdir(source)) != nullptr)
         {
             fileName fName(list->d_name);
 
@@ -1074,7 +1074,7 @@ bool Foam::ping
     struct sockaddr_in destAddr;      // will hold the destination addr
     u_int addr;
 
-    if ((hostPtr = gethostbyname(destName.c_str())) == NULL)
+    if ((hostPtr = gethostbyname(destName.c_str())) == nullptr)
     {
         FatalErrorIn
         (
@@ -1166,6 +1166,38 @@ void* Foam::dlOpen(const fileName& lib, const bool check)
             << " : dlopen of " << lib << std::endl;
     }
     void* handle = ::dlopen(lib.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+
+#ifdef darwin
+    // If failing to load under OS X, let's try some obvious variations
+    // before giving up completely
+    fileName osxFileName(lib);
+
+    if (!handle && lib.ext() == "so")
+    {
+        osxFileName = lib.lessExt() + ".dylib";
+        handle = ::dlopen(osxFileName.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+    }
+
+    // If unsuccessful, which might be the case under Mac OSX 10.11 (El
+    // Capitan) with System Integrity Protection (SIP) enabled, let's try
+    // building a full path using well-known environment variables. This is
+    // the last resort, unless you provide the full pathname yourself.
+    if (!handle)
+    {
+        fileName l_LIBBIN_Name = getEnv("FOAM_LIBBIN")/osxFileName;
+        handle = ::dlopen(l_LIBBIN_Name.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+    }
+    if (!handle)
+    {
+        fileName l_SITE_LIBBIN_Name = getEnv("FOAM_SITE_LIBBIN")/osxFileName;
+        handle = ::dlopen(l_SITE_LIBBIN_Name.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+    }
+    if (!handle)
+    {
+        fileName l_USER_LIBBIN_Name = getEnv("FOAM_USER_LIBBIN")/osxFileName;
+        handle = ::dlopen(l_USER_LIBBIN_Name.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+    }
+#endif
 
     if (!handle && check)
     {

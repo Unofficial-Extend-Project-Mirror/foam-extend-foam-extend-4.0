@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -96,8 +96,8 @@ Foam::verticalValves::verticalValves
     engineTopoChangerMesh(io),
     piston_(*this, engTime().engineDict().subDict("piston")),
     valves_(*this, engTime().engineDict().lookup("verticalValves")),
-    movingPointsMaskTopPtr_(NULL),
-    movingPointsMaskBottomPtr_(NULL),
+    movingPointsMaskTopPtr_(nullptr),
+    movingPointsMaskBottomPtr_(nullptr),
     deformSwitch_(readScalar(engTime().engineDict().lookup("deformAngle"))),
     delta_(readScalar(engTime().engineDict().lookup("delta"))),
     offSet_(readScalar(engTime().engineDict().lookup("offSet"))),

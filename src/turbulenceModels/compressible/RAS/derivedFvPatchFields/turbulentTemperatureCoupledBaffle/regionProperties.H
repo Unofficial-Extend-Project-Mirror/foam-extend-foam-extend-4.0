@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -54,10 +54,10 @@ class regionProperties
     // Private data
 
         //- List of the fluid region names
-        List<word> fluidRegionNames_;
+        wordList fluidRegionNames_;
 
         //- List of the solid region names
-        List<word> solidRegionNames_;
+        wordList solidRegionNames_;
 
 
     // Private Member Functions
@@ -87,10 +87,10 @@ public:
         // Access
 
             //- Return const reference to the list of fluid region names
-            const List<word>& fluidRegionNames() const;
+            const wordList& fluidRegionNames() const;
 
             //- Return const reference to the list of solid region names
-            const List<word>& solidRegionNames() const;
+            const wordList& solidRegionNames() const;
 };
 
 

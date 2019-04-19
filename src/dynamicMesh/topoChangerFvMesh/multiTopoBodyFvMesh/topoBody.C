@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -187,7 +187,7 @@ Foam::topoBody::topoBody
     (
         dict.lookupOrDefault<bool>("invertMotionMask", false)
     ),
-    movingPointsMaskPtr_(NULL)
+    movingPointsMaskPtr_(nullptr)
 {
     Info<< "Moving body " << name << ":" << nl
         << "    moving cells: " << movingCellsName_ << nl

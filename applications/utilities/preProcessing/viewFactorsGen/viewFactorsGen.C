@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -285,8 +285,8 @@ int main(int argc, char *argv[])
             << endl;
 
         return 0;
-    }        
-    
+    }
+
     if (Pstream::master())
     {
         Info << "\nTotal number of coarse faces: "<< totalNCoarseFaces << endl;
@@ -400,9 +400,9 @@ int main(int argc, char *argv[])
 
     // Determine rays between coarse face centres
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    DynamicList<label> rayStartFace(nCoarseFaces + 0.01*nCoarseFaces);
+    dynamicLabelList rayStartFace(nCoarseFaces + 0.01*nCoarseFaces);
 
-    DynamicList<label> rayEndFace(rayStartFace.size());
+    dynamicLabelList rayEndFace(rayStartFace.size());
 
     globalIndex globalNumbering(nCoarseFaces);
 
@@ -483,7 +483,7 @@ int main(int argc, char *argv[])
             IOobject::NO_WRITE,
             false
         ),
-        List<label>(1, map.constructSize())
+        labelList(1, map.constructSize())
     );
     consMapDim.write();
 
@@ -510,7 +510,7 @@ int main(int argc, char *argv[])
     List<List<point> > compactFineSf(map.constructSize());
     List<List<point> > compactFineCf(map.constructSize());
 
-    DynamicList<label> compactPatchId(map.constructSize());
+    dynamicLabelList compactPatchId(map.constructSize());
 
     // Insert my coarse local values
     SubList<point>(compactCoarseSf, nCoarseFaces).assign(localCoarseSf);

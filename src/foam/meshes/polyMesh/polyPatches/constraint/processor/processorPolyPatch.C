@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -63,8 +63,8 @@ Foam::processorPolyPatch::processorPolyPatch
     neighbFaceCentres_(),
     neighbFaceAreas_(),
     neighbFaceCellCentres_(),
-    neighbPointsPtr_(NULL),
-    neighbEdgesPtr_(NULL)
+    neighbPointsPtr_(nullptr),
+    neighbEdgesPtr_(nullptr)
 {}
 
 
@@ -82,25 +82,8 @@ Foam::processorPolyPatch::processorPolyPatch
     neighbFaceCentres_(),
     neighbFaceAreas_(),
     neighbFaceCellCentres_(),
-    neighbPointsPtr_(NULL),
-    neighbEdgesPtr_(NULL)
-{}
-
-
-Foam::processorPolyPatch::processorPolyPatch
-(
-    const processorPolyPatch& pp,
-    const polyBoundaryMesh& bm
-)
-:
-    coupledPolyPatch(pp, bm),
-    myProcNo_(pp.myProcNo_),
-    neighbProcNo_(pp.neighbProcNo_),
-    neighbFaceCentres_(),
-    neighbFaceAreas_(),
-    neighbFaceCellCentres_(),
-    neighbPointsPtr_(NULL),
-    neighbEdgesPtr_(NULL)
+    neighbPointsPtr_(nullptr),
+    neighbEdgesPtr_(nullptr)
 {}
 
 
@@ -119,8 +102,41 @@ Foam::processorPolyPatch::processorPolyPatch
     neighbFaceCentres_(),
     neighbFaceAreas_(),
     neighbFaceCellCentres_(),
-    neighbPointsPtr_(NULL),
-    neighbEdgesPtr_(NULL)
+    neighbPointsPtr_(nullptr),
+    neighbEdgesPtr_(nullptr)
+{}
+
+
+Foam::processorPolyPatch::processorPolyPatch
+(
+    const processorPolyPatch& pp
+)
+:
+    coupledPolyPatch(pp),
+    myProcNo_(pp.myProcNo_),
+    neighbProcNo_(pp.neighbProcNo_),
+    neighbFaceCentres_(),
+    neighbFaceAreas_(),
+    neighbFaceCellCentres_(),
+    neighbPointsPtr_(nullptr),
+    neighbEdgesPtr_(nullptr)
+{}
+
+
+Foam::processorPolyPatch::processorPolyPatch
+(
+    const processorPolyPatch& pp,
+    const polyBoundaryMesh& bm
+)
+:
+    coupledPolyPatch(pp, bm),
+    myProcNo_(pp.myProcNo_),
+    neighbProcNo_(pp.neighbProcNo_),
+    neighbFaceCentres_(),
+    neighbFaceAreas_(),
+    neighbFaceCellCentres_(),
+    neighbPointsPtr_(nullptr),
+    neighbEdgesPtr_(nullptr)
 {}
 
 

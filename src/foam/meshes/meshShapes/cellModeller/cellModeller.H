@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -78,10 +78,10 @@ public:
 
     // Member functions
 
-        //- Look up a model by name and return a pointer to the model or NULL
+        //- Look up a model by name and return a pointer to the model or nullptr
         static const cellModel* lookup(const word&);
 
-        //- Look up a model by index and return a pointer to the model or NULL
+        //- Look up a model by index and return a pointer to the model or nullptr
         static const cellModel* lookup(const label i)
         {
             return modelPtrs_[i];

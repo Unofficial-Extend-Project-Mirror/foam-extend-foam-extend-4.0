@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
-     \\/     M anipulation  |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -191,17 +190,9 @@ void Foam::oversetRegion::calcDonorAcceptorCells() const
             // Update global flag
             foundGlobalOverlap &= regionFoundSuitableOverlap;
 
-            // If the overlap has not been found for this region, we need to
-            // reset:
-            //  - holeCells (depend on fringe holes)
-            //  - eligibleDonors (depend on fringe holes and acceptors),
-            //  - cellSearch (depends on eligible donors).
-            if (!regionFoundSuitableOverlap)
-            {
-                deleteDemandDrivenData(curRegion.holeCellsPtr_);
-                deleteDemandDrivenData(curRegion.eligibleDonorCellsPtr_);
-                deleteDemandDrivenData(curRegion.cellSearchPtr_);
-            }
+            // Deletion of demand driven data relocated to the end of
+            // updateDonorAcceptors() member function. Makes more sense to have
+            // it there. VV, 13/Jan/2019.
         }
     } while (!foundGlobalOverlap);
 
@@ -1165,14 +1156,17 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
                 // Get index obtained by octree
                 const label donorCandidateIndex = pih.index();
 
+                // Whether acceptor is within donor's bounding box
+                const bool withinBB =  mesh_.pointInCellBB
+                (
+                    curP,
+                    curDonors[donorCandidateIndex]
+                );
+
                 if
                 (
                    !daPair.donorFound()
-                 || mesh_.pointInCellBB
-                    (
-                        curP,
-                        curDonors[donorCandidateIndex]
-                    )
+                 || withinBB
                  || (
                         mag(cc[curDonors[donorCandidateIndex]] - curP)
                       < mag(daPair.donorPoint() - curP)
@@ -1184,7 +1178,8 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
                     (
                         curDonors[donorCandidateIndex],
                         Pstream::myProcNo(),
-                        cc[curDonors[donorCandidateIndex]]
+                        cc[curDonors[donorCandidateIndex]],
+                        withinBB
                     );
 
                     // Set extended donors
@@ -1313,6 +1308,20 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
 
     // STAGE 11: Filter possibly multiple remote donors
 
+    // Sanity check before moving on. For each initial acceptor, we must
+    // receive at least 1 corresponding donor (even if it is not found,
+    // indicating an orphan cell) from different processors.
+    if (a.size() > completeDonorAcceptorList.size())
+    {
+        FatalErrorIn("void oversetRegion::updateDonorAcceptors() const")
+            << "Size of initial acceptor set: " << a.size()
+            << " is larger than the size of the distributed "
+            << " donor/acceptor list: " << completeDonorAcceptorList.size()
+            << nl
+            << "This should not have happened..."
+            << abort(FatalError);
+    }
+
     // Create a masking field indicating that a certain acceptor has been
     // visited
     boolList isVisited(a.size(), false);
@@ -1353,10 +1362,18 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
         {
             // This acceptor has been previously visited, meaning we have to
             // make a choice whether to update it or not. At this point, the
-            // choice will be based on least distance from acceptor cell centre
-            // to donor cell centre. Run-time selectable Donor Suitability
-            // Functions will be applied in oversetFringe
-            if (curDA.distance() < curDACombined.distance())
+            // choice will be based on:
+            // a) If this donor is within bounding box and the original one is
+            //    not, prefer the new donor
+            // b) Otherwise prefert on e with least distance from acceptor cell
+            //    centre to donor cell centre.
+            // Run-time selectable Donor Suitability Function will be applied
+            // in oversetFringe
+            if
+            (
+                (curDA.withinBB() && !curDACombined.withinBB())
+             || (curDA.distance() < curDACombined.distance())
+            )
             {
                 // This is a better candidate for the same acceptor, set donor
                 // accordingly
@@ -1364,15 +1381,19 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
                 (
                     curDA.donorCell(),
                     curDA.donorProcNo(),
-                    curDA.donorPoint()
+                    curDA.donorPoint(),
+                    curDA.withinBB()
                 );
+
+                // Bugfix: also need to reset extended donors since a better
+                // candidate has been found. VV, 1/Jan/2019
+                curDACombined.setExtendedDonors(curDA);
             }
         }
     }
 
-    // Check whether all acceptors have been visited. Used for testing/debugging
-    // parallel comms
-    if (oversetMesh::debug)
+    // Check whether all acceptors have been visited. Useful check if in
+    // no-debug mode
     {
         bool allVisited = true;
 
@@ -1400,11 +1421,34 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
                     << nl
                     << "Try switching off useLocalBoundingBoxes for all regions"
                     << nl
-                    << "(this optimisation is switched on by default)."
+                    << "(this optimisation is switched off by default)."
                     << abort(FatalError);
             }
         }
     }
+
+    // Update withinBB flag if the donor is within bounding box of acceptor
+    // (previously we checked whether the acceptor is within bounding box of
+    // donor)
+    forAll (combinedDonorAcceptorList, daI)
+    {
+        donorAcceptor& curDA = combinedDonorAcceptorList[daI];
+
+        // If the acceptor is not within bounding box of donor, set the flag
+        // other way around
+        if (!curDA.withinBB())
+        {
+            curDA.setWithinBB
+            (
+                mesh_.pointInCellBB
+                (
+                    curDA.donorPoint(),
+                    curDA.acceptorCell()
+                )
+            );
+        }
+    }
+
 
     // STAGE 12: Finish the iteration by updating the fringe, which will
     // actually hold final and some intermediate steps for donor/acceptor
@@ -1414,6 +1458,13 @@ bool Foam::oversetRegion::updateDonorAcceptors() const
     // algorithm that is used
     bool suitableOverlapFound =
         fringePtr_->updateIteration(combinedDonorAcceptorList);
+
+    // Delete all necessary demand driven data for this region since we have
+    // just updated the iteration. Therefore, cellSearch, eligibleDonors and
+    // holes need to be updated
+    deleteDemandDrivenData(cellSearchPtr_);
+    deleteDemandDrivenData(eligibleDonorCellsPtr_);
+    deleteDemandDrivenData(holeCellsPtr_);
 
     return suitableOverlapFound;
 }
@@ -1616,22 +1667,22 @@ Foam::oversetRegion::oversetRegion
     zoneIndex_(mesh_.cellZones().findZoneID(name_)),
     donorRegionNames_(dict.lookup("donorRegions")),
     fringePtr_(),
-    donorRegionsPtr_(NULL),
-    acceptorRegionsPtr_(NULL),
+    donorRegionsPtr_(nullptr),
+    acceptorRegionsPtr_(nullptr),
 
-    acceptorCellsPtr_(NULL),
-    donorCellsPtr_(NULL),
-    cutHoleCellsPtr_(NULL),
-    holeCellsPtr_(NULL),
-    eligibleDonorCellsPtr_(NULL),
+    acceptorCellsPtr_(nullptr),
+    donorCellsPtr_(nullptr),
+    cutHoleCellsPtr_(nullptr),
+    holeCellsPtr_(nullptr),
+    eligibleDonorCellsPtr_(nullptr),
 
-    holeTriMeshPtr_(NULL),
-    holeSearchPtr_(NULL),
+    holeTriMeshPtr_(nullptr),
+    holeSearchPtr_(nullptr),
 
-    localBoundsPtr_(NULL),
-    globalBoundsPtr_(NULL),
-    cellSearchPtr_(NULL),
-    procBoundBoxesPtr_(NULL),
+    localBoundsPtr_(nullptr),
+    globalBoundsPtr_(nullptr),
+    cellSearchPtr_(nullptr),
+    procBoundBoxesPtr_(nullptr),
     useLocalBoundBoxes_
     (
         dict.lookupOrDefault<Switch>

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ Description
     UCM non linear viscoelastic fluid model (BIRD et al., 1987).
 
 Author
-    Miguel Nóbrega, Silvino Araújo, Célio Fernandes, Luís Ferrás. 
+    Miguel Nóbrega, Silvino Araújo, Célio Fernandes, Luís Ferrás.
     All rights reserved
 
 SourceFiles

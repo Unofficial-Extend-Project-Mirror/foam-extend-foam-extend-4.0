@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
-     \\/     M anipulation  |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -56,17 +55,32 @@ void Foam::oversetMesh::calcCellClassification() const
         nHoleCells += regions_[regionI].holes().size();
     }
 
-    Pout<< "Number of acceptor cells: " << nAcceptorCells << endl;
     acceptorCellsPtr_ = new labelList(nAcceptorCells);
     labelList& acceptor = *acceptorCellsPtr_;
 
-    Pout<< "Number of donor cells: " << nDonorCells << endl;
     donorCellsPtr_ = new labelList(nDonorCells);
     labelList& donor = *donorCellsPtr_;
 
-    Pout<< "Number of hole cells: " << nHoleCells << endl;
     holeCellsPtr_ = new labelList(nHoleCells);
     labelList& hole = *holeCellsPtr_;
+
+    // Print out processor specific information in debug
+    if (oversetMesh::debug)
+    {
+        Pout<< "Number of acceptor cells: " << nAcceptorCells << endl;
+        Pout<< "Number of donor cells: " << nDonorCells << endl;
+        Pout<< "Number of hole cells: " << nHoleCells << endl;
+    }
+    // Else print global information
+    else
+    {
+        Info<< "Number of acceptor cells: "
+            << returnReduce(nAcceptorCells, sumOp<label>()) << endl;
+        Info<< "Number of donor cells: "
+            << returnReduce(nDonorCells, sumOp<label>()) << endl;
+        Info<< "Number of hole cells: "
+            << returnReduce(nHoleCells, sumOp<label>()) << endl;
+    }
 
     // Reset counters
     nAcceptorCells = 0;
@@ -459,8 +473,8 @@ void Foam::oversetMesh::calcFringeFaces() const
         acCellIndicator[acc[accI]] = accI;
     }
 
-    DynamicList<label> acF(2*acc.size());
-    DynamicList<label> acFC(2*acc.size());
+    dynamicLabelList acF(2*acc.size());
+    dynamicLabelList acFC(2*acc.size());
     DynamicList<bool> acFF(2*acc.size());
 
     const unallocLabelList& owner = mesh().owner();
@@ -555,7 +569,7 @@ void Foam::oversetMesh::calcFringeFaces() const
 
     // Acceptor internal face collection
 
-    DynamicList<label> acInternalF(2*acc.size());
+    dynamicLabelList acInternalF(2*acc.size());
 
     forAll (neighbour, faceI)
     {
@@ -636,8 +650,8 @@ void Foam::oversetMesh::calcHoleFaces() const
         hole[hc[hcI]] = hcI;
     }
 
-    DynamicList<label> hF(2*hc.size());
-    DynamicList<label> hFC(2*hc.size());
+    dynamicLabelList hF(2*hc.size());
+    dynamicLabelList hFC(2*hc.size());
     DynamicList<bool> hFF(2*hc.size());
 
     const unallocLabelList& owner = mesh().owner();
@@ -735,7 +749,7 @@ void Foam::oversetMesh::calcHoleFaces() const
 
     // Hole faces are the ones where both owner and neighbour is a hole
 
-    DynamicList<label> hIF(2*hc.size());
+    dynamicLabelList hIF(2*hc.size());
 
     forAll (neighbour, faceI)
     {
@@ -939,9 +953,9 @@ void Foam::oversetMesh::calcInterpolationMap() const
     /*
        Procs sending to me | Number of items being sent
       --------------------------------------------------
-              P0           |             1              
-              P1           |             7              
-              P5           |             2              
+              P0           |             1
+              P1           |             7
+              P5           |             2
               .            |             .
               .            |             .
               .            |             .

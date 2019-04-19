@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -411,7 +411,7 @@ inline scalar soaveRedlichKwong::rho
                -(
                    (this->p((this->W()/molarVolumePrevIteration),T) - p)
                    /(this->dpdv((this->W()/molarVolumePrevIteration), T))
-               )/pow(2,i);
+               )/pow(2.0,i);
 
            i++;
            if (i>8)

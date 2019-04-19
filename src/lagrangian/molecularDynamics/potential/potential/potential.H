@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -57,9 +57,9 @@ class potential
 
         const polyMesh& mesh_;
 
-        List<word> idList_;
+        wordList idList_;
 
-        List<word> siteIdList_;
+        wordList siteIdList_;
 
         label nPairPotIds_;
 
@@ -120,9 +120,9 @@ public:
 
             inline label nIds() const;
 
-            inline const List<word>& idList() const;
+            inline const wordList& idList() const;
 
-            inline const List<word>& siteIdList() const;
+            inline const wordList& siteIdList() const;
 
             inline scalar potentialEnergyLimit() const;
 

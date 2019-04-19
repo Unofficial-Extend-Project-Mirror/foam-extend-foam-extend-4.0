@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -230,7 +230,7 @@ void sammMesh::readCells()
     {
         IFstream cellsFile(cellsFileName);
 
-        labelList labels(24, -1);
+        labelList labels(24, label(-1));
         label lineLabel, sammLabel, regionLabel, typeFlag;
 
         for (label cellI = 0; cellI < nCells; cellI++)

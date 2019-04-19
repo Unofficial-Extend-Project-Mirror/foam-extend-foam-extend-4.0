@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -52,10 +52,37 @@ Foam::cloud::cloud(const objectRegistry& obr, const word& cloudName)
 {}
 
 
+Foam::autoPtr<Foam::cloudDistribute> Foam::cloud::cloudDist
+(
+    const labelList& cellToProc,
+    const labelListList& procCellAddressing,
+    const labelListList& procFaceAddressing
+)
+{
+    NotImplemented;
+    return autoPtr<cloudDistribute>(nullptr);
+}
+
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 Foam::cloud::~cloud()
 {}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+Foam::label Foam::cloud::size() const
+{
+    NotImplemented;
+    return 0;
+}
+
+
+void Foam::cloud::autoMap(const mapPolyMesh&)
+{
+    NotImplemented;
+}
 
 
 // ************************************************************************* //

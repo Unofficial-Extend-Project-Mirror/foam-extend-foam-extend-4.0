@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -213,7 +213,7 @@ wideBandSpecularRadiationMixedFvPatchScalarField
 )
 :
     mixedFvPatchField<scalar>(p, iF),
-    receivedRayIDPtr_(NULL)
+    receivedRayIDPtr_(nullptr)
 {
     this->refValue() = 0;
     this->refGrad() = 0;
@@ -231,7 +231,7 @@ wideBandSpecularRadiationMixedFvPatchScalarField
 )
 :
     mixedFvPatchField<scalar>(ptf, p, iF, mapper),
-    receivedRayIDPtr_(NULL)
+    receivedRayIDPtr_(nullptr)
 {}
 
 
@@ -244,7 +244,7 @@ wideBandSpecularRadiationMixedFvPatchScalarField
 )
 :
     mixedFvPatchField<scalar>(p, iF),
-    receivedRayIDPtr_(NULL)
+    receivedRayIDPtr_(nullptr)
 {
     this->refValue() = 0;
     this->refGrad() = 0;
@@ -278,7 +278,7 @@ wideBandSpecularRadiationMixedFvPatchScalarField
 )
 :
     mixedFvPatchField<scalar>(ptf, iF),
-    receivedRayIDPtr_(NULL)
+    receivedRayIDPtr_(nullptr)
 {}
 
 
@@ -289,7 +289,7 @@ wideBandSpecularRadiationMixedFvPatchScalarField
 )
 :
     mixedFvPatchField<scalar>(ptf),
-    receivedRayIDPtr_(NULL)
+    receivedRayIDPtr_(nullptr)
 {}
 
 

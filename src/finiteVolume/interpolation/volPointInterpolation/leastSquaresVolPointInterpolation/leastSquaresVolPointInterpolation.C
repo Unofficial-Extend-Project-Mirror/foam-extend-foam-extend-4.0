@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -3407,27 +3407,27 @@ leastSquaresVolPointInterpolation::leastSquaresVolPointInterpolation
 )
 :
     MeshObject<fvMesh, leastSquaresVolPointInterpolation>(vm),
-    pointBndFacesPtr_(NULL),
-    pointCyclicFacesPtr_(NULL),
-    pointCyclicBndFacesPtr_(NULL),
-    pointCyclicGgiFacesPtr_(NULL),
-    pointProcFacesPtr_(NULL),
-    axisEdgesPtr_(NULL),
-    pointAxisEdgesPtr_(NULL),
-//     pointNgbProcBndFaceCentresPtr_(NULL),
-    globalPointNgbProcBndFaceCentresPtr_(NULL),
-    globalPointNgbProcCellCentresPtr_(NULL),
-    procBndFacesPtr_(NULL),
-    procBndFaceCentresPtr_(NULL),
-    pointProcBndFacesPtr_(NULL),
-    procCellsPtr_(NULL),
-    pointProcCellsPtr_(NULL),
-    procCellCentresPtr_(NULL),
-    weightsPtr_(NULL),
-    originsPtr_(NULL),
-    mirrorPlaneTransformationPtr_(NULL),
+    pointBndFacesPtr_(nullptr),
+    pointCyclicFacesPtr_(nullptr),
+    pointCyclicBndFacesPtr_(nullptr),
+    pointCyclicGgiFacesPtr_(nullptr),
+    pointProcFacesPtr_(nullptr),
+    axisEdgesPtr_(nullptr),
+    pointAxisEdgesPtr_(nullptr),
+//     pointNgbProcBndFaceCentresPtr_(nullptr),
+    globalPointNgbProcBndFaceCentresPtr_(nullptr),
+    globalPointNgbProcCellCentresPtr_(nullptr),
+    procBndFacesPtr_(nullptr),
+    procBndFaceCentresPtr_(nullptr),
+    pointProcBndFacesPtr_(nullptr),
+    procCellsPtr_(nullptr),
+    pointProcCellsPtr_(nullptr),
+    procCellCentresPtr_(nullptr),
+    weightsPtr_(nullptr),
+    originsPtr_(nullptr),
+    mirrorPlaneTransformationPtr_(nullptr),
     invLsMatrices_(0),
-    refLPtr_(NULL)
+    refLPtr_(nullptr)
 {
 //     Pout << mesh().globalData().sharedPointLabels() << endl;
 

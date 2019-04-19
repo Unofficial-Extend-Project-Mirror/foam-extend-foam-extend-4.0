@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -53,7 +53,8 @@ void fvPatch::makeWeights(fvsPatchScalarField& w) const
 
 void fvPatch::makeDeltaCoeffs(fvsPatchScalarField& dc) const
 {
-    dc = 1.0/(nf() & delta());
+    const vectorField d = delta();
+    dc = 1.0/max((nf() & d), 0.05*mag(d));
 }
 
 

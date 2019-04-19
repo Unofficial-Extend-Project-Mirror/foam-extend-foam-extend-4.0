@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ Foam::debug::controlSwitches<T>::controlSwitches
     switchDescription_(switchDescription)
 {
     // Register the switch in its list
-    if (*switchValuesTable == NULL)
+    if (*switchValuesTable == nullptr)
     {
         *switchValuesTable =
             new std::map<std::string, std::list<controlSwitches<T> *> >();

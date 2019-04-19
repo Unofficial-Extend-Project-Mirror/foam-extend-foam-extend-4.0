@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -26,7 +26,9 @@ Class
     nutSpalartAllmarasStandardWallFunctionFvPatchScalarField
 
 Description
-    Wall function boundary condition for walls
+    This boundary condition is the same as nutUWallFunction. We will simply
+    derive from nutUWallFunctionFvPatchScalarField to enable backward
+    compatibility.
 
 SourceFiles
     nutSpalartAllmarasStandardWallFunctionFvPatchScalarField.C
@@ -36,7 +38,7 @@ SourceFiles
 #ifndef nutSpalartAllmarasStandardWallFunctionFvPatchScalarField_H
 #define nutSpalartAllmarasStandardWallFunctionFvPatchScalarField_H
 
-#include "nutWallFunctionFvPatchScalarField.H"
+#include "nutUWallFunctionFvPatchScalarField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -53,19 +55,8 @@ namespace RASModels
 
 class nutSpalartAllmarasStandardWallFunctionFvPatchScalarField
 :
-    public nutWallFunctionFvPatchScalarField
+    public nutUWallFunctionFvPatchScalarField
 {
-protected:
-
-    // Protected member functions
-
-        //- Calculate yPLus
-        virtual tmp<scalarField> calcYPlus(const scalarField& magUp) const;
-
-        //- Calculate the turbulence viscosity
-        virtual tmp<scalarField> calcNut() const;
-
-
 public:
 
     //- Runtime type information
@@ -140,20 +131,6 @@ public:
                 )
             );
         }
-
-
-    // Member functions
-
-        // Evaluation functions
-
-            //- Calculate and return the yPlus at the boundary
-            virtual tmp<scalarField> yPlus() const;
-
-
-        // I-O
-
-            //- Write
-            virtual void write(Ostream& os) const;
 };
 
 

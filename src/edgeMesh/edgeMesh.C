@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ Foam::edgeMesh::edgeMesh(const edgeMesh& em)
 :
     points_(em.points_),
     edges_(em.edges_),
-    pointEdgesPtr_(NULL)
+    pointEdgesPtr_(nullptr)
 {}
 
 
@@ -245,7 +245,7 @@ void Foam::edgeMesh::operator=(const edgeMesh& rhs)
 {
     points_ = rhs.points_;
     edges_ = rhs.edges_;
-    pointEdgesPtr_.reset(NULL);
+    pointEdgesPtr_.reset(nullptr);
 }
 
 

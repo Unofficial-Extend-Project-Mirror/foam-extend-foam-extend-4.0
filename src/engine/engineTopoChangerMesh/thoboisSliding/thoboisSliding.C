@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -103,8 +103,8 @@ Foam::thoboisSliding::thoboisSliding
     engineTopoChangerMesh(io),
     piston_(*this, engTime().engineDict().subDict("piston")),
     valves_(*this, engTime().engineDict().lookup("thoboisSliding")),
-    movingPointsMaskTopPtr_(NULL),
-    movingPointsMaskBottomPtr_(NULL),
+    movingPointsMaskTopPtr_(nullptr),
+    movingPointsMaskBottomPtr_(nullptr),
     deformSwitch_(readScalar(engTime().engineDict().lookup("deformAngle"))),
     valveTopTol_(readScalar(engTime().engineDict().lookup("valveTopTol"))),
     pistonPosition_(-GREAT),

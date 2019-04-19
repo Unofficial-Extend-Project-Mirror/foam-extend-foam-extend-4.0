@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -118,8 +118,8 @@ public:
         laplacianScheme(const fvMesh& mesh, Istream& is)
         :
             mesh_(mesh),
-            tinterpGammaScheme_(NULL),
-            tsnGradScheme_(NULL)
+            tinterpGammaScheme_(nullptr),
+            tsnGradScheme_(nullptr)
         {
             tinterpGammaScheme_ = tmp<surfaceInterpolationScheme<GType> >
             (

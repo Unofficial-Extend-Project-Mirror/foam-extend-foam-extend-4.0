@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -200,6 +200,15 @@ public:
                 //- Return average rotational velocity in relative coordinate
                 //  system (evaluated at midstep)
                 virtual const dimensionedVector& omegaAverage() const;
+
+
+            // Accelerations in the current time-step
+
+                //- Translational acceleration in absolute coordinate system
+                virtual dimensionedVector translationalAcceleration() const;
+
+                //- Rotational acceleration in relative coordinate system
+                virtual dimensionedVector rotationalAcceleration() const;
 
 
             // Rotations

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -204,14 +204,14 @@ int main(int argc, char *argv[])
                 sFields[i]->correctBoundaryConditions();
                 sFields[i]->write();
                 delete sFields[i];
-                sFields[i] = NULL;
+                sFields[i] = nullptr;
             }
             else if (vFields[i])
             {
                 vFields[i]->correctBoundaryConditions();
                 vFields[i]->write();
                 delete vFields[i];
-                vFields[i] = NULL;
+                vFields[i] = nullptr;
             }
         }
 

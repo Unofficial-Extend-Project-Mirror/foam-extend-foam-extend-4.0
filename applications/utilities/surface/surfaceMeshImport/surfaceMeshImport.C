@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -86,8 +86,6 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 
-    const stringList& params = args.additionalArgs();
-
     // try for the latestTime, but create "constant" as needed
     instantList Times = runTime.times();
     if (Times.size())
@@ -101,7 +99,7 @@ int main(int argc, char *argv[])
     }
 
 
-    fileName importName(params[0]);
+    fileName importName(args.additionalArgs()[0]);
     word exportName("default");
     args.optionReadIfPresent("name", exportName);
 

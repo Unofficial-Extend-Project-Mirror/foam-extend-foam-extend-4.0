@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -362,8 +362,8 @@ void advectiveFvPatchField<Type>::updateCoeffs()
     fvsPatchField<scalar> phip = this->lookupPatchField
     (
         phiName_,
-        reinterpret_cast<const surfaceScalarField*>(NULL),
-        reinterpret_cast<const scalar*>(NULL)
+        reinterpret_cast<const surfaceScalarField*>(0),
+        reinterpret_cast<const scalar*>(0)
     );
 
     // Treatment for supercritical inlet or outlet.  HJ, 28/Oct/2009

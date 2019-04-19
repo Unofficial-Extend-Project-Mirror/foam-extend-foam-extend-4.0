@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -157,10 +157,10 @@ topoSurfaceMapper::topoSurfaceMapper
     tMapper_(mapper),
     direct_(false),
     sizeBeforeMapping_(mpm.nOldInternalFaces()),
-    directAddrPtr_(NULL),
-    interpolationAddrPtr_(NULL),
-    weightsPtr_(NULL),
-    insertedFaceLabelsPtr_(NULL)
+    directAddrPtr_(nullptr),
+    interpolationAddrPtr_(nullptr),
+    weightsPtr_(nullptr),
+    insertedFaceLabelsPtr_(nullptr)
 {
     // Fetch offset sizes from topoMapper
     const labelList& sizes = tMapper_.faceSizes();

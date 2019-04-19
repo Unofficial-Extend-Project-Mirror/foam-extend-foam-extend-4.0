@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -1799,7 +1799,7 @@ void Foam::autoLayerDriver::getPatchDisplacement
             meshPoints,
             nPointFaces,
             plusEqOp<label>(),
-            0,                  // null value
+            label(0),           // null value
             false               // no separation
         );
 
@@ -2292,7 +2292,7 @@ void Foam::autoLayerDriver::setupLayerInfoTruncation
             pp.meshPoints(),
             nPatchPointLayers,
             maxEqOp<label>(),
-            0,                  // null value
+            label(0),           // null value
             false               // no separation
         );
     }

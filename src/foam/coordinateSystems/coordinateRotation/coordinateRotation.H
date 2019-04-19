@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -145,9 +145,9 @@ public:
             return autoPtr<coordinateRotation>(new coordinateRotation(*this));
         }
 
+
     // Declare run-time constructor selection table
 
-#ifndef SWIG
         declareRunTimeSelectionTable
         (
             autoPtr,
@@ -158,7 +158,6 @@ public:
             ),
             (dict)
         );
-#endif
 
 
     // Selectors
@@ -170,10 +169,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~coordinateRotation()
-        {}
+    //- Destructor
+    virtual ~coordinateRotation()
+    {}
 
 
     // Member Functions

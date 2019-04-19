@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
-     \\/     M anipulation  |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
@@ -64,6 +63,14 @@ Foam::immersedBoundaryRefinement::immersedBoundaryRefinement
     unrefinementDistance_
     (
         readScalar(coeffDict().lookup("unrefinementDistance"))
+    ),
+    internalRefinementDistance_
+    (
+        readScalar(coeffDict().lookup("internalRefinementDistance"))
+    ),
+    internalUnrefinementDistance_
+    (
+        readScalar(coeffDict().lookup("internalUnrefinementDistance"))
     )
 {}
 
@@ -84,7 +91,7 @@ Foam::immersedBoundaryRefinement::refinementCellCandidates() const
     scalarField cellDistance(mesh().nCells(), -GREAT);
 
     const polyBoundaryMesh& bMesh = mesh().boundaryMesh();
-    
+
     const vector span(GREAT, GREAT, GREAT);
 
     forAll (bMesh, patchI)
@@ -117,7 +124,7 @@ Foam::immersedBoundaryRefinement::refinementCellCandidates() const
 
     Info<< "Cell distance (min, max): (" << min(cellDistance)
         << ", " << max(cellDistance) << ")" << endl;
-        
+
     // Create storage for collection of cells. Assume that almost all of the
     // cells will be marked to prevent excessive resizing.
     dynamicLabelList refinementCandidates(mesh().nCells());
@@ -127,8 +134,8 @@ Foam::immersedBoundaryRefinement::refinementCellCandidates() const
     {
         if
         (
-             cellDistance[cellI] > -refinementDistance_
-          && cellDistance[cellI] < 0
+            cellDistance[cellI] > -refinementDistance_
+         && cellDistance[cellI] < internalRefinementDistance_
         )
         {
             // Found a refinement cell
@@ -159,7 +166,7 @@ Foam::immersedBoundaryRefinement::unrefinementPointCandidates() const
     scalarField pointDistance(mesh().nPoints(), -GREAT);
 
     const polyBoundaryMesh& bMesh = mesh().boundaryMesh();
-    
+
     const vector span(GREAT, GREAT, GREAT);
 
     forAll (bMesh, patchI)
@@ -197,7 +204,7 @@ Foam::immersedBoundaryRefinement::unrefinementPointCandidates() const
         if
         (
             pointDistance[pointI] < -unrefinementDistance_
-         || pointDistance[pointI] > SMALL
+         || pointDistance[pointI] > internalUnrefinementDistance_
         )
         {
             unrefinementCandidates.append(pointI);

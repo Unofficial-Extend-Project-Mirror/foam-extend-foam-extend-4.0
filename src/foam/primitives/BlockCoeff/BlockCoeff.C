@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -117,18 +117,18 @@ Foam::BlockCoeff<Type>::toSquare()
 template<class Type>
 Foam::BlockCoeff<Type>::BlockCoeff()
 :
-    scalarCoeffPtr_(NULL),
-    linearCoeffPtr_(NULL),
-    squareCoeffPtr_(NULL)
+    scalarCoeffPtr_(nullptr),
+    linearCoeffPtr_(nullptr),
+    squareCoeffPtr_(nullptr)
 {}
 
 
 template<class Type>
 Foam::BlockCoeff<Type>::BlockCoeff(const BlockCoeff<Type>& f)
 :
-    scalarCoeffPtr_(NULL),
-    linearCoeffPtr_(NULL),
-    squareCoeffPtr_(NULL)
+    scalarCoeffPtr_(nullptr),
+    linearCoeffPtr_(nullptr),
+    squareCoeffPtr_(nullptr)
 {
     if (f.scalarCoeffPtr_)
     {
@@ -148,9 +148,9 @@ Foam::BlockCoeff<Type>::BlockCoeff(const BlockCoeff<Type>& f)
 template<class Type>
 Foam::BlockCoeff<Type>::BlockCoeff(Istream& is)
 :
-    scalarCoeffPtr_(NULL),
-    linearCoeffPtr_(NULL),
-    squareCoeffPtr_(NULL)
+    scalarCoeffPtr_(nullptr),
+    linearCoeffPtr_(nullptr),
+    squareCoeffPtr_(nullptr)
 {
     // Read keyword and pick up allocated field
     word key(is);

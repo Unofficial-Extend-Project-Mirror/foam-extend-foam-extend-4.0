@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -147,8 +147,7 @@ Foam::ConeInjection<CloudType>::ConeInjection
     // Set total volume to inject
     this->volumeTotal_ = volumeFlowRate_().integrate(0.0, duration_);
 
-    // Set/cache the injector cell
-    this->findCellAtPosition(injectorCell_, position_);
+    updateMesh();
 }
 
 
@@ -165,6 +164,14 @@ template<class CloudType>
 bool Foam::ConeInjection<CloudType>::active() const
 {
     return true;
+}
+
+
+template<class CloudType>
+void Foam::ConeInjection<CloudType>::updateMesh()
+{
+    // Set/cache the injector cell
+    this->findCellAtPosition(injectorCell_, position_);
 }
 
 

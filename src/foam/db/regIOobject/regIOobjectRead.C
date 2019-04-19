@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -157,7 +157,7 @@ void Foam::regIOobject::close()
     if (isPtr_)
     {
         delete isPtr_;
-        isPtr_ = NULL;
+        isPtr_ = nullptr;
     }
 }
 
@@ -204,7 +204,7 @@ bool Foam::regIOobject::read()
 
         const List<Pstream::commsStruct>& comms =
         (
-            (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+            (Pstream::nProcs() < Pstream::nProcsSimpleSum())
           ? Pstream::linearCommunication()
           : Pstream::treeCommunication()
         );

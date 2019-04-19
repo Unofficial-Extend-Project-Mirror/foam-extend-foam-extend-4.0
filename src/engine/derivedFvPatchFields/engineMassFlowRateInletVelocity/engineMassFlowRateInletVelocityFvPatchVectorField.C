@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ engineMassFlowRateInletVelocityFvPatchVectorField
     fixedValueFvPatchField<vector>(p, iF),
     phiName_("phi"),
     rhoName_("rho"),
-    timeDataPtr_(NULL),
+    timeDataPtr_(nullptr),
     engineDB_((refCast<const engineTime>(this->db().time())))
 {}
 
@@ -63,7 +63,7 @@ engineMassFlowRateInletVelocityFvPatchVectorField
     phiName_(ptf.phiName_),
     rhoName_(ptf.rhoName_),
     timeDataFileName_(ptf.timeDataFileName_),
-    timeDataPtr_(NULL),
+    timeDataPtr_(nullptr),
     engineDB_((refCast<const engineTime>(this->db().time())))
 {}
 
@@ -80,7 +80,7 @@ engineMassFlowRateInletVelocityFvPatchVectorField
     phiName_("phi"),
     rhoName_("rho"),
     timeDataFileName_(fileName(dict.lookup("timeDataFileName")).expand()),
-    timeDataPtr_(NULL),
+    timeDataPtr_(nullptr),
     engineDB_((refCast<const engineTime>(this->db().time())))
 {
     if (dict.found("phi"))
@@ -105,7 +105,7 @@ engineMassFlowRateInletVelocityFvPatchVectorField
     phiName_(ptf.phiName_),
     rhoName_(ptf.rhoName_),
     timeDataFileName_(ptf.timeDataFileName_),
-    timeDataPtr_(NULL),
+    timeDataPtr_(nullptr),
     engineDB_((refCast<const engineTime>(this->db().time())))
 {}
 
@@ -121,7 +121,7 @@ engineMassFlowRateInletVelocityFvPatchVectorField
     phiName_(ptf.phiName_),
     rhoName_(ptf.rhoName_),
     timeDataFileName_(ptf.timeDataFileName_),
-    timeDataPtr_(NULL),
+    timeDataPtr_(nullptr),
     engineDB_((refCast<const engineTime>(this->db().time())))
 {}
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -98,6 +98,25 @@ mutLowReWallFunctionFvPatchScalarField::mutLowReWallFunctionFvPatchScalarField
 :
     mutWallFunctionFvPatchScalarField(mlrwfpsf, iF)
 {}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+tmp<scalarField> mutLowReWallFunctionFvPatchScalarField::yPlus() const
+{
+    const label patchI = patch().index();
+    const turbulenceModel& turbModel =
+        db().lookupObject<turbulenceModel>("turbulenceModel");
+
+    const scalarField& y = turbModel.y()[patchI];
+    const fvPatchVectorField& Uw = turbModel.U().boundaryField()[patchI];
+    const scalarField& muw = turbModel.mu().boundaryField()[patchI];
+    const scalarField& rhow = turbModel.rho().boundaryField()[patchI];
+
+    const scalarField nuw = muw/rhow;
+
+    return y*sqrt(nuw*mag(Uw.snGrad()))/nuw;
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

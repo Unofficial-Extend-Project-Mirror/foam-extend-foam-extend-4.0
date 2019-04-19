@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -276,19 +276,19 @@ inline const basicMultiComponentMixture& spray::composition() const
 }
 
 
-inline const List<label>& spray::liquidToGasIndex() const
+inline const labelList& spray::liquidToGasIndex() const
 {
     return liquidToGasIndex_;
 }
 
 
-inline const List<label>& spray::gasToLiquidIndex() const
+inline const labelList& spray::gasToLiquidIndex() const
 {
     return gasToLiquidIndex_;
 }
 
 
-inline const List<bool>& spray::isLiquidFuel() const
+inline const boolList& spray::isLiquidFuel() const
 {
     return isLiquidFuel_;
 }

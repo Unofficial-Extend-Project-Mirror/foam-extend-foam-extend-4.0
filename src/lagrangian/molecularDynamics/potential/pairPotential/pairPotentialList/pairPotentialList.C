@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ License
 
 void Foam::pairPotentialList::readPairPotentialDict
 (
-    const List<word>& idList,
+    const wordList& idList,
     const dictionary& pairPotentialDict,
     const polyMesh& mesh
 )
@@ -180,7 +180,7 @@ Foam::pairPotentialList::pairPotentialList()
 
 Foam::pairPotentialList::pairPotentialList
 (
-    const List<word>& idList,
+    const wordList& idList,
     const dictionary& pairPotentialDict,
     const polyMesh& mesh
 )
@@ -201,7 +201,7 @@ Foam::pairPotentialList::~pairPotentialList()
 
 void Foam::pairPotentialList::buildPotentials
 (
-    const List<word>& idList,
+    const wordList& idList,
     const dictionary& pairPotentialDict,
     const polyMesh& mesh
 )

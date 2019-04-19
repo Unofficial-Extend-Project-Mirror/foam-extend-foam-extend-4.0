@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -103,7 +103,7 @@ public:
         autoPtr<functionObject> clone() const
         {
             notImplemented("functionObject::clone() const");
-            return autoPtr<functionObject>(NULL);
+            return autoPtr<functionObject>(nullptr);
         }
 
         //- Return a pointer to a new functionObject created on freestore

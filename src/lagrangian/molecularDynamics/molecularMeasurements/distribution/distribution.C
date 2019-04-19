@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -24,6 +24,7 @@ License
 \*----------------------------------------------------------------------------*/
 
 #include "distribution.H"
+#include "labelList.H"
 
 namespace Foam
 {
@@ -106,7 +107,7 @@ scalar distribution::mean() const
 
     scalar totEnt = approxTotalEntries();
 
-    List<label> keys = toc();
+    labelList keys = toc();
 
     forAll(keys,k)
     {
@@ -227,7 +228,7 @@ void distribution::insertMissingKeys()
 {
     iterator iter(this->begin());
 
-    List<label> keys = toc();
+    labelList keys = toc();
 
     sort(keys);
 
@@ -252,7 +253,7 @@ List< Pair<scalar> > distribution::normalised()
 
     insertMissingKeys();
 
-    List<label> keys = toc();
+    labelList keys = toc();
 
     sort(keys);
 
@@ -384,7 +385,7 @@ List<Pair<scalar> > distribution::raw()
 {
     insertMissingKeys();
 
-    List<label> keys = toc();
+    labelList keys = toc();
 
     sort(keys);
 

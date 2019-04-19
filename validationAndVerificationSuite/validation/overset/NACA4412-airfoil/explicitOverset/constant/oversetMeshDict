@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|  \\    /   O peration     | Version:     4.1                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  | For copyright notice see file Copyright         |
 \*---------------------------------------------------------------------------*/
 
@@ -35,25 +35,26 @@ regions
 
         fringe
         {
-            type overlap;
+            type adaptiveOverlap;
 
             // Optional list of patches to start the fringe minimisation from
             initPatchNames       ();
 
-            // Fraction of minimum allowable suitable pairs respecting the
-            // chosen donor suitability criteria
-            suitablePairFraction 0.8;
-            
-            // Whether to start fringe assembly from the previous set of
-            // acceptors (for moving mesh cases)
-            cacheFringe          no;
+            // Number of iterations for adaptive overlap search
+            specifiedIterationsNumber 12; // 5 by default
+
+            // Whether to try additional iterations
+            additionalIterations yes; // yes by default
+
+            // Orphan suitability
+            orphanSuitability 0; // 1 by default
 
             donorSuitability
             {
                 // Donor/acceptor pair must have cell volumes that differ not
-                // more than 60% of the larger cell
+                // more than 20% of the larger cell
                 type        cellVolumes;
-                threshold   0.6;
+                threshold   0.2;
             }
         }
     }
@@ -65,23 +66,24 @@ regions
 
         fringe
         {
-            type overlap;
+            type adaptiveOverlap;
 
             // Optional list of patches to start the fringe minimisation from
             initPatchNames       (OversetMiddle);
 
-            // Fraction of minimum allowable suitable pairs respecting the
-            // chosen donor suitability criteria
-            suitablePairFraction 0.9;
-            
-            // Whether to start fringe assembly from the previous set of
-            // acceptors (for moving mesh cases)
-            cacheFringe          no;
+            // Number of iterations for adaptive overlap search
+            specifiedIterationsNumber 5; // 5 by default
+
+            // Whether to try additional iterations
+            additionalIterations yes; // yes by default
+
+            // Orphan suitability
+            orphanSuitability 0; // 1 by default
 
             donorSuitability
             {
-                // Donor/acceptor pair must have cell volumes that differ not
-                // more than 60% of the larger cell
+                // Donor/acceptor pair must have cell volumes that are at least
+                // 60% within each other
                 type        cellVolumes;
                 threshold   0.6;
             }
@@ -95,23 +97,24 @@ regions
 
         fringe
         {
-            type overlap;
+            type adaptiveOverlap;
 
             // Optional list of patches to start the fringe minimisation from
             initPatchNames       (OversetFront);
 
-            // Fraction of minimum allowable suitable pairs respecting the
-            // chosen donor suitability criteria
-            suitablePairFraction 0.8;
-            
-            // Whether to start fringe assembly from the previous set of
-            // acceptors (for moving mesh cases)
-            cacheFringe          no;
+            // Number of iterations for adaptive overlap search
+            specifiedIterationsNumber 5; // 5 by default
+
+            // Whether to try additional iterations
+            additionalIterations yes; // yes by default
+
+            // Orphan suitability
+            orphanSuitability 0; // 1 by default
 
             donorSuitability
             {
-                // Donor/acceptor pair must have cell volumes that differ not
-                // more than 40% of the larger cell
+                // Donor/acceptor pair must have cell volumes that are at least
+                // 40% within each other
                 type        cellVolumes;
                 threshold   0.4;
             }

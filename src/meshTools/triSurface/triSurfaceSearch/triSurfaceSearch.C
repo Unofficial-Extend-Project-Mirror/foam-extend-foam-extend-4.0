@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ const point triSurfaceSearch::greatPoint(GREAT, GREAT, GREAT);
 triSurfaceSearch::triSurfaceSearch(const triSurface& surface)
 :
     surface_(surface),
-    treePtr_(NULL)
+    treePtr_(nullptr)
 {
     // Random number generator. Bit dodgy since not exactly random ;-)
     Random rndGen(65431);

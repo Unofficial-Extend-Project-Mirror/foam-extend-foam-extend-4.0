@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -36,7 +36,7 @@ scalar velMag = 0.0;
 
 if (mesh.nInternalFaces())
 {
-    surfaceScalarField magPhi = mag(sGamma*phi);
+    surfaceScalarField magPhi = pos(sGamma - 0.5)*mag(phi);
 
     surfaceScalarField SfUfbyDelta =
         mesh.surfaceInterpolation::deltaCoeffs()*magPhi;

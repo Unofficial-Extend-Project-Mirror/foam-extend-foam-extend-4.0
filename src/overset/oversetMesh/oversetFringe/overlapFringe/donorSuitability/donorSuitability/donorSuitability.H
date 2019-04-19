@@ -1,33 +1,32 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
-     \\/     M anipulation  |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     Foam::donorSuitability::donorSuitability
 
 Description
     An abstract base class for donor suitability algorithms. This class is
-    used by overlapFringe algorithm to optimise overlap given donor suitability
+    used by oversetFringe algorithm to optimise overlap given donor suitability
     function.
 
     Donor suitability criteria is given in isDonorSuitable member function. The
@@ -43,6 +42,9 @@ SourceFiles
 
 Author
     Vuko Vukcevic, FMENA Zagreb.  All rights reserved.
+
+Contributor
+    Josip Katavic, FMENA Zagreb.  All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
@@ -62,7 +64,7 @@ namespace Foam
 {
 
 // Forward declaration of classes
-class overlapFringe;
+class oversetFringe;
 
 namespace donorSuitability
 {
@@ -75,8 +77,8 @@ class donorSuitability
 {
     // Private data
 
-        //- Reference to overlapFringe algorithm
-        const overlapFringe& overlapFringe_;
+        //- Reference to oversetFringe algorithm
+        const oversetFringe& oversetFringe_;
 
         //- Subdictionary for acceptor set specification
         const dictionary coeffDict_;
@@ -142,10 +144,10 @@ public:
             donorSuitability,
             dictionary,
             (
-                const overlapFringe& overlapFringeAlgorithm,
+                const oversetFringe& oversetFringeAlgorithm,
                 const dictionary& dict
             ),
-            (overlapFringeAlgorithm, dict)
+            (oversetFringeAlgorithm, dict)
         );
 
 
@@ -154,7 +156,7 @@ public:
         //- Construct from components
         donorSuitability
         (
-            const overlapFringe& overlapFringeAlgorithm,
+            const oversetFringe& oversetFringeAlgorithm,
             const dictionary& dict
         );
 
@@ -164,13 +166,13 @@ public:
         //- Return an autoPtr to the selected donorSuitability
         static autoPtr<donorSuitability> New
         (
-            const overlapFringe& overlapFringeAlgorithm,
+            const oversetFringe& oversetFringeAlgorithm,
             const dictionary& dict
         );
 
 
     //- Destructor
-    // Note: the destructor is pure virtual to make this class abstract
+    //  Note: the destructor is pure virtual to make this class abstract
     virtual ~donorSuitability() = 0;
 
 
@@ -178,23 +180,69 @@ public:
 
         // Access
 
-            //- Return a const reference to overlapFringe algorithm
-            const overlapFringe& overlapFringeAlgorithm() const;
+            //- Return a const reference to oversetFringe algorithm
+            inline const oversetFringe& oversetFringeAlgorithm() const
+            {
+                return oversetFringe_;
+            }
 
             //- Return coefficient dictionary
-            const dictionary& coeffDict() const;
+            inline const dictionary& coeffDict() const
+            {
+                return coeffDict_;
+            }
+
+            //- Return threshold
+            inline const scalar& threshold() const
+            {
+                return threshold_;
+            }
 
 
         // Overlap minimisation via Donor Suitability Function
 
-            //- Is this donor/acceptor pair suitable
-            bool isDonorSuitable
+            //- Donor/acceptor pair suitability fraction.
+            //  Subtract smaller DSF from the greater. Divide difference with
+            //  greater DSF to get relative difference. Return relative
+            //  difference (a value which is always between 0 and 1. Higher
+            //  value means better suitability).
+            scalar suitabilityFraction
             (
                 const donorAcceptor& daPair
             ) const
             {
-                // Note: do not check whether a donor is valid (has been found)
-                // for this acceptor.
+                // Check whether the donor is valid for this pair
+                if (!daPair.donorFound())
+                {
+                    FatalErrorIn
+                    (
+                        "scalar donorSuitability::suitabilityFraction"
+                        "\n("
+                        "\n    const donorAcceptor& daPair"
+                        "\n) const"
+                    )   << "Acceptor: " << daPair.acceptorCell()
+                        << " on processor: " << daPair.acceptorProcNo()
+                        << " did not find donor candidate."
+                        << nl
+                        << "Additional information: "
+                        << nl
+                        <<  (
+                                daPair.withinBB()
+                              ? "   Within bounding box"
+                              : "   Not within bounding box"
+                            )
+                        << nl << tab
+                        << "Donor index: " << daPair.donorCell()
+                        << nl << tab
+                        << "Donor processor index: " << daPair.donorProcNo()
+                        << nl << tab
+                        << "Number of extended donors: "
+                        << daPair.extendedDonorCells().size()
+                        << nl << nl
+                        << "Please review your fringe assembly settings"
+                        << " (or try using adaptiveOverlap fringe algorithm)."
+                        << abort(FatalError);
+                }
 
                 // Get donor suitability function in acceptor/donor pair
                 const scalar& dsfAcceptor =
@@ -206,20 +254,23 @@ public:
                 // need to take the absolute value
                 if (dsfAcceptor > dsfDonor)
                 {
-                    return
-                        (
-                            (dsfAcceptor - dsfDonor)/
-                            (dsfAcceptor + SMALL)
-                        ) < threshold_;
+                    return (1 - (dsfAcceptor - dsfDonor)/(dsfAcceptor + SMALL));
                 }
                 else
                 {
-                    return
-                        (
-                            (dsfDonor - dsfAcceptor)/
-                            (dsfDonor + SMALL)
-                        ) < threshold_;
+                    return (1 - (dsfDonor - dsfAcceptor)/(dsfDonor + SMALL));
                 }
+            }
+
+
+            //- Is this donor/acceptor pair suitable?
+            //  if sutabilityFraction > threshold
+            bool isDonorSuitable
+            (
+                const donorAcceptor& daPair
+            ) const
+            {
+                return (suitabilityFraction(daPair)) > threshold_;
             }
 };
 

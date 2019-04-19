@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -79,9 +79,28 @@ void Foam::nearWallDist::correct()
 {
     if (mesh_.changing())
     {
-        // Update size of GeometricBoundaryField
-        forAll(mesh_.boundary(), patchI)
+        // Update size if not equal
+        if (size() != mesh_.boundary().size())
         {
+            setSize(mesh_.boundary().size());
+        }
+        
+        // Update size of GeometricBoundaryField
+        forAll (mesh_.boundary(), patchI)
+        {
+            if (!set(patchI))
+            {
+                set
+                (
+                    patchI,
+                    new calculatedFvPatchScalarField
+                    (
+                        mesh_.boundary()[patchI],
+                        mesh_.V()                // Dummy internal field
+                    )
+                );
+            }
+
             operator[](patchI).setSize(mesh_.boundary()[patchI].size());
         }
     }

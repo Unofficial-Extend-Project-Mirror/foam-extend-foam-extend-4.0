@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -44,6 +44,7 @@ SourceFiles
 #define normal_H
 
 #include "pdf.H"
+#include "scalarList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -66,9 +67,9 @@ class normal
         scalar minValue_;
         scalar maxValue_;
 
-        List<scalar> expectation_;
-        List<scalar> variance_;
-        List<scalar> strength_;
+        scalarList expectation_;
+        scalarList variance_;
+        scalarList strength_;
 
         scalar range_;
 

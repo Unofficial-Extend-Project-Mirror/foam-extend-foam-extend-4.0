@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ void Foam::DsmcCloud<ParcelType>::initialise
         dsmcInitialiseDict.subDict("numberDensities")
     );
 
-    List<word> molecules(numberDensitiesDict.toc());
+    wordList molecules(numberDensitiesDict.toc());
 
     Field<scalar> numberDensities(molecules.size());
 
@@ -128,7 +128,7 @@ void Foam::DsmcCloud<ParcelType>::initialise
         // record the vertex labels of each.
         scalarList cTetVFracs(nTets, 0.0);
 
-        List<labelList> tetPtIs(nTets, labelList(3,-1));
+        List<labelList> tetPtIs(nTets, labelList(3, label(-1)));
 
         // Keep track of which tet this is.
         label tet = 0;
@@ -323,7 +323,7 @@ void Foam::DsmcCloud<ParcelType>::collisions()
             }
 
             // Inverse addressing specifying which subCell a parcel is in
-            List<label> whichSubCell(cellParcels.size());
+            labelList whichSubCell(cellParcels.size());
 
             const point& cC = mesh_.cellCentres()[celli];
 
@@ -367,7 +367,7 @@ void Foam::DsmcCloud<ParcelType>::collisions()
                 // Declare the second collision candidate
                 label candidateQ = -1;
 
-                List<label> subCellPs = subCells[whichSubCell[candidateP]];
+                labelList subCellPs = subCells[whichSubCell[candidateP]];
 
                 label nSC = subCellPs.size();
 

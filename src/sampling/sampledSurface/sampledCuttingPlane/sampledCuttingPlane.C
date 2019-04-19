@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -272,10 +272,10 @@ Foam::sampledCuttingPlane::sampledCuttingPlane
     zoneID_(dict.lookupOrDefault("zone", word::null), mesh.cellZones()),
     exposedPatchName_(word::null),
     needsUpdate_(true),
-    subMeshPtr_(NULL),
-    cellDistancePtr_(NULL),
-    isoSurfPtr_(NULL),
-    facesPtr_(NULL)
+    subMeshPtr_(nullptr),
+    cellDistancePtr_(nullptr),
+    isoSurfPtr_(nullptr),
+    facesPtr_(nullptr)
 {
     if (zoneID_.index() != -1)
     {

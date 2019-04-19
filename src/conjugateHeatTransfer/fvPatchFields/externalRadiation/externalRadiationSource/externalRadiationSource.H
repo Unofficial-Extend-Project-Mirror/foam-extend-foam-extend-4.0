@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ public:
         virtual autoPtr<externalRadiationSource> clone() const
         {
             notImplemented("autoPt<externalRadiationSource> clone() const");
-            return autoPtr<externalRadiationSource>(NULL);
+            return autoPtr<externalRadiationSource>(nullptr);
 
             return autoPtr<externalRadiationSource>
             (
@@ -136,7 +136,7 @@ public:
                     type() +"::q(const scalarField& Tw) const"
                 );
 
-                return tmp<scalarField>(NULL);
+                return tmp<scalarField>(nullptr);
             };
 
 

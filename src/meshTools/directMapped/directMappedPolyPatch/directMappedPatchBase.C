@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -616,7 +616,7 @@ Foam::directMappedPatchBase::directMappedPatchBase
     offset_(vector::zero),
     offsets_(pp.size(), offset_),
     sameRegion_(sampleRegion_ == patch_.boundaryMesh().mesh().name()),
-    mapPtr_(NULL)
+    mapPtr_(nullptr)
 {}
 
 
@@ -636,7 +636,7 @@ Foam::directMappedPatchBase::directMappedPatchBase
     uniformOffset_(false),
     offsets_(offsets),
     sameRegion_(sampleRegion_ == patch_.boundaryMesh().mesh().name()),
-    mapPtr_(NULL)
+    mapPtr_(nullptr)
 {}
 
 
@@ -657,7 +657,7 @@ Foam::directMappedPatchBase::directMappedPatchBase
     offset_(offset),
     offsets_(pp.size(), offset_),
     sameRegion_(sampleRegion_ == patch_.boundaryMesh().mesh().name()),
-    mapPtr_(NULL)
+    mapPtr_(nullptr)
 {}
 
 
@@ -692,7 +692,7 @@ Foam::directMappedPatchBase::directMappedPatchBase
       : dict.lookup("offsets")
     ),
     sameRegion_(sampleRegion_ == patch_.boundaryMesh().mesh().name()),
-    mapPtr_(NULL)
+    mapPtr_(nullptr)
 {}
 
 
@@ -710,7 +710,7 @@ Foam::directMappedPatchBase::directMappedPatchBase
     offset_(dmp.offset_),
     offsets_(dmp.offsets_),
     sameRegion_(dmp.sameRegion_),
-    mapPtr_(NULL)
+    mapPtr_(nullptr)
 {}
 
 

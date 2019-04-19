@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ jmp_buf Foam::timer::envAlarm;
 
 __p_sig_fn_t Foam::timer::oldAction_ = SIG_DFL;
 
-static HANDLE hTimer_ = NULL;
+static HANDLE hTimer_ = nullptr;
 
 // * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
 
@@ -78,7 +78,7 @@ Foam::timer::timer(const unsigned int newTimeOut)
     if (newTimeOut > 0)
     {
         // Is singleton since handler is static function
-        if( NULL != hTimer_ )
+        if( nullptr != hTimer_ )
         {
             FatalErrorIn
             (
@@ -110,15 +110,15 @@ Foam::timer::timer(const unsigned int newTimeOut)
 
         const bool success =
           ::CreateTimerQueueTimer(&hTimer_,
-                                  NULL,
+                                  nullptr,
                                   (WAITORTIMERCALLBACK)timerExpired,
-                                  NULL ,
+                                  nullptr ,
                                   newTimeOut * 1000,
                                   0, 0);
 
         if (!success)
         {
-            hTimer_ = NULL;
+            hTimer_ = nullptr;
             FatalErrorIn
             (
                 "Foam::timer::timer(const unsigned int)"
@@ -138,8 +138,8 @@ Foam::timer::~timer()
     {
         // Reset timer
         const bool timerSuccess =
-          ::DeleteTimerQueueTimer(NULL, hTimer_, NULL);
-        hTimer_ = NULL;
+          ::DeleteTimerQueueTimer(nullptr, hTimer_, nullptr);
+        hTimer_ = nullptr;
 
         if (!timerSuccess)
         {

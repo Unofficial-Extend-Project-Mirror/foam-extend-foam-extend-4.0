@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -167,7 +167,7 @@ public:
         autoPtr<MRFZone> clone() const
         {
             notImplemented("autoPtr<MRFZone> clone() const");
-            return autoPtr<MRFZone>(NULL);
+            return autoPtr<MRFZone>(nullptr);
         }
 
         //- Return a pointer to a new MRFZone created on freestore

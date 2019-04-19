@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -53,7 +53,7 @@ cohesiveZoneFvPatchVectorField::cohesiveZoneFvPatchVectorField
     directionMixedFvPatchVectorField(p, iF),
     UName_("undefined"),
     rheologyName_("undefined"),
-    cohesiveLawPtr_(NULL),
+    cohesiveLawPtr_(nullptr),
     relaxationFactor_(1.0)
 {}
 
@@ -161,10 +161,10 @@ void cohesiveZoneFvPatchVectorField::autoMap
     const fvPatchFieldMapper& m
 )
 {
-    if (cohesiveLawPtr_ == NULL)
+    if (cohesiveLawPtr_ == nullptr)
     {
         FatalErrorIn("cohesiveZoneFvPatchVectorField::autoMap")
-            << "NULL cohesive law"
+            << "nullptr cohesive law"
             << abort(FatalError);
     }
 

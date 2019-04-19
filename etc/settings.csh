@@ -1,7 +1,7 @@
 #----------------------------------*-sh-*--------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     | Version:     4.0
+#  \\    /   O peration     | Version:     4.1
 #   \\  /    A nd           | Web:         http://www.foam-extend.org
 #    \\/     M anipulation  | For copyright notice see file Copyright
 #------------------------------------------------------------------------------
@@ -41,7 +41,8 @@ setenv FOAM_JOB_DIR $WM_PROJECT_INST_DIR/jobControl
 # wmake configuration
 setenv WM_DIR $WM_PROJECT_DIR/wmake
 setenv WM_LINK_LANGUAGE c++
-setenv WM_OPTIONS $WM_ARCH$WM_COMPILER$WM_PRECISION_OPTION$WM_COMPILE_OPTION
+setenv WM_LABEL_OPTION "Int$WM_LABEL_SIZE"
+setenv WM_OPTIONS "$WM_ARCH$WM_COMPILER$WM_PRECISION_OPTION$WM_LABEL_OPTION$WM_COMPILE_OPTION"
 set path=($WM_DIR $path)
 
 # base configuration
@@ -103,30 +104,6 @@ case FOAM:
         setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/packages/gcc-4.9.2/platforms/$WM_OPTIONS
         _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.9.2/platforms/$WM_OPTIONS/etc/gcc-4.9.2.csh
     breaksw
-    case Gcc48:
-        setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/packages/gcc-4.8.4/platforms/$WM_OPTIONS
-        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.8.4/platforms/$WM_OPTIONS/etc/gcc-4.8.4.csh
-    breaksw
-    case Gcc47:
-        setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/packages/gcc-4.7.4/platforms/$WM_OPTIONS
-        _foamSource $WM_THIRD_PARTY_DIR/packages/gmp-5.1.2/platforms/$WM_OPTIONS/etc/gmp-5.1.2.csh
-        _foamSource $WM_THIRD_PARTY_DIR/packages/mpfr-3.1.2/platforms/$WM_OPTIONS/etc/mpfr-3.1.2.csh
-        _foamSource $WM_THIRD_PARTY_DIR/packages/mpc-1.0.1/platforms/$WM_OPTIONS/etc/mpc-1.0.1.csh
-        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.7.4/platforms/$WM_OPTIONS/etc/gcc-4.7.4.csh
-    breaksw
-    case Gcc45:
-        setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/packages/gcc-4.5.1/platforms/$WM_OPTIONS
-        _foamSource $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.csh
-        _foamSource $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.1/platforms/$WM_OPTIONS/etc/mpfr-3.0.1.csh
-        _foamSource $WM_THIRD_PARTY_DIR/packages/mpc-0.8.2/platforms/$WM_OPTIONS/etc/mpc-0.8.2.csh
-        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.5.1/platforms/$WM_OPTIONS/etc/gcc-4.5.1.csh
-    breaksw
-    case Gcc44:
-        setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/packages/gcc-4.4.5/platforms/$WM_OPTIONS
-        _foamSource $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.csh
-        _foamSource $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.1/platforms/$WM_OPTIONS/etc/mpfr-3.0.1.csh
-        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.4.5/platforms/$WM_OPTIONS/etc/gcc-4.4.5.csh
-    breaksw
     endsw
 
     # Check that the compiler directory can be found
@@ -167,7 +144,23 @@ set mpi_version=unknown
 
 switch ("$WM_MPLIB")
 case OPENMPI:
-    if ($?WM_THIRD_PARTY_USE_OPENMPI_188 != 0 && -d $WM_THIRD_PARTY_DIR/packages/openmpi-1.8.8/platforms/$WM_OPTIONS ) then
+    if ($?WM_THIRD_PARTY_USE_OPENMPI_400 != 0 && -d $WM_THIRD_PARTY_DIR/packages/openmpi-4.0.0/platforms/$WM_OPTIONS ) then
+        set mpi_version=openmpi-4.0.0
+
+        if ($?FOAM_VERBOSE && $?prompt) then
+            echo "Using openmpi-4.0.0 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
+        endif
+        _foamSource $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
+
+    else if ($?WM_THIRD_PARTY_USE_OPENMPI_311 != 0 && -d $WM_THIRD_PARTY_DIR/packages/openmpi-3.1.1/platforms/$WM_OPTIONS ) then
+        set mpi_version=openmpi-3.1.1
+
+        if ($?FOAM_VERBOSE && $?prompt) then
+            echo "Using openmpi-3.1.1 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
+        endif
+        _foamSource $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
+
+    else if ($?WM_THIRD_PARTY_USE_OPENMPI_188 != 0 && -d $WM_THIRD_PARTY_DIR/packages/openmpi-1.8.8/platforms/$WM_OPTIONS ) then
         set mpi_version=openmpi-1.8.8
 
         if ($?FOAM_VERBOSE && $?prompt) then
@@ -324,6 +317,18 @@ case MVAPICH2:
         echo "    PINC                  : $PINC"
         echo "    PLIBS                 : $PLIBS"
     endif
+
+    unset mpi_version
+    breaksw
+
+case SYSTEMMPICH:
+    set mpi_version=mpich-system
+    setenv MPI_HOME $CRAY_MPICH2_DIR
+    setenv MPI_ARCH_PATH $CRAY_MPICH2_DIR
+    setenv MPICH_ROOT $MPI_ARCH_PATH
+
+    _foamAddPath $MPI_ARCH_PATH/bin
+    _foamAddLib  $MPI_ARCH_PATH/lib
 
     unset mpi_version
     breaksw
@@ -502,6 +507,9 @@ endif
 if ( $?MESQUITE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_MESQUITE_212 != 0 && -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS/etc/mesquite-2.1.2.csh
 endif
+if ( $?MESQUITE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_MESQUITE_230 != 0 && -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.3.0/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/mesquite-2.3.0/platforms/$WM_OPTIONS/etc/mesquite-2.3.0.csh
+endif
 
 # Metis library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -547,6 +555,9 @@ endif
 
 # cmake
 # ~~~~~
+if ( $?CMAKE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_CMAKE_3114 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-3.11.4/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-3.11.4/platforms/$WM_OPTIONS/etc/cmake-3.11.4.csh
+endif
 if ( $?CMAKE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_CMAKE_332 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-3.3.2/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-3.3.2/platforms/$WM_OPTIONS/etc/cmake-3.3.2.csh
 endif
@@ -595,9 +606,18 @@ endif
 if ( $?PYFOAM_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_PYFOAM_064 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.6.4/platforms/noarch ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.4/platforms/noarch/etc/PyFoam-0.6.4.csh
 endif
+if ( $?PYFOAM_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_PYFOAM_066 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.6.6/platforms/noarch ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.6/platforms/noarch/etc/PyFoam-0.6.6.csh
+endif
+if ( $?PYFOAM_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_PYFOAM_069 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.6.9/platforms/noarch ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.9/platforms/noarch/etc/PyFoam-0.6.9.csh
+endif
 
 # hwloc
 # ~~~~~
+if ( $?HWLOC_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_HWLOC_201 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/hwloc-2.0.1/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-2.0.1/platforms/$WM_OPTIONS/etc/hwloc-2.0.1.csh
+endif
 if ( $?HWLOC_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_HWLOC_1101 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/hwloc-1.10.1/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-1.10.1/platforms/$WM_OPTIONS/etc/hwloc-1.10.1.csh
 endif
@@ -607,6 +627,9 @@ endif
 
 # QT
 # ~~~~~
+if ( $?QT_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_QT_5111 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/qt-everywhere-src-5.11.1/platforms/$WM_OPTIONS )then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-src-5.11.1/platforms/$WM_OPTIONS/etc/qt-everywhere-src-5.11.1.csh
+endif
 if ( $?QT_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_QT_580 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/qt-everywhere-opensource-src-5.8.0/platforms/$WM_OPTIONS )then
     _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-5.8.0/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-5.8.0.csh
 endif
@@ -616,6 +639,9 @@ endif
 
 # PARAVIEW
 # ~~~~~
+if ( $?PARAVIEW_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_PARAVIEW_552 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-5.5.2/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-5.5.2/platforms/$WM_OPTIONS/etc/ParaView-5.5.2.csh
+endif
 if ( $?PARAVIEW_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_PARAVIEW_541 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-5.4.1/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-5.4.1/platforms/$WM_OPTIONS/etc/ParaView-5.4.1.csh
 endif

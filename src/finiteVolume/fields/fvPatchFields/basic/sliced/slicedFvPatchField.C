@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -153,9 +153,9 @@ tmp<fvPatchField<Type> > slicedFvPatchField<Type>::clone
 template<class Type>
 slicedFvPatchField<Type>::~slicedFvPatchField()
 {
-    // Set the fvPatchField storage pointer to NULL before its destruction
+    // Set the fvPatchField storage pointer to nullptr before its destruction
     // to protect the field it a slice of.
-    UList<Type>::operator=(UList<Type>(NULL, 0));
+    UList<Type>::operator=(UList<Type>(nullptr, 0));
 }
 
 

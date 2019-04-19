@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -68,6 +68,10 @@ uint64_t readUint64(Istream&);
 bool read(const char*, uint64_t&);
 Istream& operator>>(Istream&, uint64_t&);
 Ostream& operator<<(Ostream&, const uint64_t);
+
+#if WM_ARCH_OPTION == 64 && darwin && __clang__
+Ostream& operator<<(Ostream&, const uintptr_t);
+#endif
 
 //- Template specialization for pTraits<uint64_t>
 template<>

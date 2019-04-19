@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ autoPtr<topoSetSource> topoSetSource::New
 } // End namespace Foam
 
 
-Foam::HashTable<Foam::string>* Foam::topoSetSource::usageTablePtr_ = NULL;
+Foam::HashTable<Foam::string>* Foam::topoSetSource::usageTablePtr_ = nullptr;
 
 template<>
 const char* Foam::NamedEnum<Foam::topoSetSource::setAction, 8>::names[] =

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -107,6 +107,21 @@ class fvPatchField
         word patchType_;
 
 
+protected:
+
+    // Protected member functions
+
+        //- Read patch type
+        //  Use for derived types which over-ride dictionary constructor
+        //  in order to read the patch type
+        void readPatchType(const dictionary& dict);
+
+        //- Set patch type
+        //  Use for derived types which over-ride dictionary constructor
+        //  in order to read the patch type
+        void setPatchType(const fvPatchField<Type>& ptf);
+
+
 public:
 
     typedef fvPatch Patch;
@@ -120,7 +135,6 @@ public:
 
     // Declare run-time constructor selection tables
 
-#ifndef SWIG
         declareRunTimeSelectionTable
         (
             tmp,
@@ -159,7 +173,7 @@ public:
             ),
             (p, iF, dict)
         );
-#endif
+
 
     // Constructors
 
@@ -262,10 +276,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~fvPatchField<Type>()
-        {}
+    //- Destructor
+    virtual ~fvPatchField<Type>()
+    {}
 
 
     // Member functions
@@ -284,8 +297,8 @@ public:
             const typename GeometricField::PatchFieldType& lookupPatchField
             (
                 const word& name,
-                const GeometricField* = NULL,
-                const Type2* = NULL
+                const GeometricField* = nullptr,
+                const Type2* = nullptr
             ) const;
 
             //- Return patch
@@ -361,6 +374,14 @@ public:
             );
 
 
+            //- Update on mesh motion
+            //  This function is used for special conditions such as
+            //  immersed boundary which need to be updated when the mesh
+            //  is moving (as opposed to topo change update)
+            virtual void updateOnMotion()
+            {}
+
+
         // Evaluation functions
 
             //- Return patch-normal gradient
@@ -381,6 +402,19 @@ public:
             {
                 notImplemented(type() + "::patchNeighbourField()");
                 return *this;
+            }
+
+            //- Return neighbour field of internal field, untransformed
+            virtual tmp<scalarField>
+            untransformedInterpolate(const direction cmpt) const
+            {
+                notImplemented
+                (
+                    type()
+                  + "::untransformedInterpolate(const direction cmpt)"
+                );
+
+                return this->component(cmpt);
             }
 
             //- Initialise the evaluation of the patch field
@@ -614,9 +648,7 @@ public:
 
     // Ostream operator
 
-#ifndef SWIG
         friend Ostream& operator<< <Type>(Ostream&, const fvPatchField<Type>&);
-#endif
 };
 
 

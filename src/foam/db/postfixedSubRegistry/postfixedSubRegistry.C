@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -137,6 +137,14 @@ bool Foam::postfixedSubRegistry::checkOut(regIOobject& io) const
 
         return false;
     }
+}
+
+
+bool Foam::postfixedSubRegistry::found(const word& objName) const
+{
+    word demangledName = objName;
+    demangledName = demangledName(objName.size() - name().size());
+    return HashTable<regIOobject*>::found(demangledName);
 }
 
 

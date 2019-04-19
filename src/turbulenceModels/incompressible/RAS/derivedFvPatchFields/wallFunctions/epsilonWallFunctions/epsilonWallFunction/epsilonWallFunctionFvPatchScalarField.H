@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -87,6 +87,20 @@ class epsilonWallFunctionFvPatchScalarField
 
         //- Check the type of the patch
         void checkType();
+
+
+protected:
+
+    // Protected Member Functions
+
+        //- Write local wall function variables
+        virtual void writeLocalEntries(Ostream&) const;
+
+        //- Return name of turbulence generation field
+        inline const word& GName() const
+        {
+            return GName_;
+        }
 
 
 public:

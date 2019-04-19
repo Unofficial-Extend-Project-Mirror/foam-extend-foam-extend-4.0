@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -55,14 +58,14 @@ partTetMesh::partTetMesh(polyMeshGen& mesh, const labelLongList& lockedPoints)
     nodeLabelInOrigMesh_(),
     smoothVertex_(),
     pointTets_(),
-    internalPointsOrderPtr_(NULL),
-    boundaryPointsOrderPtr_(NULL),
-    globalPointLabelPtr_(NULL),
-    pAtProcsPtr_(NULL),
-    globalToLocalPointAddressingPtr_(NULL),
-    neiProcsPtr_(NULL),
-    pAtParallelBoundariesPtr_(NULL),
-    pAtBufferLayersPtr_(NULL)
+    internalPointsOrderPtr_(nullptr),
+    boundaryPointsOrderPtr_(nullptr),
+    globalPointLabelPtr_(nullptr),
+    pAtProcsPtr_(nullptr),
+    globalToLocalPointAddressingPtr_(nullptr),
+    neiProcsPtr_(nullptr),
+    pAtParallelBoundariesPtr_(nullptr),
+    pAtBufferLayersPtr_(nullptr)
 {
     List<direction> useCell(mesh.cells().size(), direction(1));
 
@@ -86,14 +89,14 @@ partTetMesh::partTetMesh
     nodeLabelInOrigMesh_(),
     smoothVertex_(),
     pointTets_(),
-    internalPointsOrderPtr_(NULL),
-    boundaryPointsOrderPtr_(NULL),
-    globalPointLabelPtr_(NULL),
-    pAtProcsPtr_(NULL),
-    globalToLocalPointAddressingPtr_(NULL),
-    neiProcsPtr_(NULL),
-    pAtParallelBoundariesPtr_(NULL),
-    pAtBufferLayersPtr_(NULL)
+    internalPointsOrderPtr_(nullptr),
+    boundaryPointsOrderPtr_(nullptr),
+    globalPointLabelPtr_(nullptr),
+    pAtProcsPtr_(nullptr),
+    globalToLocalPointAddressingPtr_(nullptr),
+    neiProcsPtr_(nullptr),
+    pAtParallelBoundariesPtr_(nullptr),
+    pAtBufferLayersPtr_(nullptr)
 {
     const faceListPMG& faces = mesh.faces();
     const cellListPMG& cells = mesh.cells();
@@ -214,14 +217,14 @@ partTetMesh::partTetMesh
     nodeLabelInOrigMesh_(),
     smoothVertex_(),
     pointTets_(),
-    internalPointsOrderPtr_(NULL),
-    boundaryPointsOrderPtr_(NULL),
-    globalPointLabelPtr_(NULL),
-    pAtProcsPtr_(NULL),
-    globalToLocalPointAddressingPtr_(NULL),
-    neiProcsPtr_(NULL),
-    pAtParallelBoundariesPtr_(NULL),
-    pAtBufferLayersPtr_(NULL)
+    internalPointsOrderPtr_(nullptr),
+    boundaryPointsOrderPtr_(nullptr),
+    globalPointLabelPtr_(nullptr),
+    pAtProcsPtr_(nullptr),
+    globalToLocalPointAddressingPtr_(nullptr),
+    neiProcsPtr_(nullptr),
+    pAtParallelBoundariesPtr_(nullptr),
+    pAtBufferLayersPtr_(nullptr)
 {
     const faceListPMG& faces = mesh.faces();
     const cellListPMG& cells = mesh.cells();
@@ -591,7 +594,7 @@ void partTetMesh::updateOrigMesh(boolList* changedFacePtr)
 
             OPstream toOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 pBnd[patchI].neiProcNo(),
                 sendData.byteSize()
             );
@@ -605,7 +608,7 @@ void partTetMesh::updateOrigMesh(boolList* changedFacePtr)
 
             IPstream fromOtherProc
             (
-                Pstream::blocking,
+                Pstream::commsTypes::blocking,
                 pBnd[patchI].neiProcNo()
             );
 

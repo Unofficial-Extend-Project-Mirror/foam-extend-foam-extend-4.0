@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ bool Foam::fileFormats::GTSsurfaceFormat<Face>::read
     // write directly into the lists:
     pointField&  pointLst = this->storedPoints();
     List<Face>&  faceLst  = this->storedFaces();
-    List<label>& zoneIds  = this->storedZoneIds();
+    labelList& zoneIds  = this->storedZoneIds();
 
     pointLst.setSize(nPoints);
     faceLst.setSize(nElems);
@@ -344,7 +344,7 @@ void Foam::fileFormats::GTSsurfaceFormat<Face>::write
 {
     const pointField& pointLst   = surf.points();
     const List<Face>& faceLst    = surf.faces();
-    const List<label>& zoneIds   = surf.zoneIds();
+    const labelList& zoneIds   = surf.zoneIds();
     const List<surfZoneIdentifier>& zoneToc = surf.zoneToc();
 
     // check if output triangulation would be required

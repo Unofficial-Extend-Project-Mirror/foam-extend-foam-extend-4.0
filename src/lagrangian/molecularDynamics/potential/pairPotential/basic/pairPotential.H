@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ SourceFiles
 #include "typeInfo.H"
 #include "runTimeSelectionTables.H"
 #include "autoPtr.H"
-#include "List.H"
+#include "scalarList.H"
 #include "Pair.H"
 #include "Switch.H"
 #include "mathematicalConstants.H"
@@ -72,8 +72,8 @@ protected:
         scalar rMin_;
         scalar dr_;
 
-        List<scalar> forceLookup_;
-        List<scalar> energyLookup_;
+        scalarList forceLookup_;
+        scalarList energyLookup_;
 
         mutable energyScalingFunction* esfPtr_;
 

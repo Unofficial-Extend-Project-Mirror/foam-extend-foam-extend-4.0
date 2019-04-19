@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -63,10 +63,10 @@ class metisDecomp
 
         label decompose
         (
-            const List<int>& adjncy,
-            const List<int>& xadj,
+            const labelList& adjncy,
+            const labelList& xadj,
             const scalarField& cellWeights,
-            List<int>& finalDecomp
+            labelList& finalDecomp
         );
 
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ void Foam::channelIndex::walkOppositeFaces
     const faceList& faces = mesh.faces();
     label nBnd = mesh.nFaces() - mesh.nInternalFaces();
 
-    DynamicList<label> frontFaces(startFaces);
+    dynamicLabelList frontFaces(startFaces);
     forAll(frontFaces, i)
     {
         label faceI = frontFaces[i];
@@ -93,7 +93,7 @@ void Foam::channelIndex::walkOppositeFaces
         }
 
         // Transfer across cells
-        DynamicList<label> newFrontFaces(frontFaces.size());
+        dynamicLabelList newFrontFaces(frontFaces.size());
 
         forAll(frontFaces, i)
         {

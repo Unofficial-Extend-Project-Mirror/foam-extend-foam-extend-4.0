@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -99,7 +99,11 @@ int main(int argc, char *argv[])
     const labelList faceOwner = mesh.faceOwner();
     const vectorField faceNormals = mesh.Sf()/mesh.magSf();
 
-    labelListList abaqusCellPoints(cellPoints.size(), List<label>(8, 1));
+    labelListList abaqusCellPoints
+    (
+        cellPoints.size(),
+        labelList(8, label(1))
+    );
 
     forAll(cells, celli)
     {
@@ -338,7 +342,11 @@ int main(int argc, char *argv[])
             }
         }
 
-        labelListList materialsOrdered(numberOfMaterials, List<label>(0,0));
+        labelListList materialsOrdered
+        (
+            numberOfMaterials,
+            labelList(0, label(0))
+        );
         forAll(materialsOrdered, matOrderi)
         {
              materialsOrdered[matOrderi].setSize(cellsOfEachMaterial[matOrderi], 0);
@@ -401,7 +409,7 @@ int main(int argc, char *argv[])
         //- face 5 is nodes 3 7 8 4
         //- face 6 is nodes 4 8 5 1
         //- So i will compare points on the face and
-        labelListList abaqusFaceConvention(6, List<label>(4,-1));
+        labelListList abaqusFaceConvention(6, labelList(4, label(-1)));
         abaqusFaceConvention[0][0] = 1;
         abaqusFaceConvention[0][1] = 2;
         abaqusFaceConvention[0][2] = 3;
@@ -438,7 +446,7 @@ int main(int argc, char *argv[])
             //- face it is
             const labelList& facePoints = mesh.boundaryMesh()[patchi][facei];
             const labelList& thisCellAbaqusPoints = abaqusCellPoints[globalCelli];
-            labelList thisFaceAbaqusPoints(4,-1);
+            labelList thisFaceAbaqusPoints(4, label(-1));
             label pointsFound = 0;
             forAll(thisCellAbaqusPoints, pointi)
             {

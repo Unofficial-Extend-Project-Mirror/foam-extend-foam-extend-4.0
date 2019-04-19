@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ class ensightPart
     // Private data
 
         // Static data members
-        static List<word> elemTypes_;
+        static wordList elemTypes_;
 
 
 protected:
@@ -126,7 +126,7 @@ protected:
         void reconstruct(Istream&);
 
         //- check for fully defined fields
-        bool isFieldDefined(const List<scalar>&) const;
+        bool isFieldDefined(const scalarList&) const;
 
         //- write the part header
         void writeHeader(ensightFile&, bool withDescription=false) const;
@@ -135,7 +135,7 @@ protected:
         void writeFieldList
         (
             ensightFile& os,
-            const List<scalar>& field,
+            const scalarList& field,
             const labelList& idList
         ) const;
 
@@ -212,7 +212,7 @@ public:
 
     // Static members
 
-        virtual List<word> const& elementTypes() const
+        virtual wordList const& elementTypes() const
         {
             return elemTypes_;
         }
@@ -292,16 +292,16 @@ public:
         void writeScalarField
         (
             ensightFile&,
-            const List<scalar>& field
+            const scalarList& field
         ) const;
 
         //- write vector field components
         void writeVectorField
         (
             ensightFile&,
-            const List<scalar>& field0,
-            const List<scalar>& field1,
-            const List<scalar>& field2
+            const scalarList& field0,
+            const scalarList& field1,
+            const scalarList& field2
         ) const;
 
 

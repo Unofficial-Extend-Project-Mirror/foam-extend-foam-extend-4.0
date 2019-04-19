@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -43,6 +43,16 @@ namespace Foam
 }
 
 
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+const Foam::debug::optimisationSwitch
+Foam::faceOnlySet::maxNSteps_
+(
+    "maximumFaceOnlySetStepNumber",
+    100
+);
+
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 
@@ -58,7 +68,7 @@ bool Foam::faceOnlySet::trackToBoundary
 {
     // distance vector between sampling points
     const vector offset = end_ - start_;
-    const vector smallVec = tol*offset;
+    const vector smallVec = tol_()*offset;
     const scalar smallDist = mag(smallVec);
 
     // Alias
@@ -115,7 +125,7 @@ void Foam::faceOnlySet::calcSamples
 
     const vector offset = (end_ - start_);
     const vector normOffset = offset/mag(offset);
-    const vector smallVec = tol*offset;
+    const vector smallVec = tol_()*offset;
     const scalar smallDist = mag(smallVec);
 
 
@@ -198,7 +208,7 @@ void Foam::faceOnlySet::calcSamples
     // index in bHits; current boundary intersection
     label bHitI = 1;
 
-    while(true)
+    while(segmentI <= maxNSteps_())
     {
         if (trackFaceI != -1)
         {

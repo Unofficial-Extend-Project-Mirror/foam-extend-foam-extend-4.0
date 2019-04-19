@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ engineTimeVaryingTotalPressureFvPatchScalarField::engineTimeVaryingTotalPressure
     psiName_("undefined"),
     gamma_(0.0),
     p0_(p.size(), 0.0),
-    timeDataPtr_(NULL),
+    timeDataPtr_(nullptr),
     engineDB_((refCast<const engineTime>(this->db().time())))
 {}
 
@@ -71,7 +71,7 @@ engineTimeVaryingTotalPressureFvPatchScalarField::engineTimeVaryingTotalPressure
     gamma_(readScalar(dict.lookup("gamma"))),
     p0_("p0", dict, p.size()),
     timeDataFileName_(fileName(dict.lookup("timeDataFileName")).expand()),
-    timeDataPtr_(NULL),
+    timeDataPtr_(nullptr),
     engineDB_((refCast<const engineTime>(this->db().time())))
 {
     if (dict.found("value"))
@@ -105,7 +105,7 @@ engineTimeVaryingTotalPressureFvPatchScalarField::engineTimeVaryingTotalPressure
     gamma_(ptf.gamma_),
     p0_(ptf.p0_, mapper),
     timeDataFileName_(ptf.timeDataFileName_),
-    timeDataPtr_(NULL),
+    timeDataPtr_(nullptr),
     engineDB_((refCast<const engineTime>(this->db().time())))
 {}
 
@@ -123,7 +123,7 @@ engineTimeVaryingTotalPressureFvPatchScalarField::engineTimeVaryingTotalPressure
     gamma_(tppsf.gamma_),
     p0_(tppsf.p0_),
     timeDataFileName_(tppsf.timeDataFileName_),
-    timeDataPtr_(NULL),
+    timeDataPtr_(nullptr),
     engineDB_((refCast<const engineTime>(this->db().time())))
 {}
 
@@ -142,7 +142,7 @@ engineTimeVaryingTotalPressureFvPatchScalarField::engineTimeVaryingTotalPressure
     gamma_(tppsf.gamma_),
     p0_(tppsf.p0_),
     timeDataFileName_(tppsf.timeDataFileName_),
-    timeDataPtr_(NULL),
+    timeDataPtr_(nullptr),
     engineDB_((refCast<const engineTime>(this->db().time())))
 {}
 

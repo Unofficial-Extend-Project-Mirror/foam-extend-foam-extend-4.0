@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ void Foam::fvSurfaceMapper::calcAddressing() const
         {
             if (max(addr[faceI]) >= oldNInternal)
             {
-                addr[faceI] = labelList(1, 0);
+                addr[faceI] = labelList(1, label(0));
                 w[faceI] = scalarList(1, 1.0);
             }
         }
@@ -153,10 +153,10 @@ Foam::fvSurfaceMapper::fvSurfaceMapper
 :
     mesh_(mesh),
     faceMap_(fMapper),
-    directAddrPtr_(NULL),
-    interpolationAddrPtr_(NULL),
-    weightsPtr_(NULL),
-    insertedObjectLabelsPtr_(NULL)
+    directAddrPtr_(nullptr),
+    interpolationAddrPtr_(nullptr),
+    weightsPtr_(nullptr),
+    insertedObjectLabelsPtr_(nullptr)
 {}
 
 

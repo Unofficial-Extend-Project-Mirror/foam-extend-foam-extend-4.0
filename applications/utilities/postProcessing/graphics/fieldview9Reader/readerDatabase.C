@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ void Foam::readerDatabase::getPolyHedra()
     const cellModel& tetWedge = *(cellModeller::lookup("tetWedge"));
     const cellModel& hex = *(cellModeller::lookup("hex"));
 
-    DynamicList<label> polys(mesh().nCells()/100 + 1);
+    dynamicLabelList polys(mesh().nCells()/100 + 1);
 
     const cellShapeList& cellShapes = mesh().cellShapes();
 
@@ -84,8 +84,8 @@ void Foam::readerDatabase::getPolyHedra()
 Foam::readerDatabase::readerDatabase()
 :
     fieldviewNames_(10),
-    runTimePtr_(NULL),
-    meshPtr_(NULL),
+    runTimePtr_(nullptr),
+    meshPtr_(nullptr),
     setName_(""),
     polys_(),
     volScalarNames_(),

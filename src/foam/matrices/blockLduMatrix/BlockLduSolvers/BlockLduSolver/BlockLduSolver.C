@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ Foam::BlockLduSolver<Type>::New
                "no diagonal or off-diagonal coefficient"
             << exit(FatalError);
 
-        return autoPtr<BlockLduSolver<Type> >(NULL);
+        return autoPtr<BlockLduSolver<Type> >(nullptr);
     }
 }
 
@@ -274,7 +274,7 @@ Foam::BlockLduSolver<Type>::New
                "no diagonal or off-diagonal coefficient"
             << exit(FatalError);
 
-        return autoPtr<BlockLduSolver<Type> >(NULL);
+        return autoPtr<BlockLduSolver<Type> >(nullptr);
     }
 }
 

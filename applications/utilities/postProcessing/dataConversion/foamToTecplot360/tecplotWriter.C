@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -112,8 +112,8 @@ Pout<< "zoneName:" << zoneName
 
 
 
-    INTEGER4 *PassiveVarArray = NULL;
-    INTEGER4 *VarShareArray   = NULL;
+    INTEGER4 *PassiveVarArray = nullptr;
+    INTEGER4 *VarShareArray   = nullptr;
     INTEGER4  ShrConn         = 0;
 
     INTEGER4  NumBConns       = 0;   /* No Boundary Connections */
@@ -192,8 +192,8 @@ Pout<< "zoneName:" << zoneName
     << endl;
 
 
-    INTEGER4 *PassiveVarArray = NULL;
-    INTEGER4 *VarShareArray   = NULL;
+    INTEGER4 *PassiveVarArray = nullptr;
+    INTEGER4 *VarShareArray   = nullptr;
     INTEGER4  ShrConn         = 0;
 
     INTEGER4  NumBConns       = 0;   /* No Boundary Connections */
@@ -274,8 +274,8 @@ Pout<< "zoneName:" << zoneName
     << endl;
 
 
-    INTEGER4 *PassiveVarArray = NULL;
-    INTEGER4 *VarShareArray   = NULL;
+    INTEGER4 *PassiveVarArray = nullptr;
+    INTEGER4 *VarShareArray   = nullptr;
     INTEGER4  ShrConn         = 0;
 
 
@@ -374,9 +374,9 @@ void Foam::tecplotWriter::writeConnectivity(const fvMesh& mesh) const
             FaceNodes.begin(),      /* The face nodes array */
             FaceLeftElems.begin(),  /* The left elements array  */
             FaceRightElems.begin(), /* The right elements array  */
-            NULL,       /* No boundary connection counts */
-            NULL,       /* No boundary connection elements */
-            NULL        /* No boundary connection zones */
+            nullptr,       /* No boundary connection counts */
+            nullptr,       /* No boundary connection elements */
+            nullptr        /* No boundary connection zones */
         )
     )
     {
@@ -395,7 +395,8 @@ void Foam::tecplotWriter::writeConnectivity
     INTEGER4  NumFaceNodes    = 2*pp.nEdges();
 
     // All faces (=edges) have 2 nodes
-    List<INTEGER4> FaceNodeCounts(NumFaces, 2);
+    List<INTEGER4> FaceNodeCounts(NumFaces);
+    FaceNodeCounts = 2;
 
     List<INTEGER4> FaceNodes(NumFaceNodes);
     label nodeI = 0;
@@ -488,9 +489,9 @@ void Foam::tecplotWriter::writeConnectivity
             FaceNodes.begin(),      /* The face nodes array */
             FaceLeftElems.begin(),  /* The left elements array  */
             FaceRightElems.begin(), /* The right elements array  */
-            NULL,       /* No boundary connection counts */
-            NULL,       /* No boundary connection elements */
-            NULL        /* No boundary connection zones */
+            nullptr,       /* No boundary connection counts */
+            nullptr,       /* No boundary connection elements */
+            nullptr        /* No boundary connection zones */
         )
     )
     {

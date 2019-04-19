@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -486,7 +486,7 @@ void subsetSurfaceFields
 // Select all cells not in the region
 labelList getNonRegionCells(const labelList& cellRegion, const label regionI)
 {
-    DynamicList<label> nonRegionCells(cellRegion.size());
+    dynamicLabelList nonRegionCells(cellRegion.size());
     forAll (cellRegion, cellI)
     {
         if (cellRegion[cellI] != regionI)

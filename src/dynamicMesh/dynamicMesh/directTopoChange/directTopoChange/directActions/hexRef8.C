@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ namespace Foam
     defineTypeNameAndDebug(hexRef8, 0);
 
     //- Reduction class. If x and y are not equal assign value.
-    template< int value >
+    template<label value>
     class ifEqEqOp
     {
         public:

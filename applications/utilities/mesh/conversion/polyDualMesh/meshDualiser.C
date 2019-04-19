@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -212,7 +212,7 @@ Foam::label Foam::meshDualiser::addInternalFace
     const bool edgeOrder,
     const label dualCell0,
     const label dualCell1,
-    const DynamicList<label>& verts,
+    const dynamicLabelList& verts,
     directTopoChange& meshMod
 ) const
 {
@@ -330,7 +330,7 @@ Foam::label Foam::meshDualiser::addBoundaryFace
 
     const label dualCellI,
     const label patchI,
-    const DynamicList<label>& verts,
+    const dynamicLabelList& verts,
     directTopoChange& meshMod
 ) const
 {
@@ -423,7 +423,7 @@ void Foam::meshDualiser::createFacesAroundEdge
     //    << endl;
 
     // Walk and collect face.
-    DynamicList<label> verts(100);
+    dynamicLabelList verts(100);
 
     if (edgeToDualPoint_[edgeI] != -1)
     {
@@ -571,7 +571,7 @@ void Foam::meshDualiser::createFaceFromInternalFace
 
 
     // Walk and collect face.
-    DynamicList<label> verts(100);
+    dynamicLabelList verts(100);
 
     verts.append(faceToDualPoint_[faceI]);
     verts.append(edgeToDualPoint_[fEdges[fp]]);
@@ -672,7 +672,7 @@ void Foam::meshDualiser::createFacesAroundBoundaryPoint
         // Starting face
         label faceI = startFaceI;
 
-        DynamicList<label> verts(4);
+        dynamicLabelList verts(4);
 
         while (true)
         {
@@ -770,7 +770,7 @@ void Foam::meshDualiser::createFacesAroundBoundaryPoint
         label faceI = startFaceI;
 
         // Storage for face
-        DynamicList<label> verts(mesh_.faces()[faceI].size());
+        dynamicLabelList verts(mesh_.faces()[faceI].size());
 
         // Starting point.
         verts.append(pointToDualPoint_[pointI]);

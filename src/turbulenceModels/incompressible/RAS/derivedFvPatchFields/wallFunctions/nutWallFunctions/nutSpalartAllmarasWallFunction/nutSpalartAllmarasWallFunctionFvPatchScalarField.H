@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -141,12 +141,6 @@ public:
 
             //- Calculate and return the yPlus at the boundary
             virtual tmp<scalarField> yPlus() const;
-
-
-        // I-O
-
-            //- Write
-            virtual void write(Ostream& os) const;
 };
 
 

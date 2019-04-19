@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -49,16 +49,13 @@ namespace Foam
 class chtRcTemperatureFvPatchScalarField;
 
 /*---------------------------------------------------------------------------*\
-                  Class chtRegionCoupleBase Declaration
+                      Class chtRegionCoupleBase Declaration
 \*---------------------------------------------------------------------------*/
 
 class chtRegionCoupleBase
 :
     public regionCouplingFvPatchScalarField
 {
-    // Private data
-
-
 public:
 
     //- Runtime type information
@@ -139,6 +136,12 @@ public:
                 return regionCouplingFvPatchScalarField::originalPatchField();
             }
 
+            virtual tmp<scalarField> forig() const;
+
+            virtual tmp<scalarField> korig() const;
+
+            virtual tmp<scalarField> kw() const;
+
 
         // Evaluation functions
 
@@ -146,16 +149,17 @@ public:
             virtual void initEvaluate(const Pstream::commsTypes commsType);
 
             //- Calculate the thermal diffusivity
-            virtual void calcThermalDiffusivity
+            virtual tmp<scalarField> calcThermalDiffusivity
             (
-                chtRegionCoupleBase& owner,
-                const chtRegionCoupleBase& neighbour
+                const chtRegionCoupleBase& owner,
+                const chtRegionCoupleBase& neighbour,
+                const chtRcTemperatureFvPatchScalarField& TwOwn
             ) const;
 
             //- Calculate the temperature
-            virtual void calcTemperature
+            virtual tmp<scalarField> calcTemperature
             (
-                chtRcTemperatureFvPatchScalarField& owner,
+                const chtRcTemperatureFvPatchScalarField& TwOwn,
                 const chtRcTemperatureFvPatchScalarField& neighbour,
                 const chtRegionCoupleBase& ownerK
             ) const;
@@ -168,7 +172,8 @@ public:
                 const lduMatrix& m,
                 const scalarField& coeffs,
                 const direction cmpt,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const;
 
             //- Update result field based on interface functionality
@@ -179,9 +184,9 @@ public:
                 const lduMatrix&,
                 const scalarField& coeffs,
                 const direction cmpt,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const;
-
 };
 
 

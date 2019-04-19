@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -290,7 +290,7 @@ Foam::pointField Foam::autoSnapDriver::smoothPatchDisplacement
         pp.meshPoints(),
         nBoundary,
         plusEqOp<label>(),  // combine op
-        0,                  // null value
+        label(0),           // null value
         false               // no separation
     );
 
@@ -385,7 +385,7 @@ Foam::pointField Foam::autoSnapDriver::smoothPatchDisplacement
             mesh,
             globalNum,
             plusEqOp<label>(),  // combine op
-            0,                  // null value
+            label(0),           // null value
             false               // no separation
         );
 

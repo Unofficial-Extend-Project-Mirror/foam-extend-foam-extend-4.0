@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -165,6 +165,9 @@ class sixDOFODE
 
             //- List of rotational restraints
             PtrList<rotationalRestraint> rotationalRestraints_;
+
+            //- List of combined translational and rotational restraints
+            PtrList<combinedRestraint> combinedRestraints_;
 
 
     // Private Member Functions
@@ -345,6 +348,10 @@ public:
             inline const PtrList<rotationalRestraint>&
             rotationalRestraints() const;
 
+            //- Return const reference to combined restraints
+            inline const PtrList<combinedRestraint>&
+            combinedRestraints() const;
+
 
         // Virtual interface for 6DOF motion state
 
@@ -375,6 +382,15 @@ public:
                 //- Return average rotational velocity in relative coordinate
                 //  system (evaluated at midstep)
                 virtual const dimensionedVector& omegaAverage() const = 0;
+
+
+            // Accelerations in the current time-step
+
+                //- Translational acceleration in absolute coordinate system
+                virtual dimensionedVector translationalAcceleration() const = 0;
+
+                //- Rotational acceleration in relative coordinate system
+                virtual dimensionedVector rotationalAcceleration() const = 0;
 
 
             // Rotations

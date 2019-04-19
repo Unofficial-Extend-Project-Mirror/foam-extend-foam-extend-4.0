@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -225,7 +225,7 @@ Foam::MeshedSurfaceProxy<Face>::MeshedSurfaceProxy
     const pointField& pointLst,
     const List<Face>& faceLst,
     const List<surfZone>& zoneLst,
-    const List<label>& faceMap
+    const labelList& faceMap
 )
 :
     points_(pointLst),

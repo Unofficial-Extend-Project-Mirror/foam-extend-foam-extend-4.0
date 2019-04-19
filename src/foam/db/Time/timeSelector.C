@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -53,7 +53,7 @@ bool Foam::timeSelector::selected(const instant& value) const
 
 Foam::List<bool> Foam::timeSelector::selected(const instantList& Times) const
 {
-    List<bool> lst(Times.size(), false);
+    boolList lst(Times.size(), false);
 
     // Check ranges, avoid false positive on constant/
     forAll(Times, timeI)
@@ -166,7 +166,7 @@ Foam::instantList Foam::timeSelector::select
 {
     if (timeDirs.size())
     {
-        List<bool> selectTimes(timeDirs.size(), true);
+        boolList selectTimes(timeDirs.size(), true);
 
         // Determine locations of constant/ and 0/ directories
         label constantIdx = -1;
@@ -316,7 +316,7 @@ Foam::instantList Foam::timeSelector::select
 
     if (timeDirs.size() && args.optionFound("newTimes"))
     {
-        List<bool> selectTimes(timeDirs.size(), true);
+        boolList selectTimes(timeDirs.size(), true);
 
         forAll(timeDirs, timeI)
         {

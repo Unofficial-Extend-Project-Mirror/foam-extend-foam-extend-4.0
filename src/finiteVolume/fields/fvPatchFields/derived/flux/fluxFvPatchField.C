@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -147,8 +147,8 @@ void fluxFvPatchField<Type>::updateCoeffs()
         this->lookupPatchField
         (
             gammaName_,
-            reinterpret_cast<const volScalarField*>(NULL),
-            reinterpret_cast<const scalar*>(NULL)
+            reinterpret_cast<const volScalarField*>(0),
+            reinterpret_cast<const scalar*>(0)
         );
 
     this->gradient() = reactivity_*flux_/gammap;
@@ -163,6 +163,7 @@ void fluxFvPatchField<Type>::write(Ostream& os) const
     fixedGradientFvPatchField<Type>::write(os);
     flux_.writeEntry("flux", os);
     reactivity_.writeEntry("reactivity", os);
+    os.writeKeyword("gamma") << gammaName_ << token::END_STATEMENT << nl;
     this->writeEntry("value", os);
 }
 

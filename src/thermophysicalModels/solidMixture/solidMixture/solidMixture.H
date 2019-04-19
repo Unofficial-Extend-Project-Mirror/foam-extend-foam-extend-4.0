@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ class solidMixture
     // Private data
 
         //- The names of the solids
-        List<word> components_;
+        wordList components_;
 
         //- The solid properties
         PtrList<solid> properties_;
@@ -81,7 +81,7 @@ public:
     // Member Functions
 
         //- Return the sold names
-        inline const List<word>& components() const
+        inline const wordList& components() const
         {
             return components_;
         }

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -137,7 +137,7 @@ bool Foam::dictionary::substituteKeyword(const word& keyword)
     const entry* ePtr = lookupEntryPtr(varName, true, true);
 
     // if defined insert its entries into this dictionary
-    if (ePtr != NULL)
+    if (ePtr != nullptr)
     {
         const dictionary& addDict = ePtr->dict();
 

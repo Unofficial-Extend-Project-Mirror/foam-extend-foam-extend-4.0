@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -481,7 +481,7 @@ void Foam::mergePolyMesh::merge()
         {
             Info << "Updating point zones" << endl;
 
-            List<DynamicList<label> > pzPoints(pointZoneNames_.size());
+            List<dynamicLabelList > pzPoints(pointZoneNames_.size());
             forAll(pointZones_, pointI)
             {
                 label zoneID = pointZones_[pointI];
@@ -506,7 +506,7 @@ void Foam::mergePolyMesh::merge()
         {
             Info << "Updating face zones" << endl;
 
-            List<DynamicList<label> > fzFaces(faceZoneNames_.size());
+            List<dynamicLabelList > fzFaces(faceZoneNames_.size());
             List<DynamicList<bool> >  fzFlips(faceZoneNames_.size());
 
             forAll(faceZones_, faceI)
@@ -540,7 +540,7 @@ void Foam::mergePolyMesh::merge()
         {
             Info << "Updating cell zones" << endl;
 
-            List<DynamicList<label> > czCells(cellZoneNames_.size());
+            List<dynamicLabelList > czCells(cellZoneNames_.size());
             forAll(cellZones_, cellI)
             {
                 label zoneID = cellZones_[cellI];

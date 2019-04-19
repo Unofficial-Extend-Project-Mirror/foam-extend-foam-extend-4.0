@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -106,8 +106,8 @@ Foam::DecoupledCoeffField<Type>::toLinear()
 template<class Type>
 Foam::DecoupledCoeffField<Type>::DecoupledCoeffField(const label size)
 :
-    scalarCoeffPtr_(NULL),
-    linearCoeffPtr_(NULL),
+    scalarCoeffPtr_(nullptr),
+    linearCoeffPtr_(nullptr),
     size_(size)
 {}
 
@@ -119,8 +119,8 @@ Foam::DecoupledCoeffField<Type>::DecoupledCoeffField
 )
 :
     refCount(),
-    scalarCoeffPtr_(NULL),
-    linearCoeffPtr_(NULL),
+    scalarCoeffPtr_(nullptr),
+    linearCoeffPtr_(nullptr),
     size_(f.size())
 {
     if (f.scalarCoeffPtr_)
@@ -137,8 +137,8 @@ Foam::DecoupledCoeffField<Type>::DecoupledCoeffField
 template<class Type>
 Foam::DecoupledCoeffField<Type>::DecoupledCoeffField(Istream& is)
 :
-    scalarCoeffPtr_(NULL),
-    linearCoeffPtr_(NULL),
+    scalarCoeffPtr_(nullptr),
+    linearCoeffPtr_(nullptr),
     size_(0)
 {
     // Read keyword and pick up allocated field

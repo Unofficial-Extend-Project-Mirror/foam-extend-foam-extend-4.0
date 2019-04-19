@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -466,11 +466,11 @@ Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
     userProfileFile_(fileName::null),
     shadowIndex_(-1),
     zoneIndex_(-1),
-    patchToPatchPtr_(NULL),
-    zoneAddressingPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL),
-    localParallelPtr_(NULL),
-    receiveAddrPtr_(NULL)
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    receiveAddrPtr_(nullptr)
 {}
 
 
@@ -499,11 +499,11 @@ Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
     stackAxisType_(stackAxisType),
     userProfileFile_(fileName::null),
     shadowIndex_(-1),
-    patchToPatchPtr_(NULL),
-    zoneAddressingPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL),
-    localParallelPtr_(NULL),
-    receiveAddrPtr_(NULL)
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    receiveAddrPtr_(nullptr)
 {}
 
 
@@ -533,11 +533,11 @@ Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
     stackAxisType_(mixingPlaneInterpolation::STACK_UNKNOWN),
     userProfileFile_(fileName::null),
     shadowIndex_(-1),
-    patchToPatchPtr_(NULL),
-    zoneAddressingPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL),
-    localParallelPtr_(NULL),
-    receiveAddrPtr_(NULL)
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    receiveAddrPtr_(nullptr)
 {
     // When construting from dictionary, only master side information will be
     // read and used.  This requires special check, because polyBoundaryMesh
@@ -605,30 +605,7 @@ Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
 }
 
 
-Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
-(
-    const mixingPlanePolyPatch& pp,
-    const polyBoundaryMesh& bm
-)
-:
-    coupledPolyPatch(pp, bm),
-    shadowName_(pp.shadowName_),
-    zoneName_(pp.zoneName_),
-    csPtr_(pp.csPtr_->clone()),
-    discretisationType_(pp.discretisationType_),
-    sweepAxisType_(pp.sweepAxisType_),
-    stackAxisType_(pp.stackAxisType_),
-    userProfileFile_(pp.userProfileFile_),
-    shadowIndex_(-1),
-    patchToPatchPtr_(NULL),
-    zoneAddressingPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL),
-    localParallelPtr_(NULL),
-    receiveAddrPtr_(NULL)
-{}
-
-
-//- Construct as copy, resetting the face list and boundary mesh data
+// Construct as copy, resetting the face list and boundary mesh data
 Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
 (
     const mixingPlanePolyPatch& pp,
@@ -647,11 +624,56 @@ Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
     stackAxisType_(pp.stackAxisType_),
     userProfileFile_(pp.userProfileFile_),
     shadowIndex_(-1),
-    patchToPatchPtr_(NULL),
-    zoneAddressingPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL),
-    localParallelPtr_(NULL),
-    receiveAddrPtr_(NULL)
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    receiveAddrPtr_(nullptr)
+{}
+
+
+Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
+(
+    const mixingPlanePolyPatch& pp
+)
+:
+    coupledPolyPatch(pp),
+    shadowName_(pp.shadowName_),
+    zoneName_(pp.zoneName_),
+    csPtr_(pp.csPtr_->clone()),
+    discretisationType_(pp.discretisationType_),
+    sweepAxisType_(pp.sweepAxisType_),
+    stackAxisType_(pp.stackAxisType_),
+    userProfileFile_(pp.userProfileFile_),
+    shadowIndex_(-1),
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    receiveAddrPtr_(nullptr)
+{}
+
+
+Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
+(
+    const mixingPlanePolyPatch& pp,
+    const polyBoundaryMesh& bm
+)
+:
+    coupledPolyPatch(pp, bm),
+    shadowName_(pp.shadowName_),
+    zoneName_(pp.zoneName_),
+    csPtr_(pp.csPtr_->clone()),
+    discretisationType_(pp.discretisationType_),
+    sweepAxisType_(pp.sweepAxisType_),
+    stackAxisType_(pp.stackAxisType_),
+    userProfileFile_(pp.userProfileFile_),
+    shadowIndex_(-1),
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    receiveAddrPtr_(nullptr)
 {}
 
 

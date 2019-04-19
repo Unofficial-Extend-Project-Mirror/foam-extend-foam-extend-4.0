@@ -3,6 +3,11 @@
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
 runApplication preparePar
-runParallel cartesianMesh 4
-runParallel checkMesh 4
-runApplication reconstructParMesh -withZero
+runParallel `which cartesianMesh` 4
+runParallel `which checkMesh` 4
+if [ "$WM_PROJECT" = "OpenFOAM" ]
+then
+runApplication reconstructParMesh -constant -fullMatch
+else
+runApplication reconstructParMesh -zeroTime
+fi

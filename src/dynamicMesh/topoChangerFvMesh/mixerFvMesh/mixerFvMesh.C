@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -390,7 +390,7 @@ Foam::mixerFvMesh::mixerFvMesh
         dict_.lookupOrDefault<point>("rotatingRegionMarker", cs_.origin())
     ),
     attachDetach_(dict_.lookupOrDefault<bool>("attachDetach", false)),
-    movingPointsMaskPtr_(NULL)
+    movingPointsMaskPtr_(nullptr)
 {
     // Make sure the coordinate system does not operate in degrees
     // Bug fix, HJ, 3/Oct/2011

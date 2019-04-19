@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -54,8 +54,8 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
     master_("undefined"),
     contactActive_(false),
     rigidMaster_(false),
-    normalContactModelPtr_(NULL),
-    frictionContactModelPtr_(NULL),
+    normalContactModelPtr_(nullptr),
+    frictionContactModelPtr_(nullptr),
     shadowPatchID_(-1),
     patchInChargeOfCorrection_(-1),
     masterFaceZoneName_("undefined"),
@@ -66,13 +66,13 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
     // slaveFaceZonePatchPoints_(pointField(0)),
     // masterFaceZonePatchFaces_(faceList(0)),
     // slaveFaceZonePatchFaces_(faceList(0)),
-    masterFaceZonePatchPtr_(NULL),
-    slaveFaceZonePatchPtr_(NULL),
+    masterFaceZonePatchPtr_(nullptr),
+    slaveFaceZonePatchPtr_(nullptr),
     interpolationMethod_("undefined"),
-    slaveToMasterPatchToPatchInterpolatorPtr_(NULL),
-    slaveToMasterGgiInterpolatorPtr_(NULL),
-    masterFaceZonePatchInterpolatorPtr_(NULL),
-    slaveFaceZonePatchInterpolatorPtr_(NULL),
+    slaveToMasterPatchToPatchInterpolatorPtr_(nullptr),
+    slaveToMasterGgiInterpolatorPtr_(nullptr),
+    masterFaceZonePatchInterpolatorPtr_(nullptr),
+    slaveFaceZonePatchInterpolatorPtr_(nullptr),
     oldMasterFaceZonePoints_(0,vector::zero),
     oldSlaveFaceZonePoints_(0,vector::zero),
     alg_(Foam::intersection::VISIBLE),
@@ -81,7 +81,7 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
     iCorr_(0),
     correctionFreq_(0),
     orthotropic_(false),
-    stickSlipFieldPtr_(NULL),
+    stickSlipFieldPtr_(nullptr),
     forceCorrection_(false),
     nonLinear_(nonLinearGeometry::OFF)
 {}
@@ -151,8 +151,8 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
         ),
     contactActive_(dict.lookup("contactActive")),
     rigidMaster_(false), //dict.lookup("rigidMaster")),
-    normalContactModelPtr_(NULL),
-    frictionContactModelPtr_(NULL),
+    normalContactModelPtr_(nullptr),
+    frictionContactModelPtr_(nullptr),
     shadowPatchID_
     (
         patch().patch().boundaryMesh().findPatchID(dict.lookup("shadowPatch"))
@@ -196,7 +196,7 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
                  .localPoints()
       )
      :
-     NULL
+     nullptr
      ),
      slaveFaceZonePatchPtr_
      (
@@ -209,7 +209,7 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
              .localPoints()
       )
      :
-     NULL
+     nullptr
      ),
      interpolationMethod_
      (
@@ -218,8 +218,8 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
      :
      word("interpolationMethodUndefinedForSlave")
      ),
-     slaveToMasterPatchToPatchInterpolatorPtr_(NULL),
-     slaveToMasterGgiInterpolatorPtr_(NULL),
+     slaveToMasterPatchToPatchInterpolatorPtr_(nullptr),
+     slaveToMasterGgiInterpolatorPtr_(nullptr),
      masterFaceZonePatchInterpolatorPtr_
      (
          master_
@@ -229,7 +229,7 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
              PrimitivePatch<face, Foam::List, pointField>
      >(*masterFaceZonePatchPtr_)
      :
-     NULL
+     nullptr
      ),
      slaveFaceZonePatchInterpolatorPtr_
      (
@@ -240,7 +240,7 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
              PrimitivePatch<face, Foam::List, pointField>
      >(*slaveFaceZonePatchPtr_)
      :
-     NULL
+     nullptr
      ),
     oldMasterFaceZonePoints_
     (
@@ -563,17 +563,17 @@ void solidContactFvPatchVectorField::autoMap
     const fvPatchFieldMapper& m
 )
 {
-//     if (normalContactModelPtr_ == NULL)
+//     if (normalContactModelPtr_ == nullptr)
 //     {
 //         FatalErrorIn("solidContactFvPatchVectorField::autoMap")
-//             << "NULL contact normal law"
+//             << "nullptr contact normal law"
 //             << abort(FatalError);
 //     }
 
-//     if (frictionContactModelPtr_ == NULL)
+//     if (frictionContactModelPtr_ == nullptr)
 //     {
 //         FatalErrorIn("solidContactFvPatchVectorField::autoMap")
-//             << "NULL contact friction law"
+//             << "nullptr contact friction law"
 //             << abort(FatalError);
 //     }
 
@@ -630,7 +630,7 @@ void solidContactFvPatchVectorField::updateCoeffs()
                 {
                     FatalError
                         << "\nThe patch " << patch().name()
-                        << " has a NULL normalContactModel pointer!"
+                        << " has a nullptr normalContactModel pointer!"
                         << exit(FatalError);
                 }
 
@@ -642,7 +642,7 @@ void solidContactFvPatchVectorField::updateCoeffs()
                 {
                     FatalError
                         << "\nThe patch " << patch().name()
-                        << " has a NULL frictionContactModel pointer!"
+                        << " has a nullptr frictionContactModel pointer!"
                         << exit(FatalError);
                 }
 
@@ -654,7 +654,7 @@ void solidContactFvPatchVectorField::updateCoeffs()
                 slaveFaceZonePatchPtr_ = Upatch.slaveFaceZonePatchPtr();
 
                 // get patchToPatch and GGI interpolator pointers
-                // one of them is NULL
+                // one of them is nullptr
                 slaveToMasterGgiInterpolatorPtr_ =
                     Upatch.slaveToMasterGgiInterpolatorPtr();
                 slaveToMasterPatchToPatchInterpolatorPtr_ =
@@ -663,7 +663,7 @@ void solidContactFvPatchVectorField::updateCoeffs()
             else
             {
                 FatalErrorIn("solidContactFvPatchVectorField::updateCoeff()")
-                    << "NULL contactLaw\ncontactLaw not created by master."
+                    << "nullptr contactLaw\ncontactLaw not created by master."
                     << abort(FatalError);
             }
         }
@@ -1482,9 +1482,9 @@ void solidContactFvPatchVectorField::write(Ostream& os) const
         if (!frictionContactModelPtr_)
           {
             // pointer gets dropped sometimes, not sure what the problem is
-            // FatalError << "fricContactModel is NULL for slave"
+            // FatalError << "fricContactModel is nullptr for slave"
             //              << exit(FatalError);
-            Warning << "fricContactModel is NULL for slave" << nl
+            Warning << "fricContactModel is nullptr for slave" << nl
                     << "stickSlip field not written"
                     << endl;
           }

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -72,41 +72,14 @@ int main(int argc, char *argv[])
     while (runTime.run())
     {
 #       include "readControls.H"
-#       include "CourantNo.H"
+#       include "immersedBoundaryCourantNo.H"
 #       include "setDeltaT.H"
 
         runTime++;
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        bool meshChanged = mesh.update();
-
-        U.correctBoundaryConditions();
-        p.correctBoundaryConditions();
-        aU.correctBoundaryConditions();
-        phi.correctBoundaryConditions();
-        turbulence->correct();
-
-#       include "updateIbMasks.H"
-#       include "volContinuity.H"
-
-        if (runTime.outputTime())
-        {
-            volScalarField divMeshPhi("divMeshPhi", mag(fvc::surfaceIntegrate(mesh.phi())));
-            divMeshPhi.write();
-        }
-
-        if (checkMeshCourantNo)
-        {
-#           include "meshCourantNo.H"
-        }
-
-        // Fluxes will be corrected to absolute velocity
-        // HJ, 6/Feb/2009
-#       include "correctPhi.H"
-
-        // Make the fluxes relative to the mesh motion
-        fvc::makeRelative(phi, U);
+#       include "correctMeshMotion.H"
 
         // --- PIMPLE loop
         while (pimple.loop())

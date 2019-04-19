@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -130,7 +130,7 @@ const Foam::scalarField& Foam::thoboisSliding::movingPointsMaskTop(const label i
 {
     if(movingPointsMaskTopPtr_)
     {
-        movingPointsMaskTopPtr_ = NULL;
+        movingPointsMaskTopPtr_ = nullptr;
     }
 
     if (!movingPointsMaskTopPtr_)
@@ -217,7 +217,7 @@ const Foam::scalarField& Foam::thoboisSliding::movingPointsMaskBottom(const labe
 {
     if(movingPointsMaskBottomPtr_)
     {
-        movingPointsMaskBottomPtr_ = NULL;
+        movingPointsMaskBottomPtr_ = nullptr;
     }
 
     if (!movingPointsMaskBottomPtr_)
@@ -277,7 +277,7 @@ const Foam::scalarField& Foam::thoboisSliding::movingPointsMaskPiston() const
 {
     if(movingPointsMaskPistonPtr_)
     {
-        movingPointsMaskPistonPtr_ = NULL;
+        movingPointsMaskPistonPtr_ = nullptr;
     }
 
     if (!movingPointsMaskPistonPtr_)
@@ -338,7 +338,7 @@ const Foam::scalarField& Foam::thoboisSliding::movingPointsMaskPistonValves(cons
 {
     if(movingPointsMaskPistonValvesPtr_)
     {
-        movingPointsMaskPistonValvesPtr_ = NULL;
+        movingPointsMaskPistonValvesPtr_ = nullptr;
     }
 
     if (!movingPointsMaskPistonValvesPtr_)

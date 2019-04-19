@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -130,7 +130,7 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
         // Try and consume interfaces as they become available
         bool allUpdated = false;
 
-        for (label i = 0; i < Pstream::nPollProcInterfaces; i++)
+        for (int i = 0; i < Pstream::nPollProcInterfaces; i++)
         {
             allUpdated = true;
 

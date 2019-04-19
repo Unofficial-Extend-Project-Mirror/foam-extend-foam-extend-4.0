@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -945,7 +945,7 @@ labelList faMesh::internalPoints() const
     const edgeList& edges = patch().edges();
     label nIntEdges = patch().nInternalEdges();
 
-    List<bool> internal (nPoints(), true);
+    boolList internal (nPoints(), true);
 
     for (label curEdge = nIntEdges; curEdge < edges.size(); curEdge++)
     {
@@ -981,7 +981,7 @@ labelList faMesh::boundaryPoints() const
     const edgeList& edges = patch().edges();
     label nIntEdges = patch().nInternalEdges();
 
-    List<bool> internal (nPoints(), true);
+    boolList internal (nPoints(), true);
 
     for (label curEdge = nIntEdges; curEdge < edges.size(); curEdge++)
     {

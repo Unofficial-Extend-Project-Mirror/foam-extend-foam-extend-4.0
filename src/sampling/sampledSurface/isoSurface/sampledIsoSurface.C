@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -504,13 +504,13 @@ Foam::sampledIsoSurface::sampledIsoSurface
     average_(dict.lookupOrDefault("average", false)),
     zoneID_(dict.lookupOrDefault("zone", word::null), mesh.cellZones()),
     exposedPatchName_(word::null),
-    surfPtr_(NULL),
-    facesPtr_(NULL),
+    surfPtr_(nullptr),
+    facesPtr_(nullptr),
     prevTimeIndex_(-1),
-    storedVolFieldPtr_(NULL),
-    volFieldPtr_(NULL),
-    storedPointFieldPtr_(NULL),
-    pointFieldPtr_(NULL)
+    storedVolFieldPtr_(nullptr),
+    volFieldPtr_(nullptr),
+    storedPointFieldPtr_(nullptr),
+    pointFieldPtr_(nullptr)
 {
     if (!sampledSurface::interpolate())
     {

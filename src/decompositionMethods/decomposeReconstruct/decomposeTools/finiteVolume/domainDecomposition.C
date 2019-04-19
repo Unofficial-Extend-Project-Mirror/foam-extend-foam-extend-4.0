@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -27,6 +27,7 @@ License
 #include "foamTime.H"
 #include "dictionary.H"
 #include "labelIOList.H"
+#include "labelIOField.H"
 #include "processorPolyPatch.H"
 #include "passiveProcessorPolyPatch.H"
 #include "fvMesh.H"
@@ -525,7 +526,7 @@ bool Foam::domainDecomposition::writeDecomposition()
 
     // Note: get cellLevel and pointLevel. Avoid checking whether they exist or
     // not by hand. If they don't exist, simply assume that the level is 0
-    const labelIOList globalCellLevel
+    const labelIOField globalCellLevel
     (
         IOobject
         (
@@ -536,10 +537,10 @@ bool Foam::domainDecomposition::writeDecomposition()
             IOobject::READ_IF_PRESENT,
             IOobject::NO_WRITE
         ),
-        labelList(mesh_.nCells(), 0)
+        labelField(mesh_.nCells(), 0)
     );
 
-    const labelIOList globalPointLevel
+    const labelIOField globalPointLevel
     (
         IOobject
         (
@@ -550,7 +551,7 @@ bool Foam::domainDecomposition::writeDecomposition()
             IOobject::READ_IF_PRESENT,
             IOobject::NO_WRITE
         ),
-        labelList(mesh_.nPoints(), 0)
+        labelField(mesh_.nPoints(), 0)
     );
 
 
@@ -695,7 +696,7 @@ bool Foam::domainDecomposition::writeDecomposition()
 
         // Create and write cellLevel and pointLevel information
         const unallocLabelList& cellMap = cellProcAddressing;
-        labelIOList procCellLevel
+        labelIOField procCellLevel
         (
             IOobject
             (
@@ -706,12 +707,12 @@ bool Foam::domainDecomposition::writeDecomposition()
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
-            labelList(globalCellLevel, cellMap)
+            labelField(globalCellLevel, cellMap)
         );
         procCellLevel.write();
 
         const unallocLabelList& pointMap = pointProcAddressing;
-        labelIOList procPointLevel
+        labelIOField procPointLevel
         (
             IOobject
             (
@@ -722,7 +723,7 @@ bool Foam::domainDecomposition::writeDecomposition()
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
-            labelList(globalPointLevel, pointMap)
+            labelField(globalPointLevel, pointMap)
         );
         procPointLevel.write();
     }

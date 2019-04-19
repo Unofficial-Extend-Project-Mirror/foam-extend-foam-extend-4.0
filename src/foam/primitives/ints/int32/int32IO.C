@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ int32_t Foam::readInt32(Istream& is)
 
 bool Foam::read(const char* buf, int32_t& s)
 {
-    char *endptr = NULL;
+    char *endptr = nullptr;
     errno = 0;
     intmax_t l = strtoimax(buf, &endptr, 10);
     s = int32_t(l);

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -39,6 +39,7 @@ Author
 #include "BlockSolverPerformance.H"
 #include "BlockCGSolver.H"
 #include "BlockBiCGStabSolver.H"
+#include "BlockGMRESSolver.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -56,8 +57,8 @@ Foam::coarseBlockAMGLevel<Type>::coarseBlockAMGLevel
 :
     addrPtr_(addrPtr),
     matrixPtr_(matrixPtr),
-    x_(matrixPtr_->diag().size(),pTraits<Type>::zero),
-    b_(matrixPtr_->diag().size(),pTraits<Type>::zero),
+    x_(matrixPtr_->diag().size(), pTraits<Type>::zero),
+    b_(matrixPtr_->diag().size(), pTraits<Type>::zero),
     dict_(dict),
     coarseningPtr_
     (
@@ -212,25 +213,27 @@ void Foam::coarseBlockAMGLevel<Type>::solve
         "topLevelCorr"
     );
 
-    label maxIter = Foam::min(2*coarseningPtr_->minCoarseEqns(), 100);
-
     // Create artificial dictionary for top-level solution
     dictionary topLevelDict;
     topLevelDict.add("nDirections", "5");
-    topLevelDict.add("minIter", 1);
-    topLevelDict.add("maxIter", maxIter);
+    topLevelDict.add("preconditioner", "ILUC0");
+    topLevelDict.add("minIter", 0);
+    topLevelDict.add("maxIter", 500);
     topLevelDict.add("tolerance", tolerance);
     topLevelDict.add("relTol", relTol);
 
     // Avoid issues with round-off on strict tolerance setup
     // HJ, 27/Jun/2013
-    // Create multiplication function object
-    typename BlockCoeff<Type>::multiply mult;
+    x = pTraits<Type>::zero;
 
     // Switch of debug in top-level direct solve
     label oldDebug = blockLduMatrix::debug();
 
     if (blockLduMatrix::debug >= 4)
+    {
+        blockLduMatrix::debug = 2;
+    }
+    else if (blockLduMatrix::debug == 3)
     {
         blockLduMatrix::debug = 1;
     }
@@ -241,9 +244,6 @@ void Foam::coarseBlockAMGLevel<Type>::solve
 
     if (matrixPtr_->symmetric())
     {
-        // Note: top-level preconditioner is incorrect: FIX.  HJ, 3/Oct/2017
-        topLevelDict.add("preconditioner", "Cholesky");
-
         coarseSolverPerf = BlockCGSolver<Type>
         (
             "topLevelCorr",
@@ -253,8 +253,6 @@ void Foam::coarseBlockAMGLevel<Type>::solve
     }
     else
     {
-        topLevelDict.add("preconditioner", "ILUC0");
-
         coarseSolverPerf =
         BlockBiCGStabSolver<Type>
         (
@@ -262,6 +260,26 @@ void Foam::coarseBlockAMGLevel<Type>::solve
             matrixPtr_,
             topLevelDict
         ).solve(x, b);
+    }
+
+    // Check for convergence
+
+//    blockLduMatrix::debug = 1;
+//    coarseSolverPerf.print();
+//    Info<< "b: " << gSum(b) << " corr (min, max): (" << gMin(x) << ", " << gMax(x) << endl;
+
+    const scalar magInitialRes = mag(coarseSolverPerf.initialResidual());
+    const scalar magFinalRes = mag(coarseSolverPerf.finalResidual());
+
+    if (magFinalRes > magInitialRes && magInitialRes > 1e-12)
+    {
+        if (blockLduMatrix::debug)
+        {
+            Info<< "Divergence in top AMG level" << endl;
+            coarseSolverPerf.print();
+        }
+
+        x = pTraits<Type>::zero;
     }
 
     // Restore debug

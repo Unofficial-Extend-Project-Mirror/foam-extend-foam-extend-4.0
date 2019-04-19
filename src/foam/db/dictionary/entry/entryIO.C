@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -260,7 +260,7 @@ Foam::autoPtr<Foam::entry> Foam::entry::New(Istream& is)
     // Get the next keyword and if invalid return false
     if (!getKeyword(keyword, is))
     {
-        return autoPtr<entry>(NULL);
+        return autoPtr<entry>(nullptr);
     }
     else // Keyword starts entry ...
     {

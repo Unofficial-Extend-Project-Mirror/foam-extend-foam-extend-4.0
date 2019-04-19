@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -308,7 +308,7 @@ void omegaMEWTWallFunctionFvPatchScalarField::updateCoeffs()
         const scalar yPlus = sqrt(tauw)*y[faceI]/nuw[faceI];
 
         // Velocity gradient for viscous sublayer
-		const scalar dudyVis= magGradUw[faceI];
+        const scalar dudyVis= magGradUw[faceI];
 
         // Velocity gradient for log layer
         const scalar dudyLog =

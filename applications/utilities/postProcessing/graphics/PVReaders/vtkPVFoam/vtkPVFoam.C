@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ void Foam::vtkPVFoam::reduceMemory()
     if (!reader_->GetCacheMesh())
     {
         delete meshPtr_;
-        meshPtr_ = NULL;
+        meshPtr_ = nullptr;
     }
 }
 
@@ -222,8 +222,8 @@ Foam::vtkPVFoam::vtkPVFoam
 )
 :
     reader_(reader),
-    dbPtr_(NULL),
-    meshPtr_(NULL),
+    dbPtr_(nullptr),
+    meshPtr_(nullptr),
     meshRegion_(polyMesh::defaultRegion),
     meshDir_(polyMesh::meshSubDir),
     timeIndex_(-1),
@@ -343,7 +343,7 @@ void Foam::vtkPVFoam::updateInfo()
     if (debug)
     {
         Info<< "<beg> Foam::vtkPVFoam::updateInfo"
-            << " [meshPtr=" << (meshPtr_ ? "set" : "NULL") << "] timeIndex="
+            << " [meshPtr=" << (meshPtr_ ? "set" : "nullptr") << "] timeIndex="
             << timeIndex_ << endl;
     }
 
@@ -412,7 +412,7 @@ void Foam::vtkPVFoam::updateFoamMesh()
     if (!reader_->GetCacheMesh())
     {
         delete meshPtr_;
-        meshPtr_ = NULL;
+        meshPtr_ = nullptr;
     }
 
     // Check to see if the FOAM mesh has been created
@@ -533,7 +533,7 @@ void Foam::vtkPVFoam::CleanUp()
 double* Foam::vtkPVFoam::findTimes(int& nTimeSteps)
 {
     int nTimes = 0;
-    double* tsteps = NULL;
+    double* tsteps = nullptr;
 
     if (dbPtr_.valid())
     {

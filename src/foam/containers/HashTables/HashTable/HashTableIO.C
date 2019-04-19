@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ Foam::HashTable<T, Key, Hash>::HashTable(Istream& is, const label size)
     HashTableCore(),
     nElmts_(0),
     tableSize_(HashTableCore::canonicalSize(size)),
-    table_(NULL)
+    table_(nullptr)
 {
     if (tableSize_)
     {

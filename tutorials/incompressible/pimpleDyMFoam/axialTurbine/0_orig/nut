@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     4.0                                |
+|  \\    /   O peration     | Version:     4.1                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -43,7 +43,7 @@ boundaryField
     }
     GVBLADE
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -51,7 +51,7 @@ boundaryField
     }
     GVHUB
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -59,7 +59,7 @@ boundaryField
     }
     GVSHROUD
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -87,7 +87,7 @@ boundaryField
     }
     RUBLADE
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -95,7 +95,7 @@ boundaryField
     }
     RUHUB
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -103,7 +103,7 @@ boundaryField
     }
     RUSHROUD
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -131,7 +131,7 @@ boundaryField
     }
     DTHUB
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -139,7 +139,7 @@ boundaryField
     }
     DTSHROUD
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;

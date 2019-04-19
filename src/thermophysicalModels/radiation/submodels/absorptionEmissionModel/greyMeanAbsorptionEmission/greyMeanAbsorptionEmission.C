@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ Foam::radiation::greyMeanAbsorptionEmission::greyMeanAbsorptionEmission
     absorptionEmissionModel(dict, mesh),
     coeffsDict_((dict.subDict(typeName + "Coeffs"))),
     speciesNames_(0),
-    specieIndex_(0),
+    specieIndex_(label(0)),
     lookUpTable_
     (
         fileName(coeffsDict_.lookup("lookUpTableFileName")),
@@ -176,7 +176,7 @@ Foam::radiation::greyMeanAbsorptionEmission::aCont(const label bandI) const
 
     forAll(a, i)
     {
-        const List<scalar>& species = lookUpTable_.lookUp(ft[i]);
+        const scalarList& species = lookUpTable_.lookUp(ft[i]);
 
         for (label n=0; n<nSpecies; n++)
         {

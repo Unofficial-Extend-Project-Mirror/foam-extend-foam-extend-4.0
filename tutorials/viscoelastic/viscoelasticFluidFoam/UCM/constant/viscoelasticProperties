@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     4.0                                |
+|  \\    /   O peration     | Version:     4.1                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -18,11 +18,11 @@ FoamFile
 
 From:
 Fernandes, C., De Araujo, M.S.B., Ferrás, L.L., Nóbrega, J.M.,
-Improvements in the OpenFOAM numerical code for simulation of 
+Improvements in the OpenFOAM numerical code for simulation of
 steady-state differential viscoelastic flows, 11th OpenFOAM Workshop
 Guimarães, Portugal, June 26 - 30, 2016
 
-and 
+and
 
 De Araujo, M.S.B., Ferras, L.L.,Fernandes, C.,Nobrega, J.M.,
 Improvements ans assessment of the integral viscoelastic solver in OpenFOAM, 11th OpenFOAM Workshop
@@ -33,11 +33,11 @@ Guimarães, Portugal, June 26 - 30, 2016
 
 rheology
 {
-                type 		 	 UCM;
+                type             UCM;
                 rho              rho [1 -3 0 0 0 0 0] 100;
                 etaP             etaP [1 -1 -1 0 0 0 0] 0.25;
                 lambda           lambda [0 0 1 0 0 0 0] 1;
-                etaStab          0.25; 
+                etaStab          0.25;
 }
 
 

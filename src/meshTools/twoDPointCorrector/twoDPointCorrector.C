@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -191,8 +191,8 @@ twoDPointCorrector::twoDPointCorrector(const polyMesh& mesh)
 :
     mesh_(mesh),
     required_(mesh_.nGeometricD() == 2),
-    planeNormalPtr_(NULL),
-    normalEdgeIndicesPtr_(NULL)
+    planeNormalPtr_(nullptr),
+    normalEdgeIndicesPtr_(nullptr)
 {}
 
 

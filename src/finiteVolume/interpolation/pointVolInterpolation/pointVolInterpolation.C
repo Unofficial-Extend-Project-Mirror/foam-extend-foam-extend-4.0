@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -177,8 +177,8 @@ Foam::pointVolInterpolation::pointVolInterpolation
 :
     pointMesh_(pm),
     fvMesh_(vm),
-    volWeightsPtr_(NULL),
-    patchInterpolatorsPtr_(NULL)
+    volWeightsPtr_(nullptr),
+    patchInterpolatorsPtr_(nullptr)
 {}
 
 

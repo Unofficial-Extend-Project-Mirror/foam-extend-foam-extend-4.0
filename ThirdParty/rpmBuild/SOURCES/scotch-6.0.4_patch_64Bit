@@ -1,0 +1,12 @@
+diff -ruN scotch_6.0.4_orig/src/Make.inc/Makefile.inc.i686_pc_linux2.shlib scotch_6.0.4/src/Make.inc/Makefile.inc.i686_pc_linux2.shlib
+--- orig/scotch_6.0.4/src/Make.inc/Makefile.inc.i686_pc_linux2.shlib	2019-01-15 11:26:39.142915259 +0100
++++ scotch_6.0.4/src/Make.inc/Makefile.inc.i686_pc_linux2.shlib	2019-01-15 11:26:58.871041175 +0100
+@@ -9,7 +9,7 @@
+ CCS		= gcc
+ CCP		= mpicc
+ CCD		= mpicc -I$(MPI_HOME)/include
+-INTSIZE		=
++INTSIZE		= -DINTSIZE64
+ CFLAGS		= -O3 $(INTSIZE) -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_RENAME -DSCOTCH_PTHREAD -Drestrict=__restrict -Xlinker --no-as-needed
+ CLIBFLAGS	= -shared -fPIC
+ LDFLAGS		= -lz -lm -pthread -lrt

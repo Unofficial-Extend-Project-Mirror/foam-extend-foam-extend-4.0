@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -132,7 +132,7 @@ void Foam::fvMeshAdder::MapVolField
             newPatchI++
         )
         {
-            fld.boundaryField().set(newPatchI, NULL);
+            fld.boundaryField().set(newPatchI, nullptr);
         }
 
 
@@ -457,7 +457,7 @@ void Foam::fvMeshAdder::MapSurfaceField
             newPatchI++
         )
         {
-            fld.boundaryField().set(newPatchI, NULL);
+            fld.boundaryField().set(newPatchI, nullptr);
         }
 
 

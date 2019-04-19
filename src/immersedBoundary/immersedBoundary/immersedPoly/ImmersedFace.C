@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
-     \\/     M anipulation  |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -66,12 +65,14 @@ void Foam::ImmersedFace<Distance>::createSubfaces
         const scalar edgeLength = curEdge.mag(localPoints);
 
         // Check if there is a legitimate cut to be found
+        // Note: synced tolerances in ImmersedCell and ImmersedFace
+        // HJ, 13/Mar/2019
         if
         (
             depth[start]*depth[end] < 0
          && edgeLength > SMALL
-         && mag(depth[start]) > edgeLength*tolerance_()
-         && mag(depth[end]) > edgeLength*tolerance_()
+         && mag(depth[start]) > edgeLength*immersedPoly::tolerance_()
+         && mag(depth[end]) > edgeLength*immersedPoly::tolerance_()
         )
         {
             // Prepare a new point to insert and determine its location
@@ -178,8 +179,8 @@ void Foam::ImmersedFace<Distance>::createSubfaces
 
     // Analyse new depth
 
-    // For each point, determine if it is submerged(=-1), dry(=1) or
-    // on the surface (=0)
+    // For each point, determine if it is submerged( = -1), dry( = 1) or
+    // on the surface ( = 0)
     labelField isSubmerged(newDepth.size());
 
     forAll (newDepth, pointI)
@@ -271,18 +272,8 @@ void Foam::ImmersedFace<Distance>::createSubfaces
         {
             drySubface_.setSize(nDry);
 
-            // Check area: if it is very small, reset the face
-            if
-            (
-                drySubface_.mag(facePointsAndIntersections_)
-              < immersedPoly::tolerance_()
-            )
-            {
-                // The face is practically wet
-                isAllWet_ = true;
-
-                drySubface_.clear();
-            }
+            // Since cell cut is adjusted, face cut cannot be.
+            // HJ, 5/Apr/2019
         }
 
         if (nWet < 3)
@@ -297,18 +288,8 @@ void Foam::ImmersedFace<Distance>::createSubfaces
         {
             wetSubface_.setSize(nWet);
 
-            // Check area: if it is very small, reset the face
-            if
-            (
-                wetSubface_.mag(facePointsAndIntersections_)
-              < immersedPoly::tolerance_()
-            )
-            {
-                // The face is practically dry
-                isAllDry_ = true;
-
-                wetSubface_.clear();
-            }
+            // Since cell cut is adjusted, face cut cannot be.
+            // HJ, 5/Apr/2019
         }
     }
 }

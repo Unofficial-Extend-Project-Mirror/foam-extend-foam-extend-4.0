@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -182,7 +182,9 @@ void pointPatchInterpolation::interpolate
         }
     }
 
-    // Coupled boundaries already updated. Nothing to do. VV, 4/Dec/2017.
+    // Bugfix: Must update boundary conditions for e.g. fixedValue that changes
+    // within e.g. fvMotion solver. Dario Zivkovic, 21/Dec/2018.
+    pf.correctBoundaryConditions();
 
     if (debug)
     {

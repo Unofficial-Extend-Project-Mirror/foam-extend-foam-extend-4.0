@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -194,7 +194,7 @@ public:
 
             // Private Member Functions
 
-            //- Construct for a given SLListBase with NULL element and link.
+            //- Construct for a given SLListBase with nullptr element and link.
             //  Only used to create endIter
             inline iterator(DLListBase&);
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -179,7 +179,7 @@ skewCorrectedSnGrad<scalar>::correction
         }
     }
 
-    const volVectorField* gradVfPtr(NULL);
+    const volVectorField* gradVfPtr(nullptr);
 
     bool calcGradient = false;
 
@@ -422,7 +422,7 @@ skewCorrectedSnGrad<vector>::correction
         }
     }
 
-    const volTensorField* gradVfPtr(NULL);
+    const volTensorField* gradVfPtr(nullptr);
 
     bool calcGradient = false;
 

@@ -180,10 +180,10 @@ if (fieldTimesUsed.size())
 
 // TODO: allow similar/different time-steps for each cloud
 cloudNo = 0;
-forAllConstIter(HashTable<DynamicList<label> >, cloudTimesUsed, cloudIter)
+forAllConstIter(HashTable<dynamicLabelList >, cloudTimesUsed, cloudIter)
 {
     // const word& cloudName = cloudIter.key();
-    const DynamicList<label>& timesUsed = cloudIter();
+    const dynamicLabelList& timesUsed = cloudIter();
 
     if (timesUsed.size() && cloudNo == 0)
     {

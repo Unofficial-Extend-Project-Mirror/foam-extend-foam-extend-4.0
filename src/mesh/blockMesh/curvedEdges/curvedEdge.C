@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ Foam::curvedEdge::curvedEdge(const curvedEdge& c)
 Foam::autoPtr<Foam::curvedEdge> Foam::curvedEdge::clone() const
 {
     notImplemented("curvedEdge::clone() const");
-    return autoPtr<curvedEdge>(NULL);
+    return autoPtr<curvedEdge>(nullptr);
 }
 
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -322,10 +322,10 @@ void solidCohesiveFixedModeMixFvPatchVectorField::autoMap
     const fvPatchFieldMapper& m
 )
 {
-    // if (cohesiveLawPtr_ == NULL)
+    // if (cohesiveLawPtr_ == nullptr)
     // {
     //     FatalErrorIn("cohesiveFvPatchVectorField::autoMap")
-    //         << "NULL cohesive law"
+    //         << "nullptr cohesive law"
     //             << abort(FatalError);
     // }
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -65,7 +65,7 @@ solidCohesiveFvPatchVectorField::solidCohesiveFvPatchVectorField
     currentGII_(0, 0.0),
     oldGII_(0, 0.0),
     curTimeIndex_(-1),
-    penaltyFactorPtr_(NULL),
+    penaltyFactorPtr_(nullptr),
     penaltyScale_(0.0),
     frictionCoeff_(0.0),
     explicitSeparationDistance_(false),
@@ -105,7 +105,7 @@ solidCohesiveFvPatchVectorField::solidCohesiveFvPatchVectorField
     currentGII_(p.size(), 0.0),
     oldGII_(p.size(), 0.0),
     curTimeIndex_(-1),
-    penaltyFactorPtr_(NULL),
+    penaltyFactorPtr_(nullptr),
     penaltyScale_(readScalar(dict.lookup("penaltyScale"))),
     frictionCoeff_(readScalar(dict.lookup("frictionCoeff"))),
     explicitSeparationDistance_(dict.lookup("explicitSeparationDistance")),

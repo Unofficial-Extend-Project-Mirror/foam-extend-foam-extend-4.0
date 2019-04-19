@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -290,7 +290,7 @@ void writeCells(const polyMesh& mesh, const fileName& timeName)
         const labelList & cFaces  = cells[cellId];
 
         // create (beg,end) indices
-        List<label> indices(cFaces.size() + 1);
+        labelList indices(cFaces.size() + 1);
         indices[0] = indices.size();
 
         label count = indices.size();

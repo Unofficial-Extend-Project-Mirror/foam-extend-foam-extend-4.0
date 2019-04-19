@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -148,6 +148,33 @@ tmp<Field<Type> > overlapGgiFvPatchField<Type>::patchNeighbourField() const
 
     // Expansion and transformation is handled in interpolation
     // HJ, 7/Jan/2009
+    return overlapGgiPatch_.interpolate(sField);
+}
+
+
+template<class Type>
+tmp<scalarField>
+overlapGgiFvPatchField<Type>::untransformedInterpolate
+(
+    const direction cmpt
+) const
+{
+
+    // The easiest way to do interpolation without rotation of vectors is to do
+    // interpolation per components
+
+    const Field<Type>& iField = this->internalField();
+
+    // Get shadow face-cells and assemble shadow field
+    const unallocLabelList& sfc = overlapGgiPatch_.shadow().faceCells();
+
+    scalarField sField(sfc.size());
+
+    forAll (sField, i)
+    {
+        sField[i] = component(iField[sfc[i]], cmpt);
+    }
+
     return overlapGgiPatch_.interpolate(sField);
 }
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -46,19 +46,6 @@ jumpCyclicFvPatchField<Type>::jumpCyclicFvPatchField
 template<class Type>
 jumpCyclicFvPatchField<Type>::jumpCyclicFvPatchField
 (
-    const jumpCyclicFvPatchField<Type>& ptf,
-    const fvPatch& p,
-    const DimensionedField<Type, volMesh>& iF,
-    const fvPatchFieldMapper& mapper
-)
-:
-    cyclicFvPatchField<Type>(ptf, p, iF, mapper)
-{}
-
-
-template<class Type>
-jumpCyclicFvPatchField<Type>::jumpCyclicFvPatchField
-(
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
     const dictionary& dict
@@ -69,6 +56,19 @@ jumpCyclicFvPatchField<Type>::jumpCyclicFvPatchField
     // Call this evaluation in derived classes
     //this->evaluate(Pstream::blocking);
 }
+
+
+template<class Type>
+jumpCyclicFvPatchField<Type>::jumpCyclicFvPatchField
+(
+    const jumpCyclicFvPatchField<Type>& ptf,
+    const fvPatch& p,
+    const DimensionedField<Type, volMesh>& iF,
+    const fvPatchFieldMapper& mapper
+)
+:
+    cyclicFvPatchField<Type>(ptf, p, iF, mapper)
+{}
 
 
 template<class Type>

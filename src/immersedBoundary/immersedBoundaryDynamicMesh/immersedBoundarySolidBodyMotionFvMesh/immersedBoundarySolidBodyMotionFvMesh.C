@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -114,7 +114,7 @@ bool Foam::immersedBoundarySolidBodyMotionFvMesh::update()
         ibMotions_[ibI].movePoints();
     }
 
-    // Force quasi-topological change to rebuild addressng on motion of the
+    // Force quasi-topological change to rebuild addressing on motion of the
     // immersed boundary
     // HJ, 12/Dec/2017
     fvMesh::syncUpdateMesh();

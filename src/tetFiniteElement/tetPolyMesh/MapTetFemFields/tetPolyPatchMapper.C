@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ void Foam::tetPolyPatchMapper::calcAddressing() const
             }
             else
             {
-                addr[nAddr] = labelList(1, 0);
+                addr[nAddr] = labelList(1, label(0));
             }
 
             w[nAddr] = scalarList(1, 1.0);
@@ -231,10 +231,10 @@ Foam::tetPolyPatchMapper::tetPolyPatchMapper
     mpm_(meshMap),
     pMapper_(pMapper),
     fMapper_(fMapper),
-    directPtr_(NULL),
-    directAddrPtr_(NULL),
-    interpolationAddrPtr_(NULL),
-    weightsPtr_(NULL)
+    directPtr_(nullptr),
+    directAddrPtr_(nullptr),
+    interpolationAddrPtr_(nullptr),
+    weightsPtr_(nullptr)
 {}
 
 

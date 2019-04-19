@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -116,6 +116,9 @@ private:
 
             //- Face neighbour
             labelIOList neighbour_;
+
+            //- Is the mesh in a parallel sync state?
+            Switch syncPar_;
 
             //- Have the primitives been cleared
             bool clearedPrimitives_;
@@ -374,10 +377,25 @@ public:
                 return boundary_;
             }
 
+
+        // Mesh state and form
+
             //- Return mesh bounding box
             const boundBox& bounds() const
             {
                 return bounds_;
+            }
+
+            //- Return parallel sync state
+            const Switch& syncPar() const
+            {
+                return syncPar_;
+            }
+
+            //- Return access to parallel sync state
+            Switch& syncPar()
+            {
+                return syncPar_;
             }
 
             //- Return the vector of geometric directions in mesh.

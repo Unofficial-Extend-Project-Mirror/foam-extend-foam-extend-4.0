@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -179,7 +179,7 @@ Description
         if (baseType::argNames##ConstructorTablePtr_)                         \
         {                                                                     \
             delete baseType::argNames##ConstructorTablePtr_;                  \
-            baseType::argNames##ConstructorTablePtr_ = NULL;                  \
+            baseType::argNames##ConstructorTablePtr_ = nullptr;                  \
         }                                                                     \
     }
 
@@ -191,7 +191,7 @@ Description
                                                                               \
     /* Define the constructor function table */                               \
     baseType::argNames##ConstructorTable*                                     \
-        baseType::argNames##ConstructorTablePtr_ = NULL
+        baseType::argNames##ConstructorTablePtr_ = nullptr
 
 
 // not much in use:
@@ -199,7 +199,7 @@ Description
                                                                               \
     /* Define the constructor function table */                               \
     typename baseType::argNames##ConstructorTable*                            \
-        baseType::argNames##ConstructorTablePtr_ = NULL
+        baseType::argNames##ConstructorTablePtr_ = nullptr
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -267,7 +267,7 @@ Description
         if (baseType< Targ >::argNames##ConstructorTablePtr_)                 \
         {                                                                     \
             delete baseType< Targ >::argNames##ConstructorTablePtr_;          \
-            baseType< Targ >::argNames##ConstructorTablePtr_ = NULL;          \
+            baseType< Targ >::argNames##ConstructorTablePtr_ = nullptr;          \
         }                                                                     \
     }
 
@@ -280,7 +280,7 @@ Description
                                                                               \
     /* Define the constructor function table */                               \
     baseType< Targ >::argNames##ConstructorTable*                             \
-        baseType< Targ >::argNames##ConstructorTablePtr_ = NULL
+        baseType< Targ >::argNames##ConstructorTablePtr_ = nullptr
 
 
 // external use:

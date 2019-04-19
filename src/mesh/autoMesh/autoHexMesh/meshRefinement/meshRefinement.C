@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -1959,7 +1959,7 @@ void Foam::meshRefinement::updateMesh
     );
 
     // Update surfaceIndex
-    updateList(map.faceMap(), -1, surfaceIndex_);
+    updateList(map.faceMap(), label(-1), surfaceIndex_);
 
     // Update cached intersection information
     updateIntersections(changedFaces);
@@ -1972,7 +1972,7 @@ void Foam::meshRefinement::updateMesh
         if (userFaceData_[i].first() == KEEPALL)
         {
             // extend list with face-from-face data
-            updateList(map.faceMap(), -1, data);
+            updateList(map.faceMap(), label(-1), data);
         }
         else if (userFaceData_[i].first() == MASTERONLY)
         {

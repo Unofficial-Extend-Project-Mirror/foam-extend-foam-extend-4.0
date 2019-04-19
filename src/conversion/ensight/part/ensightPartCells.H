@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ protected:
     };
 
     // Static data members
-    static List<word> elemTypes_;
+    static wordList elemTypes_;
 
 
 public:
@@ -140,7 +140,7 @@ public:
     // Member Functions
 
         //- static listing of the element types
-        virtual List<word> const& elementTypes() const
+        virtual wordList const& elementTypes() const
         {
             return elemTypes_;
         }

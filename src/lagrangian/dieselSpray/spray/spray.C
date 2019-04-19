@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -205,10 +205,10 @@ Foam::spray::spray
     angleOfWedge_(0.0),
 
     interpolationSchemes_(sprayProperties_.subDict("interpolationSchemes")),
-    UInterpolator_(NULL),
-    rhoInterpolator_(NULL),
-    pInterpolator_(NULL),
-    TInterpolator_(NULL),
+    UInterpolator_(nullptr),
+    rhoInterpolator_(nullptr),
+    pInterpolator_(nullptr),
+    TInterpolator_(nullptr),
 
     sms_(mesh_.nCells(), vector::zero),
     shs_(mesh_.nCells(), 0.0),

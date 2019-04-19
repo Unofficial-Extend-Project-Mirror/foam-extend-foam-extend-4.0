@@ -1,7 +1,7 @@
 #----------------------------------*-sh-*--------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     | Version:     4.0
+#  \\    /   O peration     | Version:     4.1
 #   \\  /    A nd           | Web:         http://www.foam-extend.org
 #    \\/     M anipulation  | For copyright notice see file Copyright
 #------------------------------------------------------------------------------
@@ -54,6 +54,10 @@ export FOAM_VERBOSE=1
 #export OPENMPI_INCLUDE_DIR="`$OPENMPI_BIN_DIR/mpicc --showme:incdirs`"
 #export OPENMPI_COMPILE_FLAGS="`$OPENMPI_BIN_DIR/mpicc --showme:compile`"
 #export OPENMPI_LINK_FLAGS="`$OPENMPI_BIN_DIR/mpicc --showme:link`"
+
+# MPI runtime options
+#export MPI_BUFFER_SIZE=100000000
+#export MPIRUN_OPTIONS=-oversubscribe  # OpenMPI version 3.1
 
 # Specify system installed ThirdParty packages/libraries
 # NB: The packages installed under $WM_THIRD_PARTY_DIR
@@ -211,12 +215,17 @@ export FOAM_VERBOSE=1
 #export WM_THIRD_PARTY_USE_M4_1416=1
 #export WM_THIRD_PARTY_USE_BISON_27=1
 #export WM_THIRD_PARTY_USE_FLEX_2535=1
+#export WM_THIRD_PARTY_USE_CMAKE_322=1
 #export WM_THIRD_PARTY_USE_CMAKE_332=1
-export WM_THIRD_PARTY_USE_CMAKE_322=1
+export WM_THIRD_PARTY_USE_CMAKE_3114=1
 
 #
 # For AllMake.stage2
-export WM_THIRD_PARTY_USE_OPENMPI_188=1
+#export WM_THIRD_PARTY_USE_OPENMPI_400=1
+#export WM_THIRD_PARTY_USE_OPENMPI_400_ConfigureAdditionalArgs='--enable-mpi-cxx --with-verbs'
+export WM_THIRD_PARTY_USE_OPENMPI_311=1
+#export WM_THIRD_PARTY_USE_OPENMPI_311_ConfigureAdditionalArgs='--enable-mpi-cxx --with-verbs'
+#export WM_THIRD_PARTY_USE_OPENMPI_188=1
 #export WM_THIRD_PARTY_USE_OPENMPI_188_ConfigureAdditionalArgs='--enable-mpi-cxx --with-verbs'
 #export WM_THIRD_PARTY_USE_OPENMPI_165=1
 #export WM_THIRD_PARTY_USE_OPENMPI_165_ConfigureAdditionalArgs='--enable-mpi-cxx --with-openib'
@@ -232,19 +241,20 @@ export WM_THIRD_PARTY_USE_OPENMPI_188=1
 export WM_THIRD_PARTY_USE_METIS_510=1
 export WM_THIRD_PARTY_USE_PARMGRIDGEN_10=1
 export WM_THIRD_PARTY_USE_LIBCCMIO_261=1
-export WM_THIRD_PARTY_USE_MESQUITE_212=1
+export WM_THIRD_PARTY_USE_MESQUITE_230=1
 export WM_THIRD_PARTY_USE_SCOTCH_604=1
 #export WM_THIRD_PARTY_USE_SCOTCH_600=1
 export WM_THIRD_PARTY_USE_PARMETIS_403=1
 #export WM_THIRD_PARTY_USE_ZOLTAN_36=1
-export WM_THIRD_PARTY_USE_PYFOAM_064=1
-export WM_THIRD_PARTY_USE_HWLOC_1101=1
+export WM_THIRD_PARTY_USE_PYFOAM_069=1
+export WM_THIRD_PARTY_USE_HWLOC_201=1
+#export WM_THIRD_PARTY_USE_HWLOC_1101=1
 #export WM_THIRD_PARTY_USE_HWLOC_172=1
 
 #
 # For AllMake.stage4
-#export WM_THIRD_PARTY_USE_QT_580=1
-#export WM_THIRD_PARTY_USE_PARAVIEW_541=1
+#export WM_THIRD_PARTY_USE_QT_5111=1
+#export WM_THIRD_PARTY_USE_PARAVIEW_552=1
 export WM_THIRD_PARTY_USE_QT_486=1
 export WM_THIRD_PARTY_USE_PARAVIEW_440=1
 #export WM_THIRD_PARTY_USE_PARAVIEW_431=1

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -46,11 +46,17 @@ Foam::List<T> Foam::transform
 
 
 template <class T>
-void Foam::transformList
-(
-    const tensorField& rotTensor,
-    UList<T>& field
-)
+void Foam::transformList(const tensor& rotTensor, UList<T>& field)
+{
+    forAll(field, i)
+    {
+        field[i] = transform(rotTensor, field[i]);
+    }
+}
+
+
+template <class T>
+void Foam::transformList(const tensorField& rotTensor, UList<T>& field)
 {
     if (rotTensor.size() == 1)
     {
@@ -79,11 +85,17 @@ void Foam::transformList
 
 
 template <class T>
-void Foam::transformList
-(
-    const tensorField& rotTensor,
-    Map<T>& field
-)
+void Foam::transformList(const tensor& rotTensor, Map<T>& field)
+{
+    forAllIter(typename Map<T>, field, iter)
+    {
+        iter() = transform(rotTensor[0], iter());
+    }
+}
+
+
+template <class T>
+void Foam::transformList(const tensorField& rotTensor, Map<T>& field)
 {
     if (rotTensor.size() == 1)
     {
@@ -105,11 +117,17 @@ void Foam::transformList
 
 
 template <class T>
-void Foam::transformList
-(
-    const tensorField& rotTensor,
-    EdgeMap<T>& field
-)
+void Foam::transformList(const tensor& rotTensor, EdgeMap<T>& field)
+{
+    forAllIter(typename EdgeMap<T>, field, iter)
+    {
+        iter() = transform(rotTensor[0], iter());
+    }
+}
+
+
+template <class T>
+void Foam::transformList(const tensorField& rotTensor, EdgeMap<T>& field)
 {
     if (rotTensor.size() == 1)
     {

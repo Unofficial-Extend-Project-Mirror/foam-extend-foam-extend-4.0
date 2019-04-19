@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -430,7 +430,7 @@ void writePatchField
 
     word timeFile = prepend + itoa(timeIndex);
 
-    OFstream *ensightFilePtr = NULL;
+    OFstream *ensightFilePtr = nullptr;
     if (Pstream::master())
     {
         if (timeIndex == 0)
@@ -533,7 +533,7 @@ void ensightFieldAscii
     const labelList& hexes = meshCellSets.hexes;
     const labelList& polys = meshCellSets.polys;
 
-    OFstream *ensightFilePtr = NULL;
+    OFstream *ensightFilePtr = nullptr;
     if (Pstream::master())
     {
         // set the filename of the ensight file
@@ -708,7 +708,7 @@ void ensightFieldBinary
     const labelList& hexes = meshCellSets.hexes;
     const labelList& polys = meshCellSets.polys;
 
-    std::ofstream *ensightFilePtr = NULL;
+    std::ofstream *ensightFilePtr = nullptr;
     if (Pstream::master())
     {
         // set the filename of the ensight file

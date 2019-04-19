@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -522,12 +525,15 @@ void edgeExtractor::findFaceCandidates
 
     const labelList& fPatches = *facePatchPtr;
 
+    bool deleteOtherFacePatchPtr(false);
     if( !otherFacePatchPtr )
     {
-        Map<label> otherFacePatch;
-        findOtherFacePatchesParallel(otherFacePatch, &fPatches);
+        Map<label>* helperPtr = new Map<label>();
 
-        otherFacePatchPtr = &otherFacePatch;
+        findOtherFacePatchesParallel(*helperPtr, facePatchPtr);
+
+        otherFacePatchPtr = helperPtr;
+        deleteOtherFacePatchPtr = true;
     }
 
     const Map<label>& otherFacePatch = *otherFacePatchPtr;
@@ -547,15 +553,15 @@ void edgeExtractor::findFaceCandidates
         forAll(faceEdges, bfI)
         {
             DynList<label> allNeiPatches;
-            forAllRow(faceEdges, bfI, eI)
+            forAllRow(faceEdges, bfI, feI)
             {
-                const label beI = faceEdges(bfI, eI);
+                const label beI = faceEdges(bfI, feI);
 
                 if( edgeFaces.sizeOfRow(beI) == 2 )
                 {
                     label fNei = edgeFaces(beI, 0);
                     if( fNei == bfI )
-                        fNei = edgeFaces(faceEdges(bfI, eI), 1);
+                        fNei = edgeFaces(beI, 1);
 
                     allNeiPatches.appendIfNotIn(fPatches[fNei]);
                 }
@@ -584,6 +590,9 @@ void edgeExtractor::findFaceCandidates
         }
         # endif
     }
+
+    if( deleteOtherFacePatchPtr )
+        deleteDemandDrivenData(otherFacePatchPtr);
 }
 
 void edgeExtractor::findOtherFacePatchesParallel
@@ -654,10 +663,10 @@ edgeExtractor::edgeExtractor
 )
 :
     mesh_(mesh),
-    surfaceEnginePtr_(NULL),
+    surfaceEnginePtr_(nullptr),
     meshOctree_(octree),
-    surfPartitionerPtr_(NULL),
-    surfEdgeClassificationPtr_(NULL),
+    surfPartitionerPtr_(nullptr),
+    surfEdgeClassificationPtr_(nullptr),
     pointValence_(),
     pointPatch_(),
     facePatch_(),

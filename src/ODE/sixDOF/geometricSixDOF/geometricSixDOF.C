@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -452,6 +452,20 @@ const Foam::dimensionedVector& Foam::geometricSixDOF::Uaverage() const
 const Foam::dimensionedVector& Foam::geometricSixDOF::omegaAverage() const
 {
     return omegaAverage_;
+}
+
+
+Foam::dimensionedVector Foam::geometricSixDOF::translationalAcceleration() const
+{
+    // Calculate and return translational acceleration in global c. s.
+    return A(Xrel(), Uaverage(), rotation_, dict().time().value());
+}
+
+
+Foam::dimensionedVector Foam::geometricSixDOF::rotationalAcceleration() const
+{
+    // Calculate and return rotational acceleration in relative c. s.
+    return OmegaDot(rotation_, omegaAverage(), dict().time().value());
 }
 
 

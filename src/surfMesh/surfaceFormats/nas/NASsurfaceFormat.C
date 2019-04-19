@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -362,7 +362,7 @@ bool Foam::fileFormats::NASsurfaceFormat<Face>::read
 
 
     // create default zone names, or from ANSA/Hypermesh information
-    List<word> names(dynSizes.size());
+    wordList names(dynSizes.size());
     forAllConstIter(Map<label>, lookup, iter)
     {
         const label zoneI  = iter();

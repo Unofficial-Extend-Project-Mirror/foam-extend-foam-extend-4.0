@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ class FreeStream
         labelList patches_;
 
         //- The molecule types to be introduced
-        List<label> moleculeTypeIds_;
+        labelList moleculeTypeIds_;
 
         //- The number density of the species in the inflow
         Field<scalar> numberDensities_;

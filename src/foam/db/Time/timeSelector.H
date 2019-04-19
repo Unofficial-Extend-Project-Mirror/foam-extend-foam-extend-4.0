@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ public:
 
         //- Return the set of selected instants in the given list that are
         //  within the ranges
-        List<bool> selected(const instantList&) const;
+        boolList selected(const instantList&) const;
 
         //- Select a list of Time values that are within the ranges
         instantList select(const instantList&) const;

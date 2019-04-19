@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ processorFaPatch::~processorFaPatch()
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-Foam::label Foam::processorFaPatch::comm() const
+int Foam::processorFaPatch::comm() const
 {
     return boundaryMesh().mesh().comm();
 }
@@ -355,7 +355,7 @@ void processorFaPatch::updateMesh()
         {
             // Differing number of points. Probably patch includes
             // part of a cyclic.
-            neighbPointsPtr_ = NULL;
+            neighbPointsPtr_ = nullptr;
         }
     }
 }

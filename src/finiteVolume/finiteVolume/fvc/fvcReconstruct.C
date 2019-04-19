@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -88,11 +88,11 @@ reconstruct
         surfaceSum((mesh.Sf()/mesh.magSf())*ssf);
 
     // Note: hinv inverse must be used to stabilise the inverse on bad meshes
-    // but it gives strange failures
+    // but it gives strange failures.  Fixed hinv.  HJ, 22/Mar/2019
     // HJ, 19/Aug/2015
     reconField.internalField() =
     (
-        inv
+        hinv
         (
             surfaceSum(sqr(mesh.Sf())/mesh.magSf())().internalField()
         )

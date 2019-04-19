@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -103,7 +103,7 @@ void Foam::meshReader::addFaceZones(polyMesh& mesh) const
             (
                 iter.key(),
                 iter(),
-                List<bool>(iter().size(), false),
+                boolList(iter().size(), false),
                 nZone,
                 mesh.faceZones()
             )
@@ -197,7 +197,7 @@ Foam::meshReader::meshReader
     const scalar scaleFactor
 )
     :
-    pointCellsPtr_(NULL),
+    pointCellsPtr_(nullptr),
     nInternalFaces_(0),
     patchStarts_(0),
     patchSizes_(0),

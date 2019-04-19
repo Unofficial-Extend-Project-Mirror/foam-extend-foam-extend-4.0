@@ -31,9 +31,7 @@ int main()
                   &FileType,
                   &Debug,
                   &VIsDouble);
-
     /* DOCEND */
-
 
     /* After TECINI is called, call TECZNE to create one or more
      * zones for your data file. In this example, Zone 1 contains a
@@ -106,7 +104,6 @@ int main()
                   ValueLocation,
                   NULL,
                   &SharConn);
-
     /* DOCEND */
 
     /* DOCSTART:arrow_tecdat_rect.txt*/
@@ -137,7 +134,6 @@ int main()
 
     P_Rect[0] = 10;
 
-
     INTEGER4 IsDouble = 1;
     I = TECDAT112(&NumPts_Rect,   X_Rect, &IsDouble);
     I = TECDAT112(&NumPts_Rect,   Y_Rect, &IsDouble);
@@ -146,7 +142,6 @@ int main()
     /* DOCEND */
 
     /* DOCSTART:arrow_facenodes_rect.txt*/
-
     /* The FaceNodeCounts array is used to describe the number of
      * nodes in each face of the zone. The first value in the array
      * is the number of nodes in Face 1, the second value is the
@@ -160,21 +155,21 @@ int main()
         FaceNodeCounts_Rect[ii] = 4;
 
     /* The FaceNodes array is used to specify the nodes that compose
-      * each face.  For each face (n of N), the number of nodes used
-      * to define the face is specified by the nth value in the
-      * FaceNodeCounts array. For example, if the first value in the
-      * FaceNodeCounts array is 4 (indicating Face 1 is composed of
-      * four nodes), the first four values in the FaceNodes array are
-      * the node numbers of the nodes in Face 1.
-      *
-      * ------------
-      * WARNING
-      * When providing the node numbers for each face, you must
-      * provide the node numbers in a consistent order (either
-      * clockwise or counter-clockwise. Providing the node numbers
-      * out of order results in contorted faces.
-      * ------------
-      */
+     * each face.  For each face (n of N), the number of nodes used
+     * to define the face is specified by the nth value in the
+     * FaceNodeCounts array. For example, if the first value in the
+     * FaceNodeCounts array is 4 (indicating Face 1 is composed of
+     * four nodes), the first four values in the FaceNodes array are
+     * the node numbers of the nodes in Face 1.
+     *
+     * ------------
+     * WARNING
+     * When providing the node numbers for each face, you must
+     * provide the node numbers in a consistent order (either
+     * clockwise or counter-clockwise. Providing the node numbers
+     * out of order results in contorted faces.
+     * ------------
+     */
 
     INTEGER4 *FaceNodes_Rect  = new INTEGER4[TotalNumFaceNodes_Rect];
 
@@ -202,7 +197,7 @@ int main()
     FaceNodes_Rect[14]  = 7;
     FaceNodes_Rect[15]  = 3;
 
-//Nodes for Face 5
+    //Nodes for Face 5
     FaceNodes_Rect[16]  = 6;
     FaceNodes_Rect[17]  = 2;
     FaceNodes_Rect[18]  = 1;
@@ -247,6 +242,12 @@ int main()
      * in Zone 5.
      */
     FaceLeftElems_Rect[3]    = -1;
+
+    I = TECPOLYFACE112(&NumFaces_Rect,
+                       FaceNodeCounts_Rect,
+                       FaceNodes_Rect,
+                       FaceLeftElems_Rect,
+                       FaceRightElems_Rect);
     /* DOCEND */
 
     /* DOCSTART:arrow_tecpoly_rect.txt*/
@@ -276,13 +277,10 @@ int main()
     FaceBndryConnElems_Rect[0]  = 1;
     FaceBndryConnZones_Rect[0]  = 2;
 
-    I = TECPOLY112(FaceNodeCounts_Rect,
-                   FaceNodes_Rect,
-                   FaceLeftElems_Rect,
-                   FaceRightElems_Rect,
-                   FaceBndryConnCounts_Rect,
-                   FaceBndryConnElems_Rect,
-                   FaceBndryConnZones_Rect);
+    I = TECPOLYBCONN112(&NumConnBndryFaces_Rect,
+                        FaceBndryConnCounts_Rect,
+                        FaceBndryConnElems_Rect,
+                        FaceBndryConnZones_Rect);
 
     /* cleanup */
     delete X_Rect;
@@ -359,12 +357,9 @@ int main()
     /* DOCEND */
 
     /* DOCSTART:arrow_tecdat_prism.txt*/
-
-
     double *X_Prism = new double[NumPts_Prism];
     double *Y_Prism = new double[NumPts_Prism];
     double *Z_Prism = new double[NumPts_Prism];
-
 
     /* Set the X and Y variable values, one z-plane at a time */
     double ZVal = 0;
@@ -438,7 +433,7 @@ int main()
     FaceNodes_Prism[13]  = 4;
     FaceNodes_Prism[14]  = 6;
 
-//Nodes for Face 5
+    //Nodes for Face 5
     FaceNodes_Prism[15]  = 1;
     FaceNodes_Prism[16]  = 2;
     FaceNodes_Prism[17]  = 3;
@@ -470,10 +465,15 @@ int main()
      * element and zone for a face.
      */
     FaceLeftElems_Prism[0]  = -1;
+
+    I = TECPOLYFACE112(&NumFaces_Prism,
+                       FaceNodeCounts_Prism,
+                       FaceNodes_Prism,
+                       FaceLeftElems_Prism,
+                       FaceRightElems_Prism);
     /* DOCEND */
 
     /* DOCSTART:arrow_tecpoly_prism.txt*/
-
     INTEGER4 *FaceBndryConnCounts_Prism = new INTEGER4[NumConnBndryFaces_Prism];
     FaceBndryConnCounts_Prism[0] = 2;
 
@@ -500,13 +500,10 @@ int main()
     FaceBndryConnElems_Prism[1]  = 1;
     FaceBndryConnZones_Prism[1]  = 1;
 
-    I = TECPOLY112(FaceNodeCounts_Prism,
-                   FaceNodes_Prism,
-                   FaceLeftElems_Prism,
-                   FaceRightElems_Prism,
-                   FaceBndryConnCounts_Prism,
-                   FaceBndryConnElems_Prism,
-                   FaceBndryConnZones_Prism);
+    I = TECPOLYBCONN112(&NumConnBndryFaces_Prism,
+                        FaceBndryConnCounts_Prism,
+                        FaceBndryConnElems_Prism,
+                        FaceBndryConnZones_Prism);
 
     /* cleanup */
     delete X_Prism;

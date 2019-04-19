@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ Foam::FreeStream<CloudType>::FreeStream
         this->coeffDict().subDict("numberDensities")
     );
 
-    List<word> molecules(numberDensitiesDict.toc());
+    wordList molecules(numberDensitiesDict.toc());
 
     // Initialise the particleFluxAccumulators_
     particleFluxAccumulators_.setSize(patches_.size());
@@ -216,7 +216,7 @@ void Foam::FreeStream<CloudType>::inflow()
             scalar fA = mag(patch.faceAreas()[f]);
 
             // Cumulative triangle area fractions
-            List<scalar> cTriAFracs(nVertices);
+            scalarList cTriAFracs(nVertices);
 
             scalar previousCummulativeSum = 0.0;
 

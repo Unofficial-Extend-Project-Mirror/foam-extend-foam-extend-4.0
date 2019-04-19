@@ -52,7 +52,7 @@
 
                 // valve top points (move all with valve displacement)
                 dynamicLabelList valveTopPoints(nPoints() / 10);
-                List<bool> valveTopPoint(nPoints(), false);
+                boolList valveTopPoint(nPoints(), false);
                 bool foundOne = false;
 
                 const cellList& c = cells();
@@ -170,7 +170,7 @@
 
                 // valve bottom points (move all with valve displacement)
                 dynamicLabelList valveBottomPoints(nPoints() / 10);
-                List<bool> valveBottomPoint(nPoints(), false);
+                boolList valveBottomPoint(nPoints(), false);
                 bool foundOne = false;
 
 

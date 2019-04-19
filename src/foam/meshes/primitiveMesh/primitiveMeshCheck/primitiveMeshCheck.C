@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -166,7 +166,7 @@ bool Foam::primitiveMesh::checkClosedCells
     }
 
     reduce(nErrorClosed, sumOp<label>());
-    
+
     if (nErrorClosed > 0)
     {
         if (debug || report)
@@ -248,7 +248,7 @@ bool Foam::primitiveMesh::checkClosedCells
     {
         scalar maxOpenness = 0;
 
-        for(direction cmpt=0; cmpt<vector::nComponents; cmpt++)
+        for(direction cmpt = 0; cmpt < vector::nComponents; cmpt++)
         {
             maxOpenness = max
             (
@@ -1165,7 +1165,7 @@ bool Foam::primitiveMesh::checkEdgeAlignment
     }
 
     label nDirs = 0;
-    for (direction cmpt=0; cmpt<vector::nComponents; cmpt++)
+    for (direction cmpt = 0; cmpt < vector::nComponents; cmpt++)
     {
         if (directions[cmpt] == 1)
         {
@@ -1187,8 +1187,6 @@ bool Foam::primitiveMesh::checkEdgeAlignment
         return false;
     }
 
-
-
     const pointField& p = points();
     const faceList& fcs = faces();
 
@@ -1204,7 +1202,7 @@ bool Foam::primitiveMesh::checkEdgeAlignment
             label p1 = f.nextLabel(fp);
             if (p0 < p1)
             {
-                vector d(p[p1]-p[p0]);
+                vector d(p[p1] - p[p0]);
                 scalar magD = mag(d);
 
                 if (magD > ROOTVSMALL)
@@ -1214,7 +1212,7 @@ bool Foam::primitiveMesh::checkEdgeAlignment
                     // Check how many empty directions are used by the edge.
                     label nEmptyDirs = 0;
                     label nNonEmptyDirs = 0;
-                    for (direction cmpt=0; cmpt<vector::nComponents; cmpt++)
+                    for (direction cmpt = 0; cmpt < vector::nComponents; cmpt++)
                     {
                         if (mag(d[cmpt]) > 1e-6)
                         {

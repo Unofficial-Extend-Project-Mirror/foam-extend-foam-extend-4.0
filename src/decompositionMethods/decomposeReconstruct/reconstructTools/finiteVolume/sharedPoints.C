@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -132,6 +132,110 @@ Foam::labelListList Foam::sharedPoints::procPatchPairs() const
 }
 
 
+void Foam::sharedPoints::syncMark
+(
+    labelListList& markedPoints,
+    const labelListList& patchPairs,
+    const label fromMesh
+) const
+{
+    label nSynced;
+
+    do
+    {
+        nSynced = 0;
+
+        // Sync mark across processor boundaries
+        for (label meshI = fromMesh; meshI < meshes_.size(); meshI++)
+        {
+            if (meshes_.set(meshI))
+            {
+                const polyMesh& curMesh = meshes_[meshI];
+                const polyBoundaryMesh& patches = curMesh.boundaryMesh();
+
+                labelList& curMarkedPoints = markedPoints[meshI];
+
+                // Collect the points that have been addressed multiple times
+                forAll (patches, patchI)
+                {
+                    const polyPatch& pp = patches[patchI];
+
+                    if (isA<processorPolyPatch>(pp))
+                    {
+                        // My processor patch
+                        const processorPolyPatch& myProcPatch =
+                            refCast<const processorPolyPatch>(pp);
+
+                        // Get local mesh points
+                        const labelList& patchMeshPoints = pp.meshPoints();
+
+                        // Get my local faces
+                        const faceList& patchLocalFaces = pp.localFaces();
+
+                        // Get neighbour processor ID
+                        const int nbrProcID = myProcPatch.neighbProcNo();
+
+                        // Neighbour patch
+                        const polyPatch& nbrPatch =
+                            meshes_[nbrProcID].boundaryMesh()
+                            [patchPairs[meshI][patchI]];
+
+                        // Get neighbour mesh points
+                        const labelList& nbrMeshPoints = nbrPatch.meshPoints();
+
+                        // Get neighbour local faces
+                        const faceList& nbrLocalFaces = nbrPatch.localFaces();
+
+                        labelList& nbrMarkedPoints = markedPoints[nbrProcID];
+
+                        // Note:
+                        // Cannot loop over mesh points because they are sorted
+                        // Use face loops as they are synchronised
+                        // HJ, 21/May/2018
+                        forAll (patchLocalFaces, faceI)
+                        {
+                            const face& curFace = patchLocalFaces[faceI];
+
+                            // Reverse neighbour face (copy)
+                            const face nbrFace =
+                                nbrLocalFaces[faceI].reverseFace();
+
+                            forAll (curFace, fpI)
+                            {
+                                const label patchMpI =
+                                    patchMeshPoints[curFace[fpI]];
+
+                                const label nbrMpI =
+                                    nbrMeshPoints[nbrFace[fpI]];
+
+                                if
+                                (
+                                    curMarkedPoints[patchMpI]
+                                 != nbrMarkedPoints[nbrMpI]
+                                )
+                                {
+                                    const label maxMark =
+                                        Foam::max
+                                        (
+                                            curMarkedPoints[patchMpI],
+                                            nbrMarkedPoints[nbrMpI]
+                                        );
+
+                                    nbrMarkedPoints[nbrMpI] = maxMark;
+                                    curMarkedPoints[patchMpI] = maxMark;
+
+                                    nSynced++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } while (nSynced > 0);
+}
+
+
 void Foam::sharedPoints::calcSharedPoints()
 {
     // Algorithm
@@ -194,113 +298,51 @@ void Foam::sharedPoints::calcSharedPoints()
     labelListList patchPairs = procPatchPairs();
 
     // Communicate and count global points
-    labelList nGlobalPointsPerProc(meshes_.size(), 0);
 
     // Identify, count and communicate points across processor boundaries
     // Repeat until the number of points per processor stabilises,
     // ie. no further points are found through communication
-    label oldNTotalPoints, newNTotalPoints;
-    do
-    {
-        oldNTotalPoints = sum(nGlobalPointsPerProc);
 
-        // Reset the list
-        nGlobalPointsPerProc = 0;
+    // syncMark across all processors
+    syncMark(markedPoints, patchPairs, 0);
 
-        forAll (meshes_, meshI)
-        {
-            if (meshes_.set(meshI))
-            {
-                const polyMesh& curMesh = meshes_[meshI];
-                const polyBoundaryMesh& patches = curMesh.boundaryMesh();
-
-                labelList& curMarkedPoints = markedPoints[meshI];
-
-                // Collect the points that have been addressed multiple times
-                forAll (patches, patchI)
-                {
-                    const polyPatch& pp = patches[patchI];
-
-                    if (isA<processorPolyPatch>(pp))
-                    {
-                        // Found processor patch
-                        const labelList& patchMeshPoints = pp.meshPoints();
-
-                        // My processor patch
-                        const processorPolyPatch& myProcPatch =
-                            refCast<const processorPolyPatch>(pp);
-
-                        // Get neighbour processor ID
-                        const int nbrProcID = myProcPatch.neighbProcNo();
-
-                        // Neighbour patch
-                        const polyPatch& nbrPatch =
-                            meshes_[nbrProcID].boundaryMesh()
-                            [patchPairs[meshI][patchI]];
-
-                        const labelList& nbrMeshPoints = nbrPatch.meshPoints();
-
-                        forAll (patchMeshPoints, mpI)
-                        {
-                            if (curMarkedPoints[patchMeshPoints[mpI]] > 1)
-                            {
-                                // Mark the point on the other processor/side
-                                markedPoints[nbrProcID][nbrMeshPoints[mpI]] =
-                                    curMarkedPoints[patchMeshPoints[mpI]];
-                            }
-                        }
-                    }
-                }
-
-                // Count number of shared points per processor
-                forAll (curMarkedPoints, cpI)
-                {
-                    if (curMarkedPoints[cpI] > 1)
-                    {
-                        nGlobalPointsPerProc[meshI]++;
-                    }
-                }
-            }
-        }
-
-        newNTotalPoints = sum(nGlobalPointsPerProc);
-
-        Info<< "Proc merge pass: " << oldNTotalPoints << " "
-            << newNTotalPoints << endl;
-    } while (oldNTotalPoints != newNTotalPoints);
-
-    Info<< "Number of shared points per processor: " << nGlobalPointsPerProc
-        << endl;
-
-    // Collect points for every processor, in order to re-use the markedPoints
-    // list.  Note: the list of global labels of shared points
-    // will be collected later
+    // Grab marked points
     forAll (meshes_, meshI)
     {
         if (meshes_.set(meshI))
         {
-            labelList& curSharedPoints = sharedPointLabels_[meshI];
-
-            curSharedPoints.setSize(nGlobalPointsPerProc[meshI]);
-
-            // Count inserted points
+            // Count the points and then collect
             label nShared = 0;
 
-            // Get point marking
             const labelList& curMarkedPoints = markedPoints[meshI];
 
             forAll (curMarkedPoints, pointI)
             {
                 if (curMarkedPoints[pointI] > 1)
                 {
-                    curSharedPoints[nShared] = pointI;
+                    nShared++;
+                }
+            }
+
+            labelList& curShared = sharedPointLabels_[meshI];
+            curShared.setSize(nShared);
+
+            // Re-use the counter for insertion
+            nShared = 0;
+
+            forAll (curMarkedPoints, pointI)
+            {
+                if (curMarkedPoints[pointI] > 1)
+                {
+                    curShared[nShared] = pointI;
                     nShared++;
                 }
             }
         }
     }
 
-    // Clear markup list.  It will be used for the global processor point
+    // Clear markup list.  It will be used for the global processor
+    // point index
     forAll (markedPoints, meshI)
     {
         markedPoints[meshI] = -1;
@@ -312,9 +354,6 @@ void Foam::sharedPoints::calcSharedPoints()
     {
         if (meshes_.set(meshI))
         {
-            const polyMesh& curMesh = meshes_[meshI];
-            const polyBoundaryMesh& patches = curMesh.boundaryMesh();
-
             // Get shared points and assign global shared point index
             const labelList& curSharedPoints = sharedPointLabels_[meshI];
 
@@ -324,6 +363,7 @@ void Foam::sharedPoints::calcSharedPoints()
 
             labelList& curMarkedPoints = markedPoints[meshI];
 
+            // Collect shared point addressing
             forAll (curSharedPoints, spI)
             {
                 if (curMarkedPoints[curSharedPoints[spI]] == -1)
@@ -344,47 +384,68 @@ void Foam::sharedPoints::calcSharedPoints()
             }
 
             // Communicate labels accross the boundary using processor patches
-            forAll (patches, patchI)
+            // from this processor to all higher
+            syncMark(markedPoints, patchPairs, meshI);
+        }
+    }
+
+    // debug
+    {
+        pointField gp(nGlobalPoints_);
+        boolList gpSet(nGlobalPoints_, false);
+
+        forAll (meshes_, meshI)
+        {
+            if (meshes_.set(meshI))
             {
-                const polyMesh& curMesh = meshes_[meshI];
-                const polyBoundaryMesh& patches = curMesh.boundaryMesh();
+                // Get points
+                const pointField& P = meshes_[meshI].points();
 
-                // Get point marking
-                const labelList& curMarkedPoints = markedPoints[meshI];
+                // Get list of local point labels that are globally shared
+                const labelList& curShared = sharedPointLabels_[meshI];
 
-                const polyPatch& pp = patches[patchI];
+                // Get index in global point list
+                const labelList& curAddr = sharedPointAddr_[meshI];
 
-                if (isA<processorPolyPatch>(pp))
+                // Loop through all local points
+                forAll (curShared, i)
                 {
-                    // Found processor patch
-
-                    // My processor patch
-                    const processorPolyPatch& myProcPatch =
-                        refCast<const processorPolyPatch>(pp);
-
-                    const labelList& patchMeshPoints = pp.meshPoints();
-
-                    // Get neighbour processor ID
-                    const int nbrProcID = myProcPatch.neighbProcNo();
-
-                    // Neighbour patch
-                    const polyPatch& nbrPatch =
-                        meshes_[nbrProcID].boundaryMesh()
-                        [patchPairs[meshI][patchI]];
-
-                    const labelList& nbrMeshPoints = nbrPatch.meshPoints();
-
-                    forAll (patchMeshPoints, mpI)
+                    if (!gpSet[curAddr[i]])
                     {
-                        if (curMarkedPoints[patchMeshPoints[mpI]] > -1)
+                        // Point not set: set it
+                        gp[curAddr[i]] = P[curShared[i]];
+                        gpSet[curAddr[i]] = true;
+                    }
+                    else
+                    {
+                        // Point already set: check location
+                        if (mag(gp[curAddr[i]] - P[curShared[i]]) > SMALL)
                         {
-                            // Mark opposite side
-                            markedPoints[nbrProcID][nbrMeshPoints[mpI]] =
-                                curMarkedPoints[patchMeshPoints[mpI]];
+                            Info<< "MERGE MISMATCH: mesh" << meshI
+                                << " point: " << curShared[i]
+                                << " dist: " << gp[curAddr[i]] << " "
+                                << P[curShared[i]]
+                                << endl;
                         }
                     }
                 }
             }
+        }
+
+        // Grab marked points
+        OFstream ppp("points.vtk");
+        ppp << "# vtk DataFile Version 2.0" << nl
+            << "points.vtk" << nl
+            << "ASCII" << nl
+            << "DATASET POLYDATA" << nl
+            << "POINTS " << nGlobalPoints_ << " float" << nl;
+
+        forAll (gp, i)
+        {
+            ppp << float(gp[i].x()) << ' '
+                << float(gp[i].y()) << ' '
+                << float(gp[i].z())
+                << nl;
         }
     }
 }

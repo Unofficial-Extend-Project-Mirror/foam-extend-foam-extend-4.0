@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -90,7 +90,7 @@ oscillatingVelocityPointPatchVectorField
     fixedValuePointPatchVectorField(ptf, p, iF, mapper),
     amplitude_(ptf.amplitude_),
     omega_(ptf.omega_),
-    p0_(ptf.p0_)
+    p0_(ptf.p0_, mapper)
 {}
 
 
@@ -109,6 +109,29 @@ oscillatingVelocityPointPatchVectorField
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+void oscillatingVelocityPointPatchVectorField::autoMap
+(
+    const PointPatchFieldMapper& m
+)
+{
+    fixedValuePointPatchVectorField::autoMap(m);
+    p0_.autoMap(m);
+}
+
+void oscillatingVelocityPointPatchVectorField::rmap
+(
+    const PointPatchField
+        <pointPatchField, pointMesh, pointPatch, DummyMatrix, vector>& ptf,
+    const labelList& addr
+)
+{
+    const oscillatingVelocityPointPatchVectorField& oVptf =
+            refCast<const oscillatingVelocityPointPatchVectorField>(ptf);
+
+    fixedValuePointPatchVectorField::rmap(oVptf, addr);
+    p0_.rmap(oVptf.p0_, addr);
+}
 
 void oscillatingVelocityPointPatchVectorField::updateCoeffs()
 {

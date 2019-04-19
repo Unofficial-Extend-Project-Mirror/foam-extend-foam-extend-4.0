@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -97,7 +100,7 @@ inline meshOctreeCubeCoordinates meshOctreeCubeCoordinates::refineForPosition
 ) const
 {
     //- create new boxes in z-order fashion
-    FixedList<label, 3> addPos(0);
+    FixedList<label, 3> addPos(label(0));
     if( i & 1 )
         addPos[0] = 1;
     if( i & 2 )
@@ -523,15 +526,22 @@ inline Istream& operator>>
     meshOctreeCubeCoordinates& cc
 )
 {
-    // Read beginning of meshOctreeCubeCoordinates
+    //- Read beginning of meshOctreeCubeCoordinates
     is.readBegin("meshOctreeCubeCoordinates");
 
+    //- read the level in the octree structure
     label l;
     is >> l;
     cc.level_ = l;
+
+    //- read x, y and z coordinates
+    is.readBegin("meshOctreeCubeCoordinates");
+
     is >> cc.posX_;
     is >> cc.posY_;
     is >> cc.posZ_;
+
+    is.readEnd("meshOctreeCubeCoordinates");
 
     // Read end of meshOctreeCubeCoordinates
     is.readEnd("meshOctreeCubeCoordinates");
@@ -551,9 +561,14 @@ inline Ostream& operator<<
     os << token::BEGIN_LIST;
 
     os << label(cc.level_) << token::SPACE;
+
+    os << token::BEGIN_LIST;
+
     os << cc.posX_ << token::SPACE;
     os << cc.posY_ << token::SPACE;
     os << cc.posZ_ << token::END_LIST;
+
+    os << token::END_LIST;
 
     // Check state of Ostream
     os.check("operator<<(Ostream&, const meshOctreeCubeCoordinates");

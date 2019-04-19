@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -551,23 +551,23 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
                     "((threeK*rho)*alpha)"
                 );
 
-                if (!incremental)
-                {
-                    const fvPatchScalarField& DT =
-                        patch.lookupPatchField<volScalarField, scalar>("DT");
+            if (incremental)
+            {
+                const fvPatchScalarField& DT =
+                    patch.lookupPatchField<volScalarField, scalar>("DT");
 
-                    gradient += n*threeKalpha*DT;
-                }
-                else
-                {
-                    const fvPatchScalarField& T =
-                        patch.lookupPatchField<volScalarField, scalar>("T");
+                gradient += n*threeKalpha*DT;
+            }
+            else
+            {
+                const fvPatchScalarField& T =
+                    patch.lookupPatchField<volScalarField, scalar>("T");
 
-                    const scalarField T0 =
-                        thermo.T0()().boundaryField()[patch.index()];
+                const scalarField T0 =
+                    thermo.T0()().boundaryField()[patch.index()];
 
-                    gradient += n*threeKalpha*(T - T0);
-                }
+                gradient += n*threeKalpha*(T - T0);
+            }
         }
 
         // Higher order non-linear terms

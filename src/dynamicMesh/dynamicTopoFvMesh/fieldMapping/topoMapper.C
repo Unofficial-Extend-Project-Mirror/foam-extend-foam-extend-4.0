@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -189,13 +189,13 @@ topoMapper::topoMapper
 :
     mesh_(mesh),
     dict_(dict),
-    cellMap_(NULL),
-    surfaceMap_(NULL),
-    boundaryMap_(NULL),
+    cellMap_(nullptr),
+    surfaceMap_(nullptr),
+    boundaryMap_(nullptr),
     resetPatchFlag_(mesh.boundaryMesh().size(), false), // Disabled
     fluxCorrector_(fluxCorrector::New(mesh, dict)),
-    cellVolumesPtr_(NULL),
-    cellCentresPtr_(NULL)
+    cellVolumesPtr_(nullptr),
+    cellCentresPtr_(nullptr)
 {}
 
 

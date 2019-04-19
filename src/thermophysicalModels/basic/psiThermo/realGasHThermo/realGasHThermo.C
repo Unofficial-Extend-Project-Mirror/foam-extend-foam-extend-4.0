@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -22,10 +22,10 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Author
-Christian Lucas
-Institut für Thermodynamik
-Technische Universität Braunschweig
-Germany
+    Christian Lucas
+    Institut für Thermodynamik
+    Technische Universität Braunschweig
+    Germany
 
 \*---------------------------------------------------------------------------*/
 
@@ -121,8 +121,8 @@ Foam::realGasHThermo<MixtureType>::realGasHThermo
             "h",
             mesh.time().timeName(),
             obj,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
         ),
         mesh,
         dimensionSet(0, 2, -2, 0, 0),

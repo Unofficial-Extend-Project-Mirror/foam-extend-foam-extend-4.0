@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -137,10 +137,24 @@ Foam::wedgePolyPatch::wedgePolyPatch
 Foam::wedgePolyPatch::wedgePolyPatch
 (
     const wedgePolyPatch& pp,
-    const polyBoundaryMesh& bm
+    const polyBoundaryMesh& bm,
+    const label index,
+    const label newSize,
+    const label newStart
 )
 :
-    polyPatch(pp, bm)
+    polyPatch(pp, bm, index, newSize, newStart)
+{
+    initTransforms();
+}
+
+
+Foam::wedgePolyPatch::wedgePolyPatch
+(
+    const wedgePolyPatch& pp
+)
+:
+    polyPatch(pp)
 {
     initTransforms();
 }
@@ -149,13 +163,10 @@ Foam::wedgePolyPatch::wedgePolyPatch
 Foam::wedgePolyPatch::wedgePolyPatch
 (
     const wedgePolyPatch& pp,
-    const polyBoundaryMesh& bm,
-    const label index,
-    const label newSize,
-    const label newStart
+    const polyBoundaryMesh& bm
 )
 :
-    polyPatch(pp, bm, index, newSize, newStart)
+    polyPatch(pp, bm)
 {
     initTransforms();
 }

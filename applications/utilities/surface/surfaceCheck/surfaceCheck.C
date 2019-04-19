@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
     // ~~~~~~~~~~~~~~~
 
     {
-        DynamicList<label> illegalFaces(surf.size()/100 + 1);
+        dynamicLabelList illegalFaces(surf.size()/100 + 1);
 
         forAll(surf, faceI)
         {
@@ -350,7 +350,7 @@ int main(int argc, char *argv[])
 
         // Dump for subsetting
         {
-            DynamicList<label> problemFaces(surf.size()/100+1);
+            dynamicLabelList problemFaces(surf.size()/100+1);
 
             forAll(triQ, faceI)
             {
@@ -481,7 +481,7 @@ int main(int argc, char *argv[])
     // Check manifold
     // ~~~~~~~~~~~~~~
 
-    DynamicList<label> problemFaces(surf.size()/100 + 1);
+    dynamicLabelList problemFaces(surf.size()/100 + 1);
 
     const labelListList& eFaces = surf.edgeFaces();
 

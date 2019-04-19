@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ engineTimeVaryingUniformFixedValueFvPatchField
 )
 :
     fixedValueFvPatchField<Type>(p, iF),
-    timeDataPtr_(NULL),
+    timeDataPtr_(nullptr),
     engineDB_((refCast<const engineTime>(this->db().time())))
 {}
 
@@ -61,7 +61,7 @@ engineTimeVaryingUniformFixedValueFvPatchField
 :
     fixedValueFvPatchField<Type>(ptf, p, iF, mapper),
     timeDataFileName_(ptf.timeDataFileName_),
-    timeDataPtr_(NULL),
+    timeDataPtr_(nullptr),
     engineDB_((refCast<const engineTime>(this->db().time())))
 {}
 
@@ -77,7 +77,7 @@ engineTimeVaryingUniformFixedValueFvPatchField
 :
     fixedValueFvPatchField<Type>(p, iF),
     timeDataFileName_(fileName(dict.lookup("timeDataFileName")).expand()),
-    timeDataPtr_(NULL),
+    timeDataPtr_(nullptr),
     engineDB_((refCast<const engineTime>(this->db().time())))
 {
     if (dict.found("value"))
@@ -100,7 +100,7 @@ engineTimeVaryingUniformFixedValueFvPatchField
 :
     fixedValueFvPatchField<Type>(ptf),
     timeDataFileName_(ptf.timeDataFileName_),
-    timeDataPtr_(NULL),
+    timeDataPtr_(nullptr),
     engineDB_((refCast<const engineTime>(this->db().time())))
 {}
 
@@ -115,7 +115,7 @@ engineTimeVaryingUniformFixedValueFvPatchField
 :
     fixedValueFvPatchField<Type>(ptf, iF),
     timeDataFileName_(ptf.timeDataFileName_),
-    timeDataPtr_(NULL),
+    timeDataPtr_(nullptr),
     engineDB_((refCast<const engineTime>(this->db().time())))
 {}
 

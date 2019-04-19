@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -294,11 +294,19 @@ inline Cmpt det(const DiagTensor<Cmpt>& t)
 }
 
 
-//- Return the inverse of a symmetric tensor
+//- Return the inverse of a diagonal tensor as a diagonal tensor
 template <class Cmpt>
 inline DiagTensor<Cmpt> inv(const DiagTensor<Cmpt>& dt)
 {
     return DiagTensor<Cmpt>(1.0/dt.xx(), 1.0/dt.yy(), 1.0/dt.zz());
+}
+
+
+//- Return the diagonal of a symmetric tensor as a diagonal tensor
+template <class Cmpt>
+inline DiagTensor<Cmpt> diag(const SymmTensor<Cmpt>& t)
+{
+    return DiagTensor<Cmpt>(t.xx(), t.yy(), t.zz());
 }
 
 

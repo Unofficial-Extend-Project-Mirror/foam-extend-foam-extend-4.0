@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ public:
             }
 
             //- Return the "jump" across the patch as a "half" field
-            virtual tmp<Field<Type> > jump() const 
+            virtual tmp<Field<Type> > jump() const
             {
                 return jump_;
             }

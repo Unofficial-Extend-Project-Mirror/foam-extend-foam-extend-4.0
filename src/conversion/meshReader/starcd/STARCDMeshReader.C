@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -412,7 +412,7 @@ void Foam::meshReaders::STARCD::readCells(const fileName& inputName)
             }
 
             // determine the foam cell shape
-            const cellModel* curModelPtr = NULL;
+            const cellModel* curModelPtr = nullptr;
 
             // fluid/solid cells
             switch (shapeId)
@@ -640,9 +640,9 @@ void Foam::meshReaders::STARCD::readBoundary(const fileName& inputName)
     label lineLabel, starCellId, cellFaceId, starRegion, configNumber;
     word patchType;
 
-    labelList mapToFoamPatchId(1000, -1);
-    labelList nPatchFaces(1000, 0);
-    labelList origRegion(1000, 0);
+    labelList mapToFoamPatchId(1000, label(-1));
+    labelList nPatchFaces(1000, label(0));
+    labelList origRegion(1000, label(0));
     patchTypes_.setSize(1000);
 
     // this is what we seem to need

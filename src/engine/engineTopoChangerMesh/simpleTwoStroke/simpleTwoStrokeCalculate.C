@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -129,7 +129,7 @@ const Foam::scalarField& Foam::simpleTwoStroke::movingPointsMask() const
 {
     if(movingPointsMaskPtr_)
     {
-        movingPointsMaskPtr_ = NULL;
+        movingPointsMaskPtr_ = nullptr;
     }
 
     if (!movingPointsMaskPtr_)

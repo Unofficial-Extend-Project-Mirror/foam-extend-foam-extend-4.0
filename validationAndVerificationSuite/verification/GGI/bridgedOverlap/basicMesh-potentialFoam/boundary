@@ -50,7 +50,7 @@ FoamFile
         type            ggi;
         nFaces          1;
         startFace       39;
-        
+
         shadowPatch     movingSlider;
         zone            staticSliderZone;
         bridgeOverlap   true;

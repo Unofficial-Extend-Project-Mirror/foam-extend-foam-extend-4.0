@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -175,6 +175,54 @@ tmp<Field<Type> > cyclicGgiFvPatchField<Type>::patchNeighbourField() const
     }
 
     return tpnf;
+}
+
+
+template<class Type>
+tmp<scalarField>
+cyclicGgiFvPatchField<Type>::untransformedInterpolate
+(
+    const direction cmpt
+) const
+{
+    const Field<Type>& iField = this->internalField();
+
+    // Get shadow face-cells and assemble shadow field
+    const unallocLabelList& sfc = cyclicGgiPatch_.shadow().faceCells();
+
+    scalarField sField(sfc.size());
+
+    forAll (sField, i)
+    {
+        sField[i] = component(iField[sfc[i]], cmpt);
+    }
+
+    tmp<scalarField> tresult
+    (
+        new scalarField(cyclicGgiPatch_.size())
+    );
+
+    scalarField& result = tresult();
+
+    result = cyclicGgiPatch_.interpolate(sField);
+
+    if (cyclicGgiPatch_.bridgeOverlap())
+    {
+        scalarField cmptMirrorField =
+            this->patchInternalField()().component(cmpt);
+
+        // Set mirror values to fully uncovered faces
+        cyclicGgiPatch_.setUncoveredFaces
+        (
+            cmptMirrorField,
+            result
+        );
+
+        // Add part of the mirror field to partially covered faces
+        cyclicGgiPatch_.addToPartialFaces(cmptMirrorField, result);
+    }
+
+    return tresult;
 }
 
 

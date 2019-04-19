@@ -123,7 +123,7 @@
     // Construct interface from alpha1 distribution
     interfaceProperties interface(alpha1, U, twoPhaseProperties);
 
-     // Construct incompressible turbulence model
+    // Construct incompressible turbulence model
     autoPtr<incompressible::turbulenceModel> turbulence
     (
         incompressible::turbulenceModel::New(U, phi, twoPhaseProperties)

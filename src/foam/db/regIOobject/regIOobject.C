@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ Foam::regIOobject::regIOobject(const IOobject& io, const bool isTime)
       ? 0
       : db().getEvent()
     ),
-    isPtr_(NULL)
+    isPtr_(nullptr)
 {
     // Register with objectRegistry if requested
     if (registerObject())
@@ -107,7 +107,7 @@ Foam::regIOobject::regIOobject(const regIOobject& rio)
     ownedByRegistry_(false),
     watchIndex_(rio.watchIndex_),
     eventNo_(db().getEvent()),
-    isPtr_(NULL)
+    isPtr_(nullptr)
 {
     // Do not register copy with objectRegistry
 }
@@ -122,7 +122,7 @@ Foam::regIOobject::regIOobject(const regIOobject& rio, bool registerCopy)
     ownedByRegistry_(false),
     watchIndex_(-1),
     eventNo_(db().getEvent()),
-    isPtr_(NULL)
+    isPtr_(nullptr)
 {
     if (registerCopy && rio.registered_)
     {
@@ -144,7 +144,7 @@ Foam::regIOobject::regIOobject
     ownedByRegistry_(false),
     watchIndex_(-1),
     eventNo_(db().getEvent()),
-    isPtr_(NULL)
+    isPtr_(nullptr)
 {
     if (registerCopy)
     {
@@ -164,7 +164,7 @@ Foam::regIOobject::regIOobject
     ownedByRegistry_(false),
     watchIndex_(-1),
     eventNo_(db().getEvent()),
-    isPtr_(NULL)
+    isPtr_(nullptr)
 {
     if (registerObject())
     {
@@ -189,7 +189,7 @@ Foam::regIOobject::~regIOobject()
     if (isPtr_)
     {
         delete isPtr_;
-        isPtr_ = NULL;
+        isPtr_ = nullptr;
     }
 
     // Check out of objectRegistry if not owned by the registry
@@ -397,7 +397,7 @@ void Foam::regIOobject::operator=(const IOobject& io)
     if (isPtr_)
     {
         delete isPtr_;
-        isPtr_ = NULL;
+        isPtr_ = nullptr;
     }
 
     // Check out of objectRegistry

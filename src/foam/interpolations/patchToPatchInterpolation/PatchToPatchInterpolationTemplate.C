@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -105,12 +105,12 @@ PatchToPatchInterpolation<FromPatch, ToPatch>::PatchToPatchInterpolation
     toPatch_(toPatch),
     alg_(alg),
     dir_(dir),
-    pointAddressingPtr_(NULL),
-    pointWeightsPtr_(NULL),
-    pointDistancePtr_(NULL),
-    faceAddressingPtr_(NULL),
-    faceWeightsPtr_(NULL),
-    faceDistancePtr_(NULL)
+    pointAddressingPtr_(nullptr),
+    pointWeightsPtr_(nullptr),
+    pointDistancePtr_(nullptr),
+    faceAddressingPtr_(nullptr),
+    faceWeightsPtr_(nullptr),
+    faceDistancePtr_(nullptr)
 {
 }
 
@@ -127,12 +127,12 @@ PatchToPatchInterpolation<FromPatch, ToPatch>::PatchToPatchInterpolation
     toPatch_(ppi.toPatch_),
     alg_(ppi.alg_),
     dir_(ppi.dir_),
-    pointAddressingPtr_(NULL),
-    pointWeightsPtr_(NULL),
-    pointDistancePtr_(NULL),
-    faceAddressingPtr_(NULL),
-    faceWeightsPtr_(NULL),
-    faceDistancePtr_(NULL)
+    pointAddressingPtr_(nullptr),
+    pointWeightsPtr_(nullptr),
+    pointDistancePtr_(nullptr),
+    faceAddressingPtr_(nullptr),
+    faceWeightsPtr_(nullptr),
+    faceDistancePtr_(nullptr)
 {}
 
 

@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -28,8 +31,6 @@ Description
 #include "voronoiMeshGenerator.H"
 #include "triSurf.H"
 #include "demandDrivenData.H"
-#include "objectRegistry.H"
-#include "foamTime.H"
 #include "meshOctreeCreator.H"
 #include "voronoiMeshExtractor.H"
 #include "meshSurfaceEngine.H"
@@ -298,67 +299,53 @@ void voronoiMeshGenerator::renumberMesh()
 
 void voronoiMeshGenerator::generateMesh()
 {
-    try
+    if( controller_.runCurrentStep("templateGeneration") )
     {
-        if( controller_.runCurrentStep("templateGeneration") )
-        {
-            createVoronoiMesh();
-        }
-
-        if( controller_.runCurrentStep("surfaceTopology") )
-        {
-            surfacePreparation();
-        }
-
-        if( controller_.runCurrentStep("surfaceProjection") )
-        {
-            mapMeshToSurface();
-        }
-
-        if( controller_.runCurrentStep("patchAssignment") )
-        {
-            extractPatches();
-        }
-
-        if( controller_.runCurrentStep("edgeExtraction") )
-        {
-            mapEdgesAndCorners();
-
-            optimiseMeshSurface();
-        }
-
-        if( controller_.runCurrentStep("boundaryLayerGeneration") )
-        {
-            generateBoudaryLayers();
-        }
-
-        if( controller_.runCurrentStep("meshOptimisation") )
-        {
-            optimiseFinalMesh();
-
-            projectSurfaceAfterBackScaling();
-        }
-
-        if( controller_.runCurrentStep("boundaryLayerRefinement") )
-        {
-            refBoundaryLayers();
-        }
-
-        renumberMesh();
-
-        replaceBoundaries();
+        createVoronoiMesh();
     }
-    catch(const std::string& message)
+
+    if( controller_.runCurrentStep("surfaceTopology") )
     {
-        Info << message << endl;
+        surfacePreparation();
     }
-    catch(...)
+
+    if( controller_.runCurrentStep("surfaceProjection") )
     {
-        WarningIn
-        (
-            "void voronoiMeshGenerator::generateMesh()"
-        ) << "Meshing process terminated!" << endl;
+        mapMeshToSurface();
     }
+
+    if( controller_.runCurrentStep("patchAssignment") )
+    {
+        extractPatches();
+    }
+
+    if( controller_.runCurrentStep("edgeExtraction") )
+    {
+        mapEdgesAndCorners();
+
+        optimiseMeshSurface();
+    }
+
+    if( controller_.runCurrentStep("boundaryLayerGeneration") )
+    {
+        generateBoudaryLayers();
+    }
+
+    if( controller_.runCurrentStep("meshOptimisation") )
+    {
+        optimiseFinalMesh();
+
+        projectSurfaceAfterBackScaling();
+    }
+
+    if( controller_.runCurrentStep("boundaryLayerRefinement") )
+    {
+        refBoundaryLayers();
+    }
+
+    renumberMesh();
+
+    replaceBoundaries();
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -366,10 +353,10 @@ void voronoiMeshGenerator::generateMesh()
 voronoiMeshGenerator::voronoiMeshGenerator(const Time& time)
 :
     runTime_(time),
-    surfacePtr_(NULL),
-    modSurfacePtr_(NULL),
-    octreePtr_(NULL),
-    pointRegionsPtr_(NULL),
+    surfacePtr_(nullptr),
+    modSurfacePtr_(nullptr),
+    octreePtr_(nullptr),
+    pointRegionsPtr_(nullptr),
     meshDict_
     (
         IOobject
@@ -384,53 +371,67 @@ voronoiMeshGenerator::voronoiMeshGenerator(const Time& time)
     mesh_(time),
     controller_(mesh_)
 {
-    if( true )
-        checkMeshDict cmd(meshDict_);
-
-    const fileName surfaceFile = meshDict_.lookup("surfaceFile");
-
-    surfacePtr_ = new triSurf(runTime_.path()/surfaceFile);
-
-    if( true )
+    try
     {
-        //- save meta data with the mesh (surface mesh + its topology info)
-        triSurfaceMetaData sMetaData(*surfacePtr_);
-        const dictionary& surfMetaDict = sMetaData.metaData();
+        if( true )
+            checkMeshDict cmd(meshDict_);
 
-        mesh_.metaData().add("surfaceFile", surfaceFile, true);
-        mesh_.metaData().add("surfaceMeta", surfMetaDict, true);
+        const fileName surfaceFile = meshDict_.lookup("surfaceFile");
+
+        surfacePtr_ = new triSurf(runTime_.path()/surfaceFile);
+
+        if( true )
+        {
+            //- save meta data with the mesh (surface mesh + its topology info)
+            triSurfaceMetaData sMetaData(*surfacePtr_);
+            const dictionary& surfMetaDict = sMetaData.metaData();
+
+            mesh_.metaData().add("surfaceFile", surfaceFile, true);
+            mesh_.metaData().add("surfaceMeta", surfMetaDict, true);
+        }
+
+        if( surfacePtr_->featureEdges().size() != 0 )
+        {
+            //- create surface patches based on the feature edges
+            //- and update the meshDict based on the given data
+            triSurfacePatchManipulator manipulator(*surfacePtr_);
+
+            const triSurf* surfaceWithPatches =
+                manipulator.surfaceWithPatches(&meshDict_);
+
+            //- delete the old surface and assign the new one
+            deleteDemandDrivenData(surfacePtr_);
+            surfacePtr_ = surfaceWithPatches;
+        }
+
+        if( meshDict_.found("anisotropicSources") )
+        {
+            surfaceMeshGeometryModification surfMod(*surfacePtr_, meshDict_);
+
+            modSurfacePtr_ = surfMod.modifyGeometry();
+
+            octreePtr_ = new meshOctree(*modSurfacePtr_);
+        }
+        else
+        {
+            octreePtr_ = new meshOctree(*surfacePtr_);
+        }
+
+        meshOctreeCreator(*octreePtr_, meshDict_).createOctreeBoxes();
+
+        generateMesh();
     }
-
-    if( surfacePtr_->featureEdges().size() != 0 )
+    catch(const std::string& message)
     {
-        //- create surface patches based on the feature edges
-        //- and update the meshDict based on the given data
-        triSurfacePatchManipulator manipulator(*surfacePtr_);
-
-        const triSurf* surfaceWithPatches =
-            manipulator.surfaceWithPatches(&meshDict_);
-
-        //- delete the old surface and assign the new one
-        deleteDemandDrivenData(surfacePtr_);
-        surfacePtr_ = surfaceWithPatches;
+        Info << message << endl;
     }
-
-    if( meshDict_.found("anisotropicSources") )
+    catch(...)
     {
-        surfaceMeshGeometryModification surfMod(*surfacePtr_, meshDict_);
-
-        modSurfacePtr_ = surfMod.modifyGeometry();
-
-        octreePtr_ = new meshOctree(*modSurfacePtr_);
+        WarningIn
+        (
+            "voronoiMeshGenerator::voronoiMeshGenerator(const Time&)"
+        ) << "Meshing process terminated!" << endl;
     }
-    else
-    {
-        octreePtr_ = new meshOctree(*surfacePtr_);
-    }
-
-    meshOctreeCreator(*octreePtr_, meshDict_).createOctreeBoxes();
-
-    generateMesh();
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

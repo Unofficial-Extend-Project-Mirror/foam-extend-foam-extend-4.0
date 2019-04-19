@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -112,8 +112,8 @@ Foam::processorSAMGInterface::processorSAMGInterface
     label nAgglomPairs = 0;
 
     // Switching prolongation matrices
-    const crMatrix* masterP = NULL;
-    const crMatrix* neighbourP = NULL;
+    const crMatrix* masterP = nullptr;
+    const crMatrix* neighbourP = nullptr;
 
     if (myProcNo() < neighbProcNo())
     {

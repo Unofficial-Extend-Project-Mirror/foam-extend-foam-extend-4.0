@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ Foam::RBFInterpolation::RBFInterpolation
     controlPoints_(controlPoints),
     dataPoints_(dataPoints),
     RBF_(RBFFunction::New(word(dict.lookup("RBF")), dict)),
-    BPtr_(NULL),
+    BPtr_(nullptr),
     focalPoint_(dict.lookup("focalPoint")),
     innerRadius_(readScalar(dict.lookup("innerRadius"))),
     outerRadius_(readScalar(dict.lookup("outerRadius"))),
@@ -191,7 +191,7 @@ Foam::RBFInterpolation::RBFInterpolation
     controlPoints_(rbf.controlPoints_),
     dataPoints_(rbf.dataPoints_),
     RBF_(rbf.RBF_->clone()),
-    BPtr_(NULL),
+    BPtr_(nullptr),
     focalPoint_(rbf.focalPoint_),
     innerRadius_(rbf.innerRadius_),
     outerRadius_(rbf.outerRadius_),

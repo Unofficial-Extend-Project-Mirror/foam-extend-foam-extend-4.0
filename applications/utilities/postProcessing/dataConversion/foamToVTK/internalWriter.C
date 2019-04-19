@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ Foam::internalWriter::internalWriter
         << std::endl;
 
 
-    DynamicList<label> vertLabels(nFaceVerts);
+    dynamicLabelList vertLabels(nFaceVerts);
 
     forAll(vtkVertLabels, cellI)
     {
@@ -110,7 +110,7 @@ Foam::internalWriter::internalWriter
     os_ << "CELL_TYPES " << vtkCellTypes.size() << std::endl;
 
     // Make copy since writing might swap stuff.
-    DynamicList<label> cellTypes(vtkCellTypes.size());
+    dynamicLabelList cellTypes(vtkCellTypes.size());
 
     writeFuns::insert(vtkCellTypes, cellTypes);
 

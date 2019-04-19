@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -279,7 +279,7 @@ public:
                 const label,
                 const label,
                 const label
-            ) const = NULL,
+            ) const = nullptr,
             void (Foam::equationReader::*opScalarFieldFunction_)
             (
                 const equationReader *,
@@ -289,7 +289,7 @@ public:
                 label&,
                 scalarField&,
                 const scalarField&
-            ) const = NULL,
+            ) const = nullptr,
             scalar (Foam::equationReader::*getSourceScalarFunction)
             (
                 const equationReader *,
@@ -297,7 +297,7 @@ public:
                 const label,
                 const label,
                 const label
-            ) const = NULL,
+            ) const = nullptr,
             void (Foam::equationReader::*opScalarFunction)
             (
                 const equationReader *,
@@ -307,7 +307,7 @@ public:
                 label&,
                 scalar&,
                 scalar
-            ) const = NULL,
+            ) const = nullptr,
             dimensionSet (Foam::equationReader::*getSourceDimsFunction)
             (
                 const equationReader *,
@@ -315,7 +315,7 @@ public:
                 const label,
                 const label,
                 const label
-            ) const = NULL,
+            ) const = nullptr,
             void (Foam::equationReader::*opDimsFunction)
             (
                 const equationReader *,
@@ -325,7 +325,7 @@ public:
                 label&,
                 dimensionSet&,
                 dimensionSet
-            ) const = NULL
+            ) const = nullptr
         );
 
 

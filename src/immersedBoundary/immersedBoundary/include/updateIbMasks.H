@@ -20,6 +20,18 @@
     sGammaIn =  magSf.internalField()/
         scalarField::subField(magFaceAreas, mesh.nInternalFaces());
 
+    const scalar maxGamma = max(gammaIn);
+    const scalar maxSGamma = min(sGammaIn);
+    if (maxGamma > 1 || maxSGamma > 1)
+    {
+        WarningIn
+        (
+            "updateIbMasks.H"
+        )
+            << "Unbounded gamma: max(gamma) = "
+            << maxGamma << ", max(sGamma) = " << maxSGamma << endl;
+    }
+
     forAll (mesh.boundary(), patchI)
     {
         if (!isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
@@ -30,6 +42,14 @@
 
             gamma.boundaryField()[patchI] =
                 sGamma.boundaryField()[patchI];
+        }
+        else
+        {
+            sGamma.boundaryField()[patchI] =
+                scalarField(mesh.boundary()[patchI].size(), 1);
+
+            gamma.boundaryField()[patchI] =
+                scalarField(mesh.boundary()[patchI].size(), 1);
         }
     }
 
@@ -66,7 +86,7 @@
 
                     if (!isA<emptyFvPatch>(mesh.boundary()[pI]))
                     {
-                        const label fI = 
+                        const label fI =
                             mesh.boundaryMesh()[pI].whichFace(deadFaces[dfI]);
 
                         sGamma.boundaryField()[pI][fI] = 0;

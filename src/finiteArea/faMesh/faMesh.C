@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -223,24 +223,24 @@ Foam::faMesh::faMesh(const polyMesh& pMesh)
         *this
     ),
     comm_(Pstream::worldComm),
-    patchPtr_(NULL),
-    lduPtr_(NULL),
+    patchPtr_(nullptr),
+    lduPtr_(nullptr),
     curTimeIndex_(time().timeIndex()),
-    SPtr_(NULL),
-    S0Ptr_(NULL),
-    S00Ptr_(NULL),
-    patchStartsPtr_(NULL),
-    LePtr_(NULL),
-    magLePtr_(NULL),
-    centresPtr_(NULL),
-    edgeCentresPtr_(NULL),
-    faceAreaNormalsPtr_(NULL),
-    edgeAreaNormalsPtr_(NULL),
-    pointAreaNormalsPtr_(NULL),
-    faceCurvaturesPtr_(NULL),
-    edgeTransformTensorsPtr_(NULL),
-    correctPatchPointNormalsPtr_(NULL),
-    globalMeshDataPtr_(NULL)
+    SPtr_(nullptr),
+    S0Ptr_(nullptr),
+    S00Ptr_(nullptr),
+    patchStartsPtr_(nullptr),
+    LePtr_(nullptr),
+    magLePtr_(nullptr),
+    centresPtr_(nullptr),
+    edgeCentresPtr_(nullptr),
+    faceAreaNormalsPtr_(nullptr),
+    edgeAreaNormalsPtr_(nullptr),
+    pointAreaNormalsPtr_(nullptr),
+    faceCurvaturesPtr_(nullptr),
+    edgeTransformTensorsPtr_(nullptr),
+    correctPatchPointNormalsPtr_(nullptr),
+    globalMeshDataPtr_(nullptr)
 {
     if (debug)
     {
@@ -319,24 +319,24 @@ Foam::faMesh::faMesh
         0
     ),
     comm_(Pstream::worldComm),
-    patchPtr_(NULL),
-    lduPtr_(NULL),
+    patchPtr_(nullptr),
+    lduPtr_(nullptr),
     curTimeIndex_(time().timeIndex()),
-    SPtr_(NULL),
-    S0Ptr_(NULL),
-    S00Ptr_(NULL),
-    patchStartsPtr_(NULL),
-    LePtr_(NULL),
-    magLePtr_(NULL),
-    centresPtr_(NULL),
-    edgeCentresPtr_(NULL),
-    faceAreaNormalsPtr_(NULL),
-    edgeAreaNormalsPtr_(NULL),
-    pointAreaNormalsPtr_(NULL),
-    faceCurvaturesPtr_(NULL),
-    edgeTransformTensorsPtr_(NULL),
-    correctPatchPointNormalsPtr_(NULL),
-    globalMeshDataPtr_(NULL)
+    SPtr_(nullptr),
+    S0Ptr_(nullptr),
+    S00Ptr_(nullptr),
+    patchStartsPtr_(nullptr),
+    LePtr_(nullptr),
+    magLePtr_(nullptr),
+    centresPtr_(nullptr),
+    edgeCentresPtr_(nullptr),
+    faceAreaNormalsPtr_(nullptr),
+    edgeAreaNormalsPtr_(nullptr),
+    pointAreaNormalsPtr_(nullptr),
+    faceCurvaturesPtr_(nullptr),
+    edgeTransformTensorsPtr_(nullptr),
+    correctPatchPointNormalsPtr_(nullptr),
+    globalMeshDataPtr_(nullptr)
 {
     if (debug)
     {
@@ -367,7 +367,7 @@ Foam::faMesh::faMesh
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        List<label>(0)
+        labelList(0)
     ),
     boundary_
     (
@@ -384,24 +384,24 @@ Foam::faMesh::faMesh
         0
     ),
     comm_(Pstream::worldComm),
-    patchPtr_(NULL),
-    lduPtr_(NULL),
+    patchPtr_(nullptr),
+    lduPtr_(nullptr),
     curTimeIndex_(time().timeIndex()),
-    SPtr_(NULL),
-    S0Ptr_(NULL),
-    S00Ptr_(NULL),
-    patchStartsPtr_(NULL),
-    LePtr_(NULL),
-    magLePtr_(NULL),
-    centresPtr_(NULL),
-    edgeCentresPtr_(NULL),
-    faceAreaNormalsPtr_(NULL),
-    edgeAreaNormalsPtr_(NULL),
-    pointAreaNormalsPtr_(NULL),
-    faceCurvaturesPtr_(NULL),
-    edgeTransformTensorsPtr_(NULL),
-    correctPatchPointNormalsPtr_(NULL),
-    globalMeshDataPtr_(NULL)
+    SPtr_(nullptr),
+    S0Ptr_(nullptr),
+    S00Ptr_(nullptr),
+    patchStartsPtr_(nullptr),
+    LePtr_(nullptr),
+    magLePtr_(nullptr),
+    centresPtr_(nullptr),
+    edgeCentresPtr_(nullptr),
+    faceAreaNormalsPtr_(nullptr),
+    edgeAreaNormalsPtr_(nullptr),
+    pointAreaNormalsPtr_(nullptr),
+    faceCurvaturesPtr_(nullptr),
+    edgeTransformTensorsPtr_(nullptr),
+    correctPatchPointNormalsPtr_(nullptr),
+    globalMeshDataPtr_(nullptr)
 {
     if (debug)
     {
@@ -521,7 +521,7 @@ Foam::faMesh::faMesh
     {
         label curMeshEdge = meshEdges[edgeI];
 
-        labelList curEdgePatchIDs(2, -1);
+        labelList curEdgePatchIDs(2, label(-1));
 
         label patchI = -1;
 
@@ -868,24 +868,24 @@ Foam::faMesh::faMesh
         0
     ),
     comm_(Pstream::worldComm),
-    patchPtr_(NULL),
-    lduPtr_(NULL),
+    patchPtr_(nullptr),
+    lduPtr_(nullptr),
     curTimeIndex_(time().timeIndex()),
-    SPtr_(NULL),
-    S0Ptr_(NULL),
-    S00Ptr_(NULL),
-    patchStartsPtr_(NULL),
-    LePtr_(NULL),
-    magLePtr_(NULL),
-    centresPtr_(NULL),
-    edgeCentresPtr_(NULL),
-    faceAreaNormalsPtr_(NULL),
-    edgeAreaNormalsPtr_(NULL),
-    pointAreaNormalsPtr_(NULL),
-    faceCurvaturesPtr_(NULL),
-    edgeTransformTensorsPtr_(NULL),
-    correctPatchPointNormalsPtr_(NULL),
-    globalMeshDataPtr_(NULL)
+    SPtr_(nullptr),
+    S0Ptr_(nullptr),
+    S00Ptr_(nullptr),
+    patchStartsPtr_(nullptr),
+    LePtr_(nullptr),
+    magLePtr_(nullptr),
+    centresPtr_(nullptr),
+    edgeCentresPtr_(nullptr),
+    faceAreaNormalsPtr_(nullptr),
+    edgeAreaNormalsPtr_(nullptr),
+    pointAreaNormalsPtr_(nullptr),
+    faceCurvaturesPtr_(nullptr),
+    edgeTransformTensorsPtr_(nullptr),
+    correctPatchPointNormalsPtr_(nullptr),
+    globalMeshDataPtr_(nullptr)
 {
     if (debug)
     {
@@ -1054,13 +1054,13 @@ void Foam::faMesh::addFaPatches(const List<faPatch*>& p)
 }
 
 
-Foam::label Foam::faMesh::comm() const
+int Foam::faMesh::comm() const
 {
     return comm_;
 }
 
 
-Foam::label& Foam::faMesh::comm()
+int& Foam::faMesh::comm()
 {
     return comm_;
 }

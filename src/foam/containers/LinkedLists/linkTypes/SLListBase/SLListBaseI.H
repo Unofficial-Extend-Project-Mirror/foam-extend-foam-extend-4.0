@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -166,7 +166,7 @@ inline Foam::SLListBase::iterator::iterator(SLListBase& s, link* elmt)
 inline Foam::SLListBase::iterator::iterator(SLListBase& s)
 :
     curList_(s),
-    curElmt_(NULL),
+    curElmt_(nullptr),
     curLink_()
 {}
 

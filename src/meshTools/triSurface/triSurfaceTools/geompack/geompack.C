@@ -431,7 +431,7 @@ int *d2vec_sort_heap_index_a ( int n, double a[] )
 
   if ( n < 1 )
   {
-    return NULL;
+    return nullptr;
   }
 
   if ( n == 1 )
@@ -2479,7 +2479,7 @@ int *points_delaunay_naive_2d ( int n, double p[], int *ntri )
   int k;
   int m;
   int pass;
-  int *tri = NULL;
+  int *tri = nullptr;
   double xn;
   double yn;
   double zn;
@@ -2912,7 +2912,7 @@ void timestamp ( void )
   size_t len;
   time_t now;
 
-  now = time ( NULL );
+  now = time ( nullptr );
   tm = localtime ( &now );
 
   len = strftime ( time_buffer, TIME_SIZE, "%d %B %Y %I:%M:%S %p", tm );
@@ -2958,7 +2958,7 @@ char *timestring ( void )
   time_t now;
   char *s;
 
-  now = time ( NULL );
+  now = time ( nullptr );
   tm = localtime ( &now );
 
   s = new char[TIME_SIZE];

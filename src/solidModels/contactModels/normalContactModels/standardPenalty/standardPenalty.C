@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -82,8 +82,8 @@ standardPenalty::standardPenalty
   (readScalar(normalContactModelDict_.lookup("penetrationLimit"))),
   correctMissedVertices_
   (normalContactModelDict_.lookup("correctMissedVertices")),
-  slavePointPointsPtr_(NULL),
-  penaltyFactorPtr_(NULL),
+  slavePointPointsPtr_(nullptr),
+  penaltyFactorPtr_(nullptr),
   penaltyScale_(readScalar(normalContactModelDict_.lookup("penaltyScale"))),
   relaxFac_(readScalar(normalContactModelDict_.lookup("relaxationFactor"))),
   totalSlavePointTrac_(slavePointPenetration_.size(), 0.0),
@@ -102,7 +102,7 @@ standardPenalty::standardPenalty
   oscillationCorr_(normalContactModelDict_.lookup("oscillationCorrection")),
   smoothingSteps_(readInt(normalContactModelDict_.lookup("smoothingSteps"))),
   infoFreq_(readInt(normalContactModelDict_.lookup("infoFrequency"))),
-  contactFilePtr_(NULL)
+  contactFilePtr_(nullptr)
 {
   // master proc open contact info file
   if (Pstream::master())

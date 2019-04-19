@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ private:
         word stateLabel_;
 
         //- List of component names
-        List<word> names_;
+        wordList names_;
 
         //- List of component mass fractions
         scalarField Y_;
@@ -149,7 +149,7 @@ public:
             word phaseTypeName() const;
 
             //- Return the list of component names
-            const List<word>& names() const;
+            const wordList& names() const;
 
             //- Return const access to a component name
             const word& name(const label cmptI) const;

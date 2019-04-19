@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -487,7 +487,7 @@ void solidInterface::makeProcessorPatchFacesMap() const
       new labelListList
       (
        mesh_.boundary().size(),
-       labelList(0,-1)
+       labelList()
        );
     processorPatchMapPtr_  =
       new labelList
@@ -550,17 +550,17 @@ solidInterface::solidInterface
   name_(name),
   mesh_(mesh),
   rheology_(rheology),
-  subMeshPtr_(NULL),
-  globalInterFacesPtr_(NULL),
-  localInterFacesPtr_(NULL),
-  interfaceUPtr_(NULL),
-  processorPatchesPtr_(NULL),
-  processorPatchFacesPtr_(NULL),
-  processorInterfaceUPtr_(NULL),
-  indicatorPtr_(NULL),
-  indicatorFieldMapPtr_(NULL),
-  processorPatchMapPtr_(NULL),
-  processorPatchFacesMapPtr_(NULL)
+  subMeshPtr_(nullptr),
+  globalInterFacesPtr_(nullptr),
+  localInterFacesPtr_(nullptr),
+  interfaceUPtr_(nullptr),
+  processorPatchesPtr_(nullptr),
+  processorPatchFacesPtr_(nullptr),
+  processorInterfaceUPtr_(nullptr),
+  indicatorPtr_(nullptr),
+  indicatorFieldMapPtr_(nullptr),
+  processorPatchMapPtr_(nullptr),
+  processorPatchFacesMapPtr_(nullptr)
 {}
 
 

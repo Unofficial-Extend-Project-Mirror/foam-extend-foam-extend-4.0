@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -39,6 +39,7 @@ SourceFiles
 #include "IDLList.H"
 #include "IOField.H"
 #include "polyMesh.H"
+#include "CloudDistributeTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -150,6 +151,25 @@ public:
             const bool checkClass = true
         );
 
+        autoPtr<cloudDistribute> cloudDist
+        (
+            const labelList& cellToProc,
+            const labelListList& procCellAddressing,
+            const labelListList& procFaceAddressing
+        )
+        {
+            return autoPtr<cloudDistribute>
+            (
+                new CloudDistribute<ParticleType>
+                (
+                    cellToProc,
+                    procCellAddressing,
+                    procFaceAddressing,
+                    *this
+                )
+            );
+        }
+
 
     // Member Functions
 
@@ -245,9 +265,30 @@ public:
             template<class TrackingData>
             void move(TrackingData& td);
 
+            //- Update mesh
+            virtual void updateMesh()
+            {}
+
             //- Remap the cells of particles corresponding to the
             //  mesh topology change
             virtual void autoMap(const mapPolyMesh&);
+
+            //- Split cloud in load balancing
+            virtual void split
+            (
+                const labelList& cellToProc,
+                const labelListList& procCellAddressing,
+                const labelListList& procFaceAddressing,
+                List<IDLList<ParticleType> >& procClouds
+            );
+
+            //- Rebuild cloud in load balancing
+            virtual void rebuild
+            (
+                List<IDLList<ParticleType> >& receivedClouds,
+                const PtrList<labelIOList>& cellProcAddressing,
+                const PtrList<labelIOList>& faceProcAddressing
+            );
 
 
         // Read

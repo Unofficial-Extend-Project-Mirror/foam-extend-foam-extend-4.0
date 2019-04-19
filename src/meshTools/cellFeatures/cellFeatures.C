@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -390,7 +390,7 @@ Foam::cellFeatures::cellFeatures
     minCos_(minCos),
     cellI_(cellI),
     featureEdge_(10*mesh.cellEdges()[cellI].size()),
-    facesPtr_(NULL),
+    facesPtr_(nullptr),
     faceMap_(0)
 {
     const labelList& cEdges = mesh_.cellEdges()[cellI_];

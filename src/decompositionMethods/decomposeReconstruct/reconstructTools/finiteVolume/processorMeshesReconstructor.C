@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -115,21 +115,32 @@ Foam::processorMeshesReconstructor::readUpdate()
             {
                 stat = procStat;
             }
-            else
+            else if (stat != procStat)
             {
-                if (stat != procStat)
+                if (
+                    (
+                        stat == polyMesh::TOPO_CHANGE
+                     && procStat == polyMesh::TOPO_PATCH_CHANGE
+                    )
+                 || (
+                        procStat == polyMesh::TOPO_CHANGE
+                     && stat == polyMesh::TOPO_PATCH_CHANGE
+                    )
+                )
                 {
-                    FatalErrorIn("processorMeshesReconstructor::readUpdate()")
-                        << "Processor " << procI
-                        << " has a different polyMesh at time "
-                        << meshes_[procI].time().timeName()
-                        << " compared to any previous processors." << nl
-                        << "Please check time "
-                        << meshes_[procI].time().timeName()
-                        << " directories on all processors for consistent"
-                        << " mesh files."
-                        << exit(FatalError);
+                    continue;
                 }
+
+                FatalErrorIn("processorMeshesReconstructor::readUpdate()")
+                    << "Processor " << procI
+                    << " has a different polyMesh at time "
+                    << meshes_[procI].time().timeName()
+                    << " compared to any previous processors." << nl
+                    << "Please check time "
+                    << meshes_[procI].time().timeName()
+                    << " directories on all processors for consistent"
+                    << " mesh files."
+                    << exit(FatalError);
             }
         }
     }

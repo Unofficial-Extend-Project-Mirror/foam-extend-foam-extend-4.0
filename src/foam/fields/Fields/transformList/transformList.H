@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -60,31 +60,78 @@ List<T> transform
 //- Apply transformation to list. Either single transformation tensor
 //  or one tensor per element.
 template<class T>
+void transformList(const tensor&, UList<T>&);
+template<class T>
 void transformList(const tensorField&, UList<T>&);
 
+template<class T>
+void transformList(const tensor&, Map<T>&);
 template<class T>
 void transformList(const tensorField&, Map<T>&);
 
 template<class T>
+void transformList(const tensor&, EdgeMap<T>&);
+template<class T>
 void transformList(const tensorField&, EdgeMap<T>&);
 
 
+// Specialisations for bool
 template<>
-inline void transformList(const tensorField&, UList<label>&)
+inline void transformList(const tensor&, UList<bool>&)
+{}
+template<>
+inline void transformList(const tensorField&, UList<bool>&)
+{}
+template<>
+inline void transformList(const tensor&, Map<bool>&)
+{}
+template<>
+inline void transformList(const tensorField&, Map<bool>&)
+{}
+template<>
+inline void transformList(const tensor&, EdgeMap<bool>&)
+{}
+template<>
+inline void transformList(const tensorField&, EdgeMap<bool>&)
+{}
+
+
+// Specialisations for label
+template<>
+inline void transformList(const tensor&, labelUList&)
+{}
+template<>
+inline void transformList(const tensorField&, labelUList&)
+{}
+template<>
+inline void transformList(const tensor&, Map<label>&)
 {}
 template<>
 inline void transformList(const tensorField&, Map<label>&)
+{}
+template<>
+inline void transformList(const tensor&, EdgeMap<label>&)
 {}
 template<>
 inline void transformList(const tensorField&, EdgeMap<label>&)
 {}
 
 
+// Specialisations for scalar
+template<>
+inline void transformList(const tensor&, UList<scalar>&)
+{}
 template<>
 inline void transformList(const tensorField&, UList<scalar>&)
 {}
 template<>
+inline void transformList(const tensor&, Map<scalar>&)
+{}
+template<>
 inline void transformList(const tensorField&, Map<scalar>&)
+{}
+template<>
+inline void transformList(const tensor&, EdgeMap<scalar>&)
 {}
 template<>
 inline void transformList(const tensorField&, EdgeMap<scalar>&)

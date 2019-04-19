@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -61,11 +61,11 @@ void readNASEdges
     // coordinates of point
     DynamicList<point> points;
     // Nastran index of point
-    DynamicList<label> pointIndices;
+    dynamicLabelList pointIndices;
 
     // beams
     DynamicList<edge> edges;
-    DynamicList<label> edgeIndices;
+    dynamicLabelList edgeIndices;
 
 
     while (is.good())

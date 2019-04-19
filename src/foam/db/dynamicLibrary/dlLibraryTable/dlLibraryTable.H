@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -37,8 +37,6 @@ SourceFiles
 
 #include "label.H"
 #include "DynamicList.H"
-#include "Hash.H"
-#include "HashTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,8 +48,6 @@ namespace Foam
 \*---------------------------------------------------------------------------*/
 
 class dlLibraryTable
-:
-    public HashTable<fileName, void*, Hash<void*> >
 {
     // Private Member Functions
 
@@ -71,12 +67,6 @@ public:
 
     // Declare name of the class and its debug switch
     ClassName("dlLibraryTable");
-
-    // Static data members
-
-        //- Static data someStaticData
-        static dlLibraryTable loadedLibraries;
-
 
     // Constructors
 

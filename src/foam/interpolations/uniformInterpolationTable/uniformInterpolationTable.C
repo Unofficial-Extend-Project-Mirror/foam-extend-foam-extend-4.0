@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ Foam::uniformInterpolationTable<Type>::uniformInterpolationTable
 )
 :
     IOobject(io),
-    List<scalar>(2, 0.0),
+    scalarList(2, 0.0),
     x0_(0.0),
     dx_(1.0),
     log10_(false),
@@ -91,7 +91,7 @@ Foam::uniformInterpolationTable<Type>::uniformInterpolationTable
         IOobject::NO_WRITE,
         false // if used in BCs, could be used by multiple patches
     ),
-    List<scalar>(2, 0.0),
+    scalarList(2, 0.0),
     x0_(readScalar(dict.lookup("x0"))),
     dx_(readScalar(dict.lookup("dx"))),
     log10_(dict.lookupOrDefault<Switch>("log10", false)),
@@ -119,7 +119,7 @@ Foam::uniformInterpolationTable<Type>::uniformInterpolationTable
 )
 :
     IOobject(uit),
-    List<scalar>(uit),
+    scalarList(uit),
     x0_(uit.x0_),
     dx_(uit.dx_),
     log10_(uit.log10_),
@@ -216,7 +216,7 @@ void Foam::uniformInterpolationTable<Type>::write() const
 {
     IOdictionary dict(*this);
 
-    dict.add("data", static_cast<const List<scalar>&>(*this));
+    dict.add("data", static_cast<const scalarList&>(*this));
     dict.add("x0", x0_);
     dict.add("dx", dx_);
     if (log10_)

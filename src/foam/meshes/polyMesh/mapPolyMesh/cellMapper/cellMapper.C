@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -202,7 +202,7 @@ void Foam::cellMapper::calcAddressing() const
             if (addr[cellI].empty())
             {
                 // Mapped from a dummy cell
-                addr[cellI] = labelList(1, 0);
+                addr[cellI] = labelList(1, label(0));
                 w[cellI] = scalarList(1, 1.0);
 
                 insertedCells[nInsertedCells] = cellI;
@@ -233,10 +233,10 @@ Foam::cellMapper::cellMapper(const mapPolyMesh& mpm)
     mpm_(mpm),
     insertedCells_(true),
     direct_(false),
-    directAddrPtr_(NULL),
-    interpolationAddrPtr_(NULL),
-    weightsPtr_(NULL),
-    insertedCellLabelsPtr_(NULL)
+    directAddrPtr_(nullptr),
+    interpolationAddrPtr_(nullptr),
+    weightsPtr_(nullptr),
+    insertedCellLabelsPtr_(nullptr)
 {
     // Check for possibility of direct mapping
     if

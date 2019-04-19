@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -59,20 +59,20 @@ namespace Foam
 //- Does prevention of 0 cell domains and calls parmetis.
 Foam::label Foam::parMetisDecomp::decompose
 (
-    Field<int>& xadj,
-    Field<int>& adjncy,
+    Field<label>& xadj,
+    Field<label>& adjncy,
     const pointField& cellCentres,
-    Field<int>& cellWeights,
-    Field<int>& faceWeights,
-    const List<int>& options,
-    List<int>& finalDecomp
+    Field<label>& cellWeights,
+    Field<label>& faceWeights,
+    const labelList& options,
+    labelList& finalDecomp
 )
 {
     // C style numbering
-    int numFlag = 0;
+    label numFlag = 0;
 
     // Number of dimensions
-    int nDims = 3;
+    label nDims = 3;
 
 
     if (cellCentres.size() != xadj.size()-1)
@@ -85,14 +85,14 @@ Foam::label Foam::parMetisDecomp::decompose
 
 
     // Get number of cells on all processors
-    List<int> nLocalCells(Pstream::nProcs());
+    labelList nLocalCells(Pstream::nProcs());
     nLocalCells[Pstream::myProcNo()] = xadj.size()-1;
     Pstream::gatherList(nLocalCells);
     Pstream::scatterList(nLocalCells);
 
     // Get cell offsets.
-    List<int> cellOffsets(Pstream::nProcs()+1);
-    int nGlobalCells = 0;
+    labelList cellOffsets(Pstream::nProcs()+1);
+    label nGlobalCells = 0;
     forAll(nLocalCells, procI)
     {
         cellOffsets[procI] = nGlobalCells;
@@ -102,7 +102,7 @@ Foam::label Foam::parMetisDecomp::decompose
 
     // Convert pointField into the data type parMetis expects (float or double)
     Field<real_t> xyz(3*cellCentres.size());
-    int compI = 0;
+    label compI = 0;
     forAll(cellCentres, cellI)
     {
         const point& cc = cellCentres[cellI];
@@ -120,7 +120,7 @@ Foam::label Foam::parMetisDecomp::decompose
 
     // Number of cells to send to the next processor
     // (is same as number of cells next processor has to receive)
-    List<int> nSendCells(Pstream::nProcs(), 0);
+    labelList nSendCells(Pstream::nProcs(), 0);
 
     for (label procI = nLocalCells.size()-1; procI >=1; procI--)
     {
@@ -137,11 +137,11 @@ Foam::label Foam::parMetisDecomp::decompose
         // Receive cells from previous processor
         IPstream fromPrevProc(Pstream::blocking, Pstream::myProcNo()-1);
 
-        Field<int> prevXadj(fromPrevProc);
-        Field<int> prevAdjncy(fromPrevProc);
+        Field<label> prevXadj(fromPrevProc);
+        Field<label> prevAdjncy(fromPrevProc);
         Field<real_t> prevXyz(fromPrevProc);
-        Field<int> prevCellWeights(fromPrevProc);
-        Field<int> prevFaceWeights(fromPrevProc);
+        Field<label> prevCellWeights(fromPrevProc);
+        Field<label> prevFaceWeights(fromPrevProc);
 
         if (prevXadj.size() != nSendCells[Pstream::myProcNo()-1])
         {
@@ -172,34 +172,34 @@ Foam::label Foam::parMetisDecomp::decompose
         // Send cells to next processor
         OPstream toNextProc(Pstream::blocking, Pstream::myProcNo()+1);
 
-        int nCells = nSendCells[Pstream::myProcNo()];
-        int startCell = xadj.size()-1 - nCells;
-        int startFace = xadj[startCell];
-        int nFaces = adjncy.size()-startFace;
+        label nCells = nSendCells[Pstream::myProcNo()];
+        label startCell = xadj.size()-1 - nCells;
+        label startFace = xadj[startCell];
+        label nFaces = adjncy.size()-startFace;
 
         // Send for all cell data: last nCells elements
         // Send for all face data: last nFaces elements
         toNextProc
-            << Field<int>::subField(xadj, nCells, startCell)-startFace
-            << Field<int>::subField(adjncy, nFaces, startFace)
+            << Field<label>::subField(xadj, nCells, startCell)-startFace
+            << Field<label>::subField(adjncy, nFaces, startFace)
             << SubField<real_t>(xyz, nDims*nCells, nDims*startCell)
             <<
             (
                 cellWeights.size()
-              ? static_cast<const Field<int>&>
+              ? static_cast<const Field<label>&>
                 (
-                    Field<int>::subField(cellWeights, nCells, startCell)
+                    Field<label>::subField(cellWeights, nCells, startCell)
                 )
-              : Field<int>(0)
+              : Field<label>(0)
             )
             <<
             (
                 faceWeights.size()
-              ? static_cast<const Field<int>&>
+              ? static_cast<const Field<label>&>
                 (
-                    Field<int>::subField(faceWeights, nFaces, startFace)
+                    Field<label>::subField(faceWeights, nFaces, startFace)
                 )
-              : Field<int>(0)
+              : Field<label>(0)
             );
 
         // Remove data that has been sent
@@ -248,9 +248,9 @@ Foam::label Foam::parMetisDecomp::decompose
     }
 
     // Weight info
-    int wgtFlag = 0;
-    int* vwgtPtr = NULL;
-    int* adjwgtPtr = NULL;
+    label wgtFlag = 0;
+    label* vwgtPtr = nullptr;
+    label* adjwgtPtr = nullptr;
 
     if (cellWeights.size())
     {
@@ -265,7 +265,7 @@ Foam::label Foam::parMetisDecomp::decompose
 
 
     // Number of weights or balance constraints
-    int nCon = 1;
+    label nCon = 1;
     // Per processor, per constraint the weight
     Field<real_t> tpwgts(nCon*nProcessors_, 1./nProcessors_);
     // Imbalance tolerance
@@ -282,8 +282,10 @@ Foam::label Foam::parMetisDecomp::decompose
     finalDecomp.setSize(nLocalCells[Pstream::myProcNo()]);
 
     // output: number of cut edges
-    int edgeCut = 0;
+    label edgeCut = 0;
 
+    // Number of parts
+    label nProcs = nProcessors_;
 
     ParMETIS_V3_PartGeomKway
     (
@@ -297,10 +299,10 @@ Foam::label Foam::parMetisDecomp::decompose
         &nDims,
         xyz.begin(),
         &nCon,
-        &nProcessors_,          // nParts
+        &nProcs,                // nParts
         tpwgts.begin(),
         ubvec.begin(),
-        const_cast<List<int>&>(options).begin(),
+        const_cast<List<label>&>(options).begin(),
         &edgeCut,
         finalDecomp.begin(),
         &comm
@@ -315,7 +317,7 @@ Foam::label Foam::parMetisDecomp::decompose
     {
         IPstream fromNextProc(Pstream::blocking, Pstream::myProcNo()+1);
 
-        List<int> nextFinalDecomp(fromNextProc);
+        labelList nextFinalDecomp(fromNextProc);
 
         if (nextFinalDecomp.size() != nSendCells[Pstream::myProcNo()])
         {
@@ -334,10 +336,10 @@ Foam::label Foam::parMetisDecomp::decompose
     {
         OPstream toPrevProc(Pstream::blocking, Pstream::myProcNo()-1);
 
-        int nToPrevious = nSendCells[Pstream::myProcNo()-1];
+        label nToPrevious = nSendCells[Pstream::myProcNo()-1];
 
         toPrevProc <<
-            SubList<int>
+            SubList<label>
             (
                 finalDecomp,
                 nToPrevious,
@@ -399,9 +401,9 @@ Foam::labelList Foam::parMetisDecomp::decompose
 
 
     // Connections
-    Field<int> adjncy;
+    Field<label> adjncy;
     // Offsets into adjncy
-    Field<int> xadj;
+    Field<label> xadj;
     calcDistributedCSR
     (
         mesh_,
@@ -411,16 +413,16 @@ Foam::labelList Foam::parMetisDecomp::decompose
 
 
     // decomposition options. 0 = use defaults
-    List<int> options(3, 0);
+    labelList options(3, label(0));
     //options[0] = 1;     // don't use defaults but use values below
     //options[1] = -1;    // full debug info
     //options[2] = 15;    // random number seed
 
     // cell weights (so on the vertices of the dual)
-    Field<int> cellWeights;
+    Field<label> cellWeights;
 
     // face weights (so on the edges of the dual)
-    Field<int> faceWeights;
+    Field<label> faceWeights;
 
 
     // Check for externally provided cellweights and if so initialise weights
@@ -527,7 +529,7 @@ Foam::labelList Foam::parMetisDecomp::decompose
             faceWeights.setSize(adjncy.size());
 
             // Assume symmetric weights. Keep same ordering as adjncy.
-            List<int> nFacesPerCell(mesh_.nCells(), 0);
+            labelList nFacesPerCell(mesh_.nCells(), 0);
 
             // Handle internal faces
             for (label faceI = 0; faceI < mesh_.nInternalFaces(); faceI++)
@@ -581,7 +583,7 @@ Foam::labelList Foam::parMetisDecomp::decompose
 
 
     // Do actual decomposition
-    List<int> finalDecomp;
+    labelList finalDecomp;
     decompose
     (
         xadj,
@@ -636,7 +638,7 @@ Foam::labelList Foam::parMetisDecomp::decompose
     // Get renumbered owner region on other side of coupled faces
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    List<int> globalNeighbour(mesh_.nFaces()-mesh_.nInternalFaces());
+    labelList globalNeighbour(mesh_.nFaces()-mesh_.nInternalFaces());
 
     forAll(patches, patchI)
     {
@@ -781,24 +783,24 @@ Foam::labelList Foam::parMetisDecomp::decompose
     // Make Metis Distributed CSR (Compressed Storage Format) storage
 
     // Connections
-    Field<int> adjncy;
+    Field<label> adjncy;
 
     // Offsets into adjncy
-    Field<int> xadj;
+    Field<label> xadj;
 
     calcCSR(globalCellCells, adjncy, xadj);
 
     // decomposition options. 0 = use defaults
-    List<int> options(3, 0);
+    labelList options(3, label(0));
     //options[0] = 1;     // don't use defaults but use values below
     //options[1] = -1;    // full debug info
     //options[2] = 15;    // random number seed
 
     // cell weights (so on the vertices of the dual)
-    Field<int> cellWeights;
+    Field<label> cellWeights;
 
     // face weights (so on the edges of the dual)
-    Field<int> faceWeights;
+    Field<label> faceWeights;
 
 
     // Check for externally provided cellweights and if so initialise weights
@@ -860,7 +862,7 @@ Foam::labelList Foam::parMetisDecomp::decompose
 
 
     // Do actual decomposition
-    List<int> finalDecomp;
+    labelList finalDecomp;
     decompose
     (
         xadj,

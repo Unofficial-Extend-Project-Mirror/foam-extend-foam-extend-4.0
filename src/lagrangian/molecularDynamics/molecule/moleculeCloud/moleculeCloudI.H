@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -43,17 +43,17 @@ inline void Foam::moleculeCloud::evaluatePair
 
     const molecule::constantProperties& constPropJ(constProps(idJ));
 
-    List<label> siteIdsI = constPropI.siteIds();
+    labelList siteIdsI = constPropI.siteIds();
 
-    List<label> siteIdsJ = constPropJ.siteIds();
+    labelList siteIdsJ = constPropJ.siteIds();
 
-    List<bool> pairPotentialSitesI = constPropI.pairPotentialSites();
+    boolList pairPotentialSitesI = constPropI.pairPotentialSites();
 
-    List<bool> electrostaticSitesI = constPropI.electrostaticSites();
+    boolList electrostaticSitesI = constPropI.electrostaticSites();
 
-    List<bool> pairPotentialSitesJ = constPropJ.pairPotentialSites();
+    boolList pairPotentialSitesJ = constPropJ.pairPotentialSites();
 
-    List<bool> electrostaticSitesJ = constPropJ.electrostaticSites();
+    boolList electrostaticSitesJ = constPropJ.electrostaticSites();
 
     forAll(siteIdsI, sI)
     {
@@ -174,17 +174,17 @@ inline void Foam::moleculeCloud::evaluatePair
 
     const molecule::constantProperties& constPropRef(constProps(idRef));
 
-    List<label> siteIdsReal = constPropReal.siteIds();
+    labelList siteIdsReal = constPropReal.siteIds();
 
-    List<label> siteIdsRef = constPropRef.siteIds();
+    labelList siteIdsRef = constPropRef.siteIds();
 
-    List<bool> pairPotentialSitesReal = constPropReal.pairPotentialSites();
+    boolList pairPotentialSitesReal = constPropReal.pairPotentialSites();
 
-    List<bool> electrostaticSitesReal = constPropReal.electrostaticSites();
+    boolList electrostaticSitesReal = constPropReal.electrostaticSites();
 
-    List<bool> pairPotentialSitesRef = constPropRef.pairPotentialSites();
+    boolList pairPotentialSitesRef = constPropRef.pairPotentialSites();
 
-    List<bool> electrostaticSitesRef = constPropRef.electrostaticSites();
+    boolList electrostaticSitesRef = constPropRef.electrostaticSites();
 
     forAll(siteIdsReal, sReal)
     {
@@ -293,17 +293,17 @@ inline bool Foam::moleculeCloud::evaluatePotentialLimit
 
     const molecule::constantProperties& constPropJ(constProps(idJ));
 
-    List<label> siteIdsI = constPropI.siteIds();
+    labelList siteIdsI = constPropI.siteIds();
 
-    List<label> siteIdsJ = constPropJ.siteIds();
+    labelList siteIdsJ = constPropJ.siteIds();
 
-    List<bool> pairPotentialSitesI = constPropI.pairPotentialSites();
+    boolList pairPotentialSitesI = constPropI.pairPotentialSites();
 
-    List<bool> electrostaticSitesI = constPropI.electrostaticSites();
+    boolList electrostaticSitesI = constPropI.electrostaticSites();
 
-    List<bool> pairPotentialSitesJ = constPropJ.pairPotentialSites();
+    boolList pairPotentialSitesJ = constPropJ.pairPotentialSites();
 
-    List<bool> electrostaticSitesJ = constPropJ.electrostaticSites();
+    boolList electrostaticSitesJ = constPropJ.electrostaticSites();
 
     forAll(siteIdsI, sI)
     {
@@ -436,17 +436,17 @@ inline bool Foam::moleculeCloud::evaluatePotentialLimit
 
     const molecule::constantProperties& constPropRef(constProps(idRef));
 
-    List<label> siteIdsReal = constPropReal.siteIds();
+    labelList siteIdsReal = constPropReal.siteIds();
 
-    List<label> siteIdsRef = constPropRef.siteIds();
+    labelList siteIdsRef = constPropRef.siteIds();
 
-    List<bool> pairPotentialSitesReal = constPropReal.pairPotentialSites();
+    boolList pairPotentialSitesReal = constPropReal.pairPotentialSites();
 
-    List<bool> electrostaticSitesReal = constPropReal.electrostaticSites();
+    boolList electrostaticSitesReal = constPropReal.electrostaticSites();
 
-    List<bool> pairPotentialSitesRef = constPropRef.pairPotentialSites();
+    boolList pairPotentialSitesRef = constPropRef.pairPotentialSites();
 
-    List<bool> electrostaticSitesRef = constPropRef.electrostaticSites();
+    boolList electrostaticSitesRef = constPropRef.electrostaticSites();
 
     forAll(siteIdsReal, sReal)
     {

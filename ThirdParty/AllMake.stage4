@@ -71,6 +71,12 @@ then
     echo "Building Qt 5.8.0"
     ( rpm_make -p qt-everywhere-opensource-src-5.8.0 -s qt-everywhere-opensource-src-5.8.0.spec -u http://download.qt.io/archive/qt/5.8/5.8.0/single/qt-everywhere-opensource-src-5.8.0.tar.gz )
     }
+    # Qt 5.11.1
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_QT_5111" ] && {
+    echo "Building Qt 5.11.1"
+    ( rpm_make -p qt-everywhere-src-5.11.1 -s qt-everywhere-src-5.11.1.spec -u http://download.qt.io/archive/qt/5.11/5.11.1/single/qt-everywhere-src-5.11.1.tar.xz )
+    }
 else
     echo "Using system installed QT"
     echo ""
@@ -124,6 +130,14 @@ then
         -f --define='_qmakePath $QT_BIN_DIR/qmake'
             )
         }
+        # ParaView 5.5.2
+        #
+        [ ! -z "$WM_THIRD_PARTY_USE_PARAVIEW_552" ] && {
+            echo "Building ParaView 5.5.2"
+            ( rpm_make -p ParaView-5.5.2 -s ParaView-5.5.2.spec -u http://www.paraview.org/files/v5.5/ParaView-v5.5.2.tar.gz \
+        -f --define='_qmakePath $QT_BIN_DIR/qmake'
+            )
+        }
     else
         echo "WARNING: "
         echo "WARNING: Skipping the installation of ParaView-4.x.x."
@@ -172,5 +186,3 @@ echo ========================================
 echo
 
 # ----------------------------------------------------------------- end-of-file
-
-

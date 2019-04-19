@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -206,7 +206,7 @@ void storeCellInZone
     Map<label>& physToZone,
 
     labelList& zoneToPhys,
-    List<DynamicList<label> >& zoneCells
+    List<dynamicLabelList >& zoneCells
 )
 {
     Map<label>::const_iterator zoneFnd = physToZone.find(regPhys);
@@ -373,7 +373,7 @@ void readCells
     List<DynamicList<face> >& patchFaces,
 
     labelList& zoneToPhys,
-    List<DynamicList<label> >& zoneCells
+    List<dynamicLabelList >& zoneCells
 )
 {
     Info<< "Starting to read cells at line " << inFile.lineNumber() << endl;
@@ -786,7 +786,7 @@ int main(int argc, char *argv[])
     // Map from cellZone to gmsh physical region
     labelList zoneToPhys;
     // Storage for cell zones.
-    List<DynamicList<label> > zoneCells(0);
+    List<dynamicLabelList > zoneCells(0);
 
     // Name per physical region
     Map<word> physicalNames;
@@ -933,7 +933,7 @@ int main(int argc, char *argv[])
     const polyPatch& pp = mesh.boundaryMesh()[mesh.boundaryMesh().size()-1];
 
     // Storage for faceZones.
-    List<DynamicList<label> > zoneFaces(patchFaces.size());
+    List<dynamicLabelList > zoneFaces(patchFaces.size());
 
 
     // Go through all the patchFaces and find corresponding face in pp.

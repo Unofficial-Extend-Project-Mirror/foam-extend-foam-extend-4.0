@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -618,12 +618,12 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     reject_(ggiZoneInterpolation::BB_OCTREE),
     shadowIndex_(-1),
     zoneIndex_(-1),
-    patchToPatchPtr_(NULL),
-    zoneAddressingPtr_(NULL),
-    remoteZoneAddressingPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL),
-    localParallelPtr_(NULL),
-    mapPtr_(NULL)
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    remoteZoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    mapPtr_(nullptr)
 {}
 
 
@@ -655,12 +655,12 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     reject_(reject),
     shadowIndex_(-1),
     zoneIndex_(-1),
-    patchToPatchPtr_(NULL),
-    zoneAddressingPtr_(NULL),
-    remoteZoneAddressingPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL),
-    localParallelPtr_(NULL),
-    mapPtr_(NULL)
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    remoteZoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    mapPtr_(nullptr)
 {}
 
 
@@ -683,12 +683,12 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     reject_(ggiZoneInterpolation::BB_OCTREE),
     shadowIndex_(-1),
     zoneIndex_(-1),
-    patchToPatchPtr_(NULL),
-    zoneAddressingPtr_(NULL),
-    remoteZoneAddressingPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL),
-    localParallelPtr_(NULL),
-    mapPtr_(NULL)
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    remoteZoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    mapPtr_(nullptr)
 {
     if (dict.found("quickReject"))
     {
@@ -698,32 +698,6 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
         );
     }
 }
-
-
-Foam::regionCouplePolyPatch::regionCouplePolyPatch
-(
-    const regionCouplePolyPatch& pp,
-    const polyBoundaryMesh& bm
-)
-:
-    coupledPolyPatch(pp, bm),
-    shadowRegionName_(pp.shadowRegionName_),
-    shadowPatchName_(pp.shadowPatchName_),
-    zoneName_(pp.zoneName_),
-    attached_(pp.attached_),
-    master_(pp.master_),
-    isWall_(pp.isWall_),
-    bridgeOverlap_(pp.bridgeOverlap_),
-    reject_(pp.reject_),
-    shadowIndex_(-1),
-    zoneIndex_(-1),
-    patchToPatchPtr_(NULL),
-    zoneAddressingPtr_(NULL),
-    remoteZoneAddressingPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL),
-    localParallelPtr_(NULL),
-    mapPtr_(NULL)
-{}
 
 
 Foam::regionCouplePolyPatch::regionCouplePolyPatch
@@ -746,12 +720,63 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     reject_(pp.reject_),
     shadowIndex_(-1),
     zoneIndex_(-1),
-    patchToPatchPtr_(NULL),
-    zoneAddressingPtr_(NULL),
-    remoteZoneAddressingPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL),
-    localParallelPtr_(NULL),
-    mapPtr_(NULL)
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    remoteZoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    mapPtr_(nullptr)
+{}
+
+
+Foam::regionCouplePolyPatch::regionCouplePolyPatch
+(
+    const regionCouplePolyPatch& pp
+)
+:
+    coupledPolyPatch(pp),
+    shadowRegionName_(pp.shadowRegionName_),
+    shadowPatchName_(pp.shadowPatchName_),
+    zoneName_(pp.zoneName_),
+    attached_(pp.attached_),
+    master_(pp.master_),
+    isWall_(pp.isWall_),
+    bridgeOverlap_(pp.bridgeOverlap_),
+    reject_(pp.reject_),
+    shadowIndex_(-1),
+    zoneIndex_(-1),
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    remoteZoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    mapPtr_(nullptr)
+{}
+
+
+Foam::regionCouplePolyPatch::regionCouplePolyPatch
+(
+    const regionCouplePolyPatch& pp,
+    const polyBoundaryMesh& bm
+)
+:
+    coupledPolyPatch(pp, bm),
+    shadowRegionName_(pp.shadowRegionName_),
+    shadowPatchName_(pp.shadowPatchName_),
+    zoneName_(pp.zoneName_),
+    attached_(pp.attached_),
+    master_(pp.master_),
+    isWall_(pp.isWall_),
+    bridgeOverlap_(pp.bridgeOverlap_),
+    reject_(pp.reject_),
+    shadowIndex_(-1),
+    zoneIndex_(-1),
+    patchToPatchPtr_(nullptr),
+    zoneAddressingPtr_(nullptr),
+    remoteZoneAddressingPtr_(nullptr),
+    reconFaceCellCentresPtr_(nullptr),
+    localParallelPtr_(nullptr),
+    mapPtr_(nullptr)
 {}
 
 
@@ -1114,10 +1139,10 @@ void Foam::regionCouplePolyPatch::initMovePoints(const pointField& p)
 {
     clearGeom();
 
-    // Calculate transforms on mesh motion?
+    // Clear transforms on mesh motion?
     calcTransforms();
 
-    if (master())
+    if (master() && active())
     {
         shadow().clearGeom();
         shadow().calcTransforms();

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -66,16 +66,6 @@ Foam::wallPolyPatch::wallPolyPatch
 Foam::wallPolyPatch::wallPolyPatch
 (
     const wallPolyPatch& pp,
-    const polyBoundaryMesh& bm
-)
-:
-    polyPatch(pp, bm)
-{}
-
-
-Foam::wallPolyPatch::wallPolyPatch
-(
-    const wallPolyPatch& pp,
     const polyBoundaryMesh& bm,
     const label index,
     const label newSize,
@@ -83,6 +73,25 @@ Foam::wallPolyPatch::wallPolyPatch
 )
 :
     polyPatch(pp, bm, index, newSize, newStart)
+{}
+
+
+Foam::wallPolyPatch::wallPolyPatch
+(
+    const wallPolyPatch& pp
+)
+:
+    polyPatch(pp)
+{}
+
+
+Foam::wallPolyPatch::wallPolyPatch
+(
+    const wallPolyPatch& pp,
+    const polyBoundaryMesh& bm
+)
+:
+    polyPatch(pp, bm)
 {}
 
 

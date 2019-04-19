@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -230,13 +230,6 @@ public:
             const polyBoundaryMesh&
         );
 
-        //- Construct as copy, resetting the boundary mesh
-        mixingPlanePolyPatch
-        (
-            const mixingPlanePolyPatch&,
-            const polyBoundaryMesh&
-        );
-
         //- Construct as given the original patch and resetting the
         //  face list and boundary mesh information
         mixingPlanePolyPatch
@@ -246,6 +239,16 @@ public:
             const label index,
             const label newSize,
             const label newStart
+        );
+
+        //- Construct as copy
+        mixingPlanePolyPatch(const mixingPlanePolyPatch&);
+
+        //- Construct as copy, resetting the boundary mesh
+        mixingPlanePolyPatch
+        (
+            const mixingPlanePolyPatch&,
+            const polyBoundaryMesh&
         );
 
         //- Construct and return a clone, resetting the boundary mesh

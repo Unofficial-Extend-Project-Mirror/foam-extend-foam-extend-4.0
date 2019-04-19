@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -99,12 +99,12 @@ dynamicTopoFvMesh::dynamicTopoFvMesh(const IOobject& io)
     loadMotionSolver_(true),
     bandWidthReduction_(false),
     coupledModification_(false),
-    lduPtr_(NULL),
+    lduPtr_(nullptr),
     interval_(1),
-    eMeshPtr_(NULL),
-    mapper_(NULL),
-    motionSolver_(NULL),
-    lengthEstimator_(NULL),
+    eMeshPtr_(nullptr),
+    mapper_(nullptr),
+    motionSolver_(nullptr),
+    lengthEstimator_(nullptr),
     oldPoints_(polyMesh::points()),
     points_(polyMesh::points()),
     faces_(polyMesh::faces()),
@@ -223,12 +223,12 @@ dynamicTopoFvMesh::dynamicTopoFvMesh
     loadMotionSolver_(mesh.loadMotionSolver_),
     bandWidthReduction_(mesh.bandWidthReduction_),
     coupledModification_(false),
-    lduPtr_(NULL),
+    lduPtr_(nullptr),
     interval_(1),
-    eMeshPtr_(NULL),
-    mapper_(NULL),
-    motionSolver_(NULL),
-    lengthEstimator_(NULL),
+    eMeshPtr_(nullptr),
+    mapper_(nullptr),
+    motionSolver_(nullptr),
+    lengthEstimator_(nullptr),
     oldPoints_(polyMesh::points()),
     points_(points()),
     faces_(polyMesh::faces()),
@@ -1690,7 +1690,7 @@ void dynamicTopoFvMesh::calculateLengthScale(bool dump)
         dumpLengthScale = readBool(meshDict.lookup("dumpLengthScale"));
     }
 
-    autoPtr<volScalarField> lsfPtr(NULL);
+    autoPtr<volScalarField> lsfPtr(nullptr);
 
     if (dumpLengthScale && time().outputTime() && dump)
     {

@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     4.0                                |
+|  \\    /   O peration     | Version:     4.1                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  | For copyright notice see file Copyright         |
 \*---------------------------------------------------------------------------*/
@@ -46,15 +46,15 @@ solvers
     k
     {
         solver           BiCGStab;
-        preconditioner   DILU; 
+        preconditioner   DILU;
         tolerance        1e-08;
         relTol           0.1;
         minIter          1;
     }
-	omega
+    omega
     {
         solver           BiCGStab;
-        preconditioner   DILU; 
+        preconditioner   DILU;
         tolerance        1e-08;
         relTol           0.1;
         minIter          1;
@@ -65,7 +65,7 @@ SIMPLE
 {
     nNonOrthogonalCorrectors 0;
 
-	convergence  1e-5;
+    convergence  1e-5;
 }
 
 relaxationFactors

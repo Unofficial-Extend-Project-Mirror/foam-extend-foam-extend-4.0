@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------* \
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -29,6 +29,10 @@ Description
 
     This scheme interpolates 1/field using a scheme specified at run-time
     and return the reciprocal of the interpolate.
+
+Note:
+    Harmonic mean is strictly valid only for positive scalars.
+    For vectors and tensors, the norm/magnitude is used.
 
 SourceFiles
     harmonic.C

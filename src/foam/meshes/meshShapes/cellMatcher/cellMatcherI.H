@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ inline const Foam::labelList& Foam::cellMatcher::faceLabels() const
 
 inline const Foam::cellModel& Foam::cellMatcher::model() const
 {
-    if (cellModelPtr_ == NULL)
+    if (cellModelPtr_ == nullptr)
     {
         cellModelPtr_ = cellModeller::lookup(cellModelName_);
     }

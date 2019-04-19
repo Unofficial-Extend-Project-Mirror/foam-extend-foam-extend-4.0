@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ namespace debug
     // runtime tolerancesSwitch values.
     // This needs to go on the heap so the destructor will not get
     //  called before the objects' destructor it is overseeing
-    ListTolerancesControlSwitches* tolerancesSwitchValues_(NULL);
+    ListTolerancesControlSwitches* tolerancesSwitchValues_(nullptr);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

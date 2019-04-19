@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -83,7 +83,7 @@ void Foam::undoableMeshCutter::printRefTree(Ostream& os) const
         {
             if (!splitPtr->isMaster())
             {
-                splitPtr = NULL;
+                splitPtr = nullptr;
 
                 break;
             }
@@ -218,9 +218,9 @@ Foam::undoableMeshCutter::~undoableMeshCutter()
             {
                 splitCell* otherSidePtr = splitPtr->getOther();
 
-                otherSidePtr->parent() = NULL;
+                otherSidePtr->parent() = nullptr;
 
-                splitPtr->parent() = NULL;
+                splitPtr->parent() = nullptr;
             }
 
             // Delete splitCell (updates pointer on parent to itself)
@@ -266,7 +266,7 @@ void Foam::undoableMeshCutter::setRefinement
                 // place.
 
                 // Create 0th level. Null parent to denote this.
-                splitCell* parentPtr = new splitCell(cellI, NULL);
+                splitCell* parentPtr = new splitCell(cellI, nullptr);
 
                 splitCell* masterPtr = new splitCell(cellI, parentPtr);
 

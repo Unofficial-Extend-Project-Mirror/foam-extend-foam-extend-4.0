@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -43,6 +43,7 @@ SourceFiles
 #define passiveProcessorPolyPatch_H
 
 #include "polyBoundaryMesh.H"
+#include "labelField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -66,7 +67,7 @@ class passiveProcessorPolyPatch
         int neighbProcNo_;
 
         //- Global processor face index
-        labelList globalFaceIndex_;
+        labelField globalFaceIndex_;
 
 
 public:
@@ -99,13 +100,6 @@ public:
             const polyBoundaryMesh&
         );
 
-        //- Construct as copy, resetting the boundary mesh
-        passiveProcessorPolyPatch
-        (
-            const passiveProcessorPolyPatch&,
-            const polyBoundaryMesh&
-        );
-
         //- Construct as given the original patch and resetting the
         //  face list and boundary mesh information
         passiveProcessorPolyPatch
@@ -115,6 +109,16 @@ public:
             const label index,
             const label newSize,
             const label newStart
+        );
+
+        //- Construct as copy
+        passiveProcessorPolyPatch(const passiveProcessorPolyPatch&);
+
+        //- Construct as copy, resetting the boundary mesh
+        passiveProcessorPolyPatch
+        (
+            const passiveProcessorPolyPatch&,
+            const polyBoundaryMesh&
         );
 
         //- Construct and return a clone, resetting the boundary mesh
@@ -166,7 +170,7 @@ public:
         }
 
         //- Return global processor face index
-        const labelList& globalFaceIndex() const
+        const labelField& globalFaceIndex() const
         {
             return globalFaceIndex_;
         }

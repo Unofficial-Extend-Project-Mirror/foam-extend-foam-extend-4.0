@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ Foam::GradientDispersionRAS<CloudType>::GradientDispersionRAS
 )
 :
     DispersionRASModel<CloudType>(dict, owner),
-    gradkPtr_(NULL)
+    gradkPtr_(nullptr)
 {}
 
 
@@ -71,7 +71,7 @@ void Foam::GradientDispersionRAS<CloudType>::cacheFields(const bool store)
         if (gradkPtr_)
         {
             delete gradkPtr_;
-            gradkPtr_ = NULL;
+            gradkPtr_ = nullptr;
         }
     }
 }

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -36,7 +36,7 @@ defineTypeNameAndDebug(Foam::IFstream, 0);
 
 Foam::IFstreamAllocator::IFstreamAllocator(const fileName& pathname)
 :
-    ifPtr_(NULL),
+    ifPtr_(nullptr),
     compression_(IOstream::UNCOMPRESSED)
 {
     if (pathname.empty())

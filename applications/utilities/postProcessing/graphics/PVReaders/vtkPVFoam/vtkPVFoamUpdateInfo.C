@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -198,7 +198,7 @@ void Foam::vtkPVFoam::updateInfoPatches()
     if (debug)
     {
         Info<< "<beg> Foam::vtkPVFoam::updateInfoPatches"
-            << " [meshPtr=" << (meshPtr_ ? "set" : "NULL") << "]" << endl;
+            << " [meshPtr=" << (meshPtr_ ? "set" : "nullptr") << "]" << endl;
     }
 
     vtkDataArraySelection* partSelection = reader_->GetPartSelection();
@@ -292,7 +292,7 @@ void Foam::vtkPVFoam::updateInfoZones()
     if (debug)
     {
         Info<< "<beg> Foam::vtkPVFoam::updateInfoZones"
-            << " [meshPtr=" << (meshPtr_ ? "set" : "NULL") << "]" << endl;
+            << " [meshPtr=" << (meshPtr_ ? "set" : "nullptr") << "]" << endl;
     }
 
     vtkDataArraySelection* partSelection = reader_->GetPartSelection();

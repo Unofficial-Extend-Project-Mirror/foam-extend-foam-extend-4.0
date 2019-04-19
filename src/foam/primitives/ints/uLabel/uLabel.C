@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -47,15 +47,6 @@ Foam::uLabel Foam::pow(uLabel a, uLabel b)
         ans *= a;
     }
 
-    #ifdef FULLDEBUG
-    if (b < 0)
-    {
-        FatalErrorIn("pow(uLabel a, uLabel b)")
-            << "negative value for b is not supported"
-            << abort(FatalError);
-    }
-    #endif
-
     return ans;
 }
 
@@ -69,7 +60,7 @@ Foam::uLabel Foam::factorial(uLabel n)
     };
 
     #ifdef FULLDEBUG
-    if (n > 12 && n < 0)
+    if (n > 12)
     {
         FatalErrorIn("factorial(uLabel n)")
             << "n value out of range"

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -140,7 +140,7 @@ Foam::octreeLine<Type>::octreeLine
     endPoint_(endPoint),
     realStartPoint_(startPoint),
     leafExitPoint_(startPoint_),
-    currentLeaf_(NULL),
+    currentLeaf_(nullptr),
     sortedIntersections_(0),
     lastElem_(-1),
     sortedI_(-1)

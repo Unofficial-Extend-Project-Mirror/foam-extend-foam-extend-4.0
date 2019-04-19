@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -325,7 +325,7 @@ Foam::mixerRotor::mixerRotor
     ),
     useTopoSliding_(dict.lookup("useTopoSliding")),
     attachDetach_(dict.lookupOrDefault<bool>("attachDetach", true)),
-    movingPointsMaskPtr_(NULL)
+    movingPointsMaskPtr_(nullptr)
 {
     // Make sure the coordinate system does not operate in degrees
     // Bug fix, HJ, 3/Oct/2011

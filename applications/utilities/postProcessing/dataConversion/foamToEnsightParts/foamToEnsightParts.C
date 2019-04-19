@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -175,15 +175,15 @@ int main(int argc, char *argv[])
     Map<scalar>  timeIndices;
 
     // Track the time indices used by the volume fields
-    DynamicList<label> fieldTimesUsed;
+    dynamicLabelList fieldTimesUsed;
 
     // Track the time indices used by each cloud
-    HashTable<DynamicList<label> > cloudTimesUsed;
+    HashTable<dynamicLabelList > cloudTimesUsed;
 
     // Create a new DynamicList for each cloud
     forAllConstIter(HashTable<HashTable<word> >, cloudFields, cloudIter)
     {
-        cloudTimesUsed.insert(cloudIter.key(), DynamicList<label>());
+        cloudTimesUsed.insert(cloudIter.key(), dynamicLabelList());
     }
 
 

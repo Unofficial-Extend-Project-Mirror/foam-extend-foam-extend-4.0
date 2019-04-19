@@ -1,5 +1,6 @@
 {
     volScalarField pcorr("pcorr", p);
+    pcorr *= 0;
 
     // Initialise flux with interpolated velocity
     phi = fvc::interpolate(U) & mesh.Sf();
@@ -8,11 +9,13 @@
 
     mesh.schemesDict().setFluxRequired(pcorr.name());
 
+    dimensionedScalar rUAf("(1|A(U))", dimTime, 1.0);
+
     while (pimple.correctNonOrthogonal())
     {
         fvScalarMatrix pcorrEqn
         (
-            fvm::laplacian(1/aU, pcorr) == fvc::div(phi)
+            fvm::laplacian(rUAf, pcorr) == fvc::div(phi)
         );
 
         pcorrEqn.setReference(pRefCell, pRefValue);
@@ -26,6 +29,6 @@
         // Fluxes are corrected to absolute velocity and further corrected
         // later.  HJ, 6/Feb/2009
     }
-#   include "continuityErrs.H"
-}
 
+    #   include "continuityErrs.H"
+}

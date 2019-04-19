@@ -62,7 +62,7 @@ echo
 # which is also replicated under the Breeder_2.0 section of the Subversion repository
 #
 
-SWAK_RELEASE_VERSION=0.4.0
+SWAK_RELEASE_VERSION=0.4.2
 
 if [ -z "$SWAK4FOAM_SYSTEM" ]
 then
@@ -78,16 +78,22 @@ then
         then
             echo "Using Mercurial/hg to download the source code for swak4Foam"
             (
-                cd ./rpmBuild/BUILD;
-                hg clone http://hg.code.sf.net/p/openfoam-extend/swak4Foam swak4Foam-$SWAK_RELEASE_VERSION;
-                cd swak4Foam-$SWAK_RELEASE_VERSION;
-                hg checkout version_${SWAK_RELEASE_VERSION}_v2.x
+                cd ./rpmBuild/BUILD
+                hg clone http://hg.code.sf.net/p/openfoam-extend/swak4Foam swak4Foam-$SWAK_RELEASE_VERSION
+                cd swak4Foam-$SWAK_RELEASE_VERSION
+                #hg checkout version_${SWAK_RELEASE_VERSION}_v2.x
+                # We use dev-branch temporarily
+                hg checkout compile_foamExtend4.1
             )
         else
             echo "Warning: Mercurial/hg is not installed. Switching to an alternate Subversion repository"
             command -v svn >/dev/null
             if [ $? -eq 0 ];
             then
+                # Disabled temporarily
+                echo "Subversion/svn is currently not supported"
+                exit -1
+
                 echo "Using Subversion/svn to download the source code for swak4Foam"
                 (cd ./rpmBuild/BUILD; svn checkout svn://svn.code.sf.net/p/openfoam-extend/svn/trunk/Breeder_2.0/libraries/swak4Foam swak4Foam-$SWAK_RELEASE_VERSION)
             else

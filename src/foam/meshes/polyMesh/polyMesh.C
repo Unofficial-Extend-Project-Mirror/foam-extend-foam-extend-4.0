@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -227,6 +227,7 @@ Foam::polyMesh::polyMesh(const IOobject& io)
             IOobject::NO_WRITE
         )
     ),
+    syncPar_(true),  // Reading mesh from IOobject: must be valid
     clearedPrimitives_(false),
     boundary_
     (
@@ -241,7 +242,7 @@ Foam::polyMesh::polyMesh(const IOobject& io)
         ),
         *this
     ),
-    bounds_(allPoints_),
+    bounds_(allPoints_),  // Reading mesh from IOobject: syncPar
     geometricD_(Vector<label>::zero),
     solutionD_(Vector<label>::zero),
     comm_(Pstream::worldComm),
@@ -299,12 +300,12 @@ Foam::polyMesh::polyMesh(const IOobject& io)
         ),
         *this
     ),
-    globalMeshDataPtr_(NULL),
+    globalMeshDataPtr_(nullptr),
     moving_(false),
     changing_(false),
     curMotionTimeIndex_(time().timeIndex()),
-    oldAllPointsPtr_(NULL),
-    oldPointsPtr_(NULL)
+    oldAllPointsPtr_(nullptr),
+    oldPointsPtr_(nullptr)
 {
     if (exists(owner_.objectPath()))
     {
@@ -319,7 +320,6 @@ Foam::polyMesh::polyMesh(const IOobject& io)
                 "cells",
                 // Find the cells file on the basis of the faces file
                 // HJ, 8/Jul/2009
-//                 time().findInstance(meshDir(), "cells"),
                 time().findInstance(meshDir(), "faces"),
                 meshSubDir,
                 *this,
@@ -424,6 +424,7 @@ Foam::polyMesh::polyMesh
         ),
         neighbour
     ),
+    syncPar_(syncPar),
     clearedPrimitives_(false),
     boundary_
     (
@@ -485,12 +486,12 @@ Foam::polyMesh::polyMesh
         *this,
         0
     ),
-    globalMeshDataPtr_(NULL),
+    globalMeshDataPtr_(nullptr),
     moving_(false),
     changing_(false),
     curMotionTimeIndex_(time().timeIndex()),
-    oldAllPointsPtr_(NULL),
-    oldPointsPtr_(NULL)
+    oldAllPointsPtr_(nullptr),
+    oldPointsPtr_(nullptr)
 {
     // Check if the faces and cells are valid
     forAll (allFaces_, faceI)
@@ -585,6 +586,7 @@ Foam::polyMesh::polyMesh
         ),
         0
     ),
+    syncPar_(syncPar),
     clearedPrimitives_(false),
     boundary_
     (
@@ -646,12 +648,12 @@ Foam::polyMesh::polyMesh
         *this,
         0
     ),
-    globalMeshDataPtr_(NULL),
+    globalMeshDataPtr_(nullptr),
     moving_(false),
     changing_(false),
     curMotionTimeIndex_(time().timeIndex()),
-    oldAllPointsPtr_(NULL),
-    oldPointsPtr_(NULL)
+    oldAllPointsPtr_(nullptr),
+    oldPointsPtr_(nullptr)
 {
     // Check if the faces and cells are valid
     forAll (allFaces_, faceI)
@@ -739,14 +741,23 @@ void Foam::polyMesh::resetPrimitives
         // Faces will be reset in initMesh(), using size of owner list
     }
 
+    // HR 25.06.18: A mesh with a single cell has an empty neighbour list and
+    // we need to be able reset to such a mesh eg. during load balancing
     if (!own().empty())
     {
+        // Mesh has at least one face in owner list. Reset both lists even if
+        // neighbours are empty (single cell mesh).
         owner_.transfer(own());
-    }
-
-    if (!nei().empty())
-    {
         neighbour_.transfer(nei());
+    }
+    else
+    {
+        if (!nei().empty())
+        {
+            // This mesh is invalid, but the operation was valid before.
+            // Therefore we do what was done before.
+            neighbour_.transfer(nei());
+        }
     }
 
 
@@ -1168,6 +1179,14 @@ Foam::tmp<Foam::scalarField> Foam::polyMesh::movePoints
     const pointField& newPoints
 )
 {
+    if (!syncPar_)
+    {
+        Info<< "tmp<scalarField> polyMesh::movePoints"
+            << "(const pointField&) : "
+            << "Moving the mesh for the mesh with syncPar invalidated.  "
+            << "Mesh motion should not be executed." << endl;
+    }
+
     if (debug)
     {
         Info<< "tmp<scalarField> polyMesh::movePoints(const pointField&) : "
@@ -1232,9 +1251,12 @@ Foam::tmp<Foam::scalarField> Foam::polyMesh::movePoints
     geometricD_ = Vector<label>::zero;
     solutionD_ = Vector<label>::zero;
 
-    // Update all function objects
+    // Update all mesh objects
     // Moved from fvMesh.C in 1.6.x merge.  HJ, 29/Aug/2010
     meshObjectBase::allMovePoints<polyMesh>(*this);
+
+    // Update all function objects
+    const_cast<Time&>(time()).functionObjects().movePoints(allPoints_);
 
     return sweptVols;
 }

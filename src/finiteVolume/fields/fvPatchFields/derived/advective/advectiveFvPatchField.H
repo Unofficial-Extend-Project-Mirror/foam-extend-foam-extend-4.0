@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -212,27 +212,27 @@ public:
             }
 
             //- Return inlet-outlet treatment switch
-            bool inletOutlet() const
+            Switch inletOutlet() const
             {
                 return inletOutlet_;
             }
 
             //- Return reference to inlet-outlet treatment switch
             //  to allow adjustment
-            bool& inletOutlet()
+            Switch& inletOutlet()
             {
                 return inletOutlet_;
             }
 
             //- Return supercritical outlet treatment switch
-            bool correctSupercritical() const
+            Switch correctSupercritical() const
             {
                 return correctSupercritical_;
             }
 
             //- Return reference to supercritical treatment switch
             //  to allow adjustment
-            bool& correctSupercritical()
+            Switch& correctSupercritical()
             {
                 return correctSupercritical_;
             }

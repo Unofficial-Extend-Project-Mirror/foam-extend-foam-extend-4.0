@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -527,7 +527,7 @@ const Foam::treeLeaf<Type>* Foam::octree<Type>::findLeafLine
                     << " not intersect : start:"
                     << start << endl;
             }
-            return NULL;
+            return nullptr;
         }
 
         if (debug & 2)

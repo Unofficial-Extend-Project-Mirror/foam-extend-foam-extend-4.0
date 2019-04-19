@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -78,24 +78,20 @@ void Foam::wallDist::correct()
         }
     }
 
-    // Get patchids of walls
-    // labelHashSet wallPatchIDs(getPatchIDs<wallPolyPatch>());
-
     // Calculate distance starting from wallPatch faces.
     patchWave wave(cellDistFuncs::mesh(), wallPatchIDs, correctWalls_);
 
     // Transfer cell values from wave into *this
     transfer(wave.distance());
 
-    // Transfer values on patches into boundaryField of *this
-    forAll (boundaryField(), patchI)
-    {
-        if (!isA<emptyFvPatchScalarField>(boundaryField()[patchI]))
-        {
-            scalarField& waveFld = wave.patchDistance()[patchI];
+    // Make near-wall distance consistent with wall distance
+    // This is needed by immersed boundary walls
+    // HJ, 29/May/2018
+    const fvPatchList& patches = volScalarField::mesh().boundary();
 
-            boundaryField()[patchI].transfer(waveFld);
-        }
+    forAll (patches, patchI)
+    {
+        boundaryField()[patchI] = 1/patches[patchI].deltaCoeffs();
     }
 
     // Transfer number of unset values

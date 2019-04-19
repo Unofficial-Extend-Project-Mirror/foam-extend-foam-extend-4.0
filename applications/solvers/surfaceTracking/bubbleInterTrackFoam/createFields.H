@@ -50,7 +50,7 @@ volScalarField rho
 freeSurface interface(mesh, rho, U, p, phi);
 
 
-volScalarField* fluidIndicatorPtr = NULL;
+volScalarField* fluidIndicatorPtr = nullptr;
 
 if(Pstream::parRun())
 {

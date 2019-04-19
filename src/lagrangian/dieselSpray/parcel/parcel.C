@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ Foam::parcel::parcel
     const vector& U,
     const vector& Uturb,
     const scalarField& X,
-    const List<word>& liquidNames
+    const wordList& liquidNames
 )
 :
     Particle<parcel>(cloud, position, cellI),

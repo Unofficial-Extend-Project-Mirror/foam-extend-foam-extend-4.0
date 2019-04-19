@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -48,6 +48,8 @@ SourceFiles
 #include "runTimeSelectionTables.H"
 #include "autoPtr.H"
 #include "coordSet.H"
+#include "debug.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -201,7 +203,11 @@ public:
 
         //- Tolerance when comparing points. Usually relative to difference
         //  between start_ and end_
-        const static scalar tol;
+        static const debug::tolerancesSwitch tol_;
+
+        //- Tolerance used to push points out of the face. It is relative to the
+        //  distance between the cell face centre and cell centre.
+        static const debug::tolerancesSwitch pushTol_;
 
 
     // Constructors
@@ -228,7 +234,7 @@ public:
         autoPtr<sampledSet> clone() const
         {
             notImplemented("autoPtr<sampledSet> clone() const");
-            return autoPtr<sampledSet>(NULL);
+            return autoPtr<sampledSet>(nullptr);
         }
 
 

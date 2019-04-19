@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -127,8 +127,32 @@ void Foam::immersedBoundaryFvPatch::updatePhi
     scalarField sGamma =
         mag(ibPolyPatch_.correctedFaceAreas())/mag(mesh.faceAreas());
 
+    // Scaling of internal mesh flux field should be done only for the current
+    // ib patch to avoid scaling multiple times in case of multiple Ib patches
+    // present. (IG 3/Dec/2018)
+
     // Scale internalField
-    phi.internalField() *= scalarField::subField(sGamma, mesh.nInternalFaces());
+    scalarField& phiIn = phi.internalField();
+
+    const labelList& deadFaces = ibPolyPatch_.deadFaces();
+    forAll (deadFaces, dfI)
+    {
+        const label faceI = deadFaces[dfI];
+        if (mesh.isInternalFace(faceI))
+        {
+            phiIn[faceI] *= sGamma[faceI];
+        }
+    }
+ 
+    const labelList& cutFaces = ibPolyPatch_.ibFaces();
+    forAll (cutFaces, cfI)
+    {
+        const label faceI = cutFaces[cfI];
+        if (mesh.isInternalFace(faceI))
+        {
+            phiIn[faceI] *= sGamma[faceI];
+        }
+    }
 
     // Scale all other patches
     forAll (mesh.boundary(), patchI)
@@ -162,24 +186,28 @@ void Foam::immersedBoundaryFvPatch::updatePhi
     const unallocLabelList& owner = mesh.owner();
     const unallocLabelList& neighbour = mesh.neighbour();
 
-    const scalarField& phiIn = phi.internalField();
-    forAll(owner, faceI)
+    forAll (owner, faceI)
     {
         divPhi[owner[faceI]] += phiIn[faceI];
         divPhi[neighbour[faceI]] -= phiIn[faceI];
     }
 
     // Add the mesh motion fluxes from all patches including immersed boundary
-    forAll(mesh.boundary(), patchI)
+    forAll (mesh.boundary(), patchI)
     {
         const unallocLabelList& pFaceCells =
             mesh.boundary()[patchI].faceCells();
 
         const scalarField& pssf = phi.boundaryField()[patchI];
 
-        forAll (pFaceCells, faceI)
+        // Check for size since uninitialised ib patches can have zero size at
+        // this point (IG 7/Nov/2018)
+        if (pssf.size() > 0)
         {
-            divPhi[pFaceCells[faceI]] += pssf[faceI];
+            forAll (pFaceCells, faceI)
+            {
+                divPhi[pFaceCells[faceI]] += pssf[faceI];
+            }
         }
     }
 
@@ -197,16 +225,18 @@ void Foam::immersedBoundaryFvPatch::updatePhi
     // HJ, 22/Dec/2017
     forAll (magDivPhi, cellI)
     {
-        if (magDivPhi[cellI] > SMALL)
+        // if (magDivPhi[cellI] > SMALL)
+        if (magDivPhi[cellI] > 1e-40)
         {
             // Attempt to correct via old volume
             scalar corrOldVol = newVols[cellI] - divPhi[cellI]*deltaT;
 
             // Info<< "Flux maneouvre for cell " << cellI << ": "
+            //     << " error: " << magDivPhi[cellI]
             //     << " V: " << newVols[cellI]
             //     << " V0: " << oldVols[cellI]
             //     << " divPhi: " << divPhi[cellI]
-            //     << " error: " << magDivPhi[cellI];
+            //     << endl;
 
             if (corrOldVol < SMALL)
             {
@@ -220,6 +250,17 @@ void Foam::immersedBoundaryFvPatch::updatePhi
             }
         }
     }
+}
+
+
+void Foam::immersedBoundaryFvPatch::makeDeltaCoeffs
+(
+    fvsPatchScalarField& dc
+) const
+{
+    const vectorField d = delta();
+
+    dc = 1.0/max((nf() & d), 0.05*mag(d));
 }
 
 
@@ -246,7 +287,7 @@ void Foam::immersedBoundaryFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
         if
         (
             gamma[owner[faceI]] < nonOrthogonalFactor_()
-         || gamma[owner[faceI]] < nonOrthogonalFactor_()
+         || gamma[neighbour[faceI]] < nonOrthogonalFactor_()
         )
         {
             // Thin live cut.  Reset correction vectors
@@ -278,6 +319,18 @@ Foam::label Foam::immersedBoundaryFvPatch::size() const
 {
     // Immersed boundary patch size equals to the number of intersected cells
     // HJ, 28/Nov/2017
+
+    // Note: asking for patch size triggers the cutting which involves
+    // parallel communication.  This should be avoided under read/write, ie
+    // when the ibPolyPatch_ is not initialised.
+    // Initialisation happens when the fvMesh is initialised, which should be
+    // sufficient
+    //  HJ, 12/Dec/2018
+    // if (!ibPolyPatch_.active())
+    // {
+    //     return 0;
+    // }
+
     return ibPolyPatch_.ibCells().size();
 }
 
@@ -289,16 +342,23 @@ Foam::immersedBoundaryFvPatch::faceCells() const
 }
 
 
-// Foam::tmp<Foam::vectorField> Foam::immersedBoundaryFvPatch::nf() const
-// {
-//     return ibPolyPatch_.ibPatch().faceNormals();
-// }
+Foam::tmp<Foam::vectorField> Foam::immersedBoundaryFvPatch::nf() const
+{
+    // The algorithm has been changed because basic IB patch information
+    // (nf and delta) is used in assembly of derived information
+    // (eg. deltaCoeffs) and circular dependency needs to be avoided.
+    // nf and delta vectors shall be calculated directly from the intersected
+    // patch.  HJ, 21/Mar/2019
+
+    return ibPolyPatch_.ibPatch().faceNormals();
+}
 
 
-// Foam::tmp<Foam::vectorField> Foam::immersedBoundaryFvPatch::delta() const
-// {
-//     return ibPolyPatch_.ibPatch().faceCentres() - ibPolyPatch_.ibCellCentres();
-// }
+Foam::tmp<Foam::vectorField> Foam::immersedBoundaryFvPatch::delta() const
+{
+    // Not strictly needed: this is for debug only.  HJ, 5/Apr/2019
+    return ibPolyPatch_.ibPatch().faceCentres() - Cn();
+}
 
 
 // ************************************************************************* //

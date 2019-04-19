@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ void Foam::globalProcFaceIndex::calcFaceIndex()
 
     // Assemble global label list for mesh faces
     label globalFaceIndex = procFaceOffset_[Pstream::myProcNo()];
-    
+
     for (label faceI = 0; faceI < mesh_.nInternalFaces(); faceI++)
     {
         globalLabel_[faceI] = globalFaceIndex;
@@ -93,7 +93,7 @@ void Foam::globalProcFaceIndex::calcFaceIndex()
     {
         const label patchSize = patches[patchI].size();
         const label patchStart = patches[patchI].start();
-        
+
         if (isA<processorPolyPatch>(patches[patchI]))
         {
             const processorPolyPatch& procPatch =
@@ -162,7 +162,7 @@ void Foam::globalProcFaceIndex::calcFaceIndex()
 
                 // Insert the data into the list
                 const label patchStart = patches[patchI].start();
-        
+
                 forAll (masterFaceLabels, patchFaceI)
                 {
                     globalLabel_[patchStart + patchFaceI] =

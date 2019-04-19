@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -149,7 +149,7 @@ void Foam::meshReader::writeAux(const objectRegistry& registry) const
     cellTable_.writeDict(registry);
     writeInterfaces(registry);
 
-    // write origCellId as List<label>
+    // write origCellId as labelList
     writeMeshLabelList
     (
         registry,
@@ -158,7 +158,7 @@ void Foam::meshReader::writeAux(const objectRegistry& registry) const
         IOstream::BINARY
     );
 
-    // write cellTableId as List<label>
+    // write cellTableId as labelList
     // this is crucial for later conversion back to ccm/starcd
     writeMeshLabelList
     (

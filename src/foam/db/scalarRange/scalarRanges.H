@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -36,7 +36,8 @@ SourceFiles
 #define scalarRanges_H
 
 #include "scalarRange.H"
-#include "List.H"
+#include "scalarList.H"
+#include "boolList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -69,10 +70,10 @@ public:
 
         //- Return the set of selected entries in the given list
         //  that are within the ranges
-        List<bool> selected(const List<scalar>&) const;
+        boolList selected(const scalarList&) const;
 
         //- Select a list of values that are within the ranges
-        List<scalar> select(const List<scalar>&) const;
+        scalarList select(const scalarList&) const;
 
         //- Select a list of values that are within the ranges
         void inplaceSelect(List<scalar>&) const;

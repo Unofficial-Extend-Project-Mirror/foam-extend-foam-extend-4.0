@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
-     \\/     M anipulation  |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     Foam::oversetPolyPatch
@@ -111,13 +110,6 @@ public:
             const polyBoundaryMesh& bm
         );
 
-        //- Construct as copy, resetting the boundary mesh
-        oversetPolyPatch
-        (
-            const oversetPolyPatch&,
-            const polyBoundaryMesh&
-        );
-
         //- Construct given the original patch and resetting the
         //  face list and boundary mesh information
         oversetPolyPatch
@@ -127,6 +119,16 @@ public:
             const label index,
             const label newSize,
             const label newStart
+        );
+
+        //- Construct as copy
+        oversetPolyPatch(const oversetPolyPatch&);
+
+        //- Construct as copy, resetting the boundary mesh
+        oversetPolyPatch
+        (
+            const oversetPolyPatch&,
+            const polyBoundaryMesh&
         );
 
         //- Construct and return a clone, resetting the boundary mesh

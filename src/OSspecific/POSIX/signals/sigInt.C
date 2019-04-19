@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ struct sigaction Foam::sigInt::oldAction_;
 void Foam::sigInt::sigHandler(int)
 {
     // Reset old handling
-    if (sigaction(SIGINT, &oldAction_, NULL) < 0)
+    if (sigaction(SIGINT, &oldAction_, nullptr) < 0)
     {
         FatalErrorIn
         (
@@ -59,7 +59,7 @@ void Foam::sigInt::sigHandler(int)
 
 Foam::sigInt::sigInt()
 {
-    oldAction_.sa_handler = NULL;
+    oldAction_.sa_handler = nullptr;
 }
 
 
@@ -68,7 +68,7 @@ Foam::sigInt::sigInt()
 Foam::sigInt::~sigInt()
 {
     // Reset old handling
-    if (sigaction(SIGINT, &oldAction_, NULL) < 0)
+    if (sigaction(SIGINT, &oldAction_, nullptr) < 0)
     {
         FatalErrorIn
         (

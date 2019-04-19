@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -102,7 +102,7 @@ void Foam::lduMatrix::operator=(const lduMatrix& A)
     else if (lowerPtr_)
     {
         delete lowerPtr_;
-        lowerPtr_ = NULL;
+        lowerPtr_ = nullptr;
     }
 
     if (A.upperPtr_)
@@ -112,7 +112,7 @@ void Foam::lduMatrix::operator=(const lduMatrix& A)
     else if (upperPtr_)
     {
         delete upperPtr_;
-        upperPtr_ = NULL;
+        upperPtr_ = nullptr;
     }
 
     if (A.diagPtr_)
@@ -148,7 +148,7 @@ void Foam::lduMatrix::operator+=(const lduMatrix& A)
     {
         return;
     }
-    
+
     if (A.diagPtr_)
     {
         diag() += A.diag();
@@ -222,7 +222,7 @@ void Foam::lduMatrix::operator-=(const lduMatrix& A)
     {
         return;
     }
-    
+
     if (A.diagPtr_)
     {
         diag() -= A.diag();

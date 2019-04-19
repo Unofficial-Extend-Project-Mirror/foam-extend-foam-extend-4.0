@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -180,7 +180,7 @@ void Foam::scalarTransportPOD::calcDerivativeCoeffs() const
 
     instantList Times = runTime.times();
 
-    volVectorField* Uptr = NULL;
+    volVectorField* Uptr = nullptr;
 
     forAll (Times, i)
     {
@@ -259,9 +259,9 @@ Foam::scalarTransportPOD::scalarTransportPOD
     PODODE(mesh, dict),
     phiName_(dict.lookup("field")),
     coeffs_(),
-    derivativeMatrixPtr_(NULL),
-    orthoBasePtr_(NULL),
-    fieldPtr_(NULL)
+    derivativeMatrixPtr_(nullptr),
+    orthoBasePtr_(nullptr),
+    fieldPtr_(nullptr)
 {
     // Grab coefficients from the first snapshot of the ortho-normal base
     coeffs_.setSize(orthoBase().baseSize());

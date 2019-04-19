@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -53,13 +53,12 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
         dimensionedScalar("one", dimless, 1)
     );
     gamma.internalField() = mesh.V()/mesh.cellVolumes();
-    gamma.write();
 
     // Report minimal live cell volume
     scalar minLiveGamma = GREAT;
     label minLiveCell = -1;
     const scalarField& gammaIn = gamma.internalField();
-    
+
     forAll (mesh.boundary(), patchI)
     {
         if (isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
@@ -123,6 +122,7 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
     }
 
     sGamma.write();
+    gamma.write();
 
     // Check consistency of face area vectors
 
@@ -130,24 +130,118 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
     volVectorField divSf
     (
         "divSf",
-        fvc::div(mesh.Sf())
+        fvc::surfaceIntegrate(mesh.Sf())
     );
     divSf.write();
 
-    // Check divergence of face area vectors
-    scalarField magDivSf = mag(divSf)().internalField();
+    // Check divergence of face area vectors. Note: scale by the volume
+    // to avoid bias towards small cells.  HJ, 13/Mar/2019
+    scalarField magDivSf = mag(divSf)().internalField()*mesh.V().field();
 
     Info<< "Face areas divergence (min, max, average): "
         << "(" << min(magDivSf) << " " << max(magDivSf)
         << " " << average(magDivSf) << ")"
         << endl;
 
-    if (max(magDivSf) > 1e-9)
+    if (max(magDivSf) > primitiveMesh::closedThreshold_)
     {
         WarningIn("writeIbMasks")
             << "Possible problem with immersed boundary face area vectors: "
             << max(magDivSf)
             << endl;
+
+        scalar maxOpenCell = 0;
+        label maxOpenCellIndex = -1;
+
+        forAll (magDivSf, cellI)
+        {
+            if (magDivSf[cellI] > maxOpenCell)
+            {
+                maxOpenCell = magDivSf[cellI];
+                maxOpenCellIndex = cellI;
+            }
+
+            if (magDivSf[cellI] > 1e-9)
+            {
+                Info<< "Open cell " << cellI << ": " << magDivSf[cellI]
+                    << " gamma: " << gamma[cellI] << endl;
+            }
+        }
+
+        const surfaceVectorField& Sf = mesh.Sf();
+
+        const labelList& openCellFaces = mesh.cells()[maxOpenCellIndex];
+
+        scalarField openCellFaceGamma(openCellFaces.size(), scalar(-1));
+
+        vectorField openFaceAreas
+        (
+            IndirectList<vector>(mesh.faceAreas(), openCellFaces)()
+        );
+
+        vectorField adjustedFaceAreas(openCellFaces.size());
+
+        forAll (openCellFaces, cfI)
+        {
+            const label& faceI = openCellFaces[cfI];
+
+            if (mesh.isInternalFace(faceI))
+            {
+                openCellFaceGamma[cfI] = sGamma.internalField()[faceI];
+
+                adjustedFaceAreas[cfI] = Sf.internalField()[faceI];
+            }
+            else
+            {
+                const label patchI = mesh.boundaryMesh().whichPatch(faceI);
+
+                const label patchFaceI =
+                    mesh.boundaryMesh()[patchI].whichFace(faceI);
+
+                openCellFaceGamma[cfI] =
+                    sGamma.boundaryField()[patchI][patchFaceI];
+
+                adjustedFaceAreas[cfI] = Sf.boundaryField()[patchI][patchFaceI];
+            }
+        }
+
+        // Find faces on IB patches
+        vectorField ibVectors(mesh.boundary().size());
+        label nIbVectors = 0;
+
+        forAll (mesh.boundary(), patchI)
+        {
+            if (isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
+            {
+                const labelList& ibpFC = mesh.boundary()[patchI].faceCells();
+
+                forAll (ibpFC, ibpFCI)
+                {
+                    if (ibpFC[ibpFCI] == maxOpenCellIndex)
+                    {
+                        ibVectors[nIbVectors] =
+                            mesh.Sf().boundaryField()[patchI][ibpFCI];
+
+                        nIbVectors++;
+                    }
+                }
+            }
+        }
+
+        ibVectors.setSize(nIbVectors);
+
+        Pout<< "Max open cell index: " << maxOpenCellIndex
+            << " magDivSf = " << maxOpenCell << nl
+            << "faces: " << openCellFaces << nl
+            << " original areas: " << openFaceAreas << nl
+            << "sGamma: " << openCellFaceGamma << nl
+            << "adjusted areas: " << adjustedFaceAreas << nl
+            << "cut face areas: " << ibVectors << nl
+            << "Sum normal areas: " << sum(openFaceAreas) << nl
+            << "Sum iB areas: " << sum(ibVectors) << nl
+            << endl;
+
+
     }
 
     Info<< endl;

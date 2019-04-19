@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -402,11 +402,11 @@ faceTetPolyPatch::faceTetPolyPatch
     tetPolyPatch(bm),
     boundaryIndex_(p.index()),
     size_(p.meshPoints().size() + p.size()),
-    meshPointsPtr_(NULL),
-    localPointsPtr_(NULL),
-    pointNormalsPtr_(NULL),
-    localEdgeIndicesPtr_(NULL),
-    cutEdgeIndicesPtr_(NULL)
+    meshPointsPtr_(nullptr),
+    localPointsPtr_(nullptr),
+    pointNormalsPtr_(nullptr),
+    localEdgeIndicesPtr_(nullptr),
+    cutEdgeIndicesPtr_(nullptr)
 {}
 
 

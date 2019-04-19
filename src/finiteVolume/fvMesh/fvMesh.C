@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -125,16 +125,16 @@ Foam::fvMesh::fvMesh(const IOobject& io)
     polyMesh(io),
     surfaceInterpolation(*this),
     boundary_(*this),
-    lduPtr_(NULL),
+    lduPtr_(nullptr),
     curTimeIndex_(time().timeIndex()),
-    VPtr_(NULL),
-    V0Ptr_(NULL),
-    V00Ptr_(NULL),
-    SfPtr_(NULL),
-    magSfPtr_(NULL),
-    CPtr_(NULL),
-    CfPtr_(NULL),
-    phiPtr_(NULL)
+    VPtr_(nullptr),
+    V0Ptr_(nullptr),
+    V00Ptr_(nullptr),
+    SfPtr_(nullptr),
+    magSfPtr_(nullptr),
+    CPtr_(nullptr),
+    CfPtr_(nullptr),
+    phiPtr_(nullptr)
 {
     if (debug)
     {
@@ -226,16 +226,16 @@ Foam::fvMesh::fvMesh
     polyMesh(io, points, faces, allOwner, allNeighbour, syncPar),
     surfaceInterpolation(*this),
     boundary_(*this),
-    lduPtr_(NULL),
+    lduPtr_(nullptr),
     curTimeIndex_(time().timeIndex()),
-    VPtr_(NULL),
-    V0Ptr_(NULL),
-    V00Ptr_(NULL),
-    SfPtr_(NULL),
-    magSfPtr_(NULL),
-    CPtr_(NULL),
-    CfPtr_(NULL),
-    phiPtr_(NULL)
+    VPtr_(nullptr),
+    V0Ptr_(nullptr),
+    V00Ptr_(nullptr),
+    SfPtr_(nullptr),
+    magSfPtr_(nullptr),
+    CPtr_(nullptr),
+    CfPtr_(nullptr),
+    phiPtr_(nullptr)
 {
     if (debug)
     {
@@ -254,16 +254,16 @@ Foam::fvMesh::fvMesh
     polyMesh(io, is, syncPar),
     surfaceInterpolation(*this),
     boundary_(*this),
-    lduPtr_(NULL),
+    lduPtr_(nullptr),
     curTimeIndex_(time().timeIndex()),
-    VPtr_(NULL),
-    V0Ptr_(NULL),
-    V00Ptr_(NULL),
-    SfPtr_(NULL),
-    magSfPtr_(NULL),
-    CPtr_(NULL),
-    CfPtr_(NULL),
-    phiPtr_(NULL)
+    VPtr_(nullptr),
+    V0Ptr_(nullptr),
+    V00Ptr_(nullptr),
+    SfPtr_(nullptr),
+    magSfPtr_(nullptr),
+    CPtr_(nullptr),
+    CfPtr_(nullptr),
+    phiPtr_(nullptr)
 {
     if (debug)
     {
@@ -284,16 +284,16 @@ Foam::fvMesh::fvMesh
     polyMesh(io, points, faces, cells, syncPar),
     surfaceInterpolation(*this),
     boundary_(*this),
-    lduPtr_(NULL),
+    lduPtr_(nullptr),
     curTimeIndex_(time().timeIndex()),
-    VPtr_(NULL),
-    V0Ptr_(NULL),
-    V00Ptr_(NULL),
-    SfPtr_(NULL),
-    magSfPtr_(NULL),
-    CPtr_(NULL),
-    CfPtr_(NULL),
-    phiPtr_(NULL)
+    VPtr_(nullptr),
+    V0Ptr_(nullptr),
+    V00Ptr_(nullptr),
+    SfPtr_(nullptr),
+    magSfPtr_(nullptr),
+    CPtr_(nullptr),
+    CfPtr_(nullptr),
+    phiPtr_(nullptr)
 {
     if (debug)
     {
@@ -331,16 +331,16 @@ Foam::fvMesh::fvMesh
     ),
     surfaceInterpolation(*this),
     boundary_(*this),
-    lduPtr_(NULL),
+    lduPtr_(nullptr),
     curTimeIndex_(time().timeIndex()),
-    VPtr_(NULL),
-    V0Ptr_(NULL),
-    V00Ptr_(NULL),
-    SfPtr_(NULL),
-    magSfPtr_(NULL),
-    CPtr_(NULL),
-    CfPtr_(NULL),
-    phiPtr_(NULL)
+    VPtr_(nullptr),
+    V0Ptr_(nullptr),
+    V00Ptr_(nullptr),
+    SfPtr_(nullptr),
+    magSfPtr_(nullptr),
+    CPtr_(nullptr),
+    CfPtr_(nullptr),
+    phiPtr_(nullptr)
 {
     if (debug)
     {
@@ -426,7 +426,7 @@ void Foam::fvMesh::resetFvPrimitives
 
     // Clear all mesh data
     clearOut();
-}        
+}
 
 
 Foam::polyMesh::readUpdateState Foam::fvMesh::readUpdate()
@@ -514,7 +514,9 @@ void Foam::fvMesh::mapFields(const mapPolyMesh& meshMap) const
 
     // Map all the volFields in the objectRegistry
     MapGeometricFields<scalar, fvPatchField, fvMeshMapper, volMesh>(mapper);
+
     MapGeometricFields<vector, fvPatchField, fvMeshMapper, volMesh>(mapper);
+
     MapGeometricFields<sphericalTensor, fvPatchField, fvMeshMapper, volMesh>
         (mapper);
 
@@ -522,10 +524,10 @@ void Foam::fvMesh::mapFields(const mapPolyMesh& meshMap) const
         (mapper);
 
     MapGeometricFields<symmTensor4thOrder, fvPatchField, fvMeshMapper, volMesh>
-      (mapper);
+        (mapper);
 
     MapGeometricFields<diagTensor, fvPatchField, fvMeshMapper, volMesh>
-      (mapper);
+        (mapper);
 
     MapGeometricFields<tensor, fvPatchField, fvMeshMapper, volMesh>(mapper);
 
@@ -538,14 +540,15 @@ void Foam::fvMesh::mapFields(const mapPolyMesh& meshMap) const
 
     MapGeometricFields
         <sphericalTensor, fvsPatchField, fvMeshMapper, surfaceMesh>(mapper);
+
     MapGeometricFields<symmTensor, fvsPatchField, fvMeshMapper, surfaceMesh>
         (mapper);
 
-    MapGeometricFields<symmTensor4thOrder, fvsPatchField, fvMeshMapper, surfaceMesh>
-      (mapper);
+    MapGeometricFields
+        <symmTensor4thOrder, fvsPatchField, fvMeshMapper, surfaceMesh>(mapper);
 
     MapGeometricFields<diagTensor, fvsPatchField, fvMeshMapper, surfaceMesh>
-      (mapper);
+        (mapper);
 
     MapGeometricFields<tensor, fvsPatchField, fvMeshMapper, surfaceMesh>
         (mapper);

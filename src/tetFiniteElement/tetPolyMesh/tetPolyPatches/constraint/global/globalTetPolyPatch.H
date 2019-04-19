@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -366,7 +366,7 @@ public:
                 const unallocLabelList& internalData
             ) const
             {
-                return tmp<labelField>(NULL);
+                return tmp<labelField>(nullptr);
             }
 
             //- Initialise interface data transfer
@@ -384,7 +384,7 @@ public:
                 const unallocLabelList& interfaceData
             ) const
             {
-                return tmp<labelField>(NULL);
+                return tmp<labelField>(nullptr);
             }
 
             //- Initialise transfer of internal field adjacent to the interface
@@ -402,7 +402,7 @@ public:
                 const unallocLabelList& iF
             ) const
             {
-                return tmp<labelField>(NULL);
+                return tmp<labelField>(nullptr);
             }
 };
 

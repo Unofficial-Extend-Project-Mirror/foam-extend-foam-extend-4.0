@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     4.0                                |
+|  \\    /   O peration     | Version:     4.1                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -21,10 +21,9 @@ solvers
     {
         solver          PCG;
         preconditioner  DIC;
-        tolerance       1e-06;
-        relTol          0.01;
+        tolerance       1e-9;
+        relTol          0.001;
     }
-
     T
     {
         solver          PCG;
@@ -37,7 +36,7 @@ solvers
 stressedFoam
 {
     nCorrectors     1;
-    U               1e-06;
+    U               1e-07;
 }
 
 

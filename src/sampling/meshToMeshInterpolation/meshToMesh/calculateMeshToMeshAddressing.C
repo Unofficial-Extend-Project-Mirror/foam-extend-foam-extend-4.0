@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ void meshToMesh::calcAddressing()
             << "Setting up rescue" << endl;
     }
 
-    List<bool> boundaryCell(fromCells.size(), false);
+    boolList boundaryCell(fromCells.size(), false);
 
     // set reference to boundary
     const polyPatchList& patchesFrom = fromMesh_.boundaryMesh();
@@ -240,7 +240,7 @@ void meshToMesh::cellAddresses
     labelList& cellAddr,
     const pointField& points,
     const fvMesh& fromMesh,
-    const List<bool>& boundaryCell,
+    const boolList& boundaryCell,
     const octree<octreeDataCell>& oc,
     bool forceFind
 ) const

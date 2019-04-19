@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ Foam::simpleTwoStroke::simpleTwoStroke
     piston_(*this, engTime().engineDict().subDict("piston")),
     scavInCylPatchName_(engTime().engineDict().lookup("scavInCylPatch")),
     scavInPortPatchName_(engTime().engineDict().lookup("scavInPortPatch")),
-    movingPointsMaskPtr_(NULL),
+    movingPointsMaskPtr_(nullptr),
     deformSwitch_(readScalar(engTime().engineDict().lookup("deformAngle"))),
     delta_(readScalar(engTime().engineDict().lookup("delta"))),
     offSet_(readScalar(engTime().engineDict().lookup("offSet"))),

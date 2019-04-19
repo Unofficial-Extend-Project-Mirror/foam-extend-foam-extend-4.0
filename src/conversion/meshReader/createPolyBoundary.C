@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -189,7 +189,7 @@ void Foam::meshReader::createPolyBoundary()
         else if (patchPhysicalTypes_[patchI] == "monitoring")
         {
             // translate the "monitoring" pseudo-boundaries to face sets
-            List<label> monitoring(idList.size());
+            labelList monitoring(idList.size());
 
             label monitorI = 0;
             forAll(idList, bndI)

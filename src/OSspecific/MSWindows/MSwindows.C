@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -43,6 +43,8 @@ Description
 #include <map>
 
 // Windows system header files
+// DebugInfo macro defined in messageStream.H clashes with Windows headers
+#undef DebugInfo
 #include <io.h> // _close
 #include <windows.h>
 #include <signal.h>
@@ -94,11 +96,11 @@ std::string MSwindows::getLastError()
         FORMAT_MESSAGE_ALLOCATE_BUFFER |
         FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
+        nullptr,
         dw,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
         (LPTSTR) &lpMsgBuf,
-        0, NULL );
+        0, nullptr );
 
     lpDisplayBuf = LocalAlloc(LMEM_ZEROINIT,
         (lstrlen(static_cast<LPCTSTR>(lpMsgBuf))+40)*sizeof(TCHAR));
@@ -341,7 +343,7 @@ std::string toUnixPath(const std::string & path)
 bool env(const word& envName)
 {
     const DWORD actualBufferSize =
-      ::GetEnvironmentVariable(envName.c_str(), NULL, 0);
+      ::GetEnvironmentVariable(envName.c_str(), nullptr, 0);
 
     const bool envExists = (0 < actualBufferSize);
     return envExists;
@@ -353,7 +355,7 @@ string getEnv(const word& envName)
     std::string envAsString;
 
     const DWORD actualBufferSize =
-      ::GetEnvironmentVariable(envName.c_str(), NULL, 0);
+      ::GetEnvironmentVariable(envName.c_str(), nullptr, 0);
 
     if (0 < actualBufferSize)
     {
@@ -372,7 +374,7 @@ string getEnv(const word& envName)
 bool setEnv
 (
     const word& envName,
-    const string& value,
+    const std::string& value,
     const bool overwrite
 )
 {
@@ -382,9 +384,8 @@ bool setEnv
 }
 
 
-word hostName()
+string hostName(bool full)
 {
-    const bool full = true;
     const DWORD bufferSize = MAX_COMPUTERNAME_LENGTH + 1;
     TCHAR buffer[bufferSize];
     DWORD actualBufferSize = bufferSize;
@@ -392,6 +393,17 @@ word hostName()
     const bool success =
       ::GetComputerName(buffer, &actualBufferSize);
     const string computerName = success ? buffer : string::null;
+
+    // implementation as per hostname from net-tools
+    if (full)
+    {
+        struct hostent *hp = gethostbyname(computerName.c_str());
+        if (hp)
+        {
+            return hp->h_name;
+        }
+    }
+
     return computerName;
 }
 
@@ -405,7 +417,7 @@ string domainName()
 }
 
 
-word userName()
+string userName()
 {
     std::string name = getEnv("USERNAME");
 
@@ -438,7 +450,7 @@ fileName home()
 }
 
 
-fileName home(const word& userName)
+fileName home(const string& userName)
 {
     return home();
 }
@@ -449,7 +461,7 @@ fileName cwd()
     string currentDirectory;
 
     const DWORD actualBufferSize =
-      ::GetCurrentDirectory(0, NULL);
+      ::GetCurrentDirectory(0, nullptr);
 
     if (0 < actualBufferSize)
     {
@@ -692,7 +704,7 @@ bool mkDir(const fileName& pathName, const mode_t mode)
     }
 
 
-    bool success = ::CreateDirectory(pathName.c_str(), NULL);
+    bool success = ::CreateDirectory(pathName.c_str(), nullptr);
 
     if (success)
     {
@@ -1277,24 +1289,22 @@ void* dlOpen(const fileName& libName, const bool check)
             << " : LoadLibrary of " << libName << endl;
     }
 
-    const char* dllExt = ".dll";
+    // Replace extension with .dll
+    string winLibName(libName.lessExt() + ".dll");
 
-    // Assume libName is of the form, lib<name>.so
-    string winLibName(libName);
-    winLibName.replace(".so", dllExt);
     void* handle = ::LoadLibrary(winLibName.c_str());
 
-    if (NULL == handle)
+    if (nullptr == handle)
     {
         // Assumes libName = name
         winLibName = "lib";
         winLibName += libName;
-        winLibName += dllExt;
+        winLibName += ".dll";
 
         handle = ::LoadLibrary(winLibName.c_str());
     }
 
-    if (NULL != handle)
+    if (nullptr != handle)
     {
         getLoadedLibs()[handle] = libName;
     }
@@ -1347,7 +1357,7 @@ void* dlSym(void* handle, const std::string& symbol)
     // get address of symbol
     void* fun = (void*) ::GetProcAddress(static_cast<HMODULE>(handle), symbol.c_str());
 
-    if (NULL == fun)
+    if (nullptr == fun)
     {
         WarningIn("dlSym(void*, const std::string&)")
             << "Cannot lookup symbol " << symbol << " : " << MSwindows::getLastError()
@@ -1371,7 +1381,7 @@ bool dlSymFound(void* handle, const std::string& symbol)
         // get address of symbol
         void* fun = (void*) ::GetProcAddress(static_cast<HMODULE>(handle), symbol.c_str());
 
-        return (NULL != fun);
+        return (nullptr != fun);
     }
     else
     {

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ Foam::cellZone::cellZone
     name_(name),
     index_(index),
     zoneMesh_(zm),
-    cellLookupMapPtr_(NULL)
+    cellLookupMapPtr_(nullptr)
 {}
 
 
@@ -131,7 +131,7 @@ Foam::cellZone::cellZone
     name_(name),
     index_(index),
     zoneMesh_(zm),
-    cellLookupMapPtr_(NULL)
+    cellLookupMapPtr_(nullptr)
 {}
 
 
@@ -148,7 +148,7 @@ Foam::cellZone::cellZone
     name_(name),
     index_(index),
     zoneMesh_(zm),
-    cellLookupMapPtr_(NULL)
+    cellLookupMapPtr_(nullptr)
 {}
 
 
@@ -166,7 +166,7 @@ Foam::cellZone::cellZone
     name_(cz.name()),
     index_(index),
     zoneMesh_(zm),
-    cellLookupMapPtr_(NULL)
+    cellLookupMapPtr_(nullptr)
 {}
 
 Foam::cellZone::cellZone
@@ -181,7 +181,7 @@ Foam::cellZone::cellZone
     name_(cz.name()),
     index_(index),
     zoneMesh_(zm),
-    cellLookupMapPtr_(NULL)
+    cellLookupMapPtr_(nullptr)
 {}
 
 

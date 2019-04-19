@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
     bool found;
     label replaceFace = -1, retainFace = -1;
     face tmpQuadFace(4), tmpTriFace(3);
-    labelList tmpQFEdges(4, -1), tmpTFEdges(3, -1);
+    labelList tmpQFEdges(4, label(-1)), tmpTFEdges(3, label(-1));
     FixedList<label,7> newFaceIndex(-1), newEdgeIndex(-1);
     FixedList<edge,4> commonEdges(edge(-1, -1));
     FixedList<label,4> cornerEdgeIndex(-1), commonEdgeIndex(-1);
@@ -388,7 +388,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
 
         label sIndex = slaveMap.index();
         label pI = slaveMap.patchIndex();
-        const coupleMap* cMapPtr = NULL;
+        const coupleMap* cMapPtr = nullptr;
 
         // Temporarily turn off coupledModification
         unsetCoupledModification();
@@ -455,7 +455,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
 
         // Fill the masterMap with points that
         // we seek maps for...
-        FixedList<labelList, 2> slaveEdges(labelList(2, -1));
+        FixedList<labelList, 2> slaveEdges(labelList(2, label(-1)));
 
         forAll(slaveEdges, edgeI)
         {
@@ -597,7 +597,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
         // Write out VTK files prior to change
         if (debug > 3)
         {
-            labelList cellHull(2, -1);
+            labelList cellHull(2, label(-1));
 
             cellHull[0] = owner_[fIndex];
             cellHull[1] = neighbour_[fIndex];
@@ -632,7 +632,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
     otherEdgePoint[0] = commonEdges[0].otherVertex(nextToOtherPoint[0]);
     otherEdgePoint[1] = commonEdges[1].otherVertex(nextToOtherPoint[1]);
 
-    labelList mP(2, -1);
+    labelList mP(2, label(-1));
 
     // Set mapping for this point
     mP[0] = commonEdges[0][0];
@@ -1000,7 +1000,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
     );
 
     // Create / modify edges...
-    labelList tmpTriEdgeFaces(3, -1);
+    labelList tmpTriEdgeFaces(3, label(-1));
 
     // The edge bisecting the zeroth boundary triangular face
     tmpTriEdgeFaces[0] = c0BdyIndex[0];
@@ -1125,7 +1125,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
             newCells[0]
         );
 
-        labelList tmpBiEdgeFaces(2, -1);
+        labelList tmpBiEdgeFaces(2, label(-1));
 
         // The edge bisecting the face
         tmpTriEdgeFaces[0] = newFaceIndex[3];
@@ -1636,7 +1636,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
         );
 
         // Create / modify edges...
-        labelList tmpQuadEdgeFaces(4, -1);
+        labelList tmpQuadEdgeFaces(4, label(-1));
 
         // The internal edge bisecting the face
         tmpQuadEdgeFaces[0] = fIndex;
@@ -1991,7 +1991,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
         const label pI = slaveMap.patchIndex();
 
         // Fetch the appropriate coupleMap
-        const coupleMap* cMapPtr = NULL;
+        const coupleMap* cMapPtr = nullptr;
 
         if (localCouple && !procCouple)
         {
@@ -2092,7 +2092,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
 
             forAll(afList, sfI)
             {
-                const face* facePtr = NULL;
+                const face* facePtr = nullptr;
 
                 if (localCouple && !procCouple)
                 {
@@ -2197,7 +2197,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
     // Write out VTK files after change
     if (debug > 3)
     {
-        labelList cellHull(4, -1);
+        labelList cellHull(4, label(-1));
 
         cellHull[0] = owner_[fIndex];
         cellHull[1] = neighbour_[fIndex];
@@ -2838,9 +2838,9 @@ const changeMap dynamicTopoFvMesh::bisectEdge
     // Hull variables
     face tmpTriFace(3);
     edge origEdge(edges_[eIndex]);
-    labelList tmpEdgeFaces(3,-1);
-    labelList tmpIntEdgeFaces(4,-1);
-    labelList tmpFaceEdges(3,-1);
+    labelList tmpEdgeFaces(3, label(-1));
+    labelList tmpIntEdgeFaces(4, label(-1));
+    labelList tmpFaceEdges(3, label(-1));
 
     // Build vertexHull for this edge
     labelList vertexHull;
@@ -2848,9 +2848,9 @@ const changeMap dynamicTopoFvMesh::bisectEdge
 
     // Size up the hull lists
     label m = vertexHull.size();
-    labelList cellHull(m, -1);
-    labelList faceHull(m, -1);
-    labelList edgeHull(m, -1);
+    labelList cellHull(m, label(-1));
+    labelList faceHull(m, label(-1));
+    labelList edgeHull(m, label(-1));
     labelListList ringEntities(4, labelList(m, -1));
 
     // Construct a hull around this edge
@@ -2917,7 +2917,7 @@ const changeMap dynamicTopoFvMesh::bisectEdge
         }
     }
 
-    labelList mP(2, -1);
+    labelList mP(2, label(-1));
 
     // Set mapping for this point
     mP[0] = edges_[eIndex][0];
@@ -3108,7 +3108,7 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                         tmpTriFace,
                         addedCellIndices[indexI],
                         -1,
-                        labelList(3, -1)
+                        labelList(3, label(-1))
                     )
                 );
 
@@ -3188,7 +3188,7 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                         tmpTriFace,
                         addedCellIndices[prevI],
                         addedCellIndices[indexI],
-                        labelList(3, -1)
+                        labelList(3, label(-1))
                     )
                 );
 
@@ -3278,7 +3278,7 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                         tmpTriFace,
                         addedCellIndices[0],
                         addedCellIndices[indexI],
-                        labelList(3, -1)
+                        labelList(3, label(-1))
                     )
                 );
 
@@ -3370,7 +3370,7 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                     tmpTriFace,
                     addedCellIndices[prevI],
                     -1,
-                    labelList(3, -1)
+                    labelList(3, label(-1))
                 )
             );
 
@@ -3595,8 +3595,8 @@ const changeMap dynamicTopoFvMesh::bisectEdge
             const label pI = slaveMap.patchIndex();
 
             // Fetch the appropriate coupleMap / mesh
-            const coupleMap* cMapPtr = NULL;
-            const dynamicTopoFvMesh* sMeshPtr = NULL;
+            const coupleMap* cMapPtr = nullptr;
+            const dynamicTopoFvMesh* sMeshPtr = nullptr;
 
             if (localCouple && !procCouple)
             {
@@ -4941,7 +4941,7 @@ const changeMap dynamicTopoFvMesh::addCellLayer
         addedCells.insert(cIndex, labelPair(newCellIndex, 0));
     }
 
-    labelList mP(2, -1);
+    labelList mP(2, label(-1));
 
     forAll(patchFaces, indexI)
     {
@@ -5211,7 +5211,7 @@ const changeMap dynamicTopoFvMesh::addCellLayer
             }
 
             // Configure faceEdges for the new vertical face
-            labelList newVFaceEdges(4, -1);
+            labelList newVFaceEdges(4, label(-1));
 
             newVFaceEdges[0] = beIndex;
             newVFaceEdges[1] = newHEdgeIndex;

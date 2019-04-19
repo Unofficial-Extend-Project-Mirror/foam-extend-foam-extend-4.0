@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -2717,7 +2717,7 @@ Foam::cellCuts::cellCuts
     pointIsCut_(expand(mesh.nPoints(), meshVerts)),
     edgeIsCut_(expand(mesh.nEdges(), meshEdges)),
     edgeWeight_(expand(mesh.nEdges(), meshEdges, meshEdgeWeights)),
-    faceCutsPtr_(NULL),
+    faceCutsPtr_(nullptr),
     faceSplitCut_(cutCells.size()),
     cellLoops_(mesh.nCells()),
     nLoops_(-1),
@@ -2762,7 +2762,7 @@ Foam::cellCuts::cellCuts
     pointIsCut_(expand(mesh.nPoints(), meshVerts)),
     edgeIsCut_(expand(mesh.nEdges(), meshEdges)),
     edgeWeight_(expand(mesh.nEdges(), meshEdges, meshEdgeWeights)),
-    faceCutsPtr_(NULL),
+    faceCutsPtr_(nullptr),
     faceSplitCut_(mesh.nFaces()/10 + 1),
     cellLoops_(mesh.nCells()),
     nLoops_(-1),
@@ -2806,7 +2806,7 @@ Foam::cellCuts::cellCuts
     pointIsCut_(mesh.nPoints(), false),
     edgeIsCut_(mesh.nEdges(), false),
     edgeWeight_(mesh.nEdges(), -GREAT),
-    faceCutsPtr_(NULL),
+    faceCutsPtr_(nullptr),
     faceSplitCut_(cellLabels.size()),
     cellLoops_(mesh.nCells()),
     nLoops_(-1),
@@ -2850,7 +2850,7 @@ Foam::cellCuts::cellCuts
     pointIsCut_(mesh.nPoints(), false),
     edgeIsCut_(mesh.nEdges(), false),
     edgeWeight_(mesh.nEdges(), -GREAT),
-    faceCutsPtr_(NULL),
+    faceCutsPtr_(nullptr),
     faceSplitCut_(refCells.size()),
     cellLoops_(mesh.nCells()),
     nLoops_(-1),
@@ -2895,7 +2895,7 @@ Foam::cellCuts::cellCuts
     pointIsCut_(mesh.nPoints(), false),
     edgeIsCut_(mesh.nEdges(), false),
     edgeWeight_(mesh.nEdges(), -GREAT),
-    faceCutsPtr_(NULL),
+    faceCutsPtr_(nullptr),
     faceSplitCut_(cellLabels.size()),
     cellLoops_(mesh.nCells()),
     nLoops_(-1),
@@ -2946,7 +2946,7 @@ Foam::cellCuts::cellCuts
     pointIsCut_(pointIsCut),
     edgeIsCut_(edgeIsCut),
     edgeWeight_(edgeWeight),
-    faceCutsPtr_(NULL),
+    faceCutsPtr_(nullptr),
     faceSplitCut_(faceSplitCut),
     cellLoops_(cellLoops),
     nLoops_(nLoops),

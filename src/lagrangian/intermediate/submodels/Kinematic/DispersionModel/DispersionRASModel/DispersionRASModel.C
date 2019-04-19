@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -43,9 +43,9 @@ Foam::DispersionRASModel<CloudType>::DispersionRASModel
             "RASProperties"
         )
     ),
-    kPtr_(NULL),
+    kPtr_(nullptr),
     ownK_(false),
-    epsilonPtr_(NULL),
+    epsilonPtr_(nullptr),
     ownEpsilon_(false)
 {}
 
@@ -95,13 +95,13 @@ void Foam::DispersionRASModel<CloudType>::cacheFields(const bool store)
         if (ownK_ && kPtr_)
         {
             delete kPtr_;
-            kPtr_ = NULL;
+            kPtr_ = nullptr;
             ownK_ = false;
         }
         if (ownEpsilon_ && epsilonPtr_)
         {
             delete epsilonPtr_;
-            epsilonPtr_ = NULL;
+            epsilonPtr_ = nullptr;
             ownEpsilon_ = false;
         }
     }

@@ -24,7 +24,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "immersedBoundaryOmegaWallFunctionFvPatchScalarField.H"
-#include "immersedBoundaryVelocityWallFunctionFvPatchVectorField.H"
 #include "RASModel.H"
 #include "fvPatchFieldMapper.H"
 #include "volFields.H"
@@ -48,16 +47,8 @@ immersedBoundaryOmegaWallFunctionFvPatchScalarField
     const DimensionedField<scalar, volMesh>& iF
 )
 :
-    immersedBoundaryWallFunctionFvPatchScalarField(p, iF),
-    UName_("U"),
-    kName_("k"),
-    GName_("RASModel::G"),
-    nuName_("nu"),
-    nutName_("nut"),
-    Cmu_(0.09),
-    kappa_(0.41),
-    E_(9.8),
-    beta1_(0.075)
+    omegaWallFunctionFvPatchScalarField(p, iF),
+    immersedBoundaryFieldBase<scalar>(p, true, 90)
 {}
 
 
@@ -69,17 +60,18 @@ immersedBoundaryOmegaWallFunctionFvPatchScalarField
     const dictionary& dict
 )
 :
-    immersedBoundaryWallFunctionFvPatchScalarField(p, iF, dict),
-    UName_(dict.lookupOrDefault<word>("U", "U")),
-    kName_(dict.lookupOrDefault<word>("k", "k")),
-    GName_(dict.lookupOrDefault<word>("G", "RASModel::G")),
-    nuName_(dict.lookupOrDefault<word>("nu", "nu")),
-    nutName_(dict.lookupOrDefault<word>("nut", "nut")),
-    Cmu_(dict.lookupOrDefault<scalar>("Cmu", 0.09)),
-    kappa_(dict.lookupOrDefault<scalar>("kappa", 0.41)),
-    E_(dict.lookupOrDefault<scalar>("E", 9.8)),
-    beta1_(dict.lookupOrDefault<scalar>("beta1", 0.075))
-{}
+    omegaWallFunctionFvPatchScalarField(p, iF, dict),
+    immersedBoundaryFieldBase<scalar>
+    (
+        p,
+        Switch(dict.lookup("setDeadValue")),
+        readScalar(dict.lookup("deadValue"))
+    )    
+{
+    this->readPatchType(dict);
+
+    *this == this->patchInternalField();
+}
 
 
 immersedBoundaryOmegaWallFunctionFvPatchScalarField::
@@ -91,59 +83,89 @@ immersedBoundaryOmegaWallFunctionFvPatchScalarField
     const fvPatchFieldMapper& mapper
 )
 :
-    immersedBoundaryWallFunctionFvPatchScalarField(ptf, p, iF, mapper),
-    UName_(ptf.UName_),
-    kName_(ptf.kName_),
-    GName_(ptf.GName_),
-    nuName_(ptf.nuName_),
-    nutName_(ptf.nutName_),
-    Cmu_(ptf.Cmu_),
-    kappa_(ptf.kappa_),
-    E_(ptf.E_),
-    beta1_(ptf.beta1_)
-{}
+    omegaWallFunctionFvPatchScalarField(ptf, p, iF, mapper),
+    immersedBoundaryFieldBase<scalar>
+    (
+        p,
+        ptf.setDeadValue(),
+        ptf.deadValue()
+    )
+{
+    this->setPatchType(ptf);
+}
 
 
 immersedBoundaryOmegaWallFunctionFvPatchScalarField::
 immersedBoundaryOmegaWallFunctionFvPatchScalarField
 (
-    const immersedBoundaryOmegaWallFunctionFvPatchScalarField& owfpsf
+    const immersedBoundaryOmegaWallFunctionFvPatchScalarField& ptf
 )
 :
-    immersedBoundaryWallFunctionFvPatchScalarField(owfpsf),
-    UName_(owfpsf.UName_),
-    kName_(owfpsf.kName_),
-    GName_(owfpsf.GName_),
-    nuName_(owfpsf.nuName_),
-    nutName_(owfpsf.nutName_),
-    Cmu_(owfpsf.Cmu_),
-    kappa_(owfpsf.kappa_),
-    E_(owfpsf.E_),
-    beta1_(owfpsf.beta1_)
-{}
+    omegaWallFunctionFvPatchScalarField(ptf),
+    immersedBoundaryFieldBase<scalar>
+    (
+        ptf.ibPatch(),
+        ptf.setDeadValue(),
+        ptf.deadValue()
+    )
+{
+    this->setPatchType(ptf);
+}
 
 
 immersedBoundaryOmegaWallFunctionFvPatchScalarField::
 immersedBoundaryOmegaWallFunctionFvPatchScalarField
 (
-    const immersedBoundaryOmegaWallFunctionFvPatchScalarField& owfpsf,
+    const immersedBoundaryOmegaWallFunctionFvPatchScalarField& ptf,
     const DimensionedField<scalar, volMesh>& iF
 )
 :
-    immersedBoundaryWallFunctionFvPatchScalarField(owfpsf, iF),
-    UName_(owfpsf.UName_),
-    kName_(owfpsf.kName_),
-    GName_(owfpsf.GName_),
-    nuName_(owfpsf.nuName_),
-    nutName_(owfpsf.nutName_),
-    Cmu_(owfpsf.Cmu_),
-    kappa_(owfpsf.kappa_),
-    E_(owfpsf.E_),
-    beta1_(owfpsf.beta1_)
-{}
+    omegaWallFunctionFvPatchScalarField(ptf, iF),
+    immersedBoundaryFieldBase<scalar>
+    (
+        ptf.ibPatch(),
+        ptf.setDeadValue(),
+        ptf.deadValue()
+    )
+{
+    this->setPatchType(ptf);
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+void immersedBoundaryOmegaWallFunctionFvPatchScalarField::autoMap
+(
+    const fvPatchFieldMapper&
+)
+{
+    scalarField::operator=(this->patchInternalField());
+
+    // Resize refValue as well.  HJ, 10/Jul/2018
+    refValue() = this->patchInternalField();
+}
+
+
+void immersedBoundaryOmegaWallFunctionFvPatchScalarField::rmap
+(
+    const fvPatchScalarField& ptf,
+    const labelList&
+)
+{}
+
+
+void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateOnMotion()
+{
+    if (size() != ibPatch().size())
+    {
+        // Use internal values, resizing the file if needed
+        scalarField::operator=(this->patchInternalField());
+
+        // Resize refValue as well.  HJ, 10/Jul/2018
+        refValue() = this->patchInternalField();
+    }
+}
+
 
 void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateCoeffs()
 {
@@ -152,207 +174,24 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateCoeffs()
         return;
     }
 
-    // If G field is not present, execute zero gradient evaluation
-    // HJ, 20/Mar/2011
-    if (!db().foundObject<volScalarField>(GName_))
+    // Resize fields
+    if (size() != this->ibPatch().size())
     {
-        InfoIn
-        (
-            "void immersedBoundaryOmegaWallFunctionFvPatchScalarField::"
-            "updateCoeffs()"
-        )   << "Cannot access " << GName_ << " field.  for patch "
-            << patch().name() << ".  Evaluating as regular immersed boundary"
+        Info<< "Resizing immersedBoundaryOmegaWallFunction in evaluate: "
+            << "patch: " << patch().size() << " field: " << size()
             << endl;
 
-        immersedBoundaryWallFunctionFvPatchScalarField::evaluate();
-
-        return;
+        *this == patchInternalField();
+        refValue() = patchInternalField();
     }
 
-    const vectorField& n = ibPatch().ibNormals();
-
-    const RASModel& rasModel = db().lookupObject<RASModel>("RASProperties");
-    const scalar yPlusLam = rasModel.yPlusLam(kappa_, E_);
-
-    const scalar Cmu25 = pow(Cmu_, 0.25);
-    const scalar Cmu50 = sqrt(Cmu_);
-
-    volScalarField& G = const_cast<volScalarField&>
-        (db().lookupObject<volScalarField>(GName_));
-
-    // Grab values of other fields required for wall functions
-
-    // Velocity
-    const fvPatchVectorField& Uwg =
-      patch().lookupPatchField<volVectorField, vector>(UName_);
-    const immersedBoundaryVelocityWallFunctionFvPatchVectorField& Uw =
-        refCast<const immersedBoundaryVelocityWallFunctionFvPatchVectorField>
-        (
-            Uwg
-        );
-
-    // Calculate tangential component, taking into account wall velocity
-    const vectorField UtanOld =
-        (I - sqr(n)) & (Uw.ibSamplingPointValue() - Uw.ibValue());
-    const scalarField magUtanOld = mag(UtanOld);
-
-    // Tangential velocity component
-    scalarField& UTangentialNew = Uw.wallTangentialValue();
-
-    // Wall shear stress
-    vectorField& tauWall = Uw.tauWall();
-
-    // Turbulence kinetic energy
-    const fvPatchScalarField& kg =
-        patch().lookupPatchField<volScalarField, scalar>(kName_);
-    const immersedBoundaryWallFunctionFvPatchScalarField& kw =
-        refCast<const immersedBoundaryWallFunctionFvPatchScalarField>(kg);
-
-    // Current and new values of k at sampling point
-    scalarField k = kw.ibSamplingPointValue();
-    scalarField& kNew = kw.wallValue();
-
-    // Laminar viscosity
-    const fvPatchScalarField& nuwg =
-        patch().lookupPatchField<volScalarField, scalar>(nuName_);
-    const immersedBoundaryFvPatchScalarField& nuw =
-        refCast<const immersedBoundaryFvPatchScalarField>(nuwg);
-    scalarField nu = nuw.ibCellValue();
-
-    // Turbulent viscosity
-    const fvPatchScalarField& nutwg =
-       patch().lookupPatchField<volScalarField, scalar>(nutName_);
-    const immersedBoundaryWallFunctionFvPatchScalarField& nutw =
-        refCast<const immersedBoundaryWallFunctionFvPatchScalarField>(nutwg);
-
-    // New values of nut
-    scalarField nutOld = nutw.ibCellValue();
-    scalarField& nutNew = nutw.wallValue();
-
-    const scalarField magGradUw = mag(Uw.ibGrad());
-
-    // Get the IB addressing and distance
-    const labelList& ibc = ibPatch().ibCells();
-
-    // Distance to sampling point
-    const scalarField& ySample = ibPatch().ibSamplingPointDelta();
-
-    // Distance from wall to IB point
-    const scalarField& y = ibPatch().ibDelta();
-
-    // Omega: store IB cell values for direct insertion
-    scalarField omegaSample = this->ibSamplingPointValue();
-
-    scalarField& omegaNew = this->wallValue();
-
-    // Mark values to be fixed
-    boolList wf(ibc.size(), false);
-
-    // Calculate yPlus for sample points
-    scalarField ypd = Cmu25*ySample*sqrt(k)/nu;
-
-    // Calculate wall function conditions
-    forAll (ibc, ibCellI)
+    // If G field is present, execute evaluation
+    // Remove the warning from the IB patch
+    // HJ, 20/May/2018
+    if (db().foundObject<volScalarField>(GName()))
     {
-
-        // Calculate yPlus from k and laminar viscosity for the IB point
-        const scalar yPlusSample = ypd[ibCellI];
-
-        scalar tauW, uTau;  // wall-shear and friction velocity from LOW
-
-        if (yPlusSample > yPlusLam)
-        {
-            // Calculate tauW from log-law using k and U at sampling point
-
-            tauW = magUtanOld[ibCellI]*Cmu25*sqrt(k[ibCellI])*kappa_
-                  /log(E_*yPlusSample);
-        }
-        else
-        {
-            // Sampling point is in laminar sublayer
-            tauW = magUtanOld[ibCellI]*Cmu25*sqrt(k[ibCellI])/yPlusSample;
-        }
-
-        // friction velocity computed from k and U at sampling point
-        uTau = sqrt(tauW);
-
-        tauWall[ibCellI] = tauW*UtanOld[ibCellI]/(magUtanOld[ibCellI] + SMALL);
-
-        // Calculate yPlus for IB point
-
-        scalar yPlusIB = yPlusSample*y[ibCellI]/ySample[ibCellI];
-
-        // Calculate wall function data in the immersed boundary point
-        if (yPlusIB > yPlusLam)
-        {
-            const scalar nuLam = nu[ibCellI];
-            // Logarithmic region
-            wf[ibCellI] = true;
-
-            // turbulent viscosity at IB cell and at wall
-            scalar nutw = nuLam*(yPlusIB*kappa_/log(E_*yPlusIB) - 1);
-
-            // Fix generation even though it if is not used
-            G[ibc[ibCellI]] =
-                sqr((nutw + nuLam)*magGradUw[ibCellI])/
-                (Cmu25*sqrt(k[ibCellI])*kappa_*y[ibCellI]);
-
-            // Compute k at the IB cell
-            kNew[ibCellI] = tauW/Cmu50;  // equilibrium boundary layer
-            // kNew[ibCellI] = k[ibCellI];  // zero-Gradient (less stable)
-
-            // Compute omega at the IB cell
-            omegaNew[ibCellI] = sqrt(kNew[ibCellI])/(Cmu25*kappa_*y[ibCellI]);
-
-            // Log-Law for tangential velocity  - uTau = Cmu25*sqrt(kNew)
-            UTangentialNew[ibCellI] = uTau/kappa_*log(E_*yPlusIB);
-
-            // Calculate turbulent viscosity
-            nutNew[ibCellI] = nutw;
-        }
-        else
-        {
-            // Laminar sub-layer
-            wf[ibCellI] = false;
-
-            // G is zero  - immaterial!
-            // G[ibc[ibCellI]] = 0;
-
-            // quadratic fit
-            kNew[ibCellI] = k[ibCellI]*sqr(yPlusIB/yPlusLam);
-
-            // Compute omega at the IB cell
-            omegaNew[ibCellI] = 6.0*nu[ibCellI]/(beta1_*sqr(y[ibCellI]));
-
-            // Bugfix - set zeroGradient bc for large omega values at ib boundary
-            // to avoid k unboundedness (IG 30/OCT/2015), not
-            // sure if this is a good criteria
-            if(omegaNew[ibCellI] > 10.0)
-            {
-                wf[ibCellI] = true;
-            }
-
-            // Laminar sub-layer for tangential velocity: uPlus = yPlus
-            UTangentialNew[ibCellI] = uTau*yPlusIB;
-
-            // Turbulent viscosity is zero
-            nutNew[ibCellI] = SMALL;
-        }
+        omegaWallFunctionFvPatchScalarField::updateCoeffs();
     }
-
-//     Info<< "UTangentialNew " << min(UTangentialNew) << " " << max(UTangentialNew) << endl;
-//     Info<< "nutNew " << min(nutNew) << " " << max(nutNew) << endl;
-//     Info<< "kNew " << min(kNew) << " " << max(kNew) << endl;
-//     Info<< "epsilonNew " << min(epsilonNew) << " " << max(epsilonNew) << endl;
-
-    // Set the fields to calculated wall function values
-    Uw.wallMask() = true;
-    kw.wallMask() = wf;
-    nutw.wallMask() = true;
-    this->wallMask() = true;
-
-    // Insert epsilon values into the internal field
-    immersedBoundaryWallFunctionFvPatchScalarField::updateCoeffs();
 }
 
 
@@ -361,26 +200,40 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::evaluate
     const Pstream::commsTypes commsType
 )
 {
-    // Insert epsilon values into the internal field
-    this->setIbCellValues(this->wallValue());
+    // Resize fields
+    if (size() != this->ibPatch().size())
+    {
+        Info<< "Resizing immersedBoundaryOmegaWallFunction in evaluate"
+            << endl;
 
-    fvPatchScalarField::evaluate(commsType);
+        *this == patchInternalField();
+        refValue() = patchInternalField();
+    }
+
+    // Get non-constant reference to internal field
+    scalarField& intField = const_cast<scalarField&>(this->internalField());
+
+    // Set dead value
+    this->setDeadValues(intField);
+
+    omegaWallFunctionFvPatchScalarField::evaluate(commsType);
 }
 
 
-void immersedBoundaryOmegaWallFunctionFvPatchScalarField::
-write(Ostream& os) const
+void immersedBoundaryOmegaWallFunctionFvPatchScalarField::write
+(
+    Ostream& os
+) const
 {
-    immersedBoundaryWallFunctionFvPatchScalarField::write(os);
-    writeEntryIfDifferent<word>(os, "U", "U", UName_);
-    writeEntryIfDifferent<word>(os, "k", "k", kName_);
-    writeEntryIfDifferent<word>(os, "G", "RASModel::G", GName_);
-    writeEntryIfDifferent<word>(os, "nu", "nu", nuName_);
-    writeEntryIfDifferent<word>(os, "nut", "nut", nutName_);
-    os.writeKeyword("Cmu") << Cmu_ << token::END_STATEMENT << nl;
-    os.writeKeyword("kappa") << kappa_ << token::END_STATEMENT << nl;
-    os.writeKeyword("E") << E_ << token::END_STATEMENT << nl;
-    os.writeKeyword("beta1") << beta1_ << token::END_STATEMENT << nl;
+    fvPatchScalarField::write(os);
+    writeLocalEntries(os);
+    this->writeDeadData(os);
+
+    // The value entry needs to be written with zero size
+    scalarField::null().writeEntry("value", os);
+    // this->writeEntry("value", os);
+
+    writeField(*this);
 }
 
 

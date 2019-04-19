@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -35,18 +35,12 @@ Description
       - patch face ordering to be ok
       - f[0] ordering on patch faces to be ok.
 
-    Works by constructing equivalence lists for all the points on processor
-    patches. These list are procPointList and give processor and meshPoint
-    label on that processor.
-    E.g.
-    @verbatim
-          ((7 93)(4 731)(3 114))
-    @endverbatim
-
-    means point 93 on proc7 is connected to point 731 on proc4 and 114 on proc3.
-    It then gets the lowest numbered processor (the 'master') to request a
-    sharedPoint label from processor0 and it redistributes this label back to
-    the other processors in the equivalence list.
+    The class will create a unique list of multiply shared points
+    (on more than 2 mesh pieces).  On each mesh piece, it will provide a
+    a list of local point labels that are globally shared (sharedPointLabels)
+    and for each of such points the index in the list of globally shared
+    points (sharedPointAddr).  The class also provides the number of globally
+    shared points across all mesh pieces (nGlobalPoints)
 
 Note
     Currently operating with a PtrList<fvMesh>, whereas the operation actually
@@ -102,24 +96,29 @@ class sharedPoints
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        sharedPoints(const sharedPoints&) = delete;
+        sharedPoints(const sharedPoints&);
 
         //- Disallow default bitwise assignment
-        void operator=(const sharedPoints&) = delete;
+        void operator=(const sharedPoints&);
 
 
         //- Calculate processor patch pairs
         //  For each processor patch, find equivalent patch on other mesh
         labelListList procPatchPairs() const;
 
+        //- Sync mark using processor patches
+        void syncMark
+        (
+            labelListList& markedPoints,
+            const labelListList& patchPairs,
+            const label fromMesh
+        ) const;
+
         //- Calculate shared points
         void calcSharedPoints();
 
 
 public:
-
-    // Static data members
-
 
     // Constructors
 
@@ -128,7 +127,8 @@ public:
 
 
     //- Destructor
-    ~sharedPoints() = default;
+    ~sharedPoints()
+    {}
 
 
     // Member Functions

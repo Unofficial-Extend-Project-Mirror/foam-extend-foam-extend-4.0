@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ class cuttingPlane
         (
             const primitiveMesh&,
             const scalarField& dotProducts,
-            List<label>& edgePoint
+            labelList& edgePoint
         );
 
         //- Walk circumference of cell, starting from startEdgeI crossing

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -630,7 +630,14 @@ void Foam::addPatchCellLayer::setRefinement
         {
             labelList n(mesh_.nPoints(), 0);
             IndirectList<label>(n, meshPoints) = nPointLayers;
-            syncTools::syncPointList(mesh_, n, maxEqOp<label>(), 0, false);
+            syncTools::syncPointList
+            (
+                mesh_,
+                n,
+                maxEqOp<label>(),
+                label(0),
+                false
+            );
 
             // Non-synced
             forAll(meshPoints, i)
@@ -674,7 +681,7 @@ void Foam::addPatchCellLayer::setRefinement
                 mesh_,
                 nFromFace,
                 maxEqOp<label>(),
-                0,
+                label(0),
                 false
             );
 
@@ -1116,7 +1123,7 @@ void Foam::addPatchCellLayer::setRefinement
             mesh_,
             meshEdgeLayers,
             maxEqOp<label>(),
-            0,                  // initial value
+            label(0),           // initial value
             false               // no separation
         );
 

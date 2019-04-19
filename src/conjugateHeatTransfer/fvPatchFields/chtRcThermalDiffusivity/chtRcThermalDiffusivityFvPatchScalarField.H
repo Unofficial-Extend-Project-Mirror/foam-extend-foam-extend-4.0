@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -128,16 +128,17 @@ public:
             virtual void evaluate(const Pstream::commsTypes commsType);
 
             //- Calculate the thermal diffusivity
-            virtual void calcThermalDiffusivity
+            virtual tmp<scalarField> calcThermalDiffusivity
             (
-                chtRegionCoupleBase& owner,
-                const chtRegionCoupleBase& neighbour
+                const chtRegionCoupleBase& owner,
+                const chtRegionCoupleBase& neighbour,
+                const chtRcTemperatureFvPatchScalarField& TwOwn
             ) const;
 
             //- Calculate the temperature
-            virtual void calcTemperature
+            virtual tmp<scalarField> calcTemperature
             (
-                chtRcTemperatureFvPatchScalarField& owner,
+                const chtRcTemperatureFvPatchScalarField& TwOwn,
                 const chtRcTemperatureFvPatchScalarField& neighbour,
                 const chtRegionCoupleBase& ownerK
             ) const;

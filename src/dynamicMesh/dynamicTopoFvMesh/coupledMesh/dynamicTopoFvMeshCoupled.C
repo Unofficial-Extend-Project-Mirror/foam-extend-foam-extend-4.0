@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -604,7 +604,7 @@ void dynamicTopoFvMesh::initProcessorPriority()
 
             case RANDOM:
             {
-                Random randomizer(std::time(NULL));
+                Random randomizer(std::time(nullptr));
 
                 // Initialize to identity map
                 procPriority_ = identity(Pstream::nProcs());
@@ -2406,7 +2406,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                                 (
                                     pointJ,
                                     meshJ.oldPoints_[pItJ.key()],
-                                    labelList(1, -1)
+                                    labelList(1, label(-1))
                                 )
                             );
 
@@ -2500,7 +2500,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                 (
                     pointI,
                     meshI.oldPoints_[pItI.key()],
-                    labelList(1, -1)
+                    labelList(1, label(-1))
                 )
             );
 
@@ -3053,7 +3053,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                 //  - Set an invalid number so that
                 //    an entry is made in facesFromFaces,
                 //    while faceParents is empty.
-                setFaceMapping(fI(), labelList(1, -1));
+                setFaceMapping(fI(), labelList(1, label(-1)));
             }
             else
             {
@@ -8274,7 +8274,7 @@ void dynamicTopoFvMesh::initFieldTransfers
         }
 
         // Clear the stream
-        fieldNameStream.set(0, NULL);
+        fieldNameStream.set(0, nullptr);
 
         if (debug > 4)
         {
@@ -8360,7 +8360,7 @@ void dynamicTopoFvMesh::initFieldTransfers
         }
 
         // Clear the stream
-        stream.set(pI, NULL);
+        stream.set(pI, nullptr);
 
         // Send buffer to processor
         meshOps::pWrite(proc, sendBuffer[pI].size());

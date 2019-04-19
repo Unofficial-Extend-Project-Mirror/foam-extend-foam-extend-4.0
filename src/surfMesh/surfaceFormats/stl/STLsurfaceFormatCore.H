@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -62,13 +62,13 @@ class STLsurfaceFormatCore
         pointField points_;
 
         //- The zones associated with the faces
-        List<label> zoneIds_;
+        labelList zoneIds_;
 
         //- The solid names, in the order of their first appearance
-        List<word> names_;
+        wordList names_;
 
         //- The solid count, in the order of their first appearance
-        List<label> sizes_;
+        labelList sizes_;
 
 
     // Private Member Functions
@@ -139,19 +139,19 @@ public:
         }
 
         //- Return full access to the zoneIds
-        List<label>& zoneIds()
+        labelList& zoneIds()
         {
             return zoneIds_;
         }
 
         //- The list of solid names in the order of their first appearance
-        List<word>& names()
+        wordList& names()
         {
             return names_;
         }
 
         //- The list of solid sizes in the order of their first appearance
-        List<label>& sizes()
+        labelList& sizes()
         {
             return sizes_;
         }

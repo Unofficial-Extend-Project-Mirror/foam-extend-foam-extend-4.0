@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -296,8 +296,8 @@ bool Foam::layerAR::update()
     // Whether point displacement is by scaling
     boolList scaleDisp(nPoints(), true);
     label nScaled = nPoints();
-    List<bool> pistonPoint(newPoints.size(), false);
-    List<bool> headPoint(newPoints.size(), false);
+    boolList pistonPoint(newPoints.size(), false);
+    boolList headPoint(newPoints.size(), false);
 
     forAll(pistonPoints, i)
     {

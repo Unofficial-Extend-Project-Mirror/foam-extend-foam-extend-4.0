@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -152,7 +152,8 @@ public:
             //- Reverse map the given pointPatchField onto this pointPatchField
             virtual void rmap
             (
-                const pointPatchField<vector>&,
+                const PointPatchField
+                    <pointPatchField, pointMesh, pointPatch, DummyMatrix, vector>&,
                 const labelList&
             );
 

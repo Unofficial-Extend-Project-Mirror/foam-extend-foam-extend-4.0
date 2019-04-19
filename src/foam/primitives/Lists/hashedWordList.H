@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ public:
         //- Construct from number and list of names
         hashedWordList(const label nNames, const char** names);
 
-        //- Construct from a NULL-terminated list of names
+        //- Construct from a nullptr-terminated list of names
         hashedWordList(const char** names);
 
         //- Construct from Istream

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 
         //- div(sigmaOld) should be zero but I will include
         //- it to make sure errors don't accumulate
-        volVectorField* oldErrorPtr = NULL;
+        volVectorField* oldErrorPtr = nullptr;
         if (ensureTotalEquilibrium)
         {
             oldErrorPtr = new volVectorField

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -179,7 +179,7 @@ void Foam::parcel::readFields
         const parcel& p0 = iter();
 
         label nX = p0.X().size();
-        const List<word>& names = p0.liquidNames();
+        const wordList& names = p0.liquidNames();
 
         for (label j=0; j<nX; j++)
         {
@@ -272,7 +272,7 @@ void Foam::parcel::writeFields
         const parcel& p0 = iter();
 
         label nX = p0.X().size();
-        const List<word>& names = p0.liquidNames();
+        const wordList& names = p0.liquidNames();
 
         for (label j=0; j<nX; j++)
         {

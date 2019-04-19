@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -26,10 +26,16 @@ License
 #include "topoChangerFvMesh.H"
 #include "domainDecomposition.H"
 #include "fvFieldDecomposer.H"
+#include "labelIOField.H"
 #include "processorMeshesReconstructor.H"
 #include "fvFieldReconstructor.H"
 #include "passiveProcessorPolyPatch.H"
 #include "addToRunTimeSelectionTable.H"
+#include "cloud.H"
+#include "cloudDistribute.H"
+
+#include "IFstream.H"
+#include "OFstream.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -87,7 +93,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
 
     // forAll(cellToProc, celli)
     // {
-    //    cellDist[celli] = cellToProc[celli];
+    //     cellDist[celli] = cellToProc[celli];
     // }
 
     // cellDist.write();
@@ -102,8 +108,29 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
     Pstream::gatherList(migratedCells);
     Pstream::scatterList(migratedCells);
     Info<< "Migrated cells per processor: " << migratedCells << endl;
+
     // Reading through second index now tells how many cells will arrive
     // from which processor
+    forAll (migratedCells, i)
+    {
+        bool allZero = true;
+        forAll (migratedCells, j)
+        {
+            if (migratedCells[j][i] > 0)
+            {
+                allZero = false;
+                break;
+            }
+        }
+
+        if (allZero)
+        {
+            FatalErrorIn("bool topoChangerFvMesh::loadBalance()")
+                << "Reconstructed mesh must have at least one cell "
+                    "on each processor"
+                << abort(FatalError);
+        }
+    }
 
     // Find out which processor faces will become local internal faces
     // by comparing decomposition index from the other side
@@ -135,6 +162,19 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
     HashTable<const surfaceVectorField*> surfaceVectorFields =
         thisDb().lookupClass<surfaceVectorField>();
 
+    // Particles
+    HashTable<const cloud*> clouds = thisDb().lookupClass<cloud>();
+
+    // Distribute cell and point level for AMR + DLB runs. VV, 18/May/2018
+
+    // Check cellLevel and pointLevel
+    // Note: possible sync problem if cellLevel or pointLevel is not present
+    // on all processors in comms.  However, parallel reduce check
+    // is not allowed
+    // HJ, 22/Oct/2018
+    bool cellLevelFound = this->foundObject<labelIOField>("cellLevel");
+    bool pointLevelFound = this->foundObject<labelIOField>("pointLevel");
+
     //HJ, HERE: remove the fields that should not be load balanced
 
     // Prepare fields for reconstruction
@@ -147,7 +187,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
 
     List<PtrList<volVectorField> > receivedVolVectorFields
     (
-       volVectorFields.size()
+        volVectorFields.size()
     );
 
     List<PtrList<surfaceScalarField> > receivedSurfaceScalarFields
@@ -180,10 +220,35 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         receivedSurfaceVectorFields[fieldI].setSize(Pstream::nProcs());
     }
 
+    // Cell and point level
+    // Note: ordinary lists instead of IO lists
+    PtrList<labelList> receivedCellLevel(Pstream::nProcs());
+    PtrList<labelList> receivedPointLevel(Pstream::nProcs());
+
+    // Clouds
+    PtrList<cloudDistribute> cloudDistributes(clouds.size());
+    {
+        label cloudI = 0;
+        forAllConstIter(HashTable<const cloud*>, clouds, iter)
+        {
+            cloud& c = const_cast<cloud&>(*iter());
+            cloudDistributes.set
+            (
+                cloudI++,
+                c.cloudDist
+                (
+                    meshDecomp.cellToProc(),
+                    meshDecomp.procCellAddressing(),
+                    meshDecomp.procFaceAddressing()
+                )
+            );
+        }
+    }
+
     for (label procI = 0; procI < meshDecomp.nProcs(); procI++)
     {
         // Check if there is a mesh to send
-        if (curMigratedCells[procI] > 0)
+        if (migratedCells[Pstream::myProcNo()][procI] > 0)
         {
             // Send mesh and field to processor procI
 
@@ -196,7 +261,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                 true    // Create passive processor patches
             );
             fvMesh& procMesh = procMeshPtr();
-
+            procMesh.write();
             // Create a field decomposer
             fvFieldDecomposer fieldDecomposer
             (
@@ -209,13 +274,18 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
 
             if (procI != Pstream::myProcNo())
             {
-                // Pout<< "Send mesh and fields to processor " << procI << endl;
+                Pout<< "Send mesh and fields to processor " << procI << endl;
 
-                OPstream toProc
+                OFstream toProc
                 (
-                    Pstream::blocking,
-                    procI
+                    "from" + Foam::name(Pstream::myProcNo())
+                  + "To" + Foam::name(procI)
                 );
+                // OPstream toProc
+                // (
+                //     Pstream::blocking,
+                //     procI
+                // );
 
                 // Send the mesh and fields to target processor
                 toProc << procMesh << nl;
@@ -225,6 +295,42 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                 sendFields(volVectorFields, fieldDecomposer, toProc);
                 sendFields(surfaceScalarFields, fieldDecomposer, toProc);
                 sendFields(surfaceVectorFields, fieldDecomposer, toProc);
+
+                // Send cell level with procCellAddressing
+                if (cellLevelFound)
+                {
+                    const labelIOField& cellLevel =
+                        this->lookupObject<labelIOField>("cellLevel");
+
+                    toProc <<
+                        labelList
+                        (
+                            cellLevel,
+                            meshDecomp.procCellAddressing()[procI]
+                        )
+                        << nl;
+                }
+
+                if (pointLevelFound)
+                {
+                    const labelIOField& pointLevel =
+                        this->lookupObject<labelIOField>("pointLevel");
+
+                    // Send point level with procPointAddressing
+                    toProc <<
+                        labelList
+                        (
+                            pointLevel,
+                            meshDecomp.procPointAddressing()[procI]
+                        )
+                        << nl;
+                }
+
+                // Send clouds
+                forAll(cloudDistributes, cloudI)
+                {
+                    cloudDistributes[cloudI].send(toProc, procI);
+                }
             }
             else
             {
@@ -268,11 +374,52 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                     fieldDecomposer,
                     receivedSurfaceVectorFields
                 );
+
+                // Insert cell level
+                if (cellLevelFound)
+                {
+                    const labelIOField& cellLevel =
+                        this->lookupObject<labelIOField>("cellLevel");
+
+                    // Insert cell level
+                    receivedCellLevel.set
+                    (
+                        Pstream::myProcNo(),
+                        new labelList
+                        (
+                            cellLevel,
+                            meshDecomp.procCellAddressing()
+                                [Pstream::myProcNo()]
+                        )
+                    );
+                }
+
+                // Insert point level
+                if (pointLevelFound)
+                {
+                    const labelIOField& pointLevel =
+                        this->lookupObject<labelIOField>("pointLevel");
+
+                    // Insert point level
+                    receivedPointLevel.set
+                    (
+                        Pstream::myProcNo(),
+                        new labelList
+                        (
+                            pointLevel,
+                            meshDecomp.procPointAddressing()
+                                [Pstream::myProcNo()]
+                        )
+                    );
+                }
+
+                //HJ Insert clouds missing.  HJ, 12/Oct/2018
             }
         }
     }
 
-
+    sleep(2);
+    
     // Collect pieces of mesh and fields from other processors
     for (label procI = 0; procI < meshDecomp.nProcs(); procI++)
     {
@@ -281,15 +428,19 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
             // Check if there is a mesh to send
             if (migratedCells[procI][Pstream::myProcNo()] > 0)
             {
-                // Pout<< "Receive mesh and fields from " << procI
-                //     << endl;
+                Pout<< "Receive mesh and fields from " << procI << endl;
 
                 // Note: communication can be optimised.  HJ, 27/Feb/2018
-                IPstream fromProc
+                IFstream fromProc
                 (
-                    Pstream::blocking,
-                    procI
+                    "from" + Foam::name(procI)
+                  + "To" + Foam::name(Pstream::myProcNo())
                 );
+                // IPstream fromProc
+                // (
+                //     Pstream::blocking,
+                //     procI
+                // );
 
                 // Receive the mesh
                 procMeshes.set
@@ -343,6 +494,32 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                     procMeshes[procI],
                     fromProc
                 );
+
+                // Receive cell level
+                if (cellLevelFound)
+                {
+                    receivedCellLevel.set
+                    (
+                        procI,
+                        new labelList(fromProc)
+                    );
+                }
+
+                // Receive point level
+                if (pointLevelFound)
+                {
+                    receivedPointLevel.set
+                    (
+                        procI,
+                        new labelList(fromProc)
+                    );
+                }
+
+                // Receive clouds
+                forAll(cloudDistributes, cloudI)
+                {
+                    cloudDistributes[cloudI].receive(fromProc, procI);
+                }
             }
         }
     }
@@ -368,6 +545,8 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
 
     Pout<< "Reconstructed mesh stats: "
         << " nCells: " << reconMesh.nCells()
+        << " nFaces: " << reconMesh.nFaces()
+        << " nIntFaces: " << reconMesh.nInternalFaces()
         << " polyPatches: "
         << reconMesh.boundaryMesh().size()
         << " patches: "
@@ -576,6 +755,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
     labelList patchStarts(patches.size());
     labelList oldPatchNMeshPoints(patches.size());
     labelListList patchPointMap(patches.size());
+
     forAll(patches, patchI)
     {
         patchStarts[patchI] = patches[patchI].start();
@@ -623,7 +803,6 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         oldPatchNMeshPoints         // oldPatchNMeshPoints
     );
 
-    
     // Reset fvMesh and patches
     resetFvPrimitives
     (
@@ -681,8 +860,68 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         meshMap
     );
 
-    // Debug
-    checkMesh(true);
+    // Rebuild cell level field from components
+    if (cellLevelFound)
+    {
+        // Get (non-const) reference to cellLevel
+        labelIOField& cellLevel = const_cast<labelIOField&>
+            (this->lookupObject<labelIOField>("cellLevel"));
+
+        if (cellLevel.size() != this->nCells())
+        {
+            cellLevel.setSize(this->nCells());
+        }
+
+        forAll (receivedCellLevel, procI)
+        {
+            if (receivedCellLevel.set(procI))
+            {
+                cellLevel.rmap
+                (
+                    receivedCellLevel[procI],
+                    meshRecon.cellProcAddressing()[procI]
+                );
+            }
+        }
+    }
+
+    // Rebuild point level field from components
+    if (pointLevelFound)
+    {
+        // Get (non-const) reference to pointLevel
+        labelIOField& pointLevel = const_cast<labelIOField&>
+            (this->lookupObject<labelIOField>("pointLevel"));
+
+        if (pointLevel.size() != this->nPoints())
+        {
+            pointLevel.setSize(this->nPoints());
+        }
+
+        forAll (receivedPointLevel, procI)
+        {
+            if (receivedPointLevel.set(procI))
+            {
+                pointLevel.rmap
+                (
+                    receivedPointLevel[procI],
+                    meshRecon.pointProcAddressing()[procI]
+                );
+            }
+        }
+    }
+
+    // Rebuild clouds
+    forAll(cloudDistributes, cloudI)
+    {
+        cloudDistributes[cloudI].rebuild
+        (
+            meshRecon.cellProcAddressing(),
+            meshRecon.faceProcAddressing()
+        );
+    }
+
+    // Debug: remove?  HJ, 22/Oct/2018
+    // checkMesh(true);
 
     return true;
 }

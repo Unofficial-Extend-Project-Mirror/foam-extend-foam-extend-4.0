@@ -1,7 +1,12 @@
-#!/bin/sh
+#!/bin/bash
+
+# Klas Jareteg, 2012-10-13
+# Description:
+#   Script to run comparative case between coupled and segregated solvers.
+
 
 # Source tutorial run functions
 . $WM_PROJECT_DIR/bin/tools/CleanFunctions
 
 cleanCase
-\rm -rf constant/polyMesh
+rm -r constant/polyMesh

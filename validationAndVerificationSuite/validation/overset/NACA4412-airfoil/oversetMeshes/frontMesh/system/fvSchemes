@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.1                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -34,15 +34,15 @@ divSchemes
     default             none;
 
     div(phi,U)          bounded Gauss linearUpwind grad(U);//bounded Gauss limitedLinearV 1;
-    div((nuEff*dev(T(grad(U)))))	Gauss linear;
+    div((nuEff*dev(T(grad(U))))) Gauss linear;
 
-    div(phi,nuTilda)	bounded Gauss upwind;//limitedLinear 1;
-    div(phi,k)	bounded Gauss upwind;//limitedLinear 1;
-    div(phi,omega)	bounded Gauss upwind;//limitedLinear 1;
+    div(phi,nuTilda)    bounded Gauss upwind;//limitedLinear 1;
+    div(phi,k)          bounded Gauss upwind;//limitedLinear 1;
+    div(phi,omega)      bounded Gauss upwind;//limitedLinear 1;
     div(phid,p)         Gauss upwind;
     div(phi,Ekp)        bounded Gauss upwind;
-    div((phi|interpolate(rho)),p)  Gauss upwind;
-    div(tauMC)		Gauss linear;
+    div((phi|interpolate(rho)),p) Gauss upwind;
+    div(tauMC)          Gauss linear;
 }
 
 laplacianSchemes
@@ -52,7 +52,7 @@ laplacianSchemes
 
 interpolationSchemes
 {
-    default         	linear;
+    default         linear;
 }
 
 snGradSchemes

@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     4.0                                |
+|  \\    /   O peration     | Version:     4.1                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -23,8 +23,10 @@ boundaryField
 {
     pitzDailyIB
     {
-        type            kqRWallFunction;
+        type            immersedBoundaryKqRWallFunction;
         patchType       immersedBoundary;
+        setDeadValue    true;
+        deadValue       0.375;
         value           uniform 0.375;
     }
     top

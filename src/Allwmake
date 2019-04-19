@@ -44,6 +44,9 @@ wmake libso lduSolvers
 
 wmake libso tetFiniteElement
 
+# We can now compile this library from decompositionMethods
+wmake libso decompositionMethods/decomposeReconstruct
+
 # Make dynamicMesh tools
 dynamicMesh/AllwmakeLnInclude
 dynamicMesh/Allwmake
@@ -77,7 +80,7 @@ wmake libso solidModels
 wmake libso dbns
 
 wmake libso immersedBoundary/immersedBoundary
-#wmake libso immersedBoundary/immersedBoundaryTurbulence
+wmake libso immersedBoundary/immersedBoundaryTurbulence
 wmake libso immersedBoundary/immersedBoundaryDynamicMesh
 
 wmake libso overset/oversetMesh

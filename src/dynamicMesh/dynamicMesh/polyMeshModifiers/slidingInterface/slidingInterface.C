@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -234,19 +234,19 @@ Foam::slidingInterface::slidingInterface
     attached_(false),
     projectionAlgo_(algo),
     trigger_(false),
-    cutFaceMasterPtr_(NULL),
-    cutFaceSlavePtr_(NULL),
-    masterFaceCellsPtr_(NULL),
-    slaveFaceCellsPtr_(NULL),
-    masterStickOutFacesPtr_(NULL),
-    slaveStickOutFacesPtr_(NULL),
-    retiredPointMapPtr_(NULL),
-    cutPointEdgePairMapPtr_(NULL),
-    slavePointPointHitsPtr_(NULL),
-    slavePointEdgeHitsPtr_(NULL),
-    slavePointFaceHitsPtr_(NULL),
-    masterPointEdgeHitsPtr_(NULL),
-    projectedSlavePointsPtr_(NULL)
+    cutFaceMasterPtr_(nullptr),
+    cutFaceSlavePtr_(nullptr),
+    masterFaceCellsPtr_(nullptr),
+    slaveFaceCellsPtr_(nullptr),
+    masterStickOutFacesPtr_(nullptr),
+    slaveStickOutFacesPtr_(nullptr),
+    retiredPointMapPtr_(nullptr),
+    cutPointEdgePairMapPtr_(nullptr),
+    slavePointPointHitsPtr_(nullptr),
+    slavePointEdgeHitsPtr_(nullptr),
+    slavePointFaceHitsPtr_(nullptr),
+    masterPointEdgeHitsPtr_(nullptr),
+    projectedSlavePointsPtr_(nullptr)
 {
     checkDefinition();
 
@@ -327,19 +327,19 @@ Foam::slidingInterface::slidingInterface
         intersection::algorithmNames_.read(dict.lookup("projection"))
     ),
     trigger_(false),
-    cutFaceMasterPtr_(NULL),
-    cutFaceSlavePtr_(NULL),
-    masterFaceCellsPtr_(NULL),
-    slaveFaceCellsPtr_(NULL),
-    masterStickOutFacesPtr_(NULL),
-    slaveStickOutFacesPtr_(NULL),
-    retiredPointMapPtr_(NULL),
-    cutPointEdgePairMapPtr_(NULL),
-    slavePointPointHitsPtr_(NULL),
-    slavePointEdgeHitsPtr_(NULL),
-    slavePointFaceHitsPtr_(NULL),
-    masterPointEdgeHitsPtr_(NULL),
-    projectedSlavePointsPtr_(NULL)
+    cutFaceMasterPtr_(nullptr),
+    cutFaceSlavePtr_(nullptr),
+    masterFaceCellsPtr_(nullptr),
+    slaveFaceCellsPtr_(nullptr),
+    masterStickOutFacesPtr_(nullptr),
+    slaveStickOutFacesPtr_(nullptr),
+    retiredPointMapPtr_(nullptr),
+    cutPointEdgePairMapPtr_(nullptr),
+    slavePointPointHitsPtr_(nullptr),
+    slavePointEdgeHitsPtr_(nullptr),
+    slavePointFaceHitsPtr_(nullptr),
+    masterPointEdgeHitsPtr_(nullptr),
+    projectedSlavePointsPtr_(nullptr)
 {
     checkDefinition();
 

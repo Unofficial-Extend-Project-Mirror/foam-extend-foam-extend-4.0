@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ Foam::functionEntries::codeStream::getFunction
     const fileName libPath = dynCode.libPath();
 
     // see if library is loaded
-    void* lib = NULL;
+    void* lib = nullptr;
     if (isA<IOdictionary>(parentDict.topDict()))
     {
         lib = libs(parentDict).findLibrary(libPath);

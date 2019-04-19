@@ -11,7 +11,7 @@
             IOobject::NO_WRITE
         ),
         mesh,
-        dimensionedScalar("NULL", dimless, 1.0),
+        dimensionedScalar("nullptr", dimless, 1.0),
         "zeroGradient"
     );
 

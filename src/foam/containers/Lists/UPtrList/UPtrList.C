@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -75,10 +75,10 @@ void Foam::UPtrList<T>::setSize(const label newSize)
 
     if (newSize > oldSize)
     {
-        // set new elements to NULL
+        // set new elements to nullptr
         for (register label i = oldSize; i < newSize; i++)
         {
-            ptrs_[i] = NULL;
+            ptrs_[i] = nullptr;
         }
     }
 }

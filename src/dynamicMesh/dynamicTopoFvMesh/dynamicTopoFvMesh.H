@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -678,7 +678,7 @@ class dynamicTopoFvMesh
         (
             const label eIndex,
             const bool overRidePurityCheck = false,
-            label* nProcCurves = NULL
+            label* nProcCurves = nullptr
         ) const;
 
         // Allocate dynamic programming tables
@@ -1002,8 +1002,8 @@ class dynamicTopoFvMesh
             bool checkFace = false,
             bool checkEdge = false,
             bool checkPure = false,
-            FixedList<label, 2>* patchLabels = NULL,
-            FixedList<vector, 2>* patchNormals = NULL
+            FixedList<label, 2>* patchLabels = nullptr,
+            FixedList<vector, 2>* patchNormals = nullptr
         ) const;
 
         // Read optional dictionary parameters

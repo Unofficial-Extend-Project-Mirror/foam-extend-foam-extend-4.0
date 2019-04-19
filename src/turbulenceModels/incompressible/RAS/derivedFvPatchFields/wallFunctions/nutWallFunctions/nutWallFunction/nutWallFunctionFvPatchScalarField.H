@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -25,9 +25,36 @@ Class
     Foam::incompressible::RASModels::nutWallFunctionFvPatchScalarField
 
 Description
-    Boundary condition for turbulent (kinematic) viscosity when using wall
-    functions
+    Abstract base class for boundary condition for turbulent (kinematic)
+    viscosity when using wall functions
     - replicates OpenFOAM v1.5 (and earlier) behaviour
+
+Usage
+    \table
+        Property  | Description         | Required   | Default value
+        Cmu       | Cmu coefficient     | no         | 0.09
+        kappa     | Von Karman constant | no         | 0.41
+        E         | E coefficient       | no         | 9.8
+    \endtable
+
+    Examples of the boundary condition specification:
+    \verbatim
+    <patchName>
+    {
+        type            nutWallFunction;
+        value           uniform 0.0;
+    }
+    \endverbatim
+
+    Reference for the default model coefficients:
+    \verbatim
+        H. Versteeg, W. Malalasekera
+        An Introduction to Computational Fluid Dynamics: The Finite Volume
+        Method, subsection "3.5.2 k-epsilon model"
+    \endverbatim
+
+See also
+    Foam::fixedValueFvPatchField
 
 SourceFiles
     nutWallFunctionFvPatchScalarField.C
@@ -73,7 +100,7 @@ protected:
         scalar yPlusLam_;
 
 
-    // Protected member functions
+    // Protected Member Functions
 
         //- Check the type of the patch
         virtual void checkType();
@@ -82,7 +109,7 @@ protected:
         virtual scalar calcYPlusLam(const scalar kappa, const scalar E) const;
 
         //- Calculate the turbulence viscosity
-        virtual tmp<scalarField> calcNut() const;
+        virtual tmp<scalarField> calcNut() const = 0;
 
         //- Write local wall function variables
         virtual void writeLocalEntries(Ostream&) const;
@@ -128,15 +155,6 @@ public:
             const nutWallFunctionFvPatchScalarField&
         );
 
-        //- Construct and return a clone
-        virtual tmp<fvPatchScalarField> clone() const
-        {
-            return tmp<fvPatchScalarField>
-            (
-                new nutWallFunctionFvPatchScalarField(*this)
-            );
-        }
-
         //- Construct as copy setting internal field reference
         nutWallFunctionFvPatchScalarField
         (
@@ -144,25 +162,13 @@ public:
             const DimensionedField<scalar, volMesh>&
         );
 
-        //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchScalarField> clone
-        (
-            const DimensionedField<scalar, volMesh>& iF
-        ) const
-        {
-            return tmp<fvPatchScalarField>
-            (
-                new nutWallFunctionFvPatchScalarField(*this, iF)
-            );
-        }
-
 
     // Member functions
 
         // Evaluation functions
 
             //- Calculate and return the yPlus at the boundary
-            virtual tmp<scalarField> yPlus() const;
+            virtual tmp<scalarField> yPlus() const = 0;
 
             //- Update the coefficients associated with the patch field
             virtual void updateCoeffs();

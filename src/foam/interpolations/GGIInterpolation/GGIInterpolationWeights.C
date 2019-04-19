@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ GGIInterpolation<MasterPatch, SlavePatch>::featureCosTol_
 
 
 template<class MasterPatch, class SlavePatch>
-const Foam::debug::tolerancesSwitch
+Foam::debug::tolerancesSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::uncoveredFaceAreaTol_
 (
     "GGIUncoveredFaceAreaTol",
@@ -183,7 +183,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
     // Note: rescale only the local ones. HJ, 27/Apr/2016
     // Note: slave neighbours and weights delayed until master cutting
     // is complete.  HJ, 27/Apr/2016
-    List<DynamicList<label> > masterNeighbors(masterPatch_.size());
+    List<dynamicLabelList > masterNeighbors(masterPatch_.size());
     List<DynamicList<scalar> > masterNeighborsWeights(masterPatch_.size());
 
     // Store slave negighbour weights at the same time, but under
@@ -909,7 +909,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcPartiallyCoveredFaces
             InfoIn("GGIInterpolation::calcPartiallyCoveredFaces")
                 << "   : Found " << partiallyUncoveredMasterAddrPtr_->size()
                 << " partially overlapping faces for master GGI patch" << endl;
-            
+
             if (partiallyUncoveredMasterAddrPtr_->size())
             {
                 Info<< "Max uncoverage: "

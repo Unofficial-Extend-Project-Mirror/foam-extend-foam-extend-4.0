@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ uncorrectedSnGrad<Type>::correction
         "uncorrectedSnGrad<Type>::correction"
         "(const GeometricField<Type, fvPatchField, volMesh>&)"
     );
-    return tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >(NULL);
+    return tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >(nullptr);
 }
 
 

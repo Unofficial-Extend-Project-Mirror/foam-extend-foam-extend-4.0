@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -87,13 +87,6 @@ public:
             const polyBoundaryMesh& bm
         );
 
-        //- Construct as copy, resetting the boundary mesh
-        genericPolyPatch
-        (
-            const genericPolyPatch&,
-            const polyBoundaryMesh&
-        );
-
         //- Construct given the original patch and resetting the
         //  face list and boundary mesh information
         genericPolyPatch
@@ -103,6 +96,16 @@ public:
             const label index,
             const label newSize,
             const label newStart
+        );
+
+        //- Construct as copy
+        genericPolyPatch(const genericPolyPatch&);
+
+        //- Construct as copy, resetting the boundary mesh
+        genericPolyPatch
+        (
+            const genericPolyPatch&,
+            const polyBoundaryMesh&
         );
 
         //- Construct and return a clone, resetting the boundary mesh
@@ -128,9 +131,8 @@ public:
         }
 
 
-    // Destructor
-
-        ~genericPolyPatch();
+    //- Destructor
+    ~genericPolyPatch();
 
 
     // Member functions

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ Foam::sloshingHistory::sloshingHistory
     name_(name),
     time_(t),
     regionName_(polyMesh::defaultRegion),
-    historyFilePtr_(NULL),
+    historyFilePtr_(nullptr),
     freeSurfacePatchID_(-1),
     leftPointID_(-1),
     rightPointID_(-1)

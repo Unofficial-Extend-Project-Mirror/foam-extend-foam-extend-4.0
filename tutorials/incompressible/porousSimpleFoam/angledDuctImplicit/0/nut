@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     4.0                                |
+|  \\    /   O peration     | Version:     4.1                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -23,25 +23,25 @@ boundaryField
 {
     front
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         value           uniform 0;
     }
 
     back
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         value           uniform 0;
     }
 
     wall
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         value           uniform 0;
     }
 
     porosityWall
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         value           uniform 0;
     }
 

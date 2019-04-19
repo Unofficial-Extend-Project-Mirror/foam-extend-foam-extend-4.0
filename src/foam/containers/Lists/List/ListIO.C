@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ License
 template<class T>
 Foam::List<T>::List(Istream& is)
 :
-    UList<T>(NULL, 0)
+    UList<T>(nullptr, 0)
 {
     operator>>(is, *this);
 }

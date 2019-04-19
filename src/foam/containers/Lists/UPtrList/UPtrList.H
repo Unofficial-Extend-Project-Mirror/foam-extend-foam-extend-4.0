@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -152,7 +152,7 @@ public:
             //- Is element set
             inline bool set(const label) const;
 
-            //- Set element. Return old element (can be NULL).
+            //- Set element. Return old element (can be nullptr).
             //  No checks on new element.
             inline T* set(const label, T*);
 

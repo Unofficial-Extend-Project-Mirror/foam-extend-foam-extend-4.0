@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ dirichletNeumann::dirichletNeumann
     (
         normalContactModelDict_.lookup("correctMissedVertices")
     ),
-    slavePointPointsPtr_(NULL),
+    slavePointPointsPtr_(nullptr),
     contactGapTol_(readScalar(normalContactModelDict_.lookup("contactGapTol"))),
     contactIterNum_(0),
     relaxFactor_(readScalar(normalContactModelDict_.lookup("relaxationFactor"))),
@@ -124,7 +124,7 @@ dirichletNeumann::dirichletNeumann
     oscillationCorr_(normalContactModelDict_.lookup("oscillationCorrection")),
     smoothingSteps_(readInt(normalContactModelDict_.lookup("smoothingSteps"))),
     infoFreq_(readInt(normalContactModelDict_.lookup("infoFrequency"))),
-    contactFilePtr_(NULL)
+    contactFilePtr_(nullptr)
 {
     // master proc open contact info file
     if (Pstream::master())

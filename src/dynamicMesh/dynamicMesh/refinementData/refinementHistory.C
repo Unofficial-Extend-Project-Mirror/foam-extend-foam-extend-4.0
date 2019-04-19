@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -111,7 +111,7 @@ void Foam::refinementHistory::writeDebug
 Foam::refinementHistory::splitCell8::splitCell8()
 :
     parent_(-1),
-    addedCellsPtr_(NULL)
+    addedCellsPtr_(nullptr)
 {}
 
 
@@ -119,7 +119,7 @@ Foam::refinementHistory::splitCell8::splitCell8()
 Foam::refinementHistory::splitCell8::splitCell8(const label parent)
 :
     parent_(parent),
-    addedCellsPtr_(NULL)
+    addedCellsPtr_(nullptr)
 {}
 
 
@@ -138,7 +138,7 @@ Foam::refinementHistory::splitCell8::splitCell8(const splitCell8& sc)
     (
         sc.addedCellsPtr_.valid()
       ? new FixedList<label, 8>(sc.addedCellsPtr_())
-      : NULL
+      : nullptr
     )
 {}
 
@@ -157,7 +157,7 @@ Foam::Istream& Foam::operator>>(Istream& is, refinementHistory::splitCell8& sc)
     }
     else
     {
-        sc.addedCellsPtr_.reset(NULL);
+        sc.addedCellsPtr_.reset(nullptr);
     }
 
     return is;
@@ -1109,7 +1109,7 @@ void Foam::refinementHistory::combineCells
     }
 
     splitCell8& parentSplit = splitCells_[parentIndex];
-    parentSplit.addedCellsPtr_.reset(NULL);
+    parentSplit.addedCellsPtr_.reset(nullptr);
     visibleCells_[masterCellI] = parentIndex;
 }
 

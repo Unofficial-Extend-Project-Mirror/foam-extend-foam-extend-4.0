@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -117,8 +117,8 @@ tmp<scalarField>
     const fvPatchField<scalar>& psip = this->patch().lookupPatchField
     (
         psiName_,
-        reinterpret_cast<const volScalarField*>(NULL),
-        reinterpret_cast<const scalar*>(NULL)
+        reinterpret_cast<const volScalarField*>(0),
+        reinterpret_cast<const scalar*>(0)
     );
 
     const surfaceScalarField& phi =
@@ -128,8 +128,8 @@ tmp<scalarField>
     fvsPatchField<scalar> phip = this->patch().lookupPatchField
     (
         this->phiName_,
-        reinterpret_cast<const surfaceScalarField*>(NULL),
-        reinterpret_cast<const scalar*>(NULL)
+        reinterpret_cast<const surfaceScalarField*>(0),
+        reinterpret_cast<const scalar*>(0)
     );
 
     if (phi.dimensions() == dimDensity*dimVelocity*dimArea)
@@ -137,8 +137,8 @@ tmp<scalarField>
         const fvPatchScalarField& rhop = this->patch().lookupPatchField
         (
             this->rhoName_,
-            reinterpret_cast<const volScalarField*>(NULL),
-            reinterpret_cast<const scalar*>(NULL)
+            reinterpret_cast<const volScalarField*>(0),
+            reinterpret_cast<const scalar*>(0)
         );
 
         phip /= rhop;
@@ -161,16 +161,16 @@ waveTransmissiveInletFvPatchField<Type>::supercritical() const
     const fvPatchField<scalar>& psip = this->patch().lookupPatchField
     (
         psiName_,
-        reinterpret_cast<const volScalarField*>(NULL),
-        reinterpret_cast<const scalar*>(NULL)
+        reinterpret_cast<const volScalarField*>(0),
+        reinterpret_cast<const scalar*>(0)
     );
 
     const fvPatchVectorField& U =
         this->patch().lookupPatchField
         (
             UName_,
-            reinterpret_cast<const volVectorField*>(NULL),
-            reinterpret_cast<const vector*>(NULL)
+            reinterpret_cast<const volVectorField*>(0),
+            reinterpret_cast<const vector*>(0)
         );
 
     // Calculate the speed of the field wave w

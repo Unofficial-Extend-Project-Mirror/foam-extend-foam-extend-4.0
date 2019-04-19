@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -198,7 +198,7 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const FixedList<T, Size>& L)
             // Write end delimiter
             os << token::END_BLOCK;
         }
-        else if (Size < 11 && contiguous<T>())
+        else if (Size <= 1 ||(Size < 11 && contiguous<T>()))
         {
             // Write start delimiter
             os << token::BEGIN_LIST;

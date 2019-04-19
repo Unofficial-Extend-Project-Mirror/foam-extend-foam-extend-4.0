@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known
- * as TecIO, as part of its distribution of OpenFOAM and the
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- *
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #ifndef DATASET_h__
 #define DATASET_h__
 
@@ -28,7 +5,7 @@
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
@@ -76,11 +53,11 @@ void SetZoneSpecDefaults(ZoneSpec_s *ZoneSpec);
 #endif
 #endif
 
-#define GetZoneSpec(ZoneSpecList,Zone) ((ZoneSpec_s *)ArrayListGetVoidPtr(ZoneSpecList,Zone))
+#define GetZoneSpec(ZoneSpecList,Zone) (static_cast<ZoneSpec_s *>(ArrayListGetVoidPtr(ZoneSpecList,Zone)))
 #define GetZoneAuxData(DataSet, Zone) (GetZoneSpec((DataSet)->ZoneSpecList, (Zone))->AuxData)
-#define GetVarSpec(VarSpecList,Var) ((VarSpec_s *)ArrayListGetVoidPtr(VarSpecList,Var))
+#define GetVarSpec(VarSpecList,Var) (static_cast<VarSpec_s *>(ArrayListGetVoidPtr(VarSpecList,Var)))
 #define GetVarAuxData(DataSet, Var) (GetVarSpec((DataSet)->VarSpecList, (Var))->AuxData)
-#define GetStrandInfo(StrandInfoList, StrandID) ((StrandInfo_s *)ArrayListGetVoidPtr(StrandInfoList,StrandID))
+#define GetStrandInfo(StrandInfoList, StrandID) (static_cast<StrandInfo_s *>(ArrayListGetVoidPtr(StrandInfoList,StrandID)))
 
 
 #if defined TECPLOTKERNEL

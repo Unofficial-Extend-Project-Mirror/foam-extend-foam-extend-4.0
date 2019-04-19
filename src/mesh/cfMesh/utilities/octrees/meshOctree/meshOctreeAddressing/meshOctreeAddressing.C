@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -110,32 +113,32 @@ meshOctreeAddressing::meshOctreeAddressing
     meshDict_(dict),
     useDATABoxes_(useDATABoxes),
     nNodes_(0),
-    octreePointsPtr_(NULL),
-    nodeLabelsPtr_(NULL),
-    nodeLeavesPtr_(NULL),
-    boxTypePtr_(NULL),
-    nodeTypePtr_(NULL),
-    octreeFacesPtr_(NULL),
-    octreeFacesOwnersPtr_(NULL),
-    octreeFacesNeighboursPtr_(NULL),
-    leafFacesPtr_(NULL),
-    nodeFacesPtr_(NULL),
-    leafLeavesPtr_(NULL),
-    octreeEdgesPtr_(NULL),
-    edgeLeavesPtr_(NULL),
-    leafEdgesPtr_(NULL),
-    nodeEdgesPtr_(NULL),
-    faceEdgesPtr_(NULL),
-    edgeFacesPtr_(NULL),
-    globalPointLabelPtr_(NULL),
-    globalPointToLocalPtr_(NULL),
-    pointProcsPtr_(NULL),
-    globalFaceLabelPtr_(NULL),
-    globalFaceToLocalPtr_(NULL),
-    faceProcsPtr_(NULL),
-    globalLeafLabelPtr_(NULL),
-    globalLeafToLocalPtr_(NULL),
-    leafAtProcsPtr_(NULL)
+    octreePointsPtr_(nullptr),
+    nodeLabelsPtr_(nullptr),
+    nodeLeavesPtr_(nullptr),
+    boxTypePtr_(nullptr),
+    nodeTypePtr_(nullptr),
+    octreeFacesPtr_(nullptr),
+    octreeFacesOwnersPtr_(nullptr),
+    octreeFacesNeighboursPtr_(nullptr),
+    leafFacesPtr_(nullptr),
+    nodeFacesPtr_(nullptr),
+    leafLeavesPtr_(nullptr),
+    octreeEdgesPtr_(nullptr),
+    edgeLeavesPtr_(nullptr),
+    leafEdgesPtr_(nullptr),
+    nodeEdgesPtr_(nullptr),
+    faceEdgesPtr_(nullptr),
+    edgeFacesPtr_(nullptr),
+    globalPointLabelPtr_(nullptr),
+    globalPointToLocalPtr_(nullptr),
+    pointProcsPtr_(nullptr),
+    globalFaceLabelPtr_(nullptr),
+    globalFaceToLocalPtr_(nullptr),
+    faceProcsPtr_(nullptr),
+    globalLeafLabelPtr_(nullptr),
+    globalLeafToLocalPtr_(nullptr),
+    leafAtProcsPtr_(nullptr)
 {
     if( !useDATABoxes && dict.found("keepCellsIntersectingBoundary") )
     {

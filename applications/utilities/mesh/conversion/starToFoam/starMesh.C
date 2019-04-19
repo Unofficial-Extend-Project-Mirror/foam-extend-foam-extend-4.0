@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -249,7 +249,7 @@ starMesh::starMesh
     cellPolys_(0),
     nInternalFaces_(0),
     polyBoundaryPatchStartIndices_(0),
-    pointCellsPtr_(NULL),
+    pointCellsPtr_(nullptr),
     couples_(0),
     isShapeMesh_(true)
 {

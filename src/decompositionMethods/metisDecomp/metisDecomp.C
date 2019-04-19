@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -27,7 +27,6 @@ License
 #include "addToRunTimeSelectionTable.H"
 #include "floatScalar.H"
 #include "foamTime.H"
-#include "scotchDecomp.H"
 
 extern "C"
 {
@@ -55,10 +54,10 @@ namespace Foam
 
 Foam::label Foam::metisDecomp::decompose
 (
-    const List<int>& adjncy,
-    const List<int>& xadj,
+    const labelList& adjncy,
+    const labelList& xadj,
     const scalarField& cWeights,
-    List<int>& finalDecomp
+    labelList& finalDecomp
 )
 {
     // Method of decomposition
@@ -66,7 +65,7 @@ Foam::label Foam::metisDecomp::decompose
     // k-way: multi-level k-way
     word method("k-way");
 
-    int numCells = xadj.size()-1;
+    label numCells = xadj.size()-1;
 
     // decomposition options. 0 = use defaults
     idx_t options[METIS_NOPTIONS];
@@ -77,10 +76,10 @@ Foam::label Foam::metisDecomp::decompose
     Field<real_t> processorWeights;
 
     // cell weights (so on the vertices of the dual)
-    List<int> cellWeights;
+    labelList cellWeights;
 
     // face weights (so on the edges of the dual)
-    List<int> faceWeights;
+    labelList faceWeights;
 
 
     // Check for externally provided cellweights and if so initialise weights
@@ -178,7 +177,7 @@ Foam::label Foam::metisDecomp::decompose
         {
             Info<< "metisDecomp : Using cell-based weights." << endl;
 
-            IOList<int> cellIOWeights
+            IOList<label> cellIOWeights
             (
                 IOobject
                 (
@@ -201,17 +200,17 @@ Foam::label Foam::metisDecomp::decompose
         }
     }
 
-    int nProcs = nProcessors_;
+    label nProcs = nProcessors_;
 
     // output: cell -> processor addressing
     finalDecomp.setSize(numCells);
 
     // output: number of cut edges
-    int edgeCut = 0;
+    label edgeCut = 0;
 
     // Vertex weight info
-    int* vwgtPtr = NULL;
-    int* adjwgtPtr = NULL;
+    label* vwgtPtr = nullptr;
+    label* adjwgtPtr = nullptr;
 
     if (cellWeights.size())
     {
@@ -222,7 +221,7 @@ Foam::label Foam::metisDecomp::decompose
         adjwgtPtr = faceWeights.begin();
     }
 
-    int one = 1;
+    label one = 1;
 
     if (method == "recursive")
     {
@@ -230,14 +229,14 @@ Foam::label Foam::metisDecomp::decompose
         (
             &numCells,         // num vertices in graph
             &one,
-            const_cast<List<int>&>(xadj).begin(),   // indexing into adjncy
-            const_cast<List<int>&>(adjncy).begin(), // neighbour info
+            const_cast<List<label>&>(xadj).begin(),   // indexing into adjncy
+            const_cast<List<label>&>(adjncy).begin(), // neighbour info
             vwgtPtr,           // vertexweights
-            NULL,
+            nullptr,
             adjwgtPtr,         // no edgeweights
             &nProcs,
             processorWeights.begin(),
-            NULL,
+            nullptr,
             options,
             &edgeCut,
             finalDecomp.begin()
@@ -249,14 +248,14 @@ Foam::label Foam::metisDecomp::decompose
         (
             &numCells,         // num vertices in graph
             &one,
-            const_cast<List<int>&>(xadj).begin(),   // indexing into adjncy
-            const_cast<List<int>&>(adjncy).begin(), // neighbour info
+            const_cast<List<label>&>(xadj).begin(),   // indexing into adjncy
+            const_cast<List<label>&>(adjncy).begin(), // neighbour info
             vwgtPtr,           // vertexweights
-            NULL,
+            nullptr,
             adjwgtPtr,         // no edgeweights
             &nProcs,
             processorWeights.begin(),
-            NULL,
+            nullptr,
             options,
             &edgeCut,
             finalDecomp.begin()
@@ -301,8 +300,8 @@ Foam::labelList Foam::metisDecomp::decompose
             << exit(FatalError);
     }
 
-    List<int> adjncy;
-    List<int> xadj;
+    labelList adjncy;
+    labelList xadj;
     calcCSR
     (
         mesh_,
@@ -311,7 +310,7 @@ Foam::labelList Foam::metisDecomp::decompose
     );
 
     // Decompose using default weights
-    List<int> finalDecomp;
+    labelList finalDecomp;
     decompose(adjncy, xadj, pointWeights, finalDecomp);
 
     // Copy back to labelList
@@ -349,8 +348,8 @@ Foam::labelList Foam::metisDecomp::decompose
     // Make Metis CSR (Compressed Storage Format) storage
     //   adjncy      : contains neighbours (= edges in graph)
     //   xadj(celli) : start of information in adjncy for celli
-    List<int> adjncy;
-    List<int> xadj;
+    labelList adjncy;
+    labelList xadj;
     {
         // Get cellCells on coarse mesh.
         labelListList cellCells;
@@ -366,7 +365,7 @@ Foam::labelList Foam::metisDecomp::decompose
     }
 
     // Decompose using default weights
-    List<int> finalDecomp;
+    labelList finalDecomp;
     decompose(adjncy, xadj, coarseWeights, finalDecomp);
 
 
@@ -407,12 +406,12 @@ Foam::labelList Foam::metisDecomp::decompose
     //   adjncy      : contains neighbours (= edges in graph)
     //   xadj(celli) : start of information in adjncy for celli
 
-    List<int> adjncy;
-    List<int> xadj;
+    labelList adjncy;
+    labelList xadj;
     calcCSR(globalCellCells, adjncy, xadj);
 
     // Decompose using default weights
-    List<int> finalDecomp;
+    labelList finalDecomp;
     decompose(adjncy, xadj, cWeights, finalDecomp);
 
     // Copy back to labelList

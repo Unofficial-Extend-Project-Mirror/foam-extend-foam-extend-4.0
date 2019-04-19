@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -297,7 +297,7 @@ Foam::attachDetach::attachDetach
     triggerIndex_(0),
     state_(UNKNOWN),
     trigger_(false),
-    pointMatchMapPtr_(NULL)
+    pointMatchMapPtr_(nullptr)
 {
     checkDefinition();
 }
@@ -333,7 +333,7 @@ Foam::attachDetach::attachDetach
     triggerIndex_(0),
     state_(UNKNOWN),
     trigger_(false),
-    pointMatchMapPtr_(NULL)
+    pointMatchMapPtr_(nullptr)
 {
     checkDefinition();
 }

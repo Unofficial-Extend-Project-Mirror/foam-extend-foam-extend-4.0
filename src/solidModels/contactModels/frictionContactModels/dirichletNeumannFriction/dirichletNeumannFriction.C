@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ Foam::dirichletNeumannFriction::dirichletNeumannFriction
       slaveFaceZoneID
       ),
   frictionContactModelDict_(dict.subDict(name+"FrictionModelDict")),
-  frictionLawPtr_(NULL),
+  frictionLawPtr_(nullptr),
   mesh_(patch.boundaryMesh().mesh()),
   slaveDisp_(mesh().boundaryMesh()[slavePatchID].size(), vector::zero),
   oldSlaveDisp_(slaveDisp_),
@@ -86,7 +86,7 @@ Foam::dirichletNeumannFriction::dirichletNeumannFriction
   oscillationCorr_(frictionContactModelDict_.lookup("oscillationCorrection")),
   smoothingSteps_(readInt(frictionContactModelDict_.lookup("smoothingSteps"))),
   oldStickSlip_(slaveDisp_.size(), 0.0),
-  contactFilePtr_(NULL)
+  contactFilePtr_(nullptr)
 {
   // create friction law
   frictionLawPtr_ = frictionLaw::New(

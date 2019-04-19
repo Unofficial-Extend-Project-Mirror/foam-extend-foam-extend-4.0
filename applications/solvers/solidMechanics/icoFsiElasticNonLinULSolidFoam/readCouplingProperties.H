@@ -125,7 +125,7 @@
         IOobject::MUST_READ
     );
 
-    vectorField* accumulatedFluidInterfaceDisplacementPtr = NULL;
+    vectorField* accumulatedFluidInterfaceDisplacementPtr = nullptr;
 
     if(accumulatedFluidInterfaceDisplacementHeader.headerOk())
     {

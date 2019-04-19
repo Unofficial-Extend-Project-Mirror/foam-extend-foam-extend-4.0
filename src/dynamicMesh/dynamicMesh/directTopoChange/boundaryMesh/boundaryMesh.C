@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -437,7 +437,7 @@ void Foam::boundaryMesh::markZone
 // Null constructor
 Foam::boundaryMesh::boundaryMesh()
 :
-    meshPtr_(NULL),
+    meshPtr_(nullptr),
     patches_(),
     meshFace_(),
     featurePoints_(),
@@ -463,7 +463,7 @@ void Foam::boundaryMesh::clearOut()
     {
         delete meshPtr_;
 
-        meshPtr_ = NULL;
+        meshPtr_ = nullptr;
     }
 }
 

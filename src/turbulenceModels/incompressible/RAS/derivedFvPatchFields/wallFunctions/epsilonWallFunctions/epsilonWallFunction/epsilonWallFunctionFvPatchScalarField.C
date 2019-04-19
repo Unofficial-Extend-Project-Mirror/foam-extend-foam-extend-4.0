@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -51,6 +51,21 @@ void epsilonWallFunctionFvPatchScalarField::checkType()
             << "    Current patch type is " << patch().type() << nl << endl
             << abort(FatalError);
     }
+}
+
+
+// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+
+void epsilonWallFunctionFvPatchScalarField::writeLocalEntries(Ostream& os) const
+{
+    writeEntryIfDifferent<word>(os, "U", "U", UName_);
+    writeEntryIfDifferent<word>(os, "k", "k", kName_);
+    writeEntryIfDifferent<word>(os, "G", "RASModel::G", GName_);
+    writeEntryIfDifferent<word>(os, "nu", "nu", nuName_);
+    writeEntryIfDifferent<word>(os, "nut", "nut", nutName_);
+    os.writeKeyword("Cmu") << Cmu_ << token::END_STATEMENT << nl;
+    os.writeKeyword("kappa") << kappa_ << token::END_STATEMENT << nl;
+    os.writeKeyword("E") << E_ << token::END_STATEMENT << nl;
 }
 
 
@@ -211,7 +226,7 @@ void epsilonWallFunctionFvPatchScalarField::updateCoeffs()
     const scalarField magGradUw = mag(Uw.snGrad());
 
     // Set epsilon and G
-    forAll(nutw, faceI)
+    forAll (nutw, faceI)
     {
         label faceCellI = patch().faceCells()[faceI];
 
@@ -260,14 +275,7 @@ void epsilonWallFunctionFvPatchScalarField::evaluate
 void epsilonWallFunctionFvPatchScalarField::write(Ostream& os) const
 {
     fixedInternalValueFvPatchScalarField::write(os);
-    writeEntryIfDifferent<word>(os, "U", "U", UName_);
-    writeEntryIfDifferent<word>(os, "k", "k", kName_);
-    writeEntryIfDifferent<word>(os, "G", "RASModel::G", GName_);
-    writeEntryIfDifferent<word>(os, "nu", "nu", nuName_);
-    writeEntryIfDifferent<word>(os, "nut", "nut", nutName_);
-    os.writeKeyword("Cmu") << Cmu_ << token::END_STATEMENT << nl;
-    os.writeKeyword("kappa") << kappa_ << token::END_STATEMENT << nl;
-    os.writeKeyword("E") << E_ << token::END_STATEMENT << nl;
+    writeLocalEntries(os);
 }
 
 

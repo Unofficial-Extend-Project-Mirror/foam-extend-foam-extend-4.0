@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -33,8 +33,8 @@ Foam::splitCell::splitCell(const label cellI, splitCell* parent)
 :
     cellI_(cellI),
     parent_(parent),
-    master_(NULL),
-    slave_(NULL)
+    master_(nullptr),
+    slave_(nullptr)
 {}
 
 
@@ -49,11 +49,11 @@ Foam::splitCell::~splitCell()
         // Make sure parent does not refer to me anymore.
         if (myParent->master() == this)
         {
-            myParent->master() = NULL;
+            myParent->master() = nullptr;
         }
         else if (myParent->slave() == this)
         {
-            myParent->slave() = NULL;
+            myParent->slave() = nullptr;
         }
         else
         {
@@ -112,7 +112,7 @@ Foam::splitCell* Foam::splitCell::getOther() const
         FatalErrorIn("splitCell::getOther()") << "parent not set"
             << "Cell:" << cellLabel() << abort(FatalError);
 
-        return NULL;
+        return nullptr;
     }
     else if (myParent->master() == this)
     {
@@ -128,7 +128,7 @@ Foam::splitCell* Foam::splitCell::getOther() const
             << " parent's master or slave pointer" << endl
             << "Cell:" << cellLabel() << abort(FatalError);
 
-        return NULL;
+        return nullptr;
     }
 }
 

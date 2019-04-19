@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ class functionObjectList
 
         //- Remove and return the function object pointer by name,
         //  and returns the old index via the parameter.
-        //  Returns a NULL pointer (and index -1) if it didn't exist.
+        //  Returns a nullptr pointer (and index -1) if it didn't exist.
         functionObject* remove(const word&, label& oldIndex);
 
         //- Disallow default bitwise copy construct

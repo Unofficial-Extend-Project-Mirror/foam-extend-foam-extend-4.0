@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ License
 template <class Type>
 Foam::label Foam::interpolationLookUpTable<Type>::index
 (
-    const List<scalar>& indices,
+    const scalarList& indices,
     const bool lastDim
 ) const
 {

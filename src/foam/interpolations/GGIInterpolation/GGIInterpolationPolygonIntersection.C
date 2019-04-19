@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ GGIInterpolation<MasterPatch, SlavePatch>::polygonIntersection
     //  This is a quick intersection test...
 
     // Keep track of who is inside or outside
-    List<bool> subjectVertexInside(subjectPolygon->size());
+    boolList subjectVertexInside(subjectPolygon->size());
 
     insideOutside statusInOut =
         isVertexInsidePolygon
@@ -223,7 +223,7 @@ GGIInterpolation<MasterPatch, SlavePatch>::isVertexInsidePolygon
 (
     const List<point2D>& clippingPolygon,
     const List<point2D>& subjectPolygon,
-    List<bool>& subjectVertexInside
+    boolList& subjectVertexInside
 ) const
 {
     insideOutside retValue = ALL_OUTSIDE;

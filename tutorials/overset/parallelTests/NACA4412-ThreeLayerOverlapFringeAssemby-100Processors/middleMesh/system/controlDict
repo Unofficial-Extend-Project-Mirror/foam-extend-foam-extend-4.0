@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.1                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -63,14 +63,15 @@ rhoInf 1; // Reference density, fluid
 CofR (0.25 0 0); // Origin for moment calculations
 outputControl timeStep;
 outputInterval 1;
-log	true;
+log    true;
 liftDir (-0.239719744 0 0.970842132 );
 dragDir (0.970842132  0 0.239719744);
 magUInf 24.472;
-lRef	1;
-Aref	1;
+lRef    1;
+Aref    1;
 pitchAxis (0 1 0);
 }
 );
+
 
 // ************************************************************************* //

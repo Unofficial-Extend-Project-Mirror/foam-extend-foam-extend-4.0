@@ -46,4 +46,4 @@ runApplication $application2
 # Perform sampling
 runApplication sample -latestTime
 timeStep=$(grep "^endTime" system/controlDict | awk '{ print $2 }' | sed 's/;//g')
-cp -v surfaces/$timeStep/p_solidWall.raw .
+cp -v postProcessing/surfaces/$timeStep/p_solidWall.raw .

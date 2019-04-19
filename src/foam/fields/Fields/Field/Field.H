@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -352,13 +352,11 @@ public:
 
     // IOstream operators
 
-#ifndef SWIG
         friend Ostream& operator<< <Type>
         (Ostream&, const Field<Type>&);
 
         friend Ostream& operator<< <Type>
         (Ostream&, const tmp<Field<Type> >&);
-#endif
 };
 
 

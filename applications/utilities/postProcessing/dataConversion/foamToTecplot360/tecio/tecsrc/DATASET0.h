@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known
- * as TecIO, as part of its distribution of OpenFOAM and the
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- *
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #if defined EXTERN
 #undef EXTERN
 #endif
@@ -34,18 +11,19 @@
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
 */
 
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
 namespace tecplot
 {
-namespace io
-{
 class File;
-}
 }
 
 EXTERN void OutOfMemoryMsg(void);
@@ -64,22 +42,23 @@ EXTERN void OutOfMemoryMsg(void);
 struct _FieldData_a
 {
     void               *Data; /* ...placed first in the structure for fastest access */
-# if defined TECPLOTKERNEL
+    #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
-# else
+    #else
     void *GetValueCallback[1]; /* ...this field is for TecIO only */
     void *SetValueCallback[1]; /* ...this field is for TecIO only */
-# endif
+    #endif
 
     /* PRIVATE */
     FieldDataType_e     Type;
     ValueLocation_e     ValueLocation;
-    LgIndex_t           RefCount;
-    LgIndex_t           VarShareRefCount;
-    LgIndex_t           NumValues;
-# if defined TECPLOTKERNEL /* TecIO doesn't require these features yet. */
+    #if defined TECPLOTKERNEL /* TecIO doesn't require these features yet. */
 /* CORE SOURCE CODE REMOVED */
-# endif
+    #endif
+    LgIndex_t           NumValues;
+    #if defined TECPLOTKERNEL /* TecIO doesn't require these features yet. */
+/* CORE SOURCE CODE REMOVED */
+    #endif
 };
 
 
@@ -119,8 +98,8 @@ struct _FieldData_a
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 #else /* ...for TecIO only */
-#define GetFieldDataGetFunction_MACRO(FieldData)   ((FieldValueGetFunction_pf)(FieldData)->GetValueCallback[0])
-#define GetFieldDataSetFunction_MACRO(FieldData)   ((FieldValueSetFunction_pf)(FieldData)->SetValueCallback[0])
+#define GetFieldDataGetFunction_MACRO(FieldData)   (reinterpret_cast<FieldValueGetFunction_pf>((FieldData)->GetValueCallback[0]))
+#define GetFieldDataSetFunction_MACRO(FieldData)   (reinterpret_cast<FieldValueSetFunction_pf>((FieldData)->SetValueCallback[0]))
 #endif
 #define GetFieldDataNumValues_MACRO(FieldData)     ((FieldData)->NumValues)
 #define GetFieldDataValueLocation_MACRO(FieldData) ((FieldData)->ValueLocation)
@@ -202,21 +181,21 @@ typedef UInt64_t Int64Rev_t;
 #define GetFieldDataVoidPtr       GetFieldDataVoidPtr_FUNC /*danger:see above*/
 #endif
 
-#define GetFieldDataFloatPtr_MACRO(FieldData)     ((float *)((FieldData)->Data))
-#define GetFieldDataFloatRevPtr_MACRO(FieldData)  ((FloatRev_t *)((FieldData)->Data))
-#define GetFieldDataDoublePtr_MACRO(FieldData)    ((double *)((FieldData)->Data))
-#define GetFieldDataDoubleRevPtr_MACRO(FieldData) ((DoubleRev_t *)((FieldData)->Data))
-#define GetFieldDataInt64Ptr_MACRO(FieldData)     ((Int64_t *)((FieldData)->Data))
-#define GetFieldDataInt64RevPtr_MACRO(FieldData)  ((Int64Rev_t *)((FieldData)->Data))
-#define GetFieldDataInt32Ptr_MACRO(FieldData)     ((Int32_t *)((FieldData)->Data))
-#define GetFieldDataInt32RevPtr_MACRO(FieldData)  ((Int32Rev_t *)((FieldData)->Data))
-#define GetFieldDataInt16Ptr_MACRO(FieldData)     ((Int16_t *)((FieldData)->Data))
-#define GetFieldDataInt16RevPtr_MACRO(FieldData)  ((Int16Rev_t *)((FieldData)->Data))
-#define GetFieldDataBytePtr_MACRO(FieldData)      ((Byte_t *)((FieldData)->Data))
-#define GetFieldData2BytePtr_MACRO(FieldData)     ((UInt16_t *)((FieldData)->Data))
-#define GetFieldData4BytePtr_MACRO(FieldData)     ((UInt32_t *)((FieldData)->Data))
-#define GetFieldData8BytePtr_MACRO(FieldData)     ((UInt64_t *)((FieldData)->Data))
-#define GetFieldDataVoidPtr_MACRO(FieldData)      ((void *)((FieldData)->Data)) /*danger:see above*/
+#define GetFieldDataFloatPtr_MACRO(FieldData)     (static_cast<float *>((FieldData)->Data))
+#define GetFieldDataFloatRevPtr_MACRO(FieldData)  (static_cast<FloatRev_t *>((FieldData)->Data))
+#define GetFieldDataDoublePtr_MACRO(FieldData)    (static_cast<double *>((FieldData)->Data))
+#define GetFieldDataDoubleRevPtr_MACRO(FieldData) (static_cast<DoubleRev_t *>((FieldData)->Data))
+#define GetFieldDataInt64Ptr_MACRO(FieldData)     (static_cast<Int64_t *>((FieldData)->Data))
+#define GetFieldDataInt64RevPtr_MACRO(FieldData)  (static_cast<Int64Rev_t *>((FieldData)->Data))
+#define GetFieldDataInt32Ptr_MACRO(FieldData)     (static_cast<Int32_t *>((FieldData)->Data))
+#define GetFieldDataInt32RevPtr_MACRO(FieldData)  (static_cast<Int32Rev_t *>((FieldData)->Data))
+#define GetFieldDataInt16Ptr_MACRO(FieldData)     (static_cast<Int16_t *>((FieldData)->Data))
+#define GetFieldDataInt16RevPtr_MACRO(FieldData)  (static_cast<Int16Rev_t *>((FieldData)->Data))
+#define GetFieldDataBytePtr_MACRO(FieldData)      (static_cast<Byte_t *>((FieldData)->Data))
+#define GetFieldData2BytePtr_MACRO(FieldData)     (static_cast<UInt16_t *>((FieldData)->Data))
+#define GetFieldData4BytePtr_MACRO(FieldData)     (static_cast<UInt32_t *>((FieldData)->Data))
+#define GetFieldData8BytePtr_MACRO(FieldData)     (static_cast<UInt64_t *>((FieldData)->Data))
+#define GetFieldDataVoidPtr_MACRO(FieldData)      (static_cast<void *>((FieldData)->Data)) /*danger:see above*/
 
 #if !defined USE_MACROS_FOR_FIELD_DATA_FUNCTIONS
 EXTERN float *GetFieldDataFloatPtr_FUNC(FieldData_pa fd);
@@ -296,6 +275,8 @@ EXTERN void SwapBytesInUnalignedTypedValueArray(FieldDataType_e  ValueType,
 /*
  * Copies values from "src" to "dst".  "src" or "dst" may
  * be differing types.  Either or both may be V3D data pointers.
+ *
+ * NOTE: We allow src_end to be one less than src_start and is treated as a noop.
  */
 EXTERN void CopyFieldDataRange(FieldData_pa dst,
                                LgIndex_t    dst_start,
@@ -317,6 +298,9 @@ EXTERN void CopyFieldValue(FieldData_pa dst,
                            FieldData_pa src,
                            LgIndex_t    srcindex);
 
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */

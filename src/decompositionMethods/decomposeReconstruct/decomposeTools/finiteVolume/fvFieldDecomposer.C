@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -61,7 +61,10 @@ processorVolPatchFieldDecomposer
     addressing_(addressingSlice.size()),
     weights_(addressingSlice.size())
 {
-    const scalarField& weights = mesh.weights().internalField();
+    // Cannot use weights due to parallel comms in load balancing
+    // Use 0.5 instead, as this is not precise mapping
+    // HJ, 21/Oct/2018
+
     const labelList& own = mesh.faceOwner();
     const labelList& neighb = mesh.faceNeighbour();
 
@@ -75,14 +78,12 @@ processorVolPatchFieldDecomposer
             // This is a regular face. it has been an internal face
             // of the original mesh and now it has become a face
             // on the parallel boundary
+            // Use 0.5 weights
             addressing_[i].setSize(2);
-            weights_[i].setSize(2);
+            weights_[i].setSize(2, 0.5);
 
             addressing_[i][0] = own[ai];
             addressing_[i][1] = neighb[ai];
-
-            weights_[i][0] = weights[ai];
-            weights_[i][1] = 1.0 - weights[ai];
         }
         else
         {
@@ -142,19 +143,22 @@ fvFieldDecomposer::fvFieldDecomposer
     patchFieldDecomposerPtrs_
     (
         procMesh_.boundary().size(),
-        static_cast<patchFieldDecomposer*>(NULL)
+        static_cast<patchFieldDecomposer*>(nullptr)
     ),
     processorVolPatchFieldDecomposerPtrs_
     (
         procMesh_.boundary().size(),
-        static_cast<processorVolPatchFieldDecomposer*>(NULL)
+        static_cast<processorVolPatchFieldDecomposer*>(nullptr)
     ),
     processorSurfacePatchFieldDecomposerPtrs_
     (
         procMesh_.boundary().size(),
-        static_cast<processorSurfacePatchFieldDecomposer*>(NULL)
+        static_cast<processorSurfacePatchFieldDecomposer*>(nullptr)
     )
 {
+    // HR 25.06.18: Weights cannot be used for mappings
+    // HJ, 19/Oct/2018
+
     forAll (boundaryAddressing_, patchi)
     {
         if (boundaryAddressing_[patchi] >= 0)

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ public:
         virtual tmp<GeometricField<Type, faePatchField, edgeMesh> >
         correction(const GeometricField<Type, faPatchField, areaMesh>&) const
         {
-            return tmp<GeometricField<Type, faePatchField, edgeMesh> >(NULL);
+            return tmp<GeometricField<Type, faePatchField, edgeMesh> >(nullptr);
         }
 
         //- Return the lnGrad of the given cell field

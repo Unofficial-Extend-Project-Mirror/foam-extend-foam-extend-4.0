@@ -1,3 +1,3 @@
-simpleMRFOversetFoam.C 
+simpleMRFOversetFoam.C
 
 EXE = $(FOAM_APPBIN)/simpleMRFOversetFoam

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -206,8 +206,8 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
 :
     DimensionedField<Type, GeoMesh>(io, mesh, ds),
     timeIndex_(this->time().timeIndex()),
-    field0Ptr_(NULL),
-    fieldPrevIterPtr_(NULL),
+    field0Ptr_(nullptr),
+    fieldPrevIterPtr_(nullptr),
     boundaryField_(mesh.boundary(), *this, patchFieldType)
 {
     if (debug)
@@ -236,8 +236,8 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
 :
     DimensionedField<Type, GeoMesh>(io, mesh, ds),
     timeIndex_(this->time().timeIndex()),
-    field0Ptr_(NULL),
-    fieldPrevIterPtr_(NULL),
+    field0Ptr_(nullptr),
+    fieldPrevIterPtr_(nullptr),
     boundaryField_(mesh.boundary(), *this, patchFieldTypes)
 {
     if (debug)
@@ -263,8 +263,8 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
 :
     DimensionedField<Type, GeoMesh>(io, mesh, dt),
     timeIndex_(this->time().timeIndex()),
-    field0Ptr_(NULL),
-    fieldPrevIterPtr_(NULL),
+    field0Ptr_(nullptr),
+    fieldPrevIterPtr_(nullptr),
     boundaryField_(mesh.boundary(), *this, patchFieldType)
 {
     if (debug)
@@ -292,8 +292,8 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
 :
     DimensionedField<Type, GeoMesh>(io, mesh, dt),
     timeIndex_(this->time().timeIndex()),
-    field0Ptr_(NULL),
-    fieldPrevIterPtr_(NULL),
+    field0Ptr_(nullptr),
+    fieldPrevIterPtr_(nullptr),
     boundaryField_(mesh.boundary(), *this, patchFieldTypes)
 {
     if (debug)
@@ -322,8 +322,8 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
 :
     DimensionedField<Type, GeoMesh>(io, mesh, ds, iField),
     timeIndex_(this->time().timeIndex()),
-    field0Ptr_(NULL),
-    fieldPrevIterPtr_(NULL),
+    field0Ptr_(nullptr),
+    fieldPrevIterPtr_(nullptr),
     boundaryField_(mesh.boundary(), *this, ptfl)
 {
     if (debug)
@@ -346,8 +346,8 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
 :
     DimensionedField<Type, GeoMesh>(io, mesh, dimless),
     timeIndex_(this->time().timeIndex()),
-    field0Ptr_(NULL),
-    fieldPrevIterPtr_(NULL),
+    field0Ptr_(nullptr),
+    fieldPrevIterPtr_(nullptr),
     boundaryField_(*this, readField(this->readStream(typeName)))
 {
     this->close();
@@ -387,8 +387,8 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
 :
     DimensionedField<Type, GeoMesh>(io, mesh, dimless),
     timeIndex_(this->time().timeIndex()),
-    field0Ptr_(NULL),
-    fieldPrevIterPtr_(NULL),
+    field0Ptr_(nullptr),
+    fieldPrevIterPtr_(nullptr),
     boundaryField_(*this, readField(is))
 {
     // Check compatibility between field and mesh
@@ -426,8 +426,8 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
 :
     DimensionedField<Type, GeoMesh>(io, mesh, dimless),
     timeIndex_(this->time().timeIndex()),
-    field0Ptr_(NULL),
-    fieldPrevIterPtr_(NULL),
+    field0Ptr_(nullptr),
+    fieldPrevIterPtr_(nullptr),
     boundaryField_(*this, readField(dict))
 {
     // Check compatibility between field and mesh
@@ -463,8 +463,8 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
 :
     DimensionedField<Type, GeoMesh>(gf),
     timeIndex_(gf.timeIndex()),
-    field0Ptr_(NULL),
-    fieldPrevIterPtr_(NULL),
+    field0Ptr_(nullptr),
+    fieldPrevIterPtr_(nullptr),
     boundaryField_(*this, gf.boundaryField_)
 {
     if (debug)
@@ -499,8 +499,8 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
         tgf.isTmp()
     ),
     timeIndex_(tgf().timeIndex()),
-    field0Ptr_(NULL),
-    fieldPrevIterPtr_(NULL),
+    field0Ptr_(nullptr),
+    fieldPrevIterPtr_(nullptr),
     boundaryField_(*this, tgf().boundaryField_)
 {
     if (debug)
@@ -527,8 +527,8 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
 :
     DimensionedField<Type, GeoMesh>(io, gf),
     timeIndex_(gf.timeIndex()),
-    field0Ptr_(NULL),
-    fieldPrevIterPtr_(NULL),
+    field0Ptr_(nullptr),
+    fieldPrevIterPtr_(nullptr),
     boundaryField_(*this, gf.boundaryField_)
 {
     if (debug)
@@ -559,8 +559,8 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
 :
     DimensionedField<Type, GeoMesh>(newName, gf),
     timeIndex_(gf.timeIndex()),
-    field0Ptr_(NULL),
-    fieldPrevIterPtr_(NULL),
+    field0Ptr_(nullptr),
+    fieldPrevIterPtr_(nullptr),
     boundaryField_(*this, gf.boundaryField_)
 {
     if (debug)
@@ -597,8 +597,8 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
         tgf.isTmp()
     ),
     timeIndex_(tgf().timeIndex()),
-    field0Ptr_(NULL),
-    fieldPrevIterPtr_(NULL),
+    field0Ptr_(nullptr),
+    fieldPrevIterPtr_(nullptr),
     boundaryField_(*this, tgf().boundaryField_)
 {
     if (debug)
@@ -623,8 +623,8 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
 :
     DimensionedField<Type, GeoMesh>(io, gf),
     timeIndex_(gf.timeIndex()),
-    field0Ptr_(NULL),
-    fieldPrevIterPtr_(NULL),
+    field0Ptr_(nullptr),
+    fieldPrevIterPtr_(nullptr),
     boundaryField_(this->mesh().boundary(), *this, patchFieldType)
 {
     if (debug)
@@ -658,8 +658,8 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
 :
     DimensionedField<Type, GeoMesh>(io, gf),
     timeIndex_(gf.timeIndex()),
-    field0Ptr_(NULL),
-    fieldPrevIterPtr_(NULL),
+    field0Ptr_(nullptr),
+    fieldPrevIterPtr_(nullptr),
     boundaryField_(this->mesh().boundary(), *this, patchFieldTypes)
 {
     if (debug)
@@ -743,10 +743,10 @@ void Foam::GeometricField<Type, PatchField, GeoMesh>::storeOldTimes() const
     )
     {
         storeOldTime();
-
-        // Correct time index.  Bug fix, Zeljko Tukovic 14/Jun/2010
-        timeIndex_ = this->time().timeIndex();
     }
+
+    // Correct time index.  Bug fix, Zeljko Tukovic 14/Jun/2010
+    timeIndex_ = this->time().timeIndex();
 }
 
 // Store old-time field

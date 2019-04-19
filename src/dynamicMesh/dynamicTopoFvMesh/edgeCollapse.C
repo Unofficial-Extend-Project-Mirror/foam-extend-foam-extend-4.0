@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -483,7 +483,7 @@ const changeMap dynamicTopoFvMesh::collapseQuadFace
             label slaveOverRide = -1;
             label sIndex = slaveMap.index();
             label pI = slaveMap.patchIndex();
-            const coupleMap* cMapPtr = NULL;
+            const coupleMap* cMapPtr = nullptr;
 
             if (localCouple)
             {
@@ -2471,7 +2471,7 @@ const changeMap dynamicTopoFvMesh::collapseQuadFace
     }
 
     // Ensure proper orientation for the two retained faces
-    FixedList<label,2> cellCheck(0);
+    FixedList<label,2> cellCheck(label(0));
 
     if (owner_[faceToThrow[0]] == c0)
     {
@@ -3142,7 +3142,7 @@ const changeMap dynamicTopoFvMesh::collapseQuadFace
     }
 
     // Fill-in candidate mapping information
-    labelList mC(2, -1);
+    labelList mC(2, label(-1));
     mC[0] = c0, mC[1] = c1;
 
     // Now that all old / new cells possess correct connectivity,
@@ -3352,7 +3352,7 @@ const changeMap dynamicTopoFvMesh::collapseQuadFace
             label pI = slaveMap.patchIndex();
 
             // Fetch the appropriate coupleMap
-            const coupleMap* cMapPtr = NULL;
+            const coupleMap* cMapPtr = nullptr;
 
             if (localCouple && !procCouple)
             {
@@ -3519,10 +3519,10 @@ const changeMap dynamicTopoFvMesh::collapseQuadFace
                 const face& mFace = faces_[mfIndex];
 
                 // Select appropriate mesh
-                const dynamicTopoFvMesh* meshPtr = NULL;
+                const dynamicTopoFvMesh* meshPtr = nullptr;
 
                 // Fetch the appropriate coupleMap
-                const coupleMap* crMapPtr = NULL;
+                const coupleMap* crMapPtr = nullptr;
 
                 // Fetch patch info
                 label ofPatch = whichPatch(fIndex);
@@ -3688,7 +3688,7 @@ const changeMap dynamicTopoFvMesh::collapseQuadFace
                 label sfIndex = sadF[faceI].index();
 
                 // Select appropriate mesh
-                const dynamicTopoFvMesh* meshPtr = NULL;
+                const dynamicTopoFvMesh* meshPtr = nullptr;
 
                 if (localCouple && !procCouple)
                 {
@@ -4317,7 +4317,7 @@ const changeMap dynamicTopoFvMesh::collapseEdge
                 continue;
             }
 
-            const coupleMap* cMapPtr = NULL;
+            const coupleMap* cMapPtr = nullptr;
 
             edge mEdge(eCheck), sEdge(-1, -1);
 
@@ -4781,7 +4781,10 @@ const changeMap dynamicTopoFvMesh::collapseEdge
 
     // Check whether points of the edge lies on a boundary
     const FixedList<bool,2> edgeBoundary = checkEdgeBoundary(eIndex);
-    FixedList<label, 2> nBoundCurves(0), nProcCurves(0), checkPoints(-1);
+    FixedList<label, 2>
+        nBoundCurves(label(0)),
+        nProcCurves(label(0)),
+        checkPoints(label(-1));
 
     // Decide on collapseCase
     label collapseCase = -1;
@@ -6566,7 +6569,7 @@ const changeMap dynamicTopoFvMesh::collapseEdge
                 Map<label>& pointMap = cMap.entityMap(coupleMap::POINT);
                 Map<label>& rPointMap = cMap.reverseEntityMap(coupleMap::POINT);
 
-                const changeMap* slaveMapPtr = NULL;
+                const changeMap* slaveMapPtr = nullptr;
                 const label pointEnum = coupleMap::POINT;
 
                 forAll(slaveMaps, slaveI)
@@ -6718,7 +6721,7 @@ const changeMap dynamicTopoFvMesh::collapseEdge
                 Map<label>& faceMap = cMap.entityMap(faceEnum);
                 Map<label>& rFaceMap = cMap.reverseEntityMap(faceEnum);
 
-                const changeMap* slaveMapPtr = NULL;
+                const changeMap* slaveMapPtr = nullptr;
 
                 forAll(slaveMaps, slaveI)
                 {
@@ -7033,7 +7036,7 @@ const changeMap dynamicTopoFvMesh::collapseEdge
                 Map<label>& edgeMap = cMap.entityMap(edgeEnum);
                 Map<label>& rEdgeMap = cMap.reverseEntityMap(edgeEnum);
 
-                const changeMap* slaveMapPtr = NULL;
+                const changeMap* slaveMapPtr = nullptr;
 
                 forAll(slaveMaps, slaveI)
                 {

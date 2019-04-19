@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -283,7 +283,7 @@ void Foam::MRFZone::calcMeshVelocity() const
     meshVelTime_ = mesh_.time().value();
 
     // If there is no rotation, return
-    if (omega_.value() < SMALL)
+    if (mag(omega_.value()) < SMALL)
     {
         return;
     }
@@ -355,12 +355,15 @@ void Foam::MRFZone::calcMeshVelocity() const
             << endl;
     }
 
+    // mag(Omega()) loses direction information
+    // Bug fix, GC, 23/Aug/2018
+
     // Calculate new points
     const vectorField newP =
         cs.globalPosition
         (
             cs.localPosition(p)
-          + vector(0, mag(Omega())*deltaT, 0)*movingPointsMask
+          + vector(0, mag(Omega())*deltaT*sign(omega_.value()), 0)*movingPointsMask
         );
 
     // Calculate mesh velocity for all moving faces
@@ -421,7 +424,7 @@ Foam::MRFZone::MRFZone(const fvMesh& mesh, Istream& is)
     axis_(dict_.lookup("axis")),
     omega_(dict_.lookup("omega")),
     rampTime_(dict_.lookupOrDefault<scalar>("rampTime", 0)),
-    meshVelocityPtr_(NULL),
+    meshVelocityPtr_(nullptr),
     meshVelTime_(-1)
 {
     if (dict_.found("patches"))

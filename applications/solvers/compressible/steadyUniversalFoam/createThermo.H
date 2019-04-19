@@ -1,11 +1,11 @@
     Info<< "Reading thermophysical properties\n" << endl;
 
-    volScalarField* pPtr = NULL;
-    volScalarField* hPtr = NULL;
-    const volScalarField* TPtr = NULL;
+    volScalarField* pPtr = nullptr;
+    volScalarField* hPtr = nullptr;
+    const volScalarField* TPtr = nullptr;
 
-    volScalarField* psisPtr = NULL;
-    basicThermo* thermoPtr = NULL;
+    volScalarField* psisPtr = nullptr;
+    basicThermo* thermoPtr = nullptr;
 
     Switch compressible;
 

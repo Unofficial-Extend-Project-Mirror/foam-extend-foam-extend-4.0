@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ inline void Foam::PtrList<T>::resize(const label newSize)
 template<class T>
 inline bool Foam::PtrList<T>::set(const label i) const
 {
-    return ptrs_[i] != NULL;
+    return ptrs_[i] != nullptr;
 }
 
 

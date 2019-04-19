@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ uint64_t Foam::readUint64(Istream& is)
 
 bool Foam::read(const char* buf, uint64_t& s)
 {
-    char *endptr = NULL;
+    char *endptr = nullptr;
     long l = strtol(buf, &endptr, 10);
     s = uint64_t(l);
     return (*endptr == 0);
@@ -98,5 +98,13 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const uint64_t i)
     return os;
 }
 
+#if WM_ARCH_OPTION == 64 && darwin && __clang__
+Foam::Ostream& Foam::operator<<(Ostream& os, const uintptr_t i)
+{
+    os.write(label(i));
+    os.check("Ostream& operator<<(Ostream&, const uintptr_t)");
+    return os;
+}
+#endif
 
 // ************************************************************************* //

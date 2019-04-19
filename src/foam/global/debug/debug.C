@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ namespace debug
 {
 
 //! @cond ignoreDocumentation - local scope
-dictionary* controlDictPtr_(NULL);
+dictionary* controlDictPtr_(nullptr);
 
 // to ensure controlDictPtr_ is deleted at the end of the run
 class deleteControlDictPtr
@@ -82,7 +82,7 @@ public:
         if (controlDictPtr_)
         {
             delete controlDictPtr_;
-            controlDictPtr_ = NULL;
+            controlDictPtr_ = nullptr;
         }
     }
 };

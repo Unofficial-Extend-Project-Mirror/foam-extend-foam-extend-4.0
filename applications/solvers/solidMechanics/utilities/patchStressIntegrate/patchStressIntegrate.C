@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -95,8 +95,8 @@ int main(int argc, char *argv[])
           Info<< nl;
 
           // gradU needed for nonLinear
-          volTensorField* gradUPtr = NULL;
-          volSymmTensorField* sigmaCauchyPtr = NULL;
+          volTensorField* gradUPtr = nullptr;
+          volSymmTensorField* sigmaCauchyPtr = nullptr;
           if (nonLinear)
           {
               gradUPtr = new volTensorField

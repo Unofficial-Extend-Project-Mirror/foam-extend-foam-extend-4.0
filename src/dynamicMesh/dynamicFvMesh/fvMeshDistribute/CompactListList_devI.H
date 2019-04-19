@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -223,7 +223,7 @@ inline Foam::UList<T> Foam::CompactListList_dev<T, Container>::operator[]
 )
 {
     label start = offsets_[i];
-    return UList<T>((m_.size() ? &m_[start] : NULL), offsets_[i+1] - start);
+    return UList<T>((m_.size() ? &m_[start] : nullptr), offsets_[i+1] - start);
 }
 
 
@@ -237,7 +237,7 @@ Foam::CompactListList_dev<T, Container>::operator[]
     label start = offsets_[i];
     return UList<T>
     (
-        (m_.size() ? const_cast<T*>(&m_[start]) : NULL),
+        (m_.size() ? const_cast<T*>(&m_[start]) : nullptr),
         offsets_[i+1] - start
     );
 }

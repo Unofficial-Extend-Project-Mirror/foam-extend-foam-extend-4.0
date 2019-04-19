@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ lengthScaleEstimator::lengthScaleEstimator
     sliceHoldOff_(0),
     sliceBoxes_(0),
     field_("none"),
-    scale_(NULL),
+    scale_(nullptr),
     gradient_(false),
     fieldLength_(0.0),
     lowerRefineLevel_(0.001),
@@ -1029,10 +1029,10 @@ void lengthScaleEstimator::calculateLengthScale
     // If a field has been specified, use that.
     if (field_ != "none")
     {
-        const volScalarField* vFldPtr = NULL;
+        const volScalarField* vFldPtr = nullptr;
 
         // Temporary pointer for gradient
-        volScalarField* magGradPtr = NULL;
+        volScalarField* magGradPtr = nullptr;
 
         if (gradient_)
         {

@@ -1,6 +1,6 @@
 Switch solidInterfaceCorr(false);
 
-solidInterface* solidInterfacePtr(NULL);
+solidInterface* solidInterfacePtr(nullptr);
 
 {
     const dictionary& stressControl =

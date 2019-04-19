@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ class KinematicLookupTableInjection
         kinematicParcelInjectionDataIOList injectors_;
 
         //- List of injector cells per injector
-        List<label> injectorCells_;
+        labelList injectorCells_;
 
 
 protected:
@@ -128,6 +128,9 @@ public:
 
         //- Flag to indicate whether model activates injection model
         bool active() const;
+
+        //- Set injector locations when mesh is updated
+        virtual void updateMesh();
 
         //- Return the end-of-injection time
         scalar timeEnd() const;

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -90,7 +90,7 @@ class cellTable
         Map<label> zoneMap() const;
 
         //- A contiguous list of cellTable names
-        List<word> namesList() const;
+        wordList namesList() const;
 
         //- Add required entries - MaterialType
         void addDefaults();

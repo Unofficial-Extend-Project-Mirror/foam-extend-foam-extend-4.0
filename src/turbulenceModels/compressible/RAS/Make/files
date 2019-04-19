@@ -17,13 +17,17 @@ alphatWallFunctions = $(wallFunctions)/alphatWallFunctions
 $(alphatWallFunctions)/alphatWallFunction/alphatWallFunctionFvPatchScalarField.C
 
 mutWallFunctions = $(wallFunctions)/mutWallFunctions
-$(mutWallFunctions)/mutkWallFunction/mutkWallFunctionFvPatchScalarField.C
 $(mutWallFunctions)/mutWallFunction/mutWallFunctionFvPatchScalarField.C
-$(mutWallFunctions)/mutRoughWallFunction/mutRoughWallFunctionFvPatchScalarField.C
-$(mutWallFunctions)/mutSpalartAllmarasWallFunction/mutSpalartAllmarasWallFunctionFvPatchScalarField.C
+$(mutWallFunctions)/mutLowReWallFunction/mutLowReWallFunctionFvPatchScalarField.C
+$(mutWallFunctions)/mutkWallFunction/mutkWallFunctionFvPatchScalarField.C
+$(mutWallFunctions)/mutkRoughWallFunction/mutkRoughWallFunctionFvPatchScalarField.C
+$(mutWallFunctions)/mutUWallFunction/mutUWallFunctionFvPatchScalarField.C
+$(mutWallFunctions)/mutURoughWallFunction/mutURoughWallFunctionFvPatchScalarField.C
 $(mutWallFunctions)/mutSpalartAllmarasStandardWallFunction/mutSpalartAllmarasStandardWallFunctionFvPatchScalarField.C
 $(mutWallFunctions)/mutSpalartAllmarasStandardRoughWallFunction/mutSpalartAllmarasStandardRoughWallFunctionFvPatchScalarField.C
-$(mutWallFunctions)/mutLowReWallFunction/mutLowReWallFunctionFvPatchScalarField.C
+$(mutWallFunctions)/mutSpalartAllmarasWallFunction/mutSpalartAllmarasWallFunctionFvPatchScalarField.C
+
+backwardsCompatibility/wallFunctions/backwardsCompatibilityWallFunctions.C
 
 epsilonWallFunctions = $(wallFunctions)/epsilonWallFunctions
 $(epsilonWallFunctions)/epsilonWallFunction/epsilonWallFunctionFvPatchScalarField.C
@@ -41,7 +45,5 @@ derivedFvPatchFields/turbulentMixingLengthFrequencyInlet/turbulentMixingLengthFr
 derivedFvPatchFields/turbulentTemperatureCoupledBaffle/turbulentTemperatureCoupledBaffleFvPatchScalarField.C
 derivedFvPatchFields/turbulentTemperatureCoupledBaffle/regionProperties.C
 derivedFvPatchFields/turbulentTemperatureCoupledBaffleMixed/turbulentTemperatureCoupledBaffleMixedFvPatchScalarField.C
-
-backwardsCompatibility/wallFunctions/backwardsCompatibilityWallFunctions.C
 
 LIB = $(FOAM_LIBBIN)/libcompressibleRASModels

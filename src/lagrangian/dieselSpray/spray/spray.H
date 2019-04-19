@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -144,9 +144,9 @@ class spray
             const PtrList<gasThermoPhysics>& gasProperties_;
             const basicMultiComponentMixture& composition_;
 
-            List<label> liquidToGasIndex_;
-            List<label> gasToLiquidIndex_;
-            List<bool> isLiquidFuel_;
+            labelList liquidToGasIndex_;
+            labelList gasToLiquidIndex_;
+            boolList isLiquidFuel_;
 
 
         // Necessary 2D-information
@@ -280,9 +280,9 @@ public:
             inline const PtrList<gasThermoPhysics>& gasProperties() const;
             inline const basicMultiComponentMixture& composition() const;
 
-            inline const List<label>& liquidToGasIndex() const;
-            inline const List<label>& gasToLiquidIndex() const;
-            inline const List<bool>& isLiquidFuel() const;
+            inline const labelList& liquidToGasIndex() const;
+            inline const labelList& gasToLiquidIndex() const;
+            inline const boolList& isLiquidFuel() const;
 
             inline const bool& twoD() const;
             inline const vector& axisOfSymmetry() const;

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -90,13 +90,13 @@ Foam::Keyed<T>::createList(const List<T>& lst, const label key)
 
 template<class T>
 inline Foam::List<Foam::Keyed<T> >
-Foam::Keyed<T>::createList(const List<T>& lst, const List<label>& keys)
+Foam::Keyed<T>::createList(const List<T>& lst, const labelList& keys)
 {
     if (lst.size() != keys.size())
     {
         FatalErrorIn
         (
-            "Foam::Keyed<T>::createList(const List<T>&, const List<label>&)"
+            "Foam::Keyed<T>::createList(const List<T>&, const labelList&)"
         )
             << "size mismatch adding keys to a list:" << nl
             << "List has size " << lst.size()

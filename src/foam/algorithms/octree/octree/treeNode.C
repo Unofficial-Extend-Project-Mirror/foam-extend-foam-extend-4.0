@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -269,7 +269,7 @@ const Foam::treeLeaf<Type>* Foam::treeNode<Type>::findLeafLineOctant
                     << " with start:" << start << "  subLeaf:" << 0 << endl;
             }
 
-            return NULL;
+            return nullptr;
         }
         else
         {
@@ -286,7 +286,7 @@ const Foam::treeLeaf<Type>* Foam::treeNode<Type>::findLeafLineOctant
         << " does not contain start " << start
         << abort(FatalError);
 
-    return NULL;
+    return nullptr;
 }
 
 
@@ -304,7 +304,7 @@ Foam::treeNode<Type>::treeNode(const treeBoundBox& bb)
 {
     for (label octantI=0; octantI<8; octantI++)
     {
-        subNodes_[octantI] = NULL;
+        subNodes_[octantI] = nullptr;
         setVolType(octantI, octree<Type>::UNKNOWN);
     }
 }
@@ -417,7 +417,7 @@ void Foam::treeNode<Type>::distribute
         if (subLeafPtr->size() == 0)
         {
             // Contains no data. Delete.
-            setLeafPtr(octant, NULL);
+            setLeafPtr(octant, nullptr);
             delete subLeafPtr;
             top.setLeaves(top.nLeaves() - 1);
         }
@@ -1105,7 +1105,7 @@ const Foam::treeLeaf<Type>* Foam::treeNode<Type>::findLeafLine
                     << ". Returning with start:" << start << "  subLeaf:"
                     << 0 << endl;
             }
-            return NULL;
+            return nullptr;
         }
 
         // Check if start and <end> equal
@@ -1118,7 +1118,7 @@ const Foam::treeLeaf<Type>* Foam::treeNode<Type>::findLeafLine
                     << ". Returning with start:" << start << "  subLeaf:"
                     << 0 << endl;
             }
-            return NULL;
+            return nullptr;
         }
 
         if (iter >= 4)
@@ -1173,7 +1173,7 @@ const Foam::treeLeaf<Type>* Foam::treeNode<Type>::findLeafLine
         << "start:" << start << "  end:" << end
         << abort(FatalError);
 
-    return NULL;
+    return nullptr;
 }
 
 
@@ -1279,7 +1279,7 @@ template <class Type>
 void Foam::treeNode<Type>::writeOBJ
 (
     Ostream& os,
-    const label level,
+    const int level,
     label& vertNo
 ) const
 {
@@ -1330,7 +1330,7 @@ Foam::Istream& Foam::operator>>(Istream& is, treeNode<Type>& oc)
 {
     for (label octant = 0; octant < 8; octant++)
     {
-        oc.subNodes_[octant] = NULL;
+        oc.subNodes_[octant] = nullptr;
     }
 
     is >> oc.bb();

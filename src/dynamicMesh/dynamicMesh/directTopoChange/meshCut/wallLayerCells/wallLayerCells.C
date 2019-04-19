@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ bool Foam::wallLayerCells::usesCoupledPatch(const label cellI) const
 Foam::wallLayerCells::wallLayerCells
 (
     const polyMesh& mesh,
-    const List<word>& patchNames,
+    const wordList& patchNames,
     const label nLayers
 )
 :

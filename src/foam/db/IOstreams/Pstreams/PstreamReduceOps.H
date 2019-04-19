@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -244,7 +244,7 @@ void reduce
 
 void reduce
 (
-    List<label>& Value,
+    labelList& Value,
     const sumOp<List<label> >& bop,
     const int tag = Pstream::msgType(),
     const label comm = Pstream::worldComm
@@ -252,7 +252,7 @@ void reduce
 
 void reduce
 (
-    List<label>& Value,
+    labelList& Value,
     const minOp<List<label> >& bop,
     const int tag = Pstream::msgType(),
     const label comm = Pstream::worldComm
@@ -260,7 +260,7 @@ void reduce
 
 void reduce
 (
-    List<label>& Value,
+    labelList& Value,
     const maxOp<List<label> >& bop,
     const int tag = Pstream::msgType(),
     const label comm = Pstream::worldComm

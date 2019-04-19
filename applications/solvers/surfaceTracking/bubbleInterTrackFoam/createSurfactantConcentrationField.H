@@ -1,7 +1,7 @@
 
 // Volume surfactant concentration
 
-volScalarField* CPtr = NULL;
+volScalarField* CPtr = nullptr;
 
 if(!interface.cleanInterface() && interface.surfactant().soluble())
 {

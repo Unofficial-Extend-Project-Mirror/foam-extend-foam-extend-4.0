@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ greyDiffusiveRadiationMixedFvPatchScalarField
     mixedFvPatchScalarField(p, iF),
     TName_("undefinedT"),
     emissivity_(0.0),
-    sumOutgoingAnglesPtr_(NULL)
+    sumOutgoingAnglesPtr_(nullptr)
 {
     refValue() = 0.0;
     refGrad() = 0.0;
@@ -116,7 +116,7 @@ greyDiffusiveRadiationMixedFvPatchScalarField
     mixedFvPatchScalarField(ptf, p, iF, mapper),
     TName_(ptf.TName_),
     emissivity_(ptf.emissivity_),
-    sumOutgoingAnglesPtr_(NULL)
+    sumOutgoingAnglesPtr_(nullptr)
 {}
 
 
@@ -131,7 +131,7 @@ greyDiffusiveRadiationMixedFvPatchScalarField
     mixedFvPatchScalarField(p, iF),
     TName_(dict.lookup("T")),
     emissivity_(readScalar(dict.lookup("emissivity"))),
-    sumOutgoingAnglesPtr_(NULL)
+    sumOutgoingAnglesPtr_(nullptr)
 {
     if (dict.found("refValue"))
     {
@@ -173,7 +173,7 @@ greyDiffusiveRadiationMixedFvPatchScalarField
     mixedFvPatchScalarField(ptf),
     TName_(ptf.TName_),
     emissivity_(ptf.emissivity_),
-    sumOutgoingAnglesPtr_(NULL)
+    sumOutgoingAnglesPtr_(nullptr)
 {}
 
 
@@ -187,7 +187,7 @@ greyDiffusiveRadiationMixedFvPatchScalarField
     mixedFvPatchScalarField(ptf, iF),
     TName_(ptf.TName_),
     emissivity_(ptf.emissivity_),
-    sumOutgoingAnglesPtr_(NULL)
+    sumOutgoingAnglesPtr_(nullptr)
 {}
 
 

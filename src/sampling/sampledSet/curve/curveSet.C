@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------* \
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -65,7 +65,7 @@ bool Foam::curveSet::trackToBoundary
         const vector offset =
             sampleCoords_[sampleI + 1] - sampleCoords_[sampleI];
 
-        const scalar smallDist = mag(tol*offset);
+        const scalar smallDist = mag(tol_()*offset);
 
         point oldPos = trackPt;
         label facei = -1;
@@ -174,7 +174,7 @@ void Foam::curveSet::calcSamples
         {
             const vector offset =
                 sampleCoords_[sampleI+1] - sampleCoords_[sampleI];
-            const scalar smallDist = mag(tol*offset);
+            const scalar smallDist = mag(tol_()*offset);
 
 
             // Get all boundary intersections

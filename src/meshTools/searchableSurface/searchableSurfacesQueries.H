@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -83,7 +83,7 @@ class searchableSurfacesQueries
             const labelList& surfacesToTest,
             const scalar initialDistSqr,
             List<vector>& p,
-            List<scalar>& y,
+            scalarList& y,
             vector& pSum,
             const label ihi,
             const scalar fac
@@ -101,7 +101,7 @@ class searchableSurfacesQueries
             const scalar convergenceDistSqr,
             const label maxIter,
             List<vector>& p,
-            List<scalar>& y
+            scalarList& y
         );
 
         //static void findAllIntersections

@@ -1,25 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.1
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+                     Author | F.Juretic (franjo.juretic@c-fields.com)
+                  Copyright | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    foam-extend is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -214,7 +217,7 @@ void meshOctreeModifier::loadDistribution(const direction usedType)
 
         List<meshOctreeCubeBasic> mc;
 
-        IPstream fromOtherProc(Pstream::blocking, iter.key());
+        IPstream fromOtherProc(Pstream::commsTypes::blocking, iter.key());
 
         fromOtherProc >> mc;
 
@@ -254,7 +257,7 @@ void meshOctreeModifier::loadDistribution(const direction usedType)
 
         OPstream toOtherProc
         (
-            Pstream::blocking,
+            Pstream::commsTypes::blocking,
             procI,
             sendCoordinates.byteSize()
         );
@@ -270,7 +273,7 @@ void meshOctreeModifier::loadDistribution(const direction usedType)
 
         List<meshOctreeCubeBasic> mc;
 
-        IPstream fromOtherProc(Pstream::blocking, iter.key());
+        IPstream fromOtherProc(Pstream::commsTypes::blocking, iter.key());
 
         fromOtherProc >> mc;
 
@@ -309,7 +312,7 @@ void meshOctreeModifier::loadDistribution(const direction usedType)
 
         OPstream toOtherProc
         (
-            Pstream::blocking,
+            Pstream::commsTypes::blocking,
             procI,
             sendCoordinates.byteSize()
         );

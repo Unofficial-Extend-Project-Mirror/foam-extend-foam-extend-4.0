@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ public:
         void writeScalarField
         (
             ensightFile&,
-            const List<scalar>& field,
+            const scalarList& field,
             bool useFaceData = false
         ) const;
 
@@ -120,9 +120,9 @@ public:
         void writeVectorField
         (
             ensightFile&,
-            const List<scalar>& field0,
-            const List<scalar>& field1,
-            const List<scalar>& field2,
+            const scalarList& field0,
+            const scalarList& field1,
+            const scalarList& field2,
             bool useFaceData = false
         ) const;
 

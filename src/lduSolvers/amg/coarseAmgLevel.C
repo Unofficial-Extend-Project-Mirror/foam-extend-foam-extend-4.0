@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -193,18 +193,24 @@ void Foam::coarseAmgLevel::solve
 {
     lduSolverPerformance coarseSolverPerf;
 
-    label maxIter = Foam::min(2*policyPtr_->minCoarseEqns(), 1000);
-
     dictionary topLevelDict;
-    topLevelDict.add("minIter", 1);
-    topLevelDict.add("maxIter", maxIter);
+    topLevelDict.add("preconditioner", "ILUC0");
+    topLevelDict.add("minIter", 0);
+    topLevelDict.add("maxIter", 500);
     topLevelDict.add("tolerance", tolerance);
     topLevelDict.add("relTol", relTol);
+
+    // Top-level round-off error control.  HJ, 28/May/2018
+    x = 0;
 
     // Switch off debug in top-level direct solve
     label oldDebug = blockLduMatrix::debug();
 
     if (blockLduMatrix::debug >= 4)
+    {
+        blockLduMatrix::debug = 2;
+    }
+    else if (blockLduMatrix::debug == 3)
     {
         blockLduMatrix::debug = 1;
     }
@@ -215,10 +221,6 @@ void Foam::coarseAmgLevel::solve
 
     if (matrixPtr_->matrix().symmetric())
     {
-        // Note: must change preconditioner to C0.  HJ. 10/Oct/2017
-        // topLevelDict.add("preconditioner", "Cholesky");
-        topLevelDict.add("preconditioner", "ILUC0");
-
         coarseSolverPerf = cgSolver
         (
             "topLevelCorr",
@@ -231,8 +233,6 @@ void Foam::coarseAmgLevel::solve
     }
     else
     {
-        topLevelDict.add("preconditioner", "ILUC0");
-
         coarseSolverPerf = bicgStabSolver
         (
             "topLevelCorr",
@@ -242,6 +242,21 @@ void Foam::coarseAmgLevel::solve
             matrixPtr_->interfaceFields(),
             topLevelDict
         ).solve(x, b, cmpt);
+    }
+
+    // Check for convergence
+    const scalar magInitialRes = mag(coarseSolverPerf.initialResidual());
+    const scalar magFinalRes = mag(coarseSolverPerf.finalResidual());
+
+    if (magFinalRes > magInitialRes && magInitialRes > 1e-12)
+    {
+        if (blockLduMatrix::debug)
+        {
+            Info<< "Divergence in top AMG level" << endl;
+            coarseSolverPerf.print();
+        }
+
+        x = 0;
     }
 
     // Restore debug

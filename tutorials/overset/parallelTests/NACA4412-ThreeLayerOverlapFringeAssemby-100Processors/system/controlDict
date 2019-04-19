@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.1                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -44,6 +44,12 @@ timePrecision   6;
 
 runTimeModifiable yes;
 
+libs
+(
+    "liblduSolvers.so"
+);
+
+
 functions
 (
     forces
@@ -59,16 +65,17 @@ functions
 
         outputControl timeStep;
         outputInterval 1;
-        log	true;
+        log    true;
 
         CofR (0.25 0 0); // Note sure because of scaling
         liftDir (-0.239719744 0 0.970842132);
         dragDir (0.970842132  0 0.239719744);
         magUInf 27.13;
-        lRef	0.901;
-        Aref	0.815866; // Not sure because of scaling
+        lRef    0.901;
+        Aref    0.815866; // Not sure because of scaling
         pitchAxis (0 1 0);
     }
 );
+
 
 // ************************************************************************* //

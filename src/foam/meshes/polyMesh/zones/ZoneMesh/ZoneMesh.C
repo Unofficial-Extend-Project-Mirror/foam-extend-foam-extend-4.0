@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ ZoneMesh<ZoneType, MeshType>::ZoneMesh
     PtrList<ZoneType>(),
     regIOobject(io),
     mesh_(mesh),
-    zoneMapPtr_(NULL)
+    zoneMapPtr_(nullptr)
 {
     if
     (
@@ -146,7 +146,7 @@ ZoneMesh<ZoneType, MeshType>::ZoneMesh
     PtrList<ZoneType>(size),
     regIOobject(io),
     mesh_(mesh),
-    zoneMapPtr_(NULL)
+    zoneMapPtr_(nullptr)
 {}
 
 
@@ -162,26 +162,30 @@ ZoneMesh<ZoneType, MeshType>::ZoneMesh
     PtrList<ZoneType>(),
     regIOobject(io),
     mesh_(mesh),
-    zoneMapPtr_(NULL)
+    zoneMapPtr_(nullptr)
 {
-    PtrList<ZoneType>& zones = *this;
-
     PtrList<entry> zoneEntries(is);
-    zones.setSize(zoneEntries.size());
 
-    forAll(zones, zoneI)
+    if (!zoneEntries.empty())
     {
-        zones.set
-        (
-            zoneI,
-            ZoneType::New
+        PtrList<ZoneType>& zones = *this;
+
+        zones.setSize(zoneEntries.size());
+
+        forAll(zones, zoneI)
+        {
+            zones.set
             (
-                zoneEntries[zoneI].keyword(),
-                zoneEntries[zoneI].dict(),
                 zoneI,
-                *this
-            )
-        );
+                ZoneType::New
+                (
+                    zoneEntries[zoneI].keyword(),
+                    zoneEntries[zoneI].dict(),
+                    zoneI,
+                    *this
+                )
+            );
+        }
     }
 }
 

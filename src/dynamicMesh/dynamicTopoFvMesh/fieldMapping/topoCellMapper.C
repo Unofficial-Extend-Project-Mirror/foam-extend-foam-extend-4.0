@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -319,12 +319,12 @@ topoCellMapper::topoCellMapper
     tMapper_(mapper),
     direct_(false),
     sizeBeforeMapping_(mpm.nOldCells()),
-    directAddrPtr_(NULL),
-    interpolationAddrPtr_(NULL),
-    weightsPtr_(NULL),
-    insertedCellLabelsPtr_(NULL),
-    volumesPtr_(NULL),
-    centresPtr_(NULL)
+    directAddrPtr_(nullptr),
+    interpolationAddrPtr_(nullptr),
+    weightsPtr_(nullptr),
+    insertedCellLabelsPtr_(nullptr),
+    volumesPtr_(nullptr),
+    centresPtr_(nullptr)
 {
     // Fetch offset sizes from topoMapper
     const labelList& sizes = tMapper_.cellSizes();

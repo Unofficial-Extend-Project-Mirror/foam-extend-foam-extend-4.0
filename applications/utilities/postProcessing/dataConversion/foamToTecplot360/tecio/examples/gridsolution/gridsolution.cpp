@@ -89,7 +89,6 @@ int main()
     /* DOCEND */
 
     /* DOCSTART:gridsolution_grid_tecdat.txt*/
-
     /* TECDAT Parameters */
     double  Phi = 0.5 * (1.0 + sqrt(5.0));
     double  Pi  = 3.141592653578;
@@ -105,8 +104,8 @@ int main()
         Z[Count] = Phi + 1.0;
         Count++;
 
-        X[Count] = -X[Count - 1];
-        Y[Count] = -Y[Count - 1];
+        X[Count] = -X[Count - 1];	
+        Y[Count] = -Y[Count - 1];	
         Z[Count] = -Z[Count - 1];
         Count++;
 
@@ -115,26 +114,25 @@ int main()
         Z[Count] = Phi - 1.0;
         Count++;
 
-        X[Count] = -X[Count - 1];
-        Y[Count] = -Y[Count - 1];
+        X[Count] = -X[Count - 1];	
+        Y[Count] = -Y[Count - 1];	
         Z[Count] = -Z[Count - 1];
         Count++;
     }
 
     INTEGER4  IsDouble = 1;
-
+    
     I = TECDAT112(&NumPts, X, &IsDouble);
     I = TECDAT112(&NumPts, Y, &IsDouble);
     I = TECDAT112(&NumPts, Z, &IsDouble);
-
+    
     delete X;
     delete Y;
     delete Z;
-
     /* DOCEND */
 
     /* DOCSTART:gridsolution_grid_facenodes.txt*/
-    /* TecPoly Parameters */
+    /* TecPolyFace Parameters */
 
     /* Create a FaceNodes array, dimensioned by the total number
      * of face nodes in the zone.
@@ -225,7 +223,6 @@ int main()
     FaceNodes[n++] = 9;
     FaceNodes[n++] = 13;
     FaceNodes[n++] = 17;
-
     /* DOCEND */
 
     /* Specify the number of nodes for each face, and the right and
@@ -277,20 +274,16 @@ int main()
     FaceLeftElems[10] = 0;
     FaceLeftElems[11] = 1;
 
-    I = TECPOLY112(FaceNodeCounts,
-                   FaceNodes,
-                   FaceLeftElems,
-                   FaceRightElems,
-                   NULL, /* No boundary connections. */
-                   NULL,
-                   NULL);
+    I = TECPOLYFACE112(&NumFaces,
+                       FaceNodeCounts,
+                       FaceNodes,
+                       FaceLeftElems,
+                       FaceRightElems);
 
     delete FaceNodes;
     delete FaceLeftElems;
     delete FaceRightElems;
-
     /* DOCEND */
-
 
     /* DOCSTART:gridsolution_grid_tecend.txt*/
     I = TECEND112();
@@ -348,7 +341,6 @@ int main()
         /* DOCEND */
 
         /* DOCSTART:gridsolution_solution_tecdat.txt*/
-
         /* TECDAT Parameters */
         double *P = new double[NumPts];
         double *T = new double[NumPts];
@@ -364,13 +356,12 @@ int main()
 
         delete P;
         delete T;
-
         /* DOCEND */
 
         /* DOCSTART:gridsolution_solution_tecend.txt*/
         I = TECEND112();
         /* DOCEND */
     }
-
+        
     return 0;
 }

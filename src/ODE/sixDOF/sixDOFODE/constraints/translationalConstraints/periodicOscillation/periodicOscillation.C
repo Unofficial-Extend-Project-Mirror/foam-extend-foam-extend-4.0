@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ void Foam::periodicOscillation::stabilise
     x -= (x & dir_)*dir_;
 
     // ... then add the correct displacement
-    x += dir_*sin(omega_*t + phi_);
+    x += dir_*a_*sin(omega_*t + phi_);
 
 
     // Set the velocity according to periodic oscillation
@@ -140,7 +140,7 @@ void Foam::periodicOscillation::stabilise
     u -= (u & dir_)*dir_;
 
     // ... then add the correct velocity
-    u += dir_*cos(omega_*t + phi_);
+    u += dir_*a_*omega_*cos(omega_*t + phi_);
 }
 
 

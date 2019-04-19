@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -30,12 +30,12 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-inline const List<word>& parcel::liquidNames() const
+inline const wordList& parcel::liquidNames() const
 {
     return liquidComponents_;
 }
 
-inline const List<word>& parcel::fuelNames() const
+inline const wordList& parcel::fuelNames() const
 {
     return liquidComponents_;
 }

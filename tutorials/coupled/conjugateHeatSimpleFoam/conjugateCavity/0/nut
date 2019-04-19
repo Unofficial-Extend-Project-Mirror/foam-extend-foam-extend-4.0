@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     4.0                                |
+|  \\    /   O peration     | Version:     4.1                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -127,7 +127,7 @@ boundaryField
 {
     movingWall
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -135,7 +135,7 @@ boundaryField
     }
     left
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -143,7 +143,7 @@ boundaryField
     }
     right
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
@@ -151,7 +151,7 @@ boundaryField
     }
     bottom
     {
-        type            nutWallFunction;
+        type            nutkWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;

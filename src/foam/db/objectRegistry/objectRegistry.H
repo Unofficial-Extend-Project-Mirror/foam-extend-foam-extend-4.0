@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -51,11 +51,7 @@ namespace Foam
 class objectRegistry
 :
     public regIOobject,
-#ifndef SWIG
     public HashTable<regIOobject*>
-#else
-    public HashTable<regIOobject*, word, string_hash>
-#endif
 {
     // Private Data
 
@@ -190,6 +186,9 @@ public:
             //- Lookup and return all objects of the given Type
             template<class Type>
             HashTable<Type*> lookupClass(const bool strict = false);
+
+            //- Is the object with name found?
+            virtual bool found(const word& name) const;
 
             //- Is the named Type found?
             template<class Type>

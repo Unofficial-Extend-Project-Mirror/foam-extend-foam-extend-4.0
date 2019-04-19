@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ Foam::List<Foam::word> Foam::ensightPart::elemTypes_(0);
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-bool Foam::ensightPart::isFieldDefined(const List<scalar>& field) const
+bool Foam::ensightPart::isFieldDefined(const scalarList& field) const
 {
     forAll(elemLists_, elemI)
     {

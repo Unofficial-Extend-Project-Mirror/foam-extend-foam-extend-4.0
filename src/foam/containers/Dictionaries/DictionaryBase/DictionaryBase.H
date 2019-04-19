@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -111,10 +111,10 @@ public:
             //- Search DictionaryBase for given keyword
             bool found(const word&) const;
 
-            //- Find and return an entry if present, otherwise return NULL
+            //- Find and return an entry if present, otherwise return nullptr
             const T* lookupPtr(const word&) const;
 
-            //- Find and return an entry if present, otherwise return NULL
+            //- Find and return an entry if present, otherwise return nullptr
             T* lookupPtr(const word&);
 
             //- Find and return entry
@@ -136,7 +136,7 @@ public:
             void append(const word&, T*);
 
             //- Remove and return entry specified by keyword.
-            //  Return NULL if the keyword was not found.
+            //  Return nullptr if the keyword was not found.
             T* remove(const word&);
 
             //- Clear the dictionary

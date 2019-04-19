@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ int64_t Foam::readInt64(Istream& is)
 
 bool Foam::read(const char* buf, int64_t& s)
 {
-    char *endptr = NULL;
+    char *endptr = nullptr;
     errno = 0;
     intmax_t l = strtoimax(buf, &endptr, 10);
     s = int64_t(l);
@@ -113,5 +113,19 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const long i)
     return os;
 }
 #endif
+
+#if defined(mingw)
+Foam::Istream& Foam::operator>>(Istream& is, off_t& i)
+{
+    return operator>>(is, i);
+}
+
+Foam::Ostream& Foam::operator<<(Ostream& os, const off_t i)
+{
+    os << i;
+    return os;
+}
+#endif
+
 
 // ************************************************************************* //

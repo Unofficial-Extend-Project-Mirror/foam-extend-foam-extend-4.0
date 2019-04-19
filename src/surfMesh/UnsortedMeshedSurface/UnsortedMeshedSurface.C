@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -159,7 +159,7 @@ Foam::UnsortedMeshedSurface<Face>::UnsortedMeshedSurface
 (
     const Xfer< pointField >& pointLst,
     const Xfer< List<Face> >& faceLst,
-    const Xfer< List<label> >& zoneIds,
+    const Xfer< labelList >& zoneIds,
     const Xfer< surfZoneIdentifierList >& zoneTofc
 )
 :
@@ -413,7 +413,7 @@ void Foam::UnsortedMeshedSurface<Face>::remapFaces
         }
         else
         {
-            List<label> newZones(faceMap.size());
+            labelList newZones(faceMap.size());
 
             forAll(faceMap, faceI)
             {
@@ -556,7 +556,7 @@ Foam::UnsortedMeshedSurface<Face>::subsetMesh
 
     // Renumber face node labels and compact
     List<Face>  newFaces(faceMap.size());
-    List<label> newZones(faceMap.size());
+    labelList newZones(faceMap.size());
 
     forAll(faceMap, faceI)
     {
@@ -601,7 +601,7 @@ void Foam::UnsortedMeshedSurface<Face>::reset
 (
     const Xfer< pointField >& pointLst,
     const Xfer< List<Face> >& faceLst,
-    const Xfer< List<label> >& zoneIds
+    const Xfer< labelList >& zoneIds
 )
 {
     ParentType::reset
@@ -623,7 +623,7 @@ void Foam::UnsortedMeshedSurface<Face>::reset
 (
     const Xfer< List<point> >& pointLst,
     const Xfer< List<Face> >& faceLst,
-    const Xfer< List<label> >& zoneIds
+    const Xfer< labelList >& zoneIds
 )
 {
     ParentType::reset

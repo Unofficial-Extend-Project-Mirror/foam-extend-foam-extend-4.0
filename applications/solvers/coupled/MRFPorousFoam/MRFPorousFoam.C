@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 
             // Solving potential flow equation and correcting velocities
             phi = (fvc::interpolate(U) & mesh.Sf());
-            
+
             solve
             (
                 tpEqn()
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
                 + tpEqn().flux()
                 + tpresSource;
         }
-        
+
         // Make flux relative in rotating zones
         mrfZones.relativeFlux(phi);
 

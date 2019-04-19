@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -32,6 +32,9 @@ Author
     Reorganisation by Hrvoje Jasak
     Complete rewrite of methodology, Hrvoje Jasak
 
+Contributors
+    Inno Gatin, FMENA, Zagreb. All rights reserved.
+
 SourceFiles
     immersedBoundaryPolyPatch.C
 
@@ -46,6 +49,8 @@ SourceFiles
 #include "triSurfaceSearch.H"
 #include "standAlonePatch.H"
 #include "Switch.H"
+#include "volFields.H"
+#include "immersedBoundaryCorrectedMeshFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -81,10 +86,10 @@ class immersedBoundaryPolyPatch
 
     // Static data
 
-        //- Live volume factor
-        //  Fraction of face/cell size within the IB for which the face/cell is
-        //  considered to be live
-        static const debug::tolerancesSwitch liveFactor_;
+        //- Search span factor
+        //  Factor used to multiply the span of the cell to get the tri-seach
+        //  span
+        static const debug::tolerancesSwitch spanFactor_;
 
 
     // Demand-driven data
@@ -134,20 +139,17 @@ class immersedBoundaryPolyPatch
 
         // Corrected mesh geometry
 
-            //- Corrected cell centres
-            mutable vectorField* correctedCellCentresPtr_;
-
-            //- Corrected face centres
-            mutable vectorField* correctedFaceCentresPtr_;
-
-            //- Corrected cell volumes
-            mutable scalarField* correctedCellVolumesPtr_;
-
-            //- Corrected face areas
-            mutable vectorField* correctedFaceAreasPtr_;
+            // MeshObject derived object that holds corrected global field data
+            const immersedBoundaryCorrectedMeshFields& correctedFields_;
 
             //- Corrected face areas for the immersed boundary patch
             mutable vectorField* correctedIbPatchFaceAreasPtr_;
+
+            //- Topo change index, used to update the corrected fields
+            //  MeshObject consistently.
+            //  NOTE: time index cannot be used since multiple topo changes per
+            //  time-step are possible (IG 28/OCT/2018)
+            mutable label topoChangeIndex_;
 
 
         // Immersed boundary motion
@@ -209,13 +211,6 @@ public:
             const polyBoundaryMesh& bm
         );
 
-        //- Construct as copy, resetting the boundary mesh
-        immersedBoundaryPolyPatch
-        (
-            const immersedBoundaryPolyPatch&,
-            const polyBoundaryMesh&
-        );
-
         //- Construct given the original patch and resetting the
         //  face list and boundary mesh information
         immersedBoundaryPolyPatch
@@ -225,6 +220,16 @@ public:
             const label index,
             const label newSize,
             const label newStart
+        );
+
+        //- Construct as copy
+        immersedBoundaryPolyPatch(const immersedBoundaryPolyPatch&);
+
+        //- Construct as copy, resetting the boundary mesh
+        immersedBoundaryPolyPatch
+        (
+            const immersedBoundaryPolyPatch&,
+            const polyBoundaryMesh&
         );
 
         //- Construct and return a clone, resetting the boundary mesh
@@ -298,6 +303,13 @@ public:
 
         // Immersed boundary patch data
 
+            //- Is the immersed boundary patch active?
+            //  (is the intersection patch calculated?)
+            bool active() const
+            {
+                return ibPatchPtr_ != nullptr;
+            }
+
             //- Return primitivePatch of cell-intersected faces
             //  Faces are calculated as intesection between the volume mesh
             //  and the ibMesh
@@ -351,7 +363,7 @@ public:
 
 
         // Corrected immersed patch geometry
-    
+
             //- Corrected ib patch face areas
             const vectorField& correctedIbPatchFaceAreas() const;
 

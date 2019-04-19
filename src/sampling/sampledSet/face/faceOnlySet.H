@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -61,6 +61,13 @@ class faceOnlySet
 
         //- End point
         point end_;
+
+
+    // Static data
+
+        //- Maximum number of steps for intersection search. Introduced to avoid
+        //  inifinite loops (IG 4/Dec/2018)
+        static const debug::optimisationSwitch maxNSteps_;
 
 
     // Private Member Functions

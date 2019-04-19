@@ -4,7 +4,7 @@
     boolList scaleDisp(nPoints(), true);
     label nScaled = nPoints();
 
-    List<bool> pistonPoint(newPoints.size(), false);
+    boolList pistonPoint(newPoints.size(), false);
 
     label pistonPtsIndex = pointZones().findZoneID("pistonPoints");
     const labelList& pistonPoints = pointZones()[pistonPtsIndex];

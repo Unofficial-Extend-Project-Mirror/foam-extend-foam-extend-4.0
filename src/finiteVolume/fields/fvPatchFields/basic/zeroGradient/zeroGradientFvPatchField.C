@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -65,9 +65,7 @@ zeroGradientFvPatchField<Type>::zeroGradientFvPatchField
     const dictionary& dict
 )
 :
-    // Do not read value from the dictionary even if it is there
-    // HJ, 30/Nov/2017
-    fvPatchField<Type>(p, iF)
+    fvPatchField<Type>(p, iF, dict)
 {
     fvPatchField<Type>::operator=(this->patchInternalField());
 }
