@@ -502,8 +502,8 @@ inline DiagTensorN<Cmpt, length> diag(const DiagTensorN<Cmpt, length>& dt)
 // template <class Cmpt, int length>
 // inline Cmpt sum(const DiagTensorN<Cmpt, length>& dt)
 // {
-//     Cmpt result=Cmpt::zero;
-//     for(register label i=0; i<DiagTensorN<Cmpt, length>::nComponents; i++)
+//     Cmpt result = Cmpt::zero;
+//     for(label i = 0; i < DiagTensorN<Cmpt, length>::nComponents; i++)
 //     {
 //         result += dt[i];
 //     }

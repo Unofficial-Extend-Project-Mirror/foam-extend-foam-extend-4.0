@@ -104,7 +104,7 @@ leastSquaresGrad<Type>::calcGrad
     const vectorField& ownLsIn = ownLs.internalField();
     const vectorField& neiLsIn = neiLs.internalField();
 
-    register label ownFaceI, neiFaceI;
+    label ownFaceI, neiFaceI;
 
     forAll (own, facei)
     {

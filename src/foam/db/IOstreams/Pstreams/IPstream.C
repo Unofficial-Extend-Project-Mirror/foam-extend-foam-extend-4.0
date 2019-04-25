@@ -65,9 +65,9 @@ inline void Foam::IPstream::readFromBuffer
         bufPosition_ = align + ((bufPosition_ - 1) & ~(align - 1));
     }
 
-    register const char* bufPtr = &buf_[bufPosition_];
-    register char* dataPtr = reinterpret_cast<char*>(data);
-    register size_t i = count;
+    const char* bufPtr = &buf_[bufPosition_];
+    char* dataPtr = reinterpret_cast<char*>(data);
+    size_t i = count;
     while (i--) *dataPtr++ = *bufPtr++;
     bufPosition_ += count;
     checkEof();

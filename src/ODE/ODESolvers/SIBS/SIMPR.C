@@ -44,9 +44,9 @@ void Foam::SIBS::SIMPR
     const label nEqns = ode_.nEqns();
 
     scalarSquareMatrix a(nEqns);
-    for (register label i=0; i<nEqns; i++)
+    for (label i=0; i<nEqns; i++)
     {
-        for (register label j=0; j<nEqns; j++)
+        for (label j=0; j<nEqns; j++)
         {
             a[i][j] = -h*dfdy[i][j];
         }
@@ -56,7 +56,7 @@ void Foam::SIBS::SIMPR
     labelList pivotIndices(nEqns);
     scalarSquareMatrix::LUDecompose(a, pivotIndices);
 
-    for (register label i=0; i<nEqns; i++)
+    for (label i=0; i<nEqns; i++)
     {
         yEnd[i] = h*(dydx[i] + h*dfdx[i]);
     }
@@ -66,7 +66,7 @@ void Foam::SIBS::SIMPR
     scalarField del(yEnd);
     scalarField ytemp(nEqns);
 
-    for (register label i=0; i<nEqns; i++)
+    for (label i=0; i<nEqns; i++)
     {
         ytemp[i] = y[i] + del[i];
     }
@@ -75,16 +75,16 @@ void Foam::SIBS::SIMPR
 
     ode_.derivatives(x, ytemp, yEnd);
 
-    for (register label nn=2; nn<=nSteps; nn++)
+    for (label nn=2; nn<=nSteps; nn++)
     {
-        for (register label i=0; i<nEqns; i++)
+        for (label i=0; i<nEqns; i++)
         {
             yEnd[i] = h*yEnd[i] - del[i];
         }
 
         simpleMatrix<scalar>::LUBacksubstitute(a, pivotIndices, yEnd);
 
-        for (register label i=0; i<nEqns; i++)
+        for (label i=0; i<nEqns; i++)
         {
             ytemp[i] += (del[i] += 2.0*yEnd[i]);
         }
@@ -93,14 +93,14 @@ void Foam::SIBS::SIMPR
 
         ode_.derivatives(x, ytemp, yEnd);
     }
-    for (register label i=0; i<nEqns; i++)
+    for (label i=0; i<nEqns; i++)
     {
         yEnd[i] = h*yEnd[i] - del[i];
     }
 
     simpleMatrix<scalar>::LUBacksubstitute(a, pivotIndices, yEnd);
 
-    for (register label i=0; i<nEqns; i++)
+    for (label i=0; i<nEqns; i++)
     {
         yEnd[i] += ytemp[i];
     }

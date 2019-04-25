@@ -43,7 +43,7 @@ inline void contractScalar(Cmpt& result, const VectorN<Cmpt, length>& t)
 {
     result = pTraits<Cmpt>::zero;
 
-    for (register int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         result += t[i];
     }
@@ -69,8 +69,8 @@ inline void contractScalar(Cmpt& result, const TensorN<Cmpt, length>& t)
 {
     result = pTraits<Cmpt>::zero;
 
-    register int j = 0;
-    for (register int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    int j = 0;
+    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         result += t[j];
         j += TensorN<Cmpt, length>::rowLength + 1;
@@ -97,7 +97,7 @@ inline void contractScalar(Cmpt& result, const DiagTensorN<Cmpt, length>& t)
 {
     result = pTraits<Cmpt>::zero;
 
-    for (register int i = 0; i < DiagTensorN<Cmpt, length>::rowLength; i++)
+    for (int i = 0; i < DiagTensorN<Cmpt, length>::rowLength; i++)
     {
         result += t[i];
     }
@@ -146,8 +146,8 @@ inline void contractLinear
     const TensorN<Cmpt, length>& t
 )
 {
-    register int j = 0;
-    for (register int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    int j = 0;
+    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         result[i] = t[j];
         j += TensorN<Cmpt, length>::rowLength + 1;
@@ -173,7 +173,7 @@ inline void contractLinear
     const DiagTensorN<Cmpt, length>& t
 )
 {
-    for (register int i = 0; i < DiagTensorN<Cmpt, length>::rowLength; i++)
+    for (int i = 0; i < DiagTensorN<Cmpt, length>::rowLength; i++)
     {
         result[i] = t[i];
     }
@@ -200,7 +200,7 @@ inline void contractLinear
 {
     for
     (
-        register int i = 0;
+        int i = 0;
         i < SphericalTensorN<Cmpt, length>::rowLength;
         i++
     )
@@ -227,7 +227,7 @@ inline VectorN<Cmpt, length> contractLinear
 template <class Cmpt, int length>
 inline void expandScalar(VectorN<Cmpt, length>& result, const Cmpt& v)
 {
-    for (register int i = 0; i < VectorN<Cmpt, length>::nComponents; i++)
+    for (int i = 0; i < VectorN<Cmpt, length>::nComponents; i++)
     {
         result[i] = v;
     }
@@ -240,8 +240,8 @@ inline void expandScalar(TensorN<Cmpt, length>& result, const Cmpt& v)
 {
     result = TensorN<Cmpt, length>::zero;
 
-    register int j = 0;
-    for (register int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    int j = 0;
+    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         result[j] = v;
         j += TensorN<Cmpt, length>::rowLength + 1;
@@ -253,7 +253,7 @@ inline void expandScalar(TensorN<Cmpt, length>& result, const Cmpt& v)
 template <class Cmpt, int length>
 inline void expandScalar(DiagTensorN<Cmpt, length>& result, const Cmpt& v)
 {
-    for (register int i = 0; i < DiagTensorN<Cmpt, length>::rowLength; i++)
+    for (int i = 0; i < DiagTensorN<Cmpt, length>::rowLength; i++)
     {
         result[i] = v;
     }
@@ -278,8 +278,8 @@ inline void expandLinear
 {
     result = TensorN<Cmpt, length>::zero;
 
-    register int j = 0;
-    for (register int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    int j = 0;
+    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         result[j] = v[i];
         j += TensorN<Cmpt, length>::rowLength + 1;
@@ -294,7 +294,7 @@ inline void expandLinear
     const VectorN<Cmpt, length>& v
 )
 {
-    for (register int i = 0; i < DiagTensorN<Cmpt, length>::rowLength; i++)
+    for (int i = 0; i < DiagTensorN<Cmpt, length>::rowLength; i++)
     {
         result[i] = v[i];
     }
@@ -311,7 +311,7 @@ inline void expandLinear
 {
     result[0] = pTraits<Cmpt>::zero;
 
-    for (register int i = 0; i < DiagTensorN<Cmpt, length>::rowLength; i++)
+    for (int i = 0; i < DiagTensorN<Cmpt, length>::rowLength; i++)
     {
         result[0] += v[i];
     }
@@ -330,9 +330,9 @@ inline void sumToDiag
 {
     result = VectorN<Cmpt, length>::zero;
 
-    for (register int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
-        for (register int j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
+        for (int j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
         {
             result[i] += t(i, j);
         }
@@ -360,9 +360,9 @@ inline void sumMagToDiag
 {
     result = VectorN<Cmpt, length>::zero;
 
-    for (register int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
-        for (register int j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
+        for (int j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
         {
             result[i] += Foam::mag(t(i, j));
         }

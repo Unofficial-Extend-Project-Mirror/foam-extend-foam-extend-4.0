@@ -71,7 +71,7 @@ Foam::janafThermo<equationOfState>::janafThermo(Istream& is)
 
     for
     (
-        register label coefLabel=0;
+        label coefLabel = 0;
         coefLabel<janafThermo<equationOfState>::nCoeffs_;
         coefLabel++
     )
@@ -81,7 +81,7 @@ Foam::janafThermo<equationOfState>::janafThermo(Istream& is)
 
     for
     (
-        register label coefLabel=0;
+        label coefLabel = 0;
         coefLabel<janafThermo<equationOfState>::nCoeffs_;
         coefLabel++
     )
@@ -112,7 +112,7 @@ Foam::Ostream& Foam::operator<<
 
     for
     (
-        register label coefLabel=0;
+        label coefLabel = 0;
         coefLabel<janafThermo<equationOfState>::nCoeffs_;
         coefLabel++
     )
@@ -124,7 +124,7 @@ Foam::Ostream& Foam::operator<<
 
     for
     (
-        register label coefLabel=0;
+        label coefLabel = 0;
         coefLabel<janafThermo<equationOfState>::nCoeffs_;
         coefLabel++
     )

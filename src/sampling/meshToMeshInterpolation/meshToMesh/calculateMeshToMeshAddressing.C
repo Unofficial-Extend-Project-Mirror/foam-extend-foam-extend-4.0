@@ -256,7 +256,7 @@ void meshToMesh::cellAddresses
     // point than the current cell
 
     // set curCell label to zero (start)
-    register label curCell = 0;
+    label curCell = 0;
 
     // set reference to cell to cell addressing
     const vectorField& centresFrom = fromMesh.cellCentres();

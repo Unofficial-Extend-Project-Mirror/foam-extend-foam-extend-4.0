@@ -208,7 +208,7 @@ surfaceInterpolationScheme<Type>::interpolate
 
     Field<Type>& sfi = sf.internalField();
 
-    for (register label fi=0; fi<P.size(); fi++)
+    for (label fi=0; fi<P.size(); fi++)
     {
         sfi[fi] = lambda[fi]*vfi[P[fi]] + y[fi]*vfi[N[fi]];
     }
@@ -283,7 +283,7 @@ surfaceInterpolationScheme<Type>::interpolate
 
     Field<Type>& sfi = sf.internalField();
 
-    for (register label fi=0; fi<P.size(); fi++)
+    for (label fi=0; fi<P.size(); fi++)
     {
         sfi[fi] = lambda[fi]*(vfi[P[fi]] - vfi[N[fi]]) + vfi[N[fi]];
     }

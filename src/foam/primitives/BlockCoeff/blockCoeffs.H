@@ -61,7 +61,7 @@ scalar sumMult
 
     typename BlockCoeff<Type>::multiply mult;
 
-    for (register label i = 0; i < f1.size(); i++)
+    for (label i = 0; i < f1.size(); i++)
     {
         result += mult(f1[i], f2[i]);
     }

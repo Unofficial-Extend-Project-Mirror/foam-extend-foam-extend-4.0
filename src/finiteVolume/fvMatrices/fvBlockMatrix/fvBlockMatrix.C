@@ -941,7 +941,7 @@ void Foam::fvBlockMatrix<Type>::insertAdjointConvection
     // (boundary) contributions - need to check. VV, 7/Apr/2016.
 
     // Loop through faces
-    register label own, nei;
+    label own, nei;
     forAll (neighbour, faceI)
     {
         own = owner[faceI];

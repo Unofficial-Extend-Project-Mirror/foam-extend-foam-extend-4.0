@@ -78,7 +78,7 @@ Foam::labelList Foam::polyMesh::facePatchFaceCells
     const label patchID
 ) const
 {
-    register bool found;
+    bool found;
 
     labelList FaceCells(patchFaces.size());
 

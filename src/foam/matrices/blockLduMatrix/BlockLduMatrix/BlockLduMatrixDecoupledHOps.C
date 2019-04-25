@@ -60,7 +60,7 @@ Foam::BlockLduMatrix<Type>::decoupledH(const Field<Type>& x) const
         {
             const scalarTypeField& activeUpper = Upper.asScalar();
 
-            for (register label coeffI = 0; coeffI < u.size(); coeffI++)
+            for (label coeffI = 0; coeffI < u.size(); coeffI++)
             {
                 result[u[coeffI]] -= mult(activeUpper[coeffI], x[l[coeffI]]);
             }
@@ -69,7 +69,7 @@ Foam::BlockLduMatrix<Type>::decoupledH(const Field<Type>& x) const
         {
             const linearTypeField& activeUpper = Upper.asLinear();
 
-            for (register label coeffI = 0; coeffI < u.size(); coeffI++)
+            for (label coeffI = 0; coeffI < u.size(); coeffI++)
             {
                 result[u[coeffI]] -= mult(activeUpper[coeffI], x[l[coeffI]]);
             }
@@ -83,7 +83,7 @@ Foam::BlockLduMatrix<Type>::decoupledH(const Field<Type>& x) const
         {
             const scalarTypeField& activeLower = Lower.asScalar();
 
-            for (register label coeffI = 0; coeffI < u.size(); coeffI++)
+            for (label coeffI = 0; coeffI < u.size(); coeffI++)
             {
                 result[u[coeffI]] -= mult(activeLower[coeffI], x[l[coeffI]]);
             }
@@ -92,7 +92,7 @@ Foam::BlockLduMatrix<Type>::decoupledH(const Field<Type>& x) const
         {
             const linearTypeField& activeLower = Lower.asLinear();
 
-            for (register label coeffI = 0; coeffI < u.size(); coeffI++)
+            for (label coeffI = 0; coeffI < u.size(); coeffI++)
             {
                 result[u[coeffI]] -= mult(activeLower[coeffI], x[l[coeffI]]);
             }
@@ -106,7 +106,7 @@ Foam::BlockLduMatrix<Type>::decoupledH(const Field<Type>& x) const
     {
         const scalarTypeField& activeUpper = Upper.asScalar();
 
-        for (register label coeffI = 0; coeffI < u.size(); coeffI++)
+        for (label coeffI = 0; coeffI < u.size(); coeffI++)
         {
             result[l[coeffI]] -= mult(activeUpper[coeffI], x[u[coeffI]]);
         }
@@ -115,7 +115,7 @@ Foam::BlockLduMatrix<Type>::decoupledH(const Field<Type>& x) const
     {
         const linearTypeField& activeUpper = Upper.asLinear();
 
-        for (register label coeffI = 0; coeffI < u.size(); coeffI++)
+        for (label coeffI = 0; coeffI < u.size(); coeffI++)
         {
             result[l[coeffI]] -= mult(activeUpper[coeffI], x[u[coeffI]]);
         }
@@ -152,7 +152,7 @@ Foam::BlockLduMatrix<Type>::decoupledFaceH(const Field<Type>& x) const
         {
             const scalarTypeField& activeUpper = Upper.asScalar();
 
-            for (register label coeffI = 0; coeffI < u.size(); coeffI++)
+            for (label coeffI = 0; coeffI < u.size(); coeffI++)
             {
                 // This can be optimised with a subtraction.
                 // Currently not done for clarity.  HJ, 31/Oct/2007
@@ -165,7 +165,7 @@ Foam::BlockLduMatrix<Type>::decoupledFaceH(const Field<Type>& x) const
         {
             const linearTypeField& activeUpper = Upper.asLinear();
 
-            for (register label coeffI = 0; coeffI < u.size(); coeffI++)
+            for (label coeffI = 0; coeffI < u.size(); coeffI++)
             {
                 // This can be optimised with a subtraction.
                 // Currently not done for clarity.  HJ, 31/Oct/2007
@@ -184,7 +184,7 @@ Foam::BlockLduMatrix<Type>::decoupledFaceH(const Field<Type>& x) const
             const scalarTypeField& activeUpper = Upper.asScalar();
             const scalarTypeField& activeLower = Lower.asScalar();
 
-            for (register label coeffI = 0; coeffI < u.size(); coeffI++)
+            for (label coeffI = 0; coeffI < u.size(); coeffI++)
             {
                 result[coeffI] =
                     mult(activeUpper[coeffI], x[u[coeffI]])
@@ -196,7 +196,7 @@ Foam::BlockLduMatrix<Type>::decoupledFaceH(const Field<Type>& x) const
             const linearTypeField& activeUpper = Upper.asLinear();
             const linearTypeField& activeLower = Lower.asLinear();
 
-            for (register label coeffI = 0; coeffI < u.size(); coeffI++)
+            for (label coeffI = 0; coeffI < u.size(); coeffI++)
             {
                 result[coeffI] =
                     mult(activeUpper[coeffI], x[u[coeffI]])

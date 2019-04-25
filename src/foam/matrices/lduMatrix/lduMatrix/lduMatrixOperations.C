@@ -39,7 +39,7 @@ void Foam::lduMatrix::sumDiag()
     const unallocLabelList& l = lduAddr().lowerAddr();
     const unallocLabelList& u = lduAddr().upperAddr();
 
-    for (register label odcI = 0; odcI < l.size(); odcI++)
+    for (label odcI = 0; odcI < l.size(); odcI++)
     {
         Diag[l[odcI]] += Lower[odcI];
         Diag[u[odcI]] += Upper[odcI];
@@ -56,7 +56,7 @@ void Foam::lduMatrix::negSumDiag()
     const unallocLabelList& l = lduAddr().lowerAddr();
     const unallocLabelList& u = lduAddr().upperAddr();
 
-    for (register label odcI = 0; odcI < l.size(); odcI++)
+    for (label odcI = 0; odcI < l.size(); odcI++)
     {
         Diag[l[odcI]] -= Lower[odcI];
         Diag[u[odcI]] -= Upper[odcI];
@@ -75,7 +75,7 @@ void Foam::lduMatrix::sumMagOffDiag
     const unallocLabelList& l = lduAddr().lowerAddr();
     const unallocLabelList& u = lduAddr().upperAddr();
 
-    for (register label odcI = 0; odcI < l.size(); odcI++)
+    for (label odcI = 0; odcI < l.size(); odcI++)
     {
         sumOff[u[odcI]] += mag(Lower[odcI]);
         sumOff[l[odcI]] += mag(Upper[odcI]);
@@ -302,7 +302,7 @@ void Foam::lduMatrix::operator*=(const scalarField& sf)
 
         const unallocLabelList& l = lduAddr().lowerAddr();
 
-        for (register label odcI = 0; odcI < upper.size(); odcI++)
+        for (label odcI = 0; odcI < upper.size(); odcI++)
         {
             upper[odcI] *= sf[l[odcI]];
         }
@@ -314,7 +314,7 @@ void Foam::lduMatrix::operator*=(const scalarField& sf)
 
         const unallocLabelList& u = lduAddr().upperAddr();
 
-        for (register label odcI = 0; odcI < lower.size(); odcI++)
+        for (label odcI = 0; odcI < lower.size(); odcI++)
         {
             lower[odcI] *= sf[u[odcI]];
         }
@@ -360,9 +360,9 @@ Foam::tmp<Foam::scalarField> Foam::lduMatrix::H1() const
         const scalar* __restrict__ lowerPtr = lower().begin();
         const scalar* __restrict__ upperPtr = upper().begin();
 
-        register const label nOdcIs = upper().size();
+        const label nOdcIs = upper().size();
 
-        for (register label odcI = 0; odcI < nOdcIs; odcI++)
+        for (label odcI = 0; odcI < nOdcIs; odcI++)
         {
             H1Ptr[uPtr[odcI]] -= lowerPtr[odcI];
             H1Ptr[lPtr[odcI]] -= upperPtr[odcI];

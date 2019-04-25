@@ -175,12 +175,12 @@ void Foam::selectionAmgPolicy::calcCoarsening()
     // Select the strongest coefficient in each row
     // (There is no need to operate in rows in the first 2 loops, but the
     // code is left row-wise for clarity)
-    for (register label i = 0; i < nRows; i++)
+    for (label i = 0; i < nRows; i++)
     {
         const scalar signDiag = sign(diag[i]);
 
         // Do lower triangle coefficient for the row
-        for (register label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
+        for (label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
         {
             const scalar magAij = mag(min(signDiag*lower[losortAddr[jp]], 0));
 
@@ -191,7 +191,7 @@ void Foam::selectionAmgPolicy::calcCoarsening()
         }
 
         // Do upper triangle coefficient for the row
-        for (register label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
+        for (label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
         {
             const scalar magAij = mag(min(signDiag*upper[ip], 0));
 
@@ -209,12 +209,12 @@ void Foam::selectionAmgPolicy::calcCoarsening()
     // (epsilonStrongCoeff_)
     labelList strongCoeffCounter(nRows, 0);
 
-    for (register label i = 0; i < nRows; i++)
+    for (label i = 0; i < nRows; i++)
     {
         const scalar signDiag = sign(diag[i]);
 
         // Do lower triangle coefficient for the row
-        for (register label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
+        for (label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
         {
             const scalar magAij = mag(min(signDiag*lower[losortAddr[jp]], 0));
 
@@ -251,12 +251,12 @@ void Foam::selectionAmgPolicy::calcCoarsening()
     strongCoeffCounter = 0;
 
     // Fill in the empty arrays of the strong matrix
-    for (register label i = 0; i < nRows; i++)
+    for (label i = 0; i < nRows; i++)
     {
         const scalar signDiag = sign(diag[i]);
 
         // Do lower triangle coefficient for the row
-        for (register label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
+        for (label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
         {
             const scalar magAij = mag(min(signDiag*lower[losortAddr[jp]], 0));
 
@@ -518,7 +518,7 @@ void Foam::selectionAmgPolicy::calcCoarsening()
     // Start row assembly
     pRow[0] = 0;
 
-    for (register label i = 0; i < nRows; i++)
+    for (label i = 0; i < nRows; i++)
     {
         label rowCount = pRow[i];
 
@@ -529,7 +529,7 @@ void Foam::selectionAmgPolicy::calcCoarsening()
         signDii = sign(diag[i]);
 
         // Do lower triangle coefficient for the row
-        for (register label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
+        for (label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
         {
             // Adjust sign of off-diag coeff
             Dij = signDii*lower[losortAddr[jp]];
@@ -541,7 +541,7 @@ void Foam::selectionAmgPolicy::calcCoarsening()
         }
 
         // Do upper triangle coefficient for the row
-        for (register label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
+        for (label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
         {
             // Adjust sign of off-diag coeff
             Dij = signDii*upper[ip];
@@ -561,7 +561,7 @@ void Foam::selectionAmgPolicy::calcCoarsening()
 
             for
             (
-                register label sip = strongRow[i];
+                label sip = strongRow[i];
                 sip < strongRow[i + 1];
                 sip++
             )
@@ -577,7 +577,7 @@ void Foam::selectionAmgPolicy::calcCoarsening()
             // Calculate interpolation weights.
             for
             (
-                register label sip = strongRow[i];
+                label sip = strongRow[i];
                 sip < strongRow[i + 1];
                 sip++
             )
@@ -644,7 +644,7 @@ void Foam::selectionAmgPolicy::calcCoarsening()
         const labelList& prolongationRow = Pptr_->crAddr().rowStart();
         const scalarField& prolongationCoeff = Pptr_->coeffs();
 
-        for (register label rowI = 0; rowI < nRows; rowI++)
+        for (label rowI = 0; rowI < nRows; rowI++)
         {
             if (prolongationRow[rowI] == prolongationRow[rowI + 1])
             {

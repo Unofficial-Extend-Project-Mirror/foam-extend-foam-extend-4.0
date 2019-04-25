@@ -94,7 +94,7 @@ tmp<BlockLduSystem<vector, vector> > leastSquaresGrad<scalar>::fvmGrad
     const vectorField& ownLsIn = ownLs.internalField();
     const vectorField& neiLsIn = neiLs.internalField();
 
-    register label owner, neighbour;
+    label owner, neighbour;
 
     forAll (nei, faceI)
     {

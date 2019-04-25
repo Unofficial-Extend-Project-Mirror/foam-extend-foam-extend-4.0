@@ -503,7 +503,7 @@ Foam::point Foam::face::centre(const pointField& meshPoints) const
     label nPoints = size();
 
     point centrePoint = point::zero;
-    for (register label pI = 0; pI < nPoints; pI++)
+    for (label pI = 0; pI < nPoints; pI++)
     {
         centrePoint += meshPoints[operator[](pI)];
     }
@@ -512,7 +512,7 @@ Foam::point Foam::face::centre(const pointField& meshPoints) const
     scalar sumA = 0;
     vector sumAc = vector::zero;
 
-    for (register label pI = 0; pI < nPoints; pI++)
+    for (label pI = 0; pI < nPoints; pI++)
     {
         const point& nextPoint = meshPoints[operator[]((pI + 1) % nPoints)];
 
@@ -567,7 +567,7 @@ Foam::vector Foam::face::normal(const pointField& p) const
 
     label nPoints = size();
 
-    register label pI;
+    label pI;
 
     point centrePoint = vector::zero;
     for (pI = 0; pI < nPoints; pI++)
@@ -690,7 +690,7 @@ Foam::scalar Foam::face::sweptVol
     point nextOldPoint = centreOldPoint;
     point nextNewPoint = centreNewPoint;
 
-    register label pI;
+    label pI;
 
     for (pI = 0; pI < nPoints; pI++)
     {

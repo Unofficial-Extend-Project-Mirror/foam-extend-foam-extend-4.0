@@ -826,7 +826,7 @@ void Foam::BlockCholeskyPrecon<Type>::ILUmultiply
     const unallocLabelList& lowerAddr = this->matrix_.lduAddr().lowerAddr();
     const unallocLabelList& losortAddr = this->matrix_.lduAddr().losortAddr();
 
-    register label losortCoeff;
+    label losortCoeff;
 
     forAll (lower, coeffI)
     {
@@ -875,7 +875,7 @@ void Foam::BlockCholeskyPrecon<Type>::ILUmultiplyTranspose
     const unallocLabelList& lowerAddr = this->matrix_.lduAddr().lowerAddr();
     const unallocLabelList& losortAddr = this->matrix_.lduAddr().losortAddr();
 
-    register label losortCoeff;
+    label losortCoeff;
 
     //HJ Not sure if the coefficient itself needs to be transposed.
     // HJ, 30/Oct/2007

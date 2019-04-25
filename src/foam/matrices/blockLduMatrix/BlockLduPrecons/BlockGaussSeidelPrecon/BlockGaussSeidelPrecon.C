@@ -148,10 +148,10 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
         true             // switch to lhs of system
     );
 
-    register label fStart, fEnd, curCoeff;
+    label fStart, fEnd, curCoeff;
 
     // Forward sweep
-    for (register label rowI = 0; rowI < nRows; rowI++)
+    for (label rowI = 0; rowI < nRows; rowI++)
     {
         Type& curX = x[rowI];
 
@@ -181,7 +181,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
     }
 
     // Reverse sweep
-    for (register label rowI = nRows - 1; rowI >= 0; rowI--)
+    for (label rowI = nRows - 1; rowI >= 0; rowI--)
     {
         Type& curX = x[rowI];
 
@@ -249,10 +249,10 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
         true             // switch to lhs of system
     );
 
-    register label fStart, fEnd, curCoeff;
+    label fStart, fEnd, curCoeff;
 
     // Forward sweep
-    for (register label rowI = 0; rowI < nRows; rowI++)
+    for (label rowI = 0; rowI < nRows; rowI++)
     {
         Type& curX = x[rowI];
 
@@ -280,7 +280,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
     }
 
     // Reverse sweep
-    for (register label rowI = nRows - 1; rowI >= 0; rowI--)
+    for (label rowI = nRows - 1; rowI >= 0; rowI--)
     {
         Type& curX = x[rowI];
 

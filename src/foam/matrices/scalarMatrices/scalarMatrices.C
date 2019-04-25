@@ -50,11 +50,11 @@ void Foam::multiply
 
     ans = scalarRectangularMatrix(A.n(), B.m(), scalar(0));
 
-    for(register label i = 0; i < A.n(); i++)
+    for(label i = 0; i < A.n(); i++)
     {
-        for(register label j = 0; j < B.m(); j++)
+        for(label j = 0; j < B.m(); j++)
         {
-            for(register label l = 0; l < B.n(); l++)
+            for(label l = 0; l < B.n(); l++)
             {
                 ans[i][j] += A[i][l]*B[l][j];
             }
@@ -101,14 +101,14 @@ void Foam::multiply
 
     ans = scalarRectangularMatrix(A.n(), C.m(), scalar(0));
 
-    for(register label i = 0; i < A.n(); i++)
+    for(label i = 0; i < A.n(); i++)
     {
-        for(register label g = 0; g < C.m(); g++)
+        for(label g = 0; g < C.m(); g++)
         {
-            for(register label l = 0; l < C.n(); l++)
+            for(label l = 0; l < C.n(); l++)
             {
                 scalar ab = 0;
-                for(register label j = 0; j < A.m(); j++)
+                for(label j = 0; j < A.m(); j++)
                 {
                     ab += A[i][j]*B[j][l];
                 }
@@ -157,11 +157,11 @@ void Foam::multiply
 
     ans = scalarRectangularMatrix(A.n(), C.m(), scalar(0));
 
-    for(register label i = 0; i < A.n(); i++)
+    for(label i = 0; i < A.n(); i++)
     {
-        for(register label g = 0; g < C.m(); g++)
+        for(label g = 0; g < C.m(); g++)
         {
-            for(register label l = 0; l < C.n(); l++)
+            for(label l = 0; l < C.n(); l++)
             {
                 ans[i][g] += C[l][g] * A[i][l]*B[l];
             }
