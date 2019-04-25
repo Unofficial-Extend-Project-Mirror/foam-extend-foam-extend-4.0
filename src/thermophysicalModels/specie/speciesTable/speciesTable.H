@@ -44,6 +44,12 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+class speciesTable;
+
+Istream& operator>>(Istream&, speciesTable&);
+
+
 /*---------------------------------------------------------------------------*\
                            Class speciesTable Declaration
 \*---------------------------------------------------------------------------*/

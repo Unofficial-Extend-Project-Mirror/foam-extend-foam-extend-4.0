@@ -35,7 +35,7 @@ void Foam::globalProcFaceIndex::calcFaceIndex()
 
     const polyBoundaryMesh& patches = mesh_.boundaryMesh();
 
-    // Assing unique face label to all master processor faces
+    // Assign unique face label to all master processor faces
 
     // Count faces and processor faces per processor
     forAll (patches, patchI)
@@ -118,7 +118,8 @@ void Foam::globalProcFaceIndex::calcFaceIndex()
 
                 OPstream toProc
                 (
-                    Pstream::nonBlocking,
+                    // HR 12.12.18: nonBlocking fails on PLB of Aachen bomb
+                    Pstream::blocking,
                     procPatch.neighbProcNo()
                 );
                 toProc<< curFaceLabels;
@@ -154,7 +155,8 @@ void Foam::globalProcFaceIndex::calcFaceIndex()
                 // Receive the data from master and insert into the list
                 IPstream fromProc
                 (
-                    Pstream::nonBlocking,
+                    // HR 12.12.18: nonBlocking fails on PLB of Aachen bomb
+                    Pstream::blocking,
                     procPatch.neighbProcNo()
                 );
 

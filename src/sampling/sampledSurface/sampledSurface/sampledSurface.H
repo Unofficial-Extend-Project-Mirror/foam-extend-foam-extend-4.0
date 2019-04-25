@@ -68,6 +68,12 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+class sampledSurface;
+
+Ostream& operator<<(Ostream&, const sampledSurface&);
+
+
 /*---------------------------------------------------------------------------*\
                       Class sampledSurface Declaration
 \*---------------------------------------------------------------------------*/

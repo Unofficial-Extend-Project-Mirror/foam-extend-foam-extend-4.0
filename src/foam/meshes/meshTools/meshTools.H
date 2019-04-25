@@ -318,6 +318,25 @@ namespace meshTools
             label& zoneFlip
         );
 
+
+    // Mark-up of mesh bits. Relocated from refinement polyMeshModifier
+
+        //- Extend marked cells across faces given a bool list of already marked
+        //  cells
+        void extendMarkedCellsAcrossFaces
+        (
+            const polyMesh& mesh,
+            boolList& markedCell
+        );
+
+        //- Extend marked cells across points given a bool list of already
+        //  marked cells
+        void extendMarkedCellsAcrossPoints
+        (
+            const polyMesh& mesh,
+            boolList& markedCell
+        );
+
 } // End namespace meshTools
 
 

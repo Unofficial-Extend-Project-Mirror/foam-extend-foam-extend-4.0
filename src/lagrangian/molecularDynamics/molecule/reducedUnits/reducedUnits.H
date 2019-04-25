@@ -44,6 +44,12 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+class reducedUnits;
+
+Ostream& operator<<(Ostream&, const reducedUnits&);
+
+
 /*---------------------------------------------------------------------------*\
                          Class reducedUnits Declaration
 \*---------------------------------------------------------------------------*/

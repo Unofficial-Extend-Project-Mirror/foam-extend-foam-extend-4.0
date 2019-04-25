@@ -117,13 +117,26 @@ class sharedPoints
         //- Calculate shared points
         void calcSharedPoints();
 
+        //- Calculate shared points
+        void calcSharedPoints(const labelListList& globalPointIndex);
+
 
 public:
 
     // Constructors
 
         //- Construct from the list of meshes
-        sharedPoints(const PtrList<fvMesh>& meshes);
+        sharedPoints
+        (
+            const PtrList<fvMesh>& meshes
+        );
+
+        //- Construct from the list of meshes and global point addressing
+        sharedPoints
+        (
+            const PtrList<fvMesh>& meshes,
+            const labelListList& globalPointIndex
+        );
 
 
     //- Destructor

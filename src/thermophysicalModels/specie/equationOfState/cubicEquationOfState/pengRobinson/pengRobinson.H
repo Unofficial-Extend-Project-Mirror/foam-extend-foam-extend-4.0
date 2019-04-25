@@ -57,6 +57,12 @@ Germany
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+class pengRobinson;
+
+Ostream& operator<<(Ostream&, const pengRobinson&);
+
+
 /*---------------------------------------------------------------------------*\
                            Class Peng Robinson Declaration
 \*---------------------------------------------------------------------------*/

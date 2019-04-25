@@ -46,6 +46,13 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+class phaseProperties;
+
+Istream& operator>>(Istream&, phaseProperties&);
+Ostream& operator<<(Ostream&, const phaseProperties&);
+
+
 /*---------------------------------------------------------------------------*\
                       Class phaseProperties Declaration
 \*---------------------------------------------------------------------------*/

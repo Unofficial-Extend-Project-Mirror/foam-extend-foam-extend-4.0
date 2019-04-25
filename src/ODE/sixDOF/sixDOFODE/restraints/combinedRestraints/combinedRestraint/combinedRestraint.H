@@ -54,7 +54,14 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
 class sixDOFODE;
+
+// Forward declaration of friend functions and operators
+class combinedRestraint;
+
+Ostream& operator<<(Ostream&, const combinedRestraint&);
+
 
 /*---------------------------------------------------------------------------*\
                    Class combinedRestraint Declaration

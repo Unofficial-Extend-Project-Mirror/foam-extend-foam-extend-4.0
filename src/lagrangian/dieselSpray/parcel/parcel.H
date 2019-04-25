@@ -40,7 +40,14 @@ Description
 namespace Foam
 {
 
+// Forward declaration of classes
 class spray;
+
+// Forward declaration of friend functions and operators
+class parcel;
+
+Ostream& operator<<(Ostream&, const parcel&);
+
 
 /*---------------------------------------------------------------------------*\
                            Class parcel Declaration

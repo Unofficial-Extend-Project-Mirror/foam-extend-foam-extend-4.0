@@ -47,6 +47,7 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
 class Istream;
 class Ostream;
 
@@ -63,6 +64,7 @@ template<class T, class BaseType> Ostream& operator<<
     Ostream&,
     const CompactIOList<T, BaseType>&
 );
+
 
 /*---------------------------------------------------------------------------*\
                            Class CompactIOList Declaration

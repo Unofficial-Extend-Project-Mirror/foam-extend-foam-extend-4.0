@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "pointBoundaryMesh.H"
+#include "polyMesh.H"
 #include "polyBoundaryMesh.H"
 #include "facePointPatch.H"
 #include "globalPointPatch.H"
@@ -105,9 +106,38 @@ void Foam::pointBoundaryMesh::movePoints()
 }
 
 
-void Foam::pointBoundaryMesh::updateMesh()
+void Foam::pointBoundaryMesh::updateMesh
+(
+    const polyMesh& pMesh
+)
 {
+    const polyBoundaryMesh& pBoundary = pMesh.boundaryMesh();
     pointPatchList& patches = *this;
+
+    // 21.1.19 HR : Patches need to be recreated in PLB
+    patches.clear();
+    patches.setSize(pBoundary.size());
+
+    forAll(patches, patchI)
+    {
+        patches.set
+        (
+            patchI,
+            facePointPatch::New(pBoundary[patchI], *this).ptr()
+        );
+    }
+
+    // Add the globalPointPatch
+    if(pMesh.globalData().nGlobalPoints())
+    {
+        patches.setSize(pBoundary.size() + 1);
+
+        patches.set
+        (
+            patches.size() - 1,
+            new globalPointPatch(*this, patches.size() - 1)
+        );
+    }
 
     forAll(patches, patchi)
     {

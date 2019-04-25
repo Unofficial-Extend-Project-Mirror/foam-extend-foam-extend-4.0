@@ -80,7 +80,14 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
 class fvMesh;
+
+// Forward declaration of friend functions and operators
+class porousZone;
+
+Ostream& operator<<(Ostream&, const porousZone&);
+
 
 /*---------------------------------------------------------------------------*\
                         Class porousZone Declaration

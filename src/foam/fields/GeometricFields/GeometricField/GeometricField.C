@@ -728,6 +728,16 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::boundaryField()
 }
 
 
+// Return reference to GeometricBoundaryField
+template<class Type, template<class> class PatchField, class GeoMesh>
+typename
+Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricBoundaryField&
+Foam::GeometricField<Type, PatchField, GeoMesh>::boundaryFieldNoStoreOldTimes()
+{
+    return boundaryField_;
+}
+
+
 // Store old-time field
 template<class Type, template<class> class PatchField, class GeoMesh>
 void Foam::GeometricField<Type, PatchField, GeoMesh>::storeOldTimes() const

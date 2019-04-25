@@ -34,6 +34,7 @@ License
 #include "OSspecific.H"
 #include "Map.H"
 #include "DynamicList.H"
+#include "globalMeshData.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -53,8 +54,10 @@ Foam::domainDecomposition::domainDecomposition
     nProcs_(readInt(decompositionDict_.lookup("numberOfSubdomains"))),
     distributed_(false),
     gfIndex_(mesh_),
+    gpIndex_(mesh_),
     cellToProc_(mesh_.nCells()),
     patchNbrCellToProc_(mesh_.boundaryMesh().size()),
+    patchNbrFaceCells_(mesh_.boundaryMesh().size()),
     procPointAddressing_(nProcs_),
     procFaceAddressing_(nProcs_),
     nInternalProcFaces_(nProcs_),
@@ -122,8 +125,8 @@ Foam::autoPtr<Foam::fvMesh> Foam::domainDecomposition::processorMesh
     forAll (curFaceLabels, faceI)
     {
         // Mark the original face as used
-        // Remember to decrement the index by one (turning index)
-        // HJ, 5/Dec/2001
+        // Remember to decrement the index by one (turning index) (see
+        // procFaceAddressing_ data member comment). HJ, 5/Dec/2001
         label curF = mag(curFaceLabels[faceI]) - 1;
 
         faceLookup[curF] = faceI;
@@ -174,8 +177,8 @@ Foam::autoPtr<Foam::fvMesh> Foam::domainDecomposition::processorMesh
     // Note: loop over owner, not all faces: sizes are different
     forAll (procOwner, faceI)
     {
-        // Remember to decrement the index by one (turning index)
-        // HJ, 28/Mar/2009
+        // Remember to decrement the index by one (turning index) (see
+        // procFaceAddressing_ data member comment). HJ, 5/Dec/2001
         label curF = mag(curFaceLabels[faceI]) - 1;
 
         if (curFaceLabels[faceI] >= 0)
@@ -193,8 +196,8 @@ Foam::autoPtr<Foam::fvMesh> Foam::domainDecomposition::processorMesh
     // Note: loop over neighbour, not all faces: sizes are different
     forAll (procNeighbour, faceI)
     {
-        // Remember to decrement the index by one (turning index)
-        // HJ, 28/Mar/2009
+        // Remember to decrement the index by one (turning index) (see
+        // procFaceAddressing_ data member comment). HJ, 5/Dec/2001
         label curF = mag(curFaceLabels[faceI]) - 1;
 
         if (curFaceLabels[faceI] >= 0)
@@ -285,6 +288,8 @@ Foam::autoPtr<Foam::fvMesh> Foam::domainDecomposition::processorMesh
 
             forAll (patchGlobalIndex, fI)
             {
+                // Remember to decrement the index by one (turning index) (see
+                // procFaceAddressing_ data member comment). HJ, 5/Dec/2001
                 patchGlobalIndex[fI] =
                     globalIndex[mag(curFaceLabels[curPatchStart + fI]) - 1];
             }
@@ -500,6 +505,24 @@ Foam::autoPtr<Foam::fvMesh> Foam::domainDecomposition::processorMesh
 
     // Return mesh
     return procMeshPtr;
+}
+
+
+Foam::labelList Foam::domainDecomposition::globalPointIndex
+(
+    const label procI
+) const
+{
+    const labelList& gppi = gpIndex_.globalLabel();
+    const labelList& ppAddr = procPointAddressing_[procI];
+    labelList globalPointIndex(ppAddr.size());
+
+    forAll (globalPointIndex, gpI)
+    {
+        globalPointIndex[gpI] = gppi[ppAddr[gpI]];
+    }
+
+    return globalPointIndex;
 }
 
 

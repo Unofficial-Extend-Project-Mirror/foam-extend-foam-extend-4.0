@@ -75,7 +75,7 @@ void meshUntangler::cutRegion::findNewFaces()
                 << " consisting of edges " << f << endl;
             # endif
 
-            pointUsage = 0;
+	    pointUsage = label(0);
 
             DynList<label, 8> newFace;
 
@@ -147,7 +147,7 @@ void meshUntangler::cutRegion::findNewFaces()
         //- find edges which form the faceInPlane
         DynList<label, 128> edgeUsage;
         edgeUsage.setSize(cEdges.size());
-        edgeUsage = 0;
+	edgeUsage = label(0);
         forAll(cFaces, fI)
         {
             const DynList<label, 8>& f = cFaces[fI];

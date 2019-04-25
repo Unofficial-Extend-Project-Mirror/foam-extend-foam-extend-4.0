@@ -47,8 +47,12 @@ SourceFiles
 namespace Foam
 {
 
-// Class forward declarations
+// Forward declaration of friend functions and operators
 class moleculeCloud;
+class molecule;
+
+Ostream& operator<<(Ostream&, const molecule&);
+
 
 /*---------------------------------------------------------------------------*\
                            Class molecule Declaration

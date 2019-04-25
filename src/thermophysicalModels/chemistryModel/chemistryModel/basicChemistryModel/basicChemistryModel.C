@@ -57,8 +57,21 @@ Foam::basicChemistryModel::basicChemistryModel
     chemistry_(lookup("chemistry")),
     deltaTChem_
     (
-        mesh.nCells(),
-        readScalar(lookup("initialChemicalTimeStep"))
+        IOobject
+        (
+            "deltaTChem",
+            mesh.time().constant(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedScalar
+        (
+            "deltaTChem0",
+            dimTime,
+            readScalar(lookup("initialChemicalTimeStep"))
+        )
     )
 {}
 

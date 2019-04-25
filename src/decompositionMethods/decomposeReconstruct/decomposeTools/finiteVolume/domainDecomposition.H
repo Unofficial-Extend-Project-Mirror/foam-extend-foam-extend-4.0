@@ -43,6 +43,7 @@ SourceFiles
 #include "PtrList.H"
 #include "point.H"
 #include "globalProcFaceIndex.H"
+#include "globalProcPointIndex.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -72,12 +73,20 @@ class domainDecomposition
         //- Global face index
         globalProcFaceIndex gfIndex_;
 
+        //- Global face index
+        globalProcPointIndex gpIndex_;
+
         //- Processor label for each cell
         labelList cellToProc_;
 
         //- Processor label for neighbour cell for each processor boundary
         //  Data is used when running decomposition in parallel
         labelListList patchNbrCellToProc_;
+
+        //- Face cells for neighbour cell for each processor boundary
+        //  Data is used for correct upper triangular (neighbour list) ordering
+        //  when running decomposition in parallel
+        labelListList patchNbrFaceCells_;
 
         //- Labels of points for each processor
         labelListList procPointAddressing_;
@@ -87,9 +96,9 @@ class domainDecomposition
         //  Only the processor boundary faces are affected: if the sign of the
         //  index is negative, the processor face is the reverse of the
         //  original face. In order to do this properly, all face
-        //   indices will be incremented by 1 and the decremented as
-        //  necessary t avoid the problem of face number zero having no
-        //  sign.  HJ, 5/Dec/2001
+        //  indices will be incremented by 1 and then decremented as
+        //  necessary to avoid the problem of face number zero having no
+        //  sign. HJ, 5/Dec/2001
         labelListList procFaceAddressing_;
 
         //- Number of internal faces for each processor
@@ -133,11 +142,27 @@ class domainDecomposition
         //- Create cell-to processor list using domain decomposition tools
         void distributeCells();
 
+        //- Helper function for decomposeMesh. Given two lists of inter processor
+        //  boundaries and inter processor boundary faces, add neighbouring procJ
+        //  to list of the procI. Also adds faceI into the procI list and return
+        //  whether the procJ is already present in the list of visited
+        //  processors (needed for error handling on cyclic patches)
+        bool addInterProcessorBoundaryData
+        (
+            const label& procI,
+            const label& procJ,
+            const label faceI,
+
+            List<SLList<label> >& interProcBoundaries,
+            List<SLList<SLList<label> > >& interProcBFaces
+        ) const;
+
 
 public:
 
     // Declare name of the class and its debug switch
     ClassName("domainDecomposition");
+
 
     // Constructors
 
@@ -204,6 +229,9 @@ public:
                 const word& regionName,
                 const bool createPassiveProcPatches = false
             ) const;
+
+            //- Create and return global point index
+            labelList globalPointIndex(const label procI) const;
 
             //- Return processor point addressing
             const labelListList& procPointAddressing() const
