@@ -146,8 +146,8 @@ leastSquaresSolidInterfaceGrad<Type>::calcGrad
 
     forAll(own, facei)
     {
-        register label ownFaceI = own[facei];
-        register label neiFaceI = nei[facei];
+        label ownFaceI = own[facei];
+        label neiFaceI = nei[facei];
 
         if (interfaceFacesMap[facei] > -SMALL)
         {

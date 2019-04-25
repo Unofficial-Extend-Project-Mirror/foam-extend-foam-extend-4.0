@@ -41,7 +41,7 @@ void Foam::MRFZone::relativeRhoFlux
     // HJ, 6/Jun/2017
     const surfaceScalarField& meshVel = meshVelocity();
 
-    register label faceI, patchFaceI;
+    label faceI, patchFaceI;
 
     // Internal faces
     scalarField& phiIn = phi.internalField();
@@ -94,7 +94,7 @@ void Foam::MRFZone::absoluteRhoFlux
     // HJ, 6/Jun/2017
     const surfaceScalarField& meshVel = meshVelocity();
 
-    register label faceI, patchFaceI;
+    label faceI, patchFaceI;
 
     // Internal faces
     scalarField& phiIn = phi.internalField();

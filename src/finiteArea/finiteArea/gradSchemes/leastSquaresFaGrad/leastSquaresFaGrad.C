@@ -96,8 +96,8 @@ leastSquaresFaGrad<Type>::grad
 
     forAll(own, edgei)
     {
-        register label ownEdgeI = own[edgei];
-        register label neiEdgeI = nei[edgei];
+        label ownEdgeI = own[edgei];
+        label neiEdgeI = nei[edgei];
 
         Type deltaVsf = vsf[neiEdgeI] - vsf[ownEdgeI];
 

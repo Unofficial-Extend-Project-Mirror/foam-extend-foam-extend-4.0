@@ -342,7 +342,7 @@ void Foam::ggiFvPatch::expandCrMatrixToZone(crMatrix& patchP) const
         List<labelField> cols(patchCrAddr.nRows());
         List<scalarField> coeffs(patchCrAddr.nRows());
 
-        for (register label faceI = 0; faceI < patchCrAddr.nRows(); faceI++)
+        for (label faceI = 0; faceI < patchCrAddr.nRows(); faceI++)
         {
             // Unpack row
             const label rowStart = patchRowStart[faceI];
@@ -354,7 +354,7 @@ void Foam::ggiFvPatch::expandCrMatrixToZone(crMatrix& patchP) const
             coeffs[faceI].setSize(rowLength);
             scalarField& curCoeffs = coeffs[faceI];
 
-            for (register label coeffI = 0; coeffI < rowLength; coeffI++)
+            for (label coeffI = 0; coeffI < rowLength; coeffI++)
             {
                 curCols[coeffI] = patchCol[rowStart + coeffI];
                 curCoeffs[coeffI] = patchCoeff[rowStart + coeffI];

@@ -43,7 +43,7 @@ void BlockLduMatrix<scalar>::sumDiag()
     {
         const scalarField& activeUpper = upper();
 
-        for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+        for (label coeffI = 0; coeffI < l.size(); coeffI++)
         {
             activeDiag[l[coeffI]] += activeUpper[coeffI];
             activeDiag[u[coeffI]] += activeUpper[coeffI];
@@ -54,7 +54,7 @@ void BlockLduMatrix<scalar>::sumDiag()
         const scalarField& activeLower = lower();
         const scalarField& activeUpper = upper();
 
-        for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+        for (label coeffI = 0; coeffI < l.size(); coeffI++)
         {
             activeDiag[l[coeffI]] += activeLower[coeffI];
             activeDiag[u[coeffI]] += activeUpper[coeffI];
@@ -81,7 +81,7 @@ void BlockLduMatrix<scalar>::negSumDiag()
     {
         const scalarField& activeUpper = upper();
 
-        for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+        for (label coeffI = 0; coeffI < l.size(); coeffI++)
         {
             activeDiag[l[coeffI]] -= activeUpper[coeffI];
             activeDiag[u[coeffI]] -= activeUpper[coeffI];
@@ -92,7 +92,7 @@ void BlockLduMatrix<scalar>::negSumDiag()
         const scalarField& activeLower = lower();
         const scalarField& activeUpper = upper();
 
-        for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+        for (label coeffI = 0; coeffI < l.size(); coeffI++)
         {
             activeDiag[l[coeffI]] -= activeLower[coeffI];
             activeDiag[u[coeffI]] -= activeUpper[coeffI];
@@ -120,7 +120,7 @@ void BlockLduMatrix<scalar>::check() const
     {
         const scalarField& activeUpper = upper();
 
-        for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+        for (label coeffI = 0; coeffI < l.size(); coeffI++)
         {
             activeDiagCopy[l[coeffI]] -= activeUpper[coeffI];
             activeDiagCopy[u[coeffI]] -= activeUpper[coeffI];
@@ -138,7 +138,7 @@ void BlockLduMatrix<scalar>::check() const
         const scalarField& activeLower = lower();
         const scalarField& activeUpper = upper();
 
-        for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+        for (label coeffI = 0; coeffI < l.size(); coeffI++)
         {
             activeDiagCopy[l[coeffI]] -= activeLower[coeffI];
             activeDiagCopy[u[coeffI]] -= activeUpper[coeffI];
@@ -180,7 +180,7 @@ void BlockLduMatrix<scalar>::relax
     {
         const scalarField& activeUpper = upper();
 
-        for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+        for (label coeffI = 0; coeffI < l.size(); coeffI++)
         {
             sumOff[u[coeffI]] += mag(activeUpper[coeffI]);
             sumOff[l[coeffI]] += mag(activeUpper[coeffI]);
@@ -191,7 +191,7 @@ void BlockLduMatrix<scalar>::relax
         const scalarField& activeLower = lower();
         const scalarField& activeUpper = upper();
 
-        for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+        for (label coeffI = 0; coeffI < l.size(); coeffI++)
         {
             sumOff[u[coeffI]] += mag(activeLower[coeffI]);
             sumOff[l[coeffI]] += mag(activeUpper[coeffI]);
@@ -220,7 +220,7 @@ void BlockLduMatrix<scalar>::operator*=(const scalarField& sf)
 
         const unallocLabelList& l = lduAddr().lowerAddr();
 
-        for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+        for (label coeffI = 0; coeffI < l.size(); coeffI++)
         {
             activeUpper[coeffI] *= sf[l[coeffI]];
         }
@@ -232,7 +232,7 @@ void BlockLduMatrix<scalar>::operator*=(const scalarField& sf)
 
         const unallocLabelList& u = lduAddr().upperAddr();
 
-        for (register label coeffI = 0; coeffI < u.size(); coeffI++)
+        for (label coeffI = 0; coeffI < u.size(); coeffI++)
         {
             activeLower[coeffI] *= sf[u[coeffI]];
         }
@@ -258,8 +258,8 @@ void BlockLduMatrix<scalar>::AmulCore
     {
         const scalar* const __restrict__ diagPtr = diag().begin();
 
-        register const label nCells = diag().size();
-        for (register label cell=0; cell<nCells; cell++)
+        const label nCells = diag().size();
+        for (label cell=0; cell<nCells; cell++)
         {
             // AmulCore must be additive to account for initialisation step
             // in ldu interfaces.  HJ, 6/Nov/2007
@@ -273,7 +273,7 @@ void BlockLduMatrix<scalar>::AmulCore
         {
             const scalar* const __restrict__ Upper = upper().begin();
 
-            for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+            for (label coeffI = 0; coeffI < upper().size(); coeffI++)
             {
                 AX[U[coeffI]] += Upper[coeffI]*X[L[coeffI]];
                 AX[L[coeffI]] += Upper[coeffI]*X[U[coeffI]];
@@ -283,7 +283,7 @@ void BlockLduMatrix<scalar>::AmulCore
         {
             const scalar* const __restrict__ Lower = lower().begin();
 
-            for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+            for (label coeffI = 0; coeffI < upper().size(); coeffI++)
             {
                 AX[U[coeffI]] += Lower[coeffI]*X[L[coeffI]];
                 AX[L[coeffI]] += Lower[coeffI]*X[U[coeffI]];
@@ -295,7 +295,7 @@ void BlockLduMatrix<scalar>::AmulCore
         const scalar* const __restrict__ Lower = lower().begin();
         const scalar* const __restrict__  Upper = upper().begin();
 
-        for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+        for (label coeffI = 0; coeffI < upper().size(); coeffI++)
         {
             AX[U[coeffI]] += Lower[coeffI]*X[L[coeffI]];
             AX[L[coeffI]] += Upper[coeffI]*X[U[coeffI]];
@@ -322,8 +322,8 @@ void BlockLduMatrix<scalar>::TmulCore
     {
         const scalar* const __restrict__ diagPtr = diag().begin();
 
-        register const label nCells = diag().size();
-        for (register label cell=0; cell<nCells; cell++)
+        const label nCells = diag().size();
+        for (label cell=0; cell<nCells; cell++)
         {
             // AmulCore must be additive to account for initialisation step
             // in ldu interfaces.  HJ, 6/Nov/2007
@@ -337,7 +337,7 @@ void BlockLduMatrix<scalar>::TmulCore
         {
             const scalar* const __restrict__ Upper = upper().begin();
 
-            for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+            for (label coeffI = 0; coeffI < upper().size(); coeffI++)
             {
                 TX[U[coeffI]] += Upper[coeffI]*X[L[coeffI]];
                 TX[L[coeffI]] += Upper[coeffI]*X[U[coeffI]];
@@ -347,7 +347,7 @@ void BlockLduMatrix<scalar>::TmulCore
         {
             const scalar* const __restrict__ Lower = lower().begin();
 
-            for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+            for (label coeffI = 0; coeffI < upper().size(); coeffI++)
             {
                 TX[U[coeffI]] += Lower[coeffI]*X[L[coeffI]];
                 TX[L[coeffI]] += Lower[coeffI]*X[U[coeffI]];
@@ -359,7 +359,7 @@ void BlockLduMatrix<scalar>::TmulCore
         const scalar* const __restrict__ Lower = lower().begin();
         const scalar* const __restrict__ Upper = upper().begin();
 
-        for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+        for (label coeffI = 0; coeffI < upper().size(); coeffI++)
         {
             TX[U[coeffI]] += Upper[coeffI]*X[L[coeffI]];
             TX[L[coeffI]] += Lower[coeffI]*X[U[coeffI]];
@@ -409,12 +409,12 @@ tmp<scalarField> BlockLduMatrix<scalar>::H(const scalarField& x) const
 
                 scalar* __restrict__ R = result.begin();
 
-                for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+                for (label coeffI = 0; coeffI < upper().size(); coeffI++)
                 {
                     R[U[coeffI]] -= Upper[coeffI]*X[U[coeffI]];
                 }
 
-                for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+                for (label coeffI = 0; coeffI < upper().size(); coeffI++)
                 {
                     R[L[coeffI]] -= Upper[coeffI]*X[L[coeffI]];
                 }
@@ -425,12 +425,12 @@ tmp<scalarField> BlockLduMatrix<scalar>::H(const scalarField& x) const
 
                 scalar* __restrict__ R = result.begin();
 
-                for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+                for (label coeffI = 0; coeffI < upper().size(); coeffI++)
                 {
                     R[U[coeffI]] -= Lower[coeffI]*X[U[coeffI]];
                 }
 
-                for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+                for (label coeffI = 0; coeffI < upper().size(); coeffI++)
                 {
                     R[L[coeffI]] -= Lower[coeffI]*X[L[coeffI]];
                 }
@@ -443,12 +443,12 @@ tmp<scalarField> BlockLduMatrix<scalar>::H(const scalarField& x) const
 
             scalar* __restrict__ R = result.begin();
 
-            for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+            for (label coeffI = 0; coeffI < upper().size(); coeffI++)
             {
                 R[U[coeffI]] -= Upper[coeffI]*X[U[coeffI]];
             }
 
-            for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+            for (label coeffI = 0; coeffI < upper().size(); coeffI++)
             {
                 R[L[coeffI]] -= Lower[coeffI]*X[L[coeffI]];
             }
@@ -480,7 +480,7 @@ tmp<scalarField> BlockLduMatrix<scalar>::faceH(const scalarField& x) const
 
                 scalar* __restrict__ R = result.begin();
 
-                for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+                for (label coeffI = 0; coeffI < upper().size(); coeffI++)
                 {
                     R[coeffI] = Upper[coeffI]*(X[U[coeffI]] - X[L[coeffI]]);
                 }
@@ -496,7 +496,7 @@ tmp<scalarField> BlockLduMatrix<scalar>::faceH(const scalarField& x) const
 
                 scalar* __restrict__ R = result.begin();
 
-                for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+                for (label coeffI = 0; coeffI < upper().size(); coeffI++)
                 {
                     R[coeffI] = Lower[coeffI]*(X[U[coeffI]] - X[L[coeffI]]);
                 }
@@ -514,9 +514,11 @@ tmp<scalarField> BlockLduMatrix<scalar>::faceH(const scalarField& x) const
 
             scalar* __restrict__ R = result.begin();
 
-            for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+            for (label coeffI = 0; coeffI < upper().size(); coeffI++)
             {
-                R[coeffI] = Upper[coeffI]*X[U[coeffI]] - Lower[coeffI]*X[L[coeffI]];
+                R[coeffI] =
+                    Upper[coeffI]*X[U[coeffI]]
+                  - Lower[coeffI]*X[L[coeffI]];
             }
         }
     }

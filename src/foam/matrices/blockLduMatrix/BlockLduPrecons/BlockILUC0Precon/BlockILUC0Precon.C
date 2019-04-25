@@ -88,12 +88,12 @@ void Foam::BlockILUC0Precon<Type>::calcActiveTypeFactorization
 
         // Define start and end face ("virtual" face when extended addressing
         // is used) of this row/column.
-        register label fStart, fEnd, fLsrStart, fLsrEnd;
+        label fStart, fEnd, fLsrStart, fLsrEnd;
 
         // Crout LU factorization
 
         // Row by row loop (k - loop).
-        for (register label rowI = 0; rowI < nRows; ++rowI)
+        for (label rowI = 0; rowI < nRows; ++rowI)
         {
             // Start and end of k-th row (upper) and k-th column (lower)
             fStart = ownStartPtr[rowI];
@@ -103,7 +103,7 @@ void Foam::BlockILUC0Precon<Type>::calcActiveTypeFactorization
             zDiag = diagPtr[rowI];
 
             // Initialize temporary working row and column fields
-            for (register label faceI = fStart; faceI < fEnd; ++faceI)
+            for (label faceI = fStart; faceI < fEnd; ++faceI)
             {
                 // Note: z addressed by neighbour of face (column index for
                 // upper)
@@ -118,13 +118,13 @@ void Foam::BlockILUC0Precon<Type>::calcActiveTypeFactorization
             // Lower/upper coeff loop (i - loop)
             for
             (
-                register label faceLsrI = fLsrStart;
+                label faceLsrI = fLsrStart;
                 faceLsrI < fLsrEnd;
                 ++faceLsrI
             )
             {
                 // Get losort coefficient for this face
-                const register label losortCoeff = lsrPtr[faceLsrI];
+                const label losortCoeff = lsrPtr[faceLsrI];
 
                 // Get corresponding row index for upper (i label)
                 const label i = lPtr[losortCoeff];
@@ -137,14 +137,14 @@ void Foam::BlockILUC0Precon<Type>::calcActiveTypeFactorization
                 );
 
                 // Get end of row for cell i
-                const register label fEndRowi = ownStartPtr[i + 1];
+                const label fEndRowi = ownStartPtr[i + 1];
 
                 // Upper coeff loop (additional loop to avoid checking the
                 // existence of certain upper coeffs)
                 for
                 (
                     // Diagonal is already updated (losortCoeff + 1 = start)
-                    register label faceI = losortCoeff + 1;
+                    label faceI = losortCoeff + 1;
                     faceI < fEndRowi;
                     ++faceI
                 )
@@ -168,10 +168,10 @@ void Foam::BlockILUC0Precon<Type>::calcActiveTypeFactorization
             diagRowI = mult.inverse(zDiag);
 
             // Index for updating L and U
-            register label zwIndex;
+            label zwIndex;
 
             // Update upper and lower coeffs
-            for (register label faceI = fStart; faceI < fEnd; ++faceI)
+            for (label faceI = fStart; faceI < fEnd; ++faceI)
             {
                 // Get index for current face
                 zwIndex = uPtr[faceI];
@@ -192,23 +192,23 @@ void Foam::BlockILUC0Precon<Type>::calcActiveTypeFactorization
             // this step (for this row and column)
             for
             (
-                register label faceLsrI = fLsrStart;
+                label faceLsrI = fLsrStart;
                 faceLsrI < fLsrEnd;
                 ++faceLsrI
             )
             {
                 // Get losort coefficient for this face
-                const register label losortCoeff = lsrPtr[faceLsrI];
+                const label losortCoeff = lsrPtr[faceLsrI];
 
                 // Get corresponding row index for upper (i label)
                 const label i = lPtr[losortCoeff];
 
                 // Get end of row for cell i
-                const register label fEndRowi = ownStartPtr[i + 1];
+                const label fEndRowi = ownStartPtr[i + 1];
 
                 for
                 (
-                    register label faceI = losortCoeff + 1;
+                    label faceI = losortCoeff + 1;
                     faceI < fEndRowi;
                     ++faceI
                 )
@@ -369,8 +369,8 @@ void Foam::BlockILUC0Precon<Type>::LUSubstitute
     // Initialize x field
     x = b;
 
-    register label losortCoeffI;
-    register label rowI;
+    label losortCoeffI;
+    label rowI;
 
     // Forward substitution loop
     forAll (lower, coeffI)
@@ -451,8 +451,8 @@ void Foam::BlockILUC0Precon<Type>::LUSubstituteT
         );
     }
 
-    register label losortCoeffI;
-    register label rowI;
+    label losortCoeffI;
+    label rowI;
 
     // Forward substitution loop
     forAll (upper, coeffI)

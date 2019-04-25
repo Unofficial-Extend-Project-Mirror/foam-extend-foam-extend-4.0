@@ -86,8 +86,8 @@ void Foam::lduMatrix::AmulCore
     {
         const scalar* const __restrict__ diagPtr = diag().begin();
 
-        register const label nCells = diag().size();
-        for (register label cell=0; cell<nCells; cell++)
+        const label nCells = diag().size();
+        for (label cell=0; cell<nCells; cell++)
         {
             // AmulCore must be additive to account for initialisation step
             // in ldu interfaces.  HJ, 6/Nov/2007
@@ -105,9 +105,9 @@ void Foam::lduMatrix::AmulCore
         const scalar* const __restrict__ upperPtr = upper().begin();
         const scalar* const __restrict__ lowerPtr = lower().begin();
 
-        register const label nFaces = upper().size();
+        const label nFaces = upper().size();
 
-        for (register label face=0; face<nFaces; face++)
+        for (label face=0; face<nFaces; face++)
         {
             AxPtr[uPtr[face]] += lowerPtr[face]*xPtr[lPtr[face]];
             AxPtr[lPtr[face]] += upperPtr[face]*xPtr[uPtr[face]];
@@ -171,8 +171,8 @@ void Foam::lduMatrix::TmulCore
     {
         const scalar* const __restrict__ diagPtr = diag().begin();
 
-        register const label nCells = diag().size();
-        for (register label cell=0; cell<nCells; cell++)
+        const label nCells = diag().size();
+        for (label cell=0; cell<nCells; cell++)
         {
             // TmulCore must be additive to account for initialisation step
             // in ldu interfaces.  HJ, 6/Nov/2007
@@ -190,8 +190,8 @@ void Foam::lduMatrix::TmulCore
         const scalar* const __restrict__ lowerPtr = lower().begin();
         const scalar* const __restrict__ upperPtr = upper().begin();
 
-        register const label nFaces = upper().size();
-        for (register label face=0; face<nFaces; face++)
+        const label nFaces = upper().size();
+        for (label face=0; face<nFaces; face++)
         {
             TxPtr[uPtr[face]] += upperPtr[face]*xPtr[lPtr[face]];
             TxPtr[lPtr[face]] += lowerPtr[face]*xPtr[uPtr[face]];
@@ -217,15 +217,15 @@ void Foam::lduMatrix::sumA
     const scalar* __restrict__ lowerPtr = lower().begin();
     const scalar* __restrict__ upperPtr = upper().begin();
 
-    register const label nCells = diag().size();
-    register const label nFaces = upper().size();
+    const label nCells = diag().size();
+    const label nFaces = upper().size();
 
-    for (register label cell=0; cell<nCells; cell++)
+    for (label cell=0; cell<nCells; cell++)
     {
         sumAPtr[cell] = diagPtr[cell];
     }
 
-    for (register label face=0; face<nFaces; face++)
+    for (label face=0; face<nFaces; face++)
     {
         sumAPtr[uPtr[face]] += lowerPtr[face];
         sumAPtr[lPtr[face]] += upperPtr[face];

@@ -166,7 +166,7 @@ void Foam::RK::solve
         solve(x, y, dydx, h, yTemp2_, yErr_);
 
         maxErr = 0.0;
-        for (register label i=0; i<ode_.nEqns(); i++)
+        for (label i=0; i<ode_.nEqns(); i++)
         {
             maxErr = max(maxErr, mag(yErr_[i]/yScale[i]));
         }

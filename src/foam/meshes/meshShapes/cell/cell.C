@@ -81,7 +81,7 @@ Foam::labelList Foam::cell::labels(const unallocFaceList& f) const
 
             bool found = false;
 
-            for (register label checkI = 0; checkI < maxVert; checkI++)
+            for (label checkI = 0; checkI < maxVert; checkI++)
             {
                 if (curPoint == p[checkI])
                 {

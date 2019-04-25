@@ -237,7 +237,7 @@ void Foam::extendedLduAddressing::calcFaceMap() const
         // Loop through extended neighbouring faces (upper matrix coeffs)
         for
         (
-            register label extFaceI = startLabel;
+            label extFaceI = startLabel;
             extFaceI < endLabel;
             ++extFaceI
         )

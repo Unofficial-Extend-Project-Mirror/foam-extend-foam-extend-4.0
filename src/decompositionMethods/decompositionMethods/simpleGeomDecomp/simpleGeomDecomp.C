@@ -73,7 +73,7 @@ void Foam::simpleGeomDecomp::assignToProcessorGroup
     // one extra cell each
     for (j = 0; j < fstProcessorGroup; j++)
     {
-        for (register label k = 0; k < jumpb; k++)
+        for (label k = 0; k < jumpb; k++)
         {
             processorGroup[ind++] = j;
         }
@@ -82,7 +82,7 @@ void Foam::simpleGeomDecomp::assignToProcessorGroup
     // and now to the `normal' processor groups
     for (; j<nProcGroup; j++)
     {
-        for (register label k = 0; k < jump; k++)
+        for (label k = 0; k < jump; k++)
         {
             processorGroup[ind++] = j;
         }

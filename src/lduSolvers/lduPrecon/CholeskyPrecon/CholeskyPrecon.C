@@ -165,7 +165,7 @@ void Foam::CholeskyPrecon::precondition
 
         // Note: multiplication over-write x: no need to initialise
         // HJ, and VV, 19/Jun/2017
-        for (register label rowI = 0; rowI < nRows; rowI++)
+        for (label rowI = 0; rowI < nRows; rowI++)
         {
             xPtr[rowI] = bPtr[rowI]*preconDiagPtr[rowI];
         }
@@ -190,7 +190,7 @@ void Foam::CholeskyPrecon::precondition
         const label nCoeffs = matrix_.upper().size();
 
         // Forward sweep
-        for (register label coeffI = 0; coeffI < nCoeffs; coeffI++)
+        for (label coeffI = 0; coeffI < nCoeffs; coeffI++)
         {
             xPtr[uPtr[coeffI]] -=
                 preconDiagPtr[uPtr[coeffI]]*
@@ -198,7 +198,7 @@ void Foam::CholeskyPrecon::precondition
         }
 
         // Reverse sweep
-        for (register label coeffI = nCoeffs - 1; coeffI >= 0; coeffI--)
+        for (label coeffI = nCoeffs - 1; coeffI >= 0; coeffI--)
         {
             xPtr[lPtr[coeffI]] -=
                 preconDiagPtr[lPtr[coeffI]]*

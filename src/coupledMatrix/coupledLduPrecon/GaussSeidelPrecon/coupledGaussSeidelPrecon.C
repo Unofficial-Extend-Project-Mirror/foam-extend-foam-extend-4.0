@@ -69,7 +69,7 @@ void Foam::coupledGaussSeidelPrecon::forwardSweep
     const label nRows = x.size();
     label fStart, fEnd;
 
-    for (register label rowI = 0; rowI < nRows; rowI++)
+    for (label rowI = 0; rowI < nRows; rowI++)
     {
         // lRow is equal to rowI
         scalar& curX = x[rowI];
@@ -82,7 +82,7 @@ void Foam::coupledGaussSeidelPrecon::forwardSweep
         fEnd = ownStartAddr[rowI + 1];
 
         // Accumulate the owner product side
-        for (register label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
+        for (label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
         {
             curX -= upper[curCoeff]*x[upperAddr[curCoeff]];
         }
@@ -91,7 +91,7 @@ void Foam::coupledGaussSeidelPrecon::forwardSweep
         curX /= diag[rowI];
 
         // Distribute the neighbour side using current x
-        for (register label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
+        for (label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
         {
             bPrime[upperAddr[curCoeff]] -= lower[curCoeff]*curX;
         }
@@ -116,7 +116,7 @@ void Foam::coupledGaussSeidelPrecon::reverseSweep
     const label nRows = x.size();
     label fStart, fEnd;
 
-    for (register label rowI = nRows - 1; rowI >= 0; rowI--)
+    for (label rowI = nRows - 1; rowI >= 0; rowI--)
     {
         // lRow is equal to rowI
         scalar& curX = x[rowI];
@@ -129,7 +129,7 @@ void Foam::coupledGaussSeidelPrecon::reverseSweep
         fEnd = ownStartAddr[rowI + 1];
 
         // Accumulate the owner product side
-        for (register label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
+        for (label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
         {
             curX -= upper[curCoeff]*x[upperAddr[curCoeff]];
         }
@@ -138,7 +138,7 @@ void Foam::coupledGaussSeidelPrecon::reverseSweep
         curX /= diag[rowI];
 
         // Distribute the neighbour side using current x
-        for (register label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
+        for (label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
         {
             bPrime[upperAddr[curCoeff]] -= lower[curCoeff]*curX;
         }
@@ -163,7 +163,7 @@ void Foam::coupledGaussSeidelPrecon::forwardSweepTranspose
     const label nRows = x.size();
     label fStart, fEnd;
 
-    for (register label rowI = 0; rowI < nRows; rowI++)
+    for (label rowI = 0; rowI < nRows; rowI++)
     {
         // lRow is equal to rowI
         scalar& curX = x[rowI];
@@ -176,7 +176,7 @@ void Foam::coupledGaussSeidelPrecon::forwardSweepTranspose
         fEnd = ownStartAddr[rowI + 1];
 
         // Accumulate the owner product side
-        for (register label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
+        for (label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
         {
             // Transpose multiplication.  HJ, 19/Jan/2009
             curX -= lower[curCoeff]*x[upperAddr[curCoeff]];
@@ -186,7 +186,7 @@ void Foam::coupledGaussSeidelPrecon::forwardSweepTranspose
         curX /= diag[rowI];
 
         // Distribute the neighbour side using current x
-        for (register label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
+        for (label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
         {
             // Transpose multiplication.  HJ, 19/Jan/2009
             bPrime[upperAddr[curCoeff]] -= upper[curCoeff]*curX;
@@ -212,7 +212,7 @@ void Foam::coupledGaussSeidelPrecon::reverseSweepTranspose
     const label nRows = x.size();
     label fStart, fEnd;
 
-    for (register label rowI = nRows - 1; rowI >= 0; rowI--)
+    for (label rowI = nRows - 1; rowI >= 0; rowI--)
     {
         // lRow is equal to rowI
         scalar& curX = x[rowI];
@@ -225,7 +225,7 @@ void Foam::coupledGaussSeidelPrecon::reverseSweepTranspose
         fEnd = ownStartAddr[rowI + 1];
 
         // Accumulate the owner product side
-        for (register label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
+        for (label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
         {
             // Transpose multiplication.  HJ, 19/Jan/2009
             curX -= lower[curCoeff]*x[upperAddr[curCoeff]];
@@ -235,7 +235,7 @@ void Foam::coupledGaussSeidelPrecon::reverseSweepTranspose
         curX /= diag[rowI];
 
         // Distribute the neighbour side using current x
-        for (register label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
+        for (label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
         {
             // Transpose multiplication.  HJ, 19/Jan/2009
             bPrime[upperAddr[curCoeff]] -= upper[curCoeff]*curX;

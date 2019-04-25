@@ -202,7 +202,7 @@ void Foam::ILU0::precondition
 
         // Note: multiplication over-write x: no need to initialise
         // HJ, and VV, 19/Jun/2017
-        for (register label rowI = 0; rowI < nRows; rowI++)
+        for (label rowI = 0; rowI < nRows; rowI++)
         {
             xPtr[rowI] = bPtr[rowI]*preconDiagPtr[rowI];
         }
@@ -308,7 +308,7 @@ void Foam::ILU0::preconditionT
 
         // Note: multiplication over-write x: no need to initialise
         // HJ, and VV, 19/Jun/2017
-        for (register label rowI = 0; rowI < nRows; rowI++)
+        for (label rowI = 0; rowI < nRows; rowI++)
         {
             xPtr[rowI] = bPtr[rowI]*preconDiagPtr[rowI];
         }

@@ -72,7 +72,7 @@ Foam::lduSolverPerformance Foam::PBiCG::solve
     // --- Setup class containing solver performance data
     lduSolverPerformance solverPerf(typeName, fieldName());
 
-    register label nCells = x.size();
+    label nCells = x.size();
 
     scalar* __restrict__ xPtr = x.begin();
 
@@ -147,7 +147,7 @@ Foam::lduSolverPerformance Foam::PBiCG::solve
 
             if (solverPerf.nIterations() == 0)
             {
-                for (register label cell=0; cell<nCells; cell++)
+                for (label cell=0; cell<nCells; cell++)
                 {
                     pAPtr[cell] = wAPtr[cell];
                     pTPtr[cell] = wTPtr[cell];
@@ -157,7 +157,7 @@ Foam::lduSolverPerformance Foam::PBiCG::solve
             {
                 scalar beta = wArT/wArTold;
 
-                for (register label cell=0; cell<nCells; cell++)
+                for (label cell=0; cell<nCells; cell++)
                 {
                     pAPtr[cell] = wAPtr[cell] + beta*pAPtr[cell];
                     pTPtr[cell] = wTPtr[cell] + beta*pTPtr[cell];
@@ -180,7 +180,7 @@ Foam::lduSolverPerformance Foam::PBiCG::solve
 
             scalar alpha = wArT/wApT;
 
-            for (register label cell=0; cell<nCells; cell++)
+            for (label cell=0; cell<nCells; cell++)
             {
                 xPtr[cell] += alpha*pAPtr[cell];
                 rAPtr[cell] -= alpha*wAPtr[cell];

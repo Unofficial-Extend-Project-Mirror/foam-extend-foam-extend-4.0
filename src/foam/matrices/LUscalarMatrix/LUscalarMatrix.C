@@ -137,15 +137,15 @@ void Foam::LUscalarMatrix::convert
     const scalar* __restrict__ upperPtr = ldum.upper().begin();
     const scalar* __restrict__ lowerPtr = ldum.lower().begin();
 
-    register const label nCells = ldum.diag().size();
-    register const label nFaces = ldum.upper().size();
+    const label nCells = ldum.diag().size();
+    const label nFaces = ldum.upper().size();
 
-    for (register label cell=0; cell<nCells; cell++)
+    for (label cell=0; cell<nCells; cell++)
     {
         operator[](cell)[cell] = diagPtr[cell];
     }
 
-    for (register label face=0; face<nFaces; face++)
+    for (label face=0; face<nFaces; face++)
     {
         label uCell = uPtr[face];
         label lCell = lPtr[face];
@@ -164,9 +164,9 @@ void Foam::LUscalarMatrix::convert
             const scalar* __restrict__ upperLowerPtr =
                 interfaceCoeffs[inti].begin();
 
-            register label inFaces = interface.faceCells().size()/2;
+            label inFaces = interface.faceCells().size()/2;
 
-            for (register label face=0; face<inFaces; face++)
+            for (label face=0; face<inFaces; face++)
             {
                 label uCell = ulPtr[face];
                 label lCell = ulPtr[face + inFaces];
@@ -206,16 +206,16 @@ void Foam::LUscalarMatrix::convert
         const scalar* __restrict__ upperPtr = lduMatrixi.upper_.begin();
         const scalar* __restrict__ lowerPtr = lduMatrixi.lower_.begin();
 
-        register const label nCells = lduMatrixi.size();
-        register const label nFaces = lduMatrixi.upper_.size();
+        const label nCells = lduMatrixi.size();
+        const label nFaces = lduMatrixi.upper_.size();
 
-        for (register label cell=0; cell<nCells; cell++)
+        for (label cell=0; cell<nCells; cell++)
         {
             label globalCell = cell + offset;
             operator[](globalCell)[globalCell] = diagPtr[cell];
         }
 
-        for (register label face=0; face<nFaces; face++)
+        for (label face=0; face<nFaces; face++)
         {
             label uCell = uPtr[face] + offset;
             label lCell = lPtr[face] + offset;
@@ -238,9 +238,9 @@ void Foam::LUscalarMatrix::convert
                 const scalar* __restrict__ upperLowerPtr =
                     interface.coeffs_.begin();
 
-                register label inFaces = interface.faceCells_.size()/2;
+                label inFaces = interface.faceCells_.size()/2;
 
-                for (register label face=0; face<inFaces; face++)
+                for (label face=0; face<inFaces; face++)
                 {
                     label uCell = ulPtr[face] + offset;
                     label lCell = ulPtr[face + inFaces] + offset;
@@ -283,10 +283,10 @@ void Foam::LUscalarMatrix::convert
                 const scalar* __restrict__ upperPtr = interface.coeffs_.begin();
                 const scalar* __restrict__ lowerPtr = neiInterface.coeffs_.begin();
 
-                register label inFaces = interface.faceCells_.size();
+                label inFaces = interface.faceCells_.size();
                 label neiOffset = procOffsets_[interface.neighbProcNo_];
 
-                for (register label face=0; face<inFaces; face++)
+                for (label face=0; face<inFaces; face++)
                 {
                     label uCell = uPtr[face] + offset;
                     label lCell = lPtr[face] + neiOffset;

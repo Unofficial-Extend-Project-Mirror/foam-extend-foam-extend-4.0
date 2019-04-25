@@ -56,7 +56,7 @@ void Foam::BlockLduMatrix<Type>::sumDiag()
             const squareTypeField& activeUpper = Upper.asSquare();
             squareTypeField& activeDiag = Diag.asSquare();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeDiag[l[coeffI]] += activeUpper[coeffI].T();
                 activeDiag[u[coeffI]] += activeUpper[coeffI];
@@ -71,7 +71,7 @@ void Foam::BlockLduMatrix<Type>::sumDiag()
             const linearTypeField& activeUpper = Upper.asLinear();
             linearTypeField& activeDiag = Diag.asLinear();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeDiag[l[coeffI]] += activeUpper[coeffI];
                 activeDiag[u[coeffI]] += activeUpper[coeffI];
@@ -86,7 +86,7 @@ void Foam::BlockLduMatrix<Type>::sumDiag()
             const scalarTypeField& activeUpper = Upper.asScalar();
             scalarTypeField& activeDiag = Diag.asScalar();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeDiag[l[coeffI]] += activeUpper[coeffI];
                 activeDiag[u[coeffI]] += activeUpper[coeffI];
@@ -114,7 +114,7 @@ void Foam::BlockLduMatrix<Type>::sumDiag()
             const squareTypeField& activeUpper = Upper.asSquare();
             squareTypeField& activeDiag = Diag.asSquare();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeDiag[l[coeffI]] += activeLower[coeffI];
                 activeDiag[u[coeffI]] += activeUpper[coeffI];
@@ -131,7 +131,7 @@ void Foam::BlockLduMatrix<Type>::sumDiag()
             const linearTypeField& activeUpper = Upper.asLinear();
             linearTypeField& activeDiag = Diag.asLinear();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeDiag[l[coeffI]] += activeLower[coeffI];
                 activeDiag[u[coeffI]] += activeUpper[coeffI];
@@ -148,7 +148,7 @@ void Foam::BlockLduMatrix<Type>::sumDiag()
             const scalarTypeField& activeUpper = Upper.asScalar();
             scalarTypeField& activeDiag = Diag.asScalar();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeDiag[l[coeffI]] += activeLower[coeffI];
                 activeDiag[u[coeffI]] += activeUpper[coeffI];
@@ -192,7 +192,7 @@ void Foam::BlockLduMatrix<Type>::negSumDiag()
             const squareTypeField& activeUpper = Upper.asSquare();
             squareTypeField& activeDiag = Diag.asSquare();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeDiag[l[coeffI]] -= activeUpper[coeffI].T();
                 activeDiag[u[coeffI]] -= activeUpper[coeffI];
@@ -207,7 +207,7 @@ void Foam::BlockLduMatrix<Type>::negSumDiag()
             const linearTypeField& activeUpper = Upper.asLinear();
             linearTypeField& activeDiag = Diag.asLinear();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeDiag[l[coeffI]] -= activeUpper[coeffI];
                 activeDiag[u[coeffI]] -= activeUpper[coeffI];
@@ -222,7 +222,7 @@ void Foam::BlockLduMatrix<Type>::negSumDiag()
             const scalarTypeField& activeUpper = Upper.asScalar();
             scalarTypeField& activeDiag = Diag.asScalar();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeDiag[l[coeffI]] -= activeUpper[coeffI];
                 activeDiag[u[coeffI]] -= activeUpper[coeffI];
@@ -250,7 +250,7 @@ void Foam::BlockLduMatrix<Type>::negSumDiag()
             const squareTypeField& activeUpper = Upper.asSquare();
             squareTypeField& activeDiag = Diag.asSquare();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeDiag[l[coeffI]] -= activeLower[coeffI];
                 activeDiag[u[coeffI]] -= activeUpper[coeffI];
@@ -267,7 +267,7 @@ void Foam::BlockLduMatrix<Type>::negSumDiag()
             const linearTypeField& activeUpper = Upper.asLinear();
             linearTypeField& activeDiag = Diag.asLinear();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeDiag[l[coeffI]] -= activeLower[coeffI];
                 activeDiag[u[coeffI]] -= activeUpper[coeffI];
@@ -284,7 +284,7 @@ void Foam::BlockLduMatrix<Type>::negSumDiag()
             const scalarTypeField& activeUpper = Upper.asScalar();
             scalarTypeField& activeDiag = Diag.asScalar();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeDiag[l[coeffI]] -= activeLower[coeffI];
                 activeDiag[u[coeffI]] -= activeUpper[coeffI];
@@ -362,7 +362,7 @@ void Foam::BlockLduMatrix<Type>::check() const
 
             const squareTypeField& activeUpper = Upper.asSquare();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeSumOffDiag[l[coeffI]] +=
                     sumMagToDiag(activeUpper[coeffI].T());
@@ -395,7 +395,7 @@ void Foam::BlockLduMatrix<Type>::check() const
             const linearTypeField& activeUpper = Upper.asLinear();
             linearTypeField& activeSumOffDiag = SumOffDiag.asLinear();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeSumOffDiag[l[coeffI]] += cmptMag(activeUpper[coeffI]);
                 activeSumOffDiag[u[coeffI]] += cmptMag(activeUpper[coeffI]);
@@ -422,7 +422,7 @@ void Foam::BlockLduMatrix<Type>::check() const
             const scalarTypeField& activeUpper = Upper.asScalar();
             scalarTypeField& activeSumOffDiag = SumOffDiag.asScalar();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeSumOffDiag[l[coeffI]] += cmptMag(activeUpper[coeffI]);
                 activeSumOffDiag[u[coeffI]] += cmptMag(activeUpper[coeffI]);
@@ -481,7 +481,7 @@ void Foam::BlockLduMatrix<Type>::check() const
             const squareTypeField& activeLower = Lower.asSquare();
             const squareTypeField& activeUpper = Upper.asSquare();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeSumOffDiag[l[coeffI]] +=
                     sumMagToDiag(activeLower[coeffI]);
@@ -516,7 +516,7 @@ void Foam::BlockLduMatrix<Type>::check() const
             const linearTypeField& activeUpper = Upper.asLinear();
             linearTypeField& activeSumOffDiag = SumOffDiag.asLinear();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeSumOffDiag[l[coeffI]] += cmptMag(activeLower[coeffI]);
                 activeSumOffDiag[u[coeffI]] += cmptMag(activeUpper[coeffI]);
@@ -545,7 +545,7 @@ void Foam::BlockLduMatrix<Type>::check() const
             const scalarTypeField& activeUpper = Upper.asScalar();
             scalarTypeField& activeSumOffDiag = SumOffDiag.asScalar();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeSumOffDiag[l[coeffI]] += cmptMag(activeLower[coeffI]);
                 activeSumOffDiag[u[coeffI]] += cmptMag(activeUpper[coeffI]);
@@ -623,7 +623,7 @@ void Foam::BlockLduMatrix<Type>::relax
                 pTraits<typename TypeCoeffField::squareType>::zero
             );
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 sumOff[u[coeffI]] += cmptMag(activeUpper[coeffI].T());
                 sumOff[l[coeffI]] += cmptMag(activeUpper[coeffI]);
@@ -658,7 +658,7 @@ void Foam::BlockLduMatrix<Type>::relax
                 pTraits<typename TypeCoeffField::linearType>::zero
             );
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 sumOff[u[coeffI]] += cmptMag(activeUpper[coeffI]);
                 sumOff[l[coeffI]] += cmptMag(activeUpper[coeffI]);
@@ -691,7 +691,7 @@ void Foam::BlockLduMatrix<Type>::relax
                 pTraits<typename TypeCoeffField::scalarType>::zero
             );
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 sumOff[u[coeffI]] += mag(activeUpper[coeffI]);
                 sumOff[l[coeffI]] += mag(activeUpper[coeffI]);
@@ -741,7 +741,7 @@ void Foam::BlockLduMatrix<Type>::relax
                 pTraits<typename TypeCoeffField::squareType>::zero
             );
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 sumOff[u[coeffI]] += cmptMag(activeLower[coeffI]);
                 sumOff[l[coeffI]] += cmptMag(activeUpper[coeffI]);
@@ -778,7 +778,7 @@ void Foam::BlockLduMatrix<Type>::relax
                 pTraits<typename TypeCoeffField::linearType>::zero
             );
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 sumOff[u[coeffI]] += cmptMag(activeLower[coeffI]);
                 sumOff[l[coeffI]] += cmptMag(activeUpper[coeffI]);
@@ -813,7 +813,7 @@ void Foam::BlockLduMatrix<Type>::relax
                 pTraits<typename TypeCoeffField::scalarType>::zero
             );
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 sumOff[u[coeffI]] += mag(activeLower[coeffI]);
                 sumOff[l[coeffI]] += mag(activeUpper[coeffI]);
@@ -1047,7 +1047,7 @@ void Foam::BlockLduMatrix<Type>::operator*=(const scalarField& sf)
         {
             scalarTypeField& activeUpper = Upper.asScalar();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeUpper[coeffI] *= sf[l[coeffI]];
             }
@@ -1056,7 +1056,7 @@ void Foam::BlockLduMatrix<Type>::operator*=(const scalarField& sf)
         {
             linearTypeField& activeUpper = Upper.asLinear();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeUpper[coeffI] *= sf[l[coeffI]];
             }
@@ -1065,7 +1065,7 @@ void Foam::BlockLduMatrix<Type>::operator*=(const scalarField& sf)
         {
             squareTypeField& activeUpper = Upper.asSquare();
 
-            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            for (label coeffI = 0; coeffI < l.size(); coeffI++)
             {
                 activeUpper[coeffI] *= sf[l[coeffI]];
             }
@@ -1082,7 +1082,7 @@ void Foam::BlockLduMatrix<Type>::operator*=(const scalarField& sf)
         {
             scalarTypeField& activeLower = Lower.asScalar();
 
-            for (register label coeffI = 0; coeffI < u.size(); coeffI++)
+            for (label coeffI = 0; coeffI < u.size(); coeffI++)
             {
                 activeLower[coeffI] *= sf[u[coeffI]];
             }
@@ -1091,7 +1091,7 @@ void Foam::BlockLduMatrix<Type>::operator*=(const scalarField& sf)
         {
             linearTypeField& activeLower = Lower.asLinear();
 
-            for (register label coeffI = 0; coeffI < u.size(); coeffI++)
+            for (label coeffI = 0; coeffI < u.size(); coeffI++)
             {
                 activeLower[coeffI] *= sf[u[coeffI]];
             }
@@ -1100,7 +1100,7 @@ void Foam::BlockLduMatrix<Type>::operator*=(const scalarField& sf)
         {
             squareTypeField& activeLower = Lower.asSquare();
 
-            for (register label coeffI = 0; coeffI < u.size(); coeffI++)
+            for (label coeffI = 0; coeffI < u.size(); coeffI++)
             {
                 activeLower[coeffI] *= sf[u[coeffI]];
             }

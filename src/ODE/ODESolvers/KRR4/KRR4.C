@@ -101,11 +101,11 @@ void Foam::KRR4::solve
 
     scalar h = hTry;
 
-    for (register label jtry=0; jtry<maxtry; jtry++)
+    for (label jtry=0; jtry<maxtry; jtry++)
     {
-        for (register label i=0; i<nEqns; i++)
+        for (label i=0; i<nEqns; i++)
         {
-            for (register label j=0; j<nEqns; j++)
+            for (label j=0; j<nEqns; j++)
             {
                 a_[i][j] = -dfdy_[i][j];
             }
@@ -115,14 +115,14 @@ void Foam::KRR4::solve
 
         simpleMatrix<scalar>::LUDecompose(a_, pivotIndices_);
 
-        for (register label i=0; i<nEqns; i++)
+        for (label i=0; i<nEqns; i++)
         {
             g1_[i] = dydxTemp_[i] + h*c1X*dfdx_[i];
         }
 
         simpleMatrix<scalar>::LUBacksubstitute(a_, pivotIndices_, g1_);
 
-        for (register label i=0; i<nEqns; i++)
+        for (label i=0; i<nEqns; i++)
         {
             y[i] = yTemp_[i] + a21*g1_[i];
         }
@@ -130,14 +130,14 @@ void Foam::KRR4::solve
         x = xTemp + a2X*h;
         ode_.derivatives(x, y, dydx_);
 
-        for (register label i=0; i<nEqns; i++)
+        for (label i=0; i<nEqns; i++)
         {
             g2_[i] = dydx_[i] + h*c2X*dfdx_[i] + c21*g1_[i]/h;
         }
 
         simpleMatrix<scalar>::LUBacksubstitute(a_, pivotIndices_, g2_);
 
-        for (register label i=0; i<nEqns; i++)
+        for (label i=0; i<nEqns; i++)
         {
             y[i] = yTemp_[i] + a31*g1_[i] + a32*g2_[i];
         }
@@ -145,14 +145,14 @@ void Foam::KRR4::solve
         x = xTemp + a3X*h;
         ode_.derivatives(x, y, dydx_);
 
-        for (register label i=0; i<nEqns; i++)
+        for (label i=0; i<nEqns; i++)
         {
             g3_[i] = dydx[i] + h*c3X*dfdx_[i] + (c31*g1_[i] + c32*g2_[i])/h;
         }
 
         simpleMatrix<scalar>::LUBacksubstitute(a_, pivotIndices_, g3_);
 
-        for (register label i=0; i<nEqns; i++)
+        for (label i=0; i<nEqns; i++)
         {
             g4_[i] = dydx_[i] + h*c4X*dfdx_[i]
                 + (c41*g1_[i] + c42*g2_[i] + c43*g3_[i])/h;
@@ -160,7 +160,7 @@ void Foam::KRR4::solve
 
         simpleMatrix<scalar>::LUBacksubstitute(a_, pivotIndices_, g4_);
 
-        for (register label i=0; i<nEqns; i++)
+        for (label i=0; i<nEqns; i++)
         {
             y[i] = yTemp_[i] + b1*g1_[i] + b2*g2_[i] + b3*g3_[i] + b4*g4_[i];
             yErr_[i] = e1*g1_[i] + e2*g2_[i] + e3*g3_[i] + e4*g4_[i];
@@ -176,7 +176,7 @@ void Foam::KRR4::solve
         }
 
         scalar maxErr = 0.0;
-        for (register label i=0; i<nEqns; i++)
+        for (label i=0; i<nEqns; i++)
         {
             maxErr = max(maxErr, mag(yErr_[i]/yScale[i]));
         }

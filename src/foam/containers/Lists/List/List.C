@@ -354,7 +354,7 @@ void Foam::List<T>::setSize(const label newSize)
 
             if (this->size_)
             {
-                register label i = min(this->size_, newSize);
+                label i = min(this->size_, newSize);
 
 #               ifdef USEMEMCPY
                 if (contiguous<T>())
@@ -364,8 +364,8 @@ void Foam::List<T>::setSize(const label newSize)
                 else
 #               endif
                 {
-                    register T* vv = &this->v_[i];
-                    register T* av = &nv[i];
+                    T* vv = &this->v_[i];
+                    T* av = &nv[i];
                     while (i--) *--av = *--vv;
                 }
             }
@@ -390,8 +390,8 @@ void Foam::List<T>::setSize(const label newSize, const T& a)
 
     if (newSize > oldSize)
     {
-        register label i = newSize - oldSize;
-        register T* vv = &this->v_[newSize];
+        label i = newSize - oldSize;
+        T* vv = &this->v_[newSize];
         while (i--) *--vv = a;
     }
 }

@@ -94,12 +94,12 @@ void Foam::ILUC0::calcFactorization()
 
         // Define start and end face of this row/column, and number of non zero
         // off diagonal entries
-        register label fStart, fEnd, fLsrStart, fLsrEnd;
+        label fStart, fEnd, fLsrStart, fLsrEnd;
 
         // Crout LU factorization
 
         // Row by row loop (k - loop).
-        for (register label rowI = 0; rowI < nRows; ++rowI)
+        for (label rowI = 0; rowI < nRows; ++rowI)
         {
             // Start and end of k-th row (upper) and k-th column (lower)
             fStart = ownStartPtr[rowI];
@@ -109,7 +109,7 @@ void Foam::ILUC0::calcFactorization()
             zDiag_ = diagPtr[rowI];
 
             // Initialize temporary working row field
-            for (register label faceI = fStart; faceI < fEnd; ++faceI)
+            for (label faceI = fStart; faceI < fEnd; ++faceI)
             {
                 // Note: z addressed by neighbour of face (column index for
                 // upper), w addressed by neighbour of face (row index for
@@ -125,13 +125,13 @@ void Foam::ILUC0::calcFactorization()
             // Lower coeff loop (first i - loop)
             for
             (
-                register label faceLsrI = fLsrStart;
+                label faceLsrI = fLsrStart;
                 faceLsrI < fLsrEnd;
                 ++faceLsrI
             )
             {
                 // Get losort coefficient for this face
-                const register label losortIndex = lsrPtr[faceLsrI];
+                const label losortIndex = lsrPtr[faceLsrI];
 
                 // Get corresponding row index for upper (i label)
                 const label i = lPtr[losortIndex];
@@ -140,14 +140,14 @@ void Foam::ILUC0::calcFactorization()
                 zDiag_ -= lowerPtr[losortIndex]*upperPtr[losortIndex];
 
                 // Get end of row for cell i
-                const register label fEndRowi = ownStartPtr[i + 1];
+                const label fEndRowi = ownStartPtr[i + 1];
 
                 // Upper coeff loop (additional loop to avoid checking the
                 // existence of certain upper coeffs)
                 for
                 (
                     // Diagonal is already updated (losortIndex + 1 = start)
-                    register label faceI = losortIndex + 1;
+                    label faceI = losortIndex + 1;
                     faceI < fEndRowi;
                     ++faceI
                 )
@@ -162,10 +162,10 @@ void Foam::ILUC0::calcFactorization()
             diagRowI = 1.0/zDiag_;
 
             // Index for updating L and U
-            register label zwIndex;
+            label zwIndex;
 
             // Update upper and lower coeffs
-            for (register label faceI = fStart; faceI < fEnd; ++faceI)
+            for (label faceI = fStart; faceI < fEnd; ++faceI)
             {
                 // Get index for current face
                 zwIndex = uPtr[faceI];
@@ -182,23 +182,23 @@ void Foam::ILUC0::calcFactorization()
             // this step (for this row and column)
             for
             (
-                register label faceLsrI = fLsrStart;
+                label faceLsrI = fLsrStart;
                 faceLsrI < fLsrEnd;
                 ++faceLsrI
             )
             {
                 // Get losort coefficient for this face
-                const register label losortIndex = lsrPtr[faceLsrI];
+                const label losortIndex = lsrPtr[faceLsrI];
 
                 // Get corresponding row index for upper (i label)
                 const label i = lPtr[losortIndex];
 
                 // Get end of row for cell i
-                const register label fEndRowi = ownStartPtr[i + 1];
+                const label fEndRowi = ownStartPtr[i + 1];
 
                 for
                 (
-                    register label faceI = losortIndex + 1;
+                    label faceI = losortIndex + 1;
                     faceI < fEndRowi;
                     ++faceI
                 )
@@ -303,8 +303,8 @@ void Foam::ILUC0::precondition
         // Initialize x field
         x = b;
 
-        register label losortIndexI;
-        register label rowI;
+        label losortIndexI;
+        label rowI;
 
         // Forward substitution loop
         forAll (preconLower_, coeffI)
@@ -379,8 +379,8 @@ void Foam::ILUC0::preconditionT
             x[i] = b[i]*preconDiag_[i];
         }
 
-        register label losortIndexI;
-        register label rowI;
+        label losortIndexI;
+        label rowI;
 
         // Forward substitution loop
         forAll (preconUpper_, coeffI)

@@ -52,17 +52,17 @@ void Foam::DICPreconditioner::calcReciprocalD
     const scalar* const __restrict__ upperPtr = matrix.upper().begin();
 
     // Calculate the DIC diagonal
-    register const label nFaces = matrix.upper().size();
-    for (register label face=0; face<nFaces; face++)
+    const label nFaces = matrix.upper().size();
+    for (label face=0; face<nFaces; face++)
     {
         rDPtr[uPtr[face]] -= upperPtr[face]*upperPtr[face]/rDPtr[lPtr[face]];
     }
 
 
     // Calculate the reciprocal of the preconditioned diagonal
-    register const label nCells = rD.size();
+    const label nCells = rD.size();
 
-    for (register label cell=0; cell<nCells; cell++)
+    for (label cell=0; cell<nCells; cell++)
     {
         rDPtr[cell] = 1.0/rDPtr[cell];
     }
@@ -112,21 +112,21 @@ void Foam::DICPreconditioner::precondition
         matrix_.lduAddr().lowerAddr().begin();
     const scalar* const __restrict__ upperPtr = matrix_.upper().begin();
 
-    register label nCells = wA.size();
-    register label nFaces = matrix_.upper().size();
-    register label nFacesM1 = nFaces - 1;
+    label nCells = wA.size();
+    label nFaces = matrix_.upper().size();
+    label nFacesM1 = nFaces - 1;
 
-    for (register label cell=0; cell<nCells; cell++)
+    for (label cell=0; cell<nCells; cell++)
     {
         wAPtr[cell] = rDPtr[cell]*rAPtr[cell];
     }
 
-    for (register label face=0; face<nFaces; face++)
+    for (label face=0; face<nFaces; face++)
     {
         wAPtr[uPtr[face]] -= rDPtr[uPtr[face]]*upperPtr[face]*wAPtr[lPtr[face]];
     }
 
-    for (register label face=nFacesM1; face>=0; face--)
+    for (label face=nFacesM1; face>=0; face--)
     {
         wAPtr[lPtr[face]] -= rDPtr[lPtr[face]]*upperPtr[face]*wAPtr[uPtr[face]];
     }

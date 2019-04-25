@@ -112,7 +112,7 @@ void Foam::symGaussSeidelPrecon::precondition
 
         const label nRows = x.size();
 
-        for (register label rowI = 0; rowI < nRows; rowI++)
+        for (label rowI = 0; rowI < nRows; rowI++)
         {
             xPtr[rowI] = bPtr[rowI]/diagPtr[rowI];
         }
@@ -164,7 +164,7 @@ void Foam::symGaussSeidelPrecon::precondition
         }
 
         // Forward sweep
-        for (register label rowI = 0; rowI < nRows; rowI++)
+        for (label rowI = 0; rowI < nRows; rowI++)
         {
             // lRow is equal to rowI
             scalar& curX = xPtr[rowI];
@@ -177,7 +177,7 @@ void Foam::symGaussSeidelPrecon::precondition
             fEnd = ownStartPtr[rowI + 1];
 
             // Accumulate the owner product side
-            for (register label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
+            for (label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
             {
                 curX -= upperPtr[curCoeff]*xPtr[uPtr[curCoeff]];
             }
@@ -186,14 +186,14 @@ void Foam::symGaussSeidelPrecon::precondition
             curX /= diagPtr[rowI];
 
             // Distribute the neighbour side using current x
-            for (register label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
+            for (label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
             {
                 bPrimePtr[uPtr[curCoeff]] -= lowerPtr[curCoeff]*curX;
             }
         }
 
         // Reverse sweep
-        for (register label rowI = nRows - 1; rowI >= 0; rowI--)
+        for (label rowI = nRows - 1; rowI >= 0; rowI--)
         {
             // lRow is equal to rowI
             scalar& curX = xPtr[rowI];
@@ -206,7 +206,7 @@ void Foam::symGaussSeidelPrecon::precondition
             fEnd = ownStartPtr[rowI + 1];
 
             // Accumulate the owner product side
-            for (register label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
+            for (label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
             {
                 curX -= upperPtr[curCoeff]*xPtr[uPtr[curCoeff]];
             }
@@ -279,7 +279,7 @@ void Foam::symGaussSeidelPrecon::preconditionT
         }
 
         // Forward sweep
-        for (register label rowI = 0; rowI < nRows; rowI++)
+        for (label rowI = 0; rowI < nRows; rowI++)
         {
             // lRow is equal to rowI
             scalar& curX = xPtr[rowI];
@@ -292,7 +292,7 @@ void Foam::symGaussSeidelPrecon::preconditionT
             fEnd = ownStartPtr[rowI + 1];
 
             // Accumulate the owner product side
-            for (register label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
+            for (label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
             {
                 // Transpose multiplication.  HJ, 10/Jul/2007
                 curX -= lowerPtr[curCoeff]*xPtr[uPtr[curCoeff]];
@@ -302,7 +302,7 @@ void Foam::symGaussSeidelPrecon::preconditionT
             curX /= diagPtr[rowI];
 
             // Distribute the neighbour side using current x
-            for (register label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
+            for (label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
             {
                 // Transpose multiplication.  HJ, 10/Jul/2007
                 bPrimePtr[uPtr[curCoeff]] -= upperPtr[curCoeff]*curX;
@@ -310,7 +310,7 @@ void Foam::symGaussSeidelPrecon::preconditionT
         }
 
         // Reverse sweep
-        for (register label rowI = nRows - 1; rowI >= 0; rowI--)
+        for (label rowI = nRows - 1; rowI >= 0; rowI--)
         {
             // lRow is equal to rowI
             scalar& curX = xPtr[rowI];
@@ -323,7 +323,7 @@ void Foam::symGaussSeidelPrecon::preconditionT
             fEnd = ownStartPtr[rowI + 1];
 
             // Accumulate the owner product side
-            for (register label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
+            for (label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
             {
                 // Transpose multiplication.  HJ, 10/Jul/2007
                 curX -= lowerPtr[curCoeff]*xPtr[uPtr[curCoeff]];

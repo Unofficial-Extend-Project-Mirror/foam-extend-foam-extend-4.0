@@ -101,10 +101,16 @@ public:
         // Access
 
             //- Return component
-            inline const Cmpt& ii() const;
+            inline const Cmpt& ii() const
+            {
+                return this->v_[II];
+            }
 
             //- Return access to component
-            inline Cmpt& ii();
+            inline Cmpt& ii()
+            {
+                return this->v_[II];
+            }
 
 
         //- Diagonal

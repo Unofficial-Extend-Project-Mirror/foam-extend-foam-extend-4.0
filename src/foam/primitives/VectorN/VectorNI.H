@@ -210,7 +210,7 @@ scaleRow(const VectorN<Cmpt, length>& v, const Cmpt& c)
 // inline Cmpt sum(const VectorN<Cmpt, length>& v)
 // {
 //     Cmpt result = pTraits<Cmpt>::zero;
-//     for(register label i=0; i<VectorN<Cmpt, length>::nComponents; i++)
+//     for(label i = 0; i < VectorN<Cmpt, length>::nComponents; i++)
 //     {
 //         result += v[i];
 //     }

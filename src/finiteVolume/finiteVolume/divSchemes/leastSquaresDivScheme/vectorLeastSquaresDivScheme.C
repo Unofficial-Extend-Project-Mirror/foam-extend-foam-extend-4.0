@@ -98,7 +98,7 @@ tmp<BlockLduSystem<vector, scalar> > leastSquaresDivScheme<vector>::fvmUDiv
     const vectorField& neiLsIn = neiLs.internalField();
 //     const scalarField& wIn = weights.internalField();
 
-    register label owner, neighbour;
+    label owner, neighbour;
 
     forAll (nei, faceI)
     {
@@ -231,8 +231,8 @@ tmp<BlockLduSystem<vector, scalar> > leastSquaresDivScheme<vector>::fvmUDiv
 
     forAll (nei, faceI)
     {
-        register label owner = own[faceI];
-        register label neighbour = nei[faceI];
+        label owner = own[faceI];
+        label neighbour = nei[faceI];
 
         u[faceI] = cellVIn[owner]*ownLsIn[faceI]*fluxIn[faceI];
         l[faceI] = cellVIn[neighbour]*neiLsIn[faceI]*fluxIn[faceI];

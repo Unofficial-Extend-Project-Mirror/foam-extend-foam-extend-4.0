@@ -105,7 +105,7 @@ bool Foam::fileName::clean()
         src < maxLen;
     )
     {
-        register char c = operator[](src++);
+        char c = operator[](src++);
 
         if (prev == '/')
         {

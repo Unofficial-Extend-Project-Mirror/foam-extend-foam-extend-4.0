@@ -70,7 +70,7 @@ public:
             const direction dim
         )
         {
-            register label curIdx = 0;
+            label curIdx = 0;
 
             coeffs[curIdx++] = weight;
             coeffs[curIdx++] = weight*d.x();

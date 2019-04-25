@@ -15,7 +15,7 @@
         // Warning.  Possible problem with a zone which is both MRF and porous
         // The solution is to do the loop below everywhere
         // Currently only inserting zones for efficiency.  HJ, 18/Nov/2017
-        register label cellI;
+        label cellI;
 
         forAll (mrfZones, mrfZoneI)
         {

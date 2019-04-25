@@ -186,12 +186,12 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     scalarField epsilonStrongCoeff(nRows, 0);
 
     // Select the strongest coefficient in each row
-    for (register label i = 0; i < nRows; i++)
+    for (label i = 0; i < nRows; i++)
     {
         const scalar signDiag = sign(normDiag[i]);
 
         // Do lower triangle coefficient for the row first
-        for (register label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
+        for (label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
         {
             const scalar magAij =
                 mag(min(signDiag*normLower[losortAddr[jp]], 0));
@@ -203,7 +203,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
         }
 
         // Do upper triangle coefficient for the row
-        for (register label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
+        for (label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
         {
             const scalar magAij = mag(min(signDiag*normUpper[ip], 0));
 
@@ -222,12 +222,12 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     // positive and negative coefficients.  HJ, 28/Feb/2017
     labelList strongCoeffCounter(nRows, 0);
 
-    for (register label i = 0; i < nRows; i++)
+    for (label i = 0; i < nRows; i++)
     {
         const scalar signDiag = sign(normDiag[i]);
 
         // Do lower triangle coefficient for the row first
-        for (register label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
+        for (label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
         {
             const scalar magAij =
                 mag(min(signDiag*normLower[losortAddr[jp]], 0));
@@ -239,7 +239,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
         }
 
         // Do upper triangle coefficient for the row
-        for (register label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
+        for (label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
         {
             const scalar magAij = mag(min(signDiag*normUpper[ip], 0));
 
@@ -266,12 +266,12 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     // Reset strongCoeffCounter for re-use
     strongCoeffCounter = 0;
 
-    for (register label i = 0; i < nRows; i++)
+    for (label i = 0; i < nRows; i++)
     {
         const scalar signDiag = sign(normDiag[i]);
 
         // Do lower triangle coefficient for the row first
-        for (register label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
+        for (label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
         {
             const scalar magAij =
                 mag(min(signDiag*normLower[losortAddr[jp]], 0));
@@ -511,7 +511,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     // Start row assembly
     pRow[0] = 0;
 
-    for (register label i = 0; i < nRows; i++)
+    for (label i = 0; i < nRows; i++)
     {
         label rowCount = pRow[i];
 
@@ -520,7 +520,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
         signDii = sign(normDiag[i]);
 
         // Do lower triangle coefficient for the row first
-        for (register label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
+        for (label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
         {
             // Adjust sign of off-diag coeff
             Dij = sign(normDiag[i])*normLower[losortAddr[jp]];
@@ -532,7 +532,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
         }
 
         // Do upper triangle coefficient for the row
-        for (register label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
+        for (label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
         {
             // Adjust sign of off-diag coeff
             Dij = signDii*normUpper[ip];
@@ -551,7 +551,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 
             for
             (
-                register label sip = strongRow[i];
+                label sip = strongRow[i];
                 sip < strongRow[i + 1];
                 sip++
             )
@@ -566,7 +566,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 
             for
             (
-                register label sip = strongRow[i];
+                label sip = strongRow[i];
                 sip < strongRow[i + 1];
                 sip++
             )
@@ -614,7 +614,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
         const labelList& prolongationRow = Pptr_->crAddr().rowStart();
         const scalarField& prolongationCoeff = Pptr_->coeffs();
 
-        for (register label rowI = 0; rowI < nRows; rowI++)
+        for (label rowI = 0; rowI < nRows; rowI++)
         {
             for
             (
@@ -1505,9 +1505,9 @@ void Foam::BlockMatrixSelection<Type>::restrictResidual
     // Multiply the residual with restriction weights to obtain the initial
     // coarse residual
 
-    for (register label i = 0; i < nCoarseEqns_; i++)
+    for (label i = 0; i < nCoarseEqns_; i++)
     {
-        for (register label k = rowR[i]; k < rowR[i + 1]; k++)
+        for (label k = rowR[i]; k < rowR[i + 1]; k++)
         {
             // Multiply each coeff in row of restriction with the corresponding
             // residual coefficient (col index of R is the same as row index
@@ -1546,9 +1546,9 @@ void Foam::BlockMatrixSelection<Type>::prolongateCorrection
     // Multiply the coarse level solution with prolongation and obtain fine
     // level solution
 
-    for (register label i = 0; i < sizeP; i++)
+    for (label i = 0; i < sizeP; i++)
     {
-        for (register label k = rowP[i]; k < rowP[i + 1]; k++)
+        for (label k = rowP[i]; k < rowP[i + 1]; k++)
         {
             // Multiply each coeff in row of prolongation with the corresponding
             // coarse residual coefficient (col index of prolongation must be

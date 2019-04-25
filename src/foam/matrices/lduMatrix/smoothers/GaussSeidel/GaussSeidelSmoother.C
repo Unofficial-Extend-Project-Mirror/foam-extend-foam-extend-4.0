@@ -72,23 +72,23 @@ void Foam::GaussSeidelSmoother::smooth
     const label nSweeps
 )
 {
-    register scalar* __restrict__ xPtr = x.begin();
+    scalar* __restrict__ xPtr = x.begin();
 
-    register const label nCells = x.size();
+    const label nCells = x.size();
 
     scalarField bPrime(nCells);
-    register scalar* __restrict__ bPrimePtr = bPrime.begin();
+    scalar* __restrict__ bPrimePtr = bPrime.begin();
 
-    register const scalar* const __restrict__ diagPtr = matrix.diag().begin();
-    register const scalar* const __restrict__ upperPtr =
+    const scalar* const __restrict__ diagPtr = matrix.diag().begin();
+    const scalar* const __restrict__ upperPtr =
         matrix.upper().begin();
-    register const scalar* const __restrict__ lowerPtr =
+    const scalar* const __restrict__ lowerPtr =
         matrix.lower().begin();
 
-    register const label* const __restrict__ uPtr =
+    const label* const __restrict__ uPtr =
         matrix.lduAddr().upperAddr().begin();
 
-    register const label* const __restrict__ ownStartPtr =
+    const label* const __restrict__ ownStartPtr =
         matrix.lduAddr().ownerStartAddr().begin();
 
 
@@ -133,11 +133,11 @@ void Foam::GaussSeidelSmoother::smooth
             true         // switch to lhs
         );
 
-        register scalar curX;
-        register label fStart;
-        register label fEnd = ownStartPtr[0];
+        scalar curX;
+        label fStart;
+        label fEnd = ownStartPtr[0];
 
-        for (register label cellI = 0; cellI < nCells; cellI++)
+        for (label cellI = 0; cellI < nCells; cellI++)
         {
             // Start and end of this row
             fStart = fEnd;
@@ -147,7 +147,7 @@ void Foam::GaussSeidelSmoother::smooth
             curX = bPrimePtr[cellI];
 
             // Accumulate the owner product side
-            for (register label curFace = fStart; curFace < fEnd; curFace++)
+            for (label curFace = fStart; curFace < fEnd; curFace++)
             {
                 curX -= upperPtr[curFace]*xPtr[uPtr[curFace]];
             }
@@ -156,7 +156,7 @@ void Foam::GaussSeidelSmoother::smooth
             curX /= diagPtr[cellI];
 
             // Distribute the neighbour side using current x
-            for (register label curFace = fStart; curFace < fEnd; curFace++)
+            for (label curFace = fStart; curFace < fEnd; curFace++)
             {
                 bPrimePtr[uPtr[curFace]] -= lowerPtr[curFace]*curX;
             }

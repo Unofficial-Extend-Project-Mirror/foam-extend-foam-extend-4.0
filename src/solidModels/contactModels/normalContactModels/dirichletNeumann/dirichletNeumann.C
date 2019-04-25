@@ -692,7 +692,7 @@ void dirichletNeumann::calcSlavePointPoints(const label slavePatchID)
 
   const faceList& lf = mesh.boundaryMesh()[slavePatchID].localFaces();
 
-  register bool found = false;
+  bool found = false;
 
   forAll (lf, faceI)
     {
