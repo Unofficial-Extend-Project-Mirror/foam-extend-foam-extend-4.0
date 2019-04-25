@@ -46,7 +46,7 @@ Description
 #include <stdio.h>
 
 
-#if READLINE != 0
+#if HAS_READLINE
 #include <readline/readline.h>
 #include <readline/history.h>
 #endif
@@ -56,7 +56,7 @@ using namespace Foam;
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 
-#if READLINE != 0
+#if HAS_READLINE
 static const char* historyFile = ".setSet";
 #endif
 
@@ -785,7 +785,7 @@ int main(int argc, char *argv[])
 
         fileStreamPtr = new std::ifstream(batchFile.c_str());
     }
-#if READLINE != 0
+#if HAS_READLINE
     else if (!read_history(historyFile))
     {
         Info<< "Successfully read history from " << historyFile << endl;
@@ -829,7 +829,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-#           if READLINE != 0
+#           if HAS_READLINE
             {
                 char* linePtr = readline("readline>");
 
