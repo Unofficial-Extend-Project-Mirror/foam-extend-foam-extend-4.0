@@ -82,7 +82,7 @@ void whisperReduce(const ListType& neis, const scatterOp& sop, gatherOp& gop)
     {
         //- receive the data
         List<T> receivedData;
-        IPstream fromOtherProc(Pstream::commsTypes::blocking, above[aboveI]);
+        IPstream fromOtherProc(Pstream::blocking, above[aboveI]);
         fromOtherProc >> receivedData;
 
         gop(receivedData);
@@ -99,7 +99,7 @@ void whisperReduce(const ListType& neis, const scatterOp& sop, gatherOp& gop)
         //- send the data
         OPstream toOtherProc
         (
-            Pstream::commsTypes::blocking,
+            Pstream::blocking,
             neiProc,
             dts.byteSize()
         );
@@ -113,7 +113,7 @@ void whisperReduce(const ListType& neis, const scatterOp& sop, gatherOp& gop)
     {
         //- receive the data
         List<T> receivedData;
-        IPstream fromOtherProc(Pstream::commsTypes::blocking, below[belowI]);
+        IPstream fromOtherProc(Pstream::blocking, below[belowI]);
         fromOtherProc >> receivedData;
 
         gop(receivedData);
@@ -130,7 +130,7 @@ void whisperReduce(const ListType& neis, const scatterOp& sop, gatherOp& gop)
         //- send the data
         OPstream toOtherProc
         (
-            Pstream::commsTypes::blocking,
+            Pstream::blocking,
             neiProc,
             dts.byteSize()
         );
@@ -160,7 +160,7 @@ void exchangeMap
     {
         OPstream toOtherProc
         (
-            Pstream::commsTypes::blocking,
+            Pstream::blocking,
             iter->first,
             sizeof(label)
         );
@@ -172,7 +172,7 @@ void exchangeMap
     {
         IPstream fromOtherProc
         (
-            Pstream::commsTypes::blocking,
+            Pstream::blocking,
             iter->first,
             sizeof(label)
         );
@@ -184,7 +184,7 @@ void exchangeMap
             receiveData.insert(iter->first);
     }
 
-    if( commsType == Pstream::commsTypes::blocking )
+    if( commsType == Pstream::blocking )
     {
         //- start with blocking type of send and received operation
 
@@ -198,7 +198,7 @@ void exchangeMap
 
             OPstream toOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 iter->first,
                 dts.byteSize()
             );
@@ -213,14 +213,14 @@ void exchangeMap
 
             IPstream fromOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 iter->first
             );
 
             data.appendFromStream(fromOtherProc);
         }
     }
-    else if( commsType == Pstream::commsTypes::scheduled )
+    else if( commsType == Pstream::scheduled )
     {
         //- start with scheduled data transfer
         //- this type of transfer is intended for long messages because
@@ -236,7 +236,7 @@ void exchangeMap
 
             IPstream fromOtherProc
             (
-                Pstream::commsTypes::scheduled,
+                Pstream::scheduled,
                 iter->first
             );
 
@@ -256,7 +256,7 @@ void exchangeMap
 
             OPstream toOtherProc
             (
-                Pstream::commsTypes::scheduled,
+                Pstream::scheduled,
                 iter->first,
                 dts.byteSize()
             );
@@ -275,7 +275,7 @@ void exchangeMap
 
             IPstream fromOtherProc
             (
-                Pstream::commsTypes::scheduled,
+                Pstream::scheduled,
                 riter->first
             );
 
@@ -295,7 +295,7 @@ void exchangeMap
 
             OPstream toOtherProc
             (
-                Pstream::commsTypes::scheduled,
+                Pstream::scheduled,
                 riter->first,
                 dts.byteSize()
             );
@@ -310,7 +310,7 @@ void exchangeMap
             "template<class T, class ListType>"
             "void exchangeMap"
             "(const std::map<label, ListType>& m, LongList<T>& data,"
-            " const Pstream::commsTypes commsType)"
+            " const Pstream commsType)"
         ) << "Unknown communication type" << exit(FatalError);
     }
 
@@ -347,7 +347,7 @@ void exchangeMap
 
         OPstream toOtherProc
         (
-            Pstream::commsTypes::blocking,
+            Pstream::blocking,
             iter->first,
             dataToSend.byteSize()
         );
@@ -362,7 +362,7 @@ void exchangeMap
 
         IPstream fromOtherProc
         (
-            Pstream::commsTypes::blocking,
+            Pstream::blocking,
             iter->first
         );
 

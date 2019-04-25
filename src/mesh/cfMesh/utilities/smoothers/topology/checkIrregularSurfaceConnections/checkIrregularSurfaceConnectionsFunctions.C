@@ -235,7 +235,7 @@ bool checkIrregularSurfaceConnections::checkAndFixCellGroupsAtBndVertices
 
             OPstream toOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 globalLabels.byteSize()
             );
@@ -251,7 +251,7 @@ bool checkIrregularSurfaceConnections::checkAndFixCellGroupsAtBndVertices
             labelList receivedData;
             IPstream fromOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
 

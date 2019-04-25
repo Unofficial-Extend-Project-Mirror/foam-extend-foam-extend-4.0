@@ -119,7 +119,7 @@ void surfaceMorpherCells::findBoundaryVertices()
                 //- send the list of other processor
                 OPstream toOtherProc
                 (
-                    Pstream::commsTypes::blocking,
+                    Pstream::blocking,
                     procBoundaries[patchI].neiProcNo(),
                     bndVertsToSend.byteSize()
                 );
@@ -133,7 +133,7 @@ void surfaceMorpherCells::findBoundaryVertices()
                 labelList receivedBndNodes;
                 IPstream fromOtherProc
                 (
-                    Pstream::commsTypes::blocking,
+                    Pstream::blocking,
                     procBoundaries[patchI].neiProcNo()
                 );
                 fromOtherProc >> receivedBndNodes;

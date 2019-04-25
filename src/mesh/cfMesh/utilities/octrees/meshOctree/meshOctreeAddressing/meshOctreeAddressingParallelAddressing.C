@@ -174,7 +174,7 @@ void meshOctreeAddressing::calcGlobalPointLabels() const
     {
         //- receive the data
         labelList receivedLabels;
-        IPstream fromOtherProc(Pstream::commsTypes::blocking, above[aboveI]);
+        IPstream fromOtherProc(Pstream::blocking, above[aboveI]);
         fromOtherProc >> receivedLabels;
 
         label counter(0);
@@ -248,7 +248,7 @@ void meshOctreeAddressing::calcGlobalPointLabels() const
         }
 
         //- send the data
-        OPstream toOtherProc(Pstream::commsTypes::blocking, neiProc, dts.byteSize());
+        OPstream toOtherProc(Pstream::blocking, neiProc, dts.byteSize());
         toOtherProc << dts;
     }
 
@@ -258,7 +258,7 @@ void meshOctreeAddressing::calcGlobalPointLabels() const
     {
         //- receive the data
         labelList receivedLabels;
-        IPstream fromOtherProc(Pstream::commsTypes::blocking, below[belowI]);
+        IPstream fromOtherProc(Pstream::blocking, below[belowI]);
         fromOtherProc >> receivedLabels;
 
         label counter(0);
@@ -332,7 +332,7 @@ void meshOctreeAddressing::calcGlobalPointLabels() const
         }
 
         //- send the data
-        OPstream toOtherProc(Pstream::commsTypes::blocking, neiProc, dts.byteSize());
+        OPstream toOtherProc(Pstream::blocking, neiProc, dts.byteSize());
         toOtherProc << dts;
     }
 }
@@ -440,7 +440,7 @@ void meshOctreeAddressing::calcGlobalLeafLabels() const
 
     //- exchange the data with other processors
     LongList<meshOctreeCubeBasic> rLeaves;
-    help::exchangeMap(exchangeData, rLeaves, Pstream::commsTypes::scheduled);
+    help::exchangeMap(exchangeData, rLeaves, Pstream::scheduled);
 
     //- update the local data
     forAll(rLeaves, i)
@@ -482,9 +482,9 @@ void meshOctreeAddressing::calcGlobalLeafLabels() const
 
     //- exchange the data
     rLeaves.clear();
-    help::exchangeMap(exchangeData, rLeaves, Pstream::commsTypes::scheduled);
+    help::exchangeMap(exchangeData, rLeaves, Pstream::scheduled);
     labelLongList rLabels;
-    help::exchangeMap(exchangeLabels, rLabels, Pstream::commsTypes::scheduled);
+    help::exchangeMap(exchangeLabels, rLabels, Pstream::scheduled);
 
     if( rLeaves.size() != rLabels.size() )
         FatalErrorIn("void meshOctreeAddressing::calcGlobalLeafLabels() const")
@@ -529,7 +529,7 @@ void meshOctreeAddressing::calcGlobalLeafLabels() const
 
     //- exchange the data
     rLabels.clear();
-    help::exchangeMap(exchangeLabels, rLabels, Pstream::commsTypes::scheduled);
+    help::exchangeMap(exchangeLabels, rLabels, Pstream::scheduled);
 
     //- update the local data
     label counter(0);

@@ -90,7 +90,7 @@ void polyMeshGenModifier::addBufferCells()
 
         OPstream toOtherProc
         (
-            Pstream::commsTypes::blocking,
+            Pstream::blocking,
             procBoundaries[patchI].neiProcNo()
         );
 
@@ -103,7 +103,7 @@ void polyMeshGenModifier::addBufferCells()
         List<labelledPoint> receivedPoints;
         IPstream fromOtherProc
         (
-            Pstream::commsTypes::blocking,
+            Pstream::blocking,
             procBoundaries[patchI].neiProcNo()
         );
 
@@ -157,7 +157,7 @@ void polyMeshGenModifier::addBufferCells()
 
         OPstream toOtherProc
         (
-            Pstream::commsTypes::blocking,
+            Pstream::blocking,
             procBoundaries[patchI].neiProcNo()
         );
 
@@ -174,7 +174,7 @@ void polyMeshGenModifier::addBufferCells()
 
         IPstream fromOtherProc
         (
-            Pstream::commsTypes::blocking,
+            Pstream::blocking,
             procBoundaries[patchI].neiProcNo()
         );
 

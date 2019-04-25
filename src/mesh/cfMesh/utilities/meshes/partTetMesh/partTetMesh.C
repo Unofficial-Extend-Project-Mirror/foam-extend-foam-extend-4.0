@@ -594,7 +594,7 @@ void partTetMesh::updateOrigMesh(boolList* changedFacePtr)
 
             OPstream toOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 pBnd[patchI].neiProcNo(),
                 sendData.byteSize()
             );
@@ -608,7 +608,7 @@ void partTetMesh::updateOrigMesh(boolList* changedFacePtr)
 
             IPstream fromOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 pBnd[patchI].neiProcNo()
             );
 

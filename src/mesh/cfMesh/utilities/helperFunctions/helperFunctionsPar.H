@@ -68,7 +68,7 @@ void exchangeMap
 (
     const std::map<label, ListType>&,
     LongList<T>&,
-    const Pstream::commsTypes commsType = Pstream::commsTypes::blocking
+    const Pstream commsType = Pstream::blocking
 );
 
 //- sends the data stored in a map to other processors and receives the data

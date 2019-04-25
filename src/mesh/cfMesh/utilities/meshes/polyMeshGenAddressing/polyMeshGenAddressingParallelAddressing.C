@@ -134,7 +134,7 @@ void polyMeshGenAddressing::calcGlobalPointLabels() const
 
             OPstream toOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 dataToSend.byteSize()
             );
@@ -145,7 +145,7 @@ void polyMeshGenAddressing::calcGlobalPointLabels() const
         {
             IPstream fromOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
             labelList receivedData;
@@ -239,7 +239,7 @@ void polyMeshGenAddressing::calcGlobalPointLabels() const
 
             OPstream toOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 dataToSend.byteSize()
             );
@@ -250,7 +250,7 @@ void polyMeshGenAddressing::calcGlobalPointLabels() const
         {
             IPstream fromOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
             labelList receivedData;
@@ -347,7 +347,7 @@ void polyMeshGenAddressing::calcGlobalFaceLabels() const
 
             OPstream toOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 dataToSend.byteSize()
             );
@@ -361,7 +361,7 @@ void polyMeshGenAddressing::calcGlobalFaceLabels() const
         {
             IPstream fromOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
 
@@ -532,7 +532,7 @@ void polyMeshGenAddressing::calcGlobalEdgeLabels() const
 
             OPstream toOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 dataToSend.byteSize()
             );
@@ -543,7 +543,7 @@ void polyMeshGenAddressing::calcGlobalEdgeLabels() const
         {
             IPstream fromOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
             labelList receivedData;
@@ -645,7 +645,7 @@ void polyMeshGenAddressing::calcGlobalEdgeLabels() const
 
             OPstream toOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 dataToSend.byteSize()
             );
@@ -656,7 +656,7 @@ void polyMeshGenAddressing::calcGlobalEdgeLabels() const
         {
             IPstream fromOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
             labelList receivedData;

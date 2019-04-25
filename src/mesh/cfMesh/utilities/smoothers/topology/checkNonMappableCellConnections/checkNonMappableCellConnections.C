@@ -207,7 +207,7 @@ void checkNonMappableCellConnections::findCells(labelHashSet& badCells)
 
             OPstream toOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 procBoundaries[patchI].neiProcNo(),
                 patchCellType.byteSize()
             );
@@ -220,7 +220,7 @@ void checkNonMappableCellConnections::findCells(labelHashSet& badCells)
         {
             IPstream fromOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 procBoundaries[patchI].neiProcNo()
             );
 

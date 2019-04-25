@@ -264,7 +264,7 @@ void meshOctreeModifier::addLayerFromNeighbouringProcessors()
 
     //- exchange data with other processors
     LongList<meshOctreeCubeBasic> receivedCoordinates;
-    help::exchangeMap(toProcs, receivedCoordinates, Pstream::commsTypes::blocking);
+    help::exchangeMap(toProcs, receivedCoordinates, Pstream::blocking);
 
     # ifdef OCTREE_DEBUG
     Pout << "Received " << receivedCoordinates.size()
