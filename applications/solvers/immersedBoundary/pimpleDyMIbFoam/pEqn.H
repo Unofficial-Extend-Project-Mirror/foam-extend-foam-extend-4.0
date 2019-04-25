@@ -35,7 +35,8 @@
         }
     }
 
-    // Explicitly relax pressure for momentum corrector except for last corrector
+    // Explicitly relax pressure for momentum corrector
+    // except for last corrector
     if (!pimple.finalIter())
     {
         p.relax();
@@ -54,5 +55,8 @@
             )
         )
       + (1 - UUrf)*U.prevIter();
+
+    // U.correctBoundaryConditions() must be called with relative fluxes
+    // because of inletOutlet BC's
     U.correctBoundaryConditions();
 }
