@@ -45,10 +45,11 @@ SourceFiles
 namespace Foam
 {
 
-// Forward declaration of friend functions and operators
-
-class Switch;
+// Forward declaration of classes
 class dictionary;
+
+// Forward declaration of friend functions and operators
+class Switch;
 
 Istream& operator>>(Istream&, Switch&);
 Ostream& operator<<(Ostream&, const Switch&);

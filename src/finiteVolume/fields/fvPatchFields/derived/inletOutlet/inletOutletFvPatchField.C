@@ -62,7 +62,7 @@ inletOutletFvPatchField<Type>::inletOutletFvPatchField
 {
     // Read patch type
     this->readPatchType(dict);
-    
+
     this->refValue() = Field<Type>("inletValue", dict, p.size());
 
     if (dict.found("value"))

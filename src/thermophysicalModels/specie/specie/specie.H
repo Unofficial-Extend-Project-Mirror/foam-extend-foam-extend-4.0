@@ -46,8 +46,15 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
 class Istream;
 class Ostream;
+
+// Forward declaration of friend functions and operators
+class specie;
+
+Ostream& operator<<(Ostream&, const specie&);
+
 
 /*---------------------------------------------------------------------------*\
                            Class specie Declaration

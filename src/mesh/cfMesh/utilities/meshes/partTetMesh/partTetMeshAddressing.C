@@ -91,7 +91,7 @@ void partTetMesh::createPointsAndTets
 
         OPstream toOtherProc
         (
-            Pstream::commsTypes::blocking,
+            Pstream::blocking,
             procBoundaries[patchI].neiProcNo(),
             dataToSend.byteSize()
         );
@@ -106,7 +106,7 @@ void partTetMesh::createPointsAndTets
 
         IPstream fromOtherProc
         (
-            Pstream::commsTypes::blocking,
+            Pstream::blocking,
             procBoundaries[patchI].neiProcNo()
         );
 

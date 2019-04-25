@@ -45,7 +45,10 @@ SourceFiles
 namespace Foam
 {
 
-// Forward declaration of classes
+// Forward declaration of friend functions and operators
+class surfZoneIOList;
+Ostream& operator<<(Ostream&, const surfZoneIOList&);
+
 
 /*---------------------------------------------------------------------------*\
                       Class surfZoneIOList Declaration

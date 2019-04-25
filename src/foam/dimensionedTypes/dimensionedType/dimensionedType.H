@@ -45,8 +45,10 @@ SourceFiles
 namespace Foam
 {
 
-// Forward declaration of friend functions and operators
+// Forward declaration of classes
+class dictionary;
 
+// Forward declaration of friend functions and operators
 template<class Type> class dimensioned;
 
 template<class Type>
@@ -55,7 +57,6 @@ Istream& operator>>(Istream&, dimensioned<Type>&);
 template<class Type>
 Ostream& operator<<(Ostream&, const dimensioned<Type>&);
 
-class dictionary;
 
 /*---------------------------------------------------------------------------*\
                            Class dimensioned Declaration

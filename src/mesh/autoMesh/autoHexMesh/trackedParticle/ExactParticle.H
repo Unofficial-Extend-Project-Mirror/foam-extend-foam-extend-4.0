@@ -40,6 +40,7 @@ Description
 namespace Foam
 {
 
+// Forward declaration of classes
 template<class ExactParticle>
 class Cloud;
 

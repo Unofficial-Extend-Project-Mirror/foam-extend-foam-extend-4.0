@@ -662,8 +662,7 @@ void Foam::solutionControl::calcSteadyConsistentFlux
                 "void solutionControl::calcSteadyConsistentFlux"
                 "\n("
                 "\n    surfaceScalarField& phi,"
-                "\n    const volVectorField& U,"
-                "\n    const volScalarField& rAU"
+                "\n    const volVectorField& U"
                 "\n)"
             )   << "Either aCoeff or faceU is allocated for field " << UName
                 << " while the other is not."
@@ -684,8 +683,7 @@ void Foam::solutionControl::calcSteadyConsistentFlux
                 "void solutionControl::calcSteadyConsistentFlux"
                 "\n("
                 "\n    surfaceScalarField& phi,"
-                "\n    const volVectorField& U,"
-                "\n    const volScalarField& rAU"
+                "\n    const volVectorField& U"
                 "\n)"
             )   << "Index is set, but the aCoeff field is not allocated for "
                 << UName << "." << nl
@@ -701,8 +699,7 @@ void Foam::solutionControl::calcSteadyConsistentFlux
                 "void solutionControl::calcSteadyConsistentFlux"
                 "\n("
                 "\n    surfaceScalarField& phi,"
-                "\n    const volVectorField& U,"
-                "\n    const volScalarField& rAU"
+                "\n    const volVectorField& U"
                 "\n)"
             )   << "Index is set, but the faceU field is allocated for "
                 << UName << "." << nl
@@ -794,8 +791,7 @@ void Foam::solutionControl::calcSteadyConsistentFlux
                 "void solutionControl::calcSteadyConsistentFlux"
                 "\n("
                 "\n    surfaceScalarField& phi,"
-                "\n    const volVectorField& U,"
-                "\n    const volScalarField& rAU"
+                "\n    const volVectorField& U"
                 "\n)"
             )   << "Either aCoeff or faceU is allocated for field " << UName
                 << " while the other is not."
@@ -816,8 +812,7 @@ void Foam::solutionControl::calcSteadyConsistentFlux
                 "void solutionControl::calcSteadyConsistentFlux"
                 "\n("
                 "\n    surfaceScalarField& phi,"
-                "\n    const volVectorField& U,"
-                "\n    const volScalarField& rAU"
+                "\n    const volVectorField& U"
                 "\n)"
             )   << "Index is set, but the aCoeff field is not allocated for "
                 << UName << "." << nl
@@ -833,8 +828,7 @@ void Foam::solutionControl::calcSteadyConsistentFlux
                 "void solutionControl::calcSteadyConsistentFlux"
                 "\n("
                 "\n    surfaceScalarField& phi,"
-                "\n    const volVectorField& U,"
-                "\n    const volScalarField& rAU"
+                "\n    const volVectorField& U"
                 "\n)"
             )   << "Index is set, but the faceU field is allocated for "
                 << UName << "." << nl
@@ -928,11 +922,11 @@ void Foam::solutionControl::calcSteadyMRFConsistentFlux
         {
             FatalErrorIn
             (
-                "void solutionControl::calcSteadyConsistentFlux"
+                "void solutionControl::calcSteadyMRFConsistentFlux"
                 "\n("
                 "\n    surfaceScalarField& phi,"
                 "\n    const volVectorField& U,"
-                "\n    const volScalarField& rAU"
+                "\n    const MRFZones& mrfZones"
                 "\n)"
             )   << "Either aCoeff or faceU is allocated for field " << UName
                 << " while the other is not."
@@ -954,7 +948,7 @@ void Foam::solutionControl::calcSteadyMRFConsistentFlux
                 "\n("
                 "\n    surfaceScalarField& phi,"
                 "\n    const volVectorField& U,"
-                "\n    const volScalarField& rAU"
+                "\n    const MRFZones& mrfZones"
                 "\n)"
             )   << "Index is set, but the aCoeff field is not allocated for "
                 << UName << "." << nl
@@ -971,7 +965,7 @@ void Foam::solutionControl::calcSteadyMRFConsistentFlux
                 "\n("
                 "\n    surfaceScalarField& phi,"
                 "\n    const volVectorField& U,"
-                "\n    const volScalarField& rAU"
+                "\n    const MRFZones& mrfZones"
                 "\n)"
             )   << "Index is set, but the faceU field is allocated for "
                 << UName << "." << nl
@@ -1044,10 +1038,10 @@ void Foam::solutionControl::reconstructTransientVelocity
             "void solutionControl::reconstructTransientVelocity"
             "\n("
             "\n    volVectorField& U,"
+            "\n    const surfaceScalarField& phi,"
             "\n    const volVectorField& ddtUEqn,"
             "\n    const volScalarField& rAU,"
             "\n    const volScalarField& p"
-            "\n    const surfaceScalarField& phi"
             "\n) const"
         )   << "faceU not calculated for field " << UName
             << ". Make sure you have called"
@@ -1110,7 +1104,8 @@ const Foam::surfaceScalarField& Foam::solutionControl::aCoeff
     {
         FatalErrorIn
         (
-            "const surfaceScalarField& solutionControl::aCoeff() const"
+            "const surfaceScalarField& solutionControl::aCoeff"
+            "(const word& UName) const"
         )   << "aCoeff not calculated for field " << UName
             << ". Make sure you have called"
             << " calcTransientConsistentFlux(...) or "

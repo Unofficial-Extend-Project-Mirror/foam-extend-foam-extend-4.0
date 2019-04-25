@@ -64,6 +64,13 @@ Foam::autoPtr<Foam::cloudDistribute> Foam::cloud::cloudDist
 }
 
 
+Foam::labelList Foam::cloud::nParticlesPerCell() const
+{
+    NotImplemented;
+    return labelList(0);
+}
+
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 Foam::cloud::~cloud()

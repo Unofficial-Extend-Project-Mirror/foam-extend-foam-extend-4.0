@@ -107,13 +107,42 @@ public:
 
         // Access
 
+            //- Return component
             inline const Cmpt& ii() const;
+
+            //- Return access to component
             inline Cmpt& ii();
 
 
         //- Transpose
         inline const SphericalTensor<Cmpt>& T() const;
 };
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// VectorSpace operations with component loops need specialisation
+// HJ, 24/Apr/2019
+
+template<class Cmpt>
+inline Cmpt cmptMax(const SphericalTensor<Cmpt>& st)
+{
+    return st.ii();
+}
+
+
+template<class Cmpt>
+inline Cmpt cmptMin(const SphericalTensor<Cmpt>& st)
+{
+    return st.ii();
+}
+
+
+template<class Cmpt>
+inline Cmpt cmptSum(const SphericalTensor<Cmpt>& st)
+{
+    return st.ii();
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

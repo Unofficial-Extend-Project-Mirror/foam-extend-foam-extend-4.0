@@ -658,7 +658,7 @@ inline Cmpt operator&&
 )
 {
     Cmpt ddProd = vs1.v_[0]*vs2.v_[0];
-    for (int i=1; i<nCmpt; ++i)
+    for (int i = 1; i < nCmpt; ++i)
     {
         ddProd += vs1.v_[i]*vs2.v_[i];
     }

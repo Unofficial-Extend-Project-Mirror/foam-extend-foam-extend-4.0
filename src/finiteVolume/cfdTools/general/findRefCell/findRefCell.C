@@ -127,7 +127,7 @@ Foam::scalar Foam::getRefCellValue
 )
 {
     scalar refCellValue = (refCelli >= 0 ? field[refCelli] : 0.0);
-    return returnReduce<label>(refCellValue, sumOp<scalar>());
+    return returnReduce<scalar>(refCellValue, sumOp<scalar>());
 }
 
 

@@ -44,6 +44,7 @@ Description
 namespace Foam
 {
 
+// Forward declaration of classes
 template<class Particle>
 class Cloud;
 

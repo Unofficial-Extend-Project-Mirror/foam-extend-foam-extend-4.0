@@ -51,6 +51,12 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+class translationODE;
+
+Ostream& operator<<(Ostream&, const translationODE&);
+
+
 /*---------------------------------------------------------------------------*\
                            Class translationODE Declaration
 \*---------------------------------------------------------------------------*/

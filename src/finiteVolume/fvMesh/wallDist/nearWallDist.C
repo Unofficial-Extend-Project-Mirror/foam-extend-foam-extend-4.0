@@ -84,7 +84,7 @@ void Foam::nearWallDist::correct()
         {
             setSize(mesh_.boundary().size());
         }
-        
+
         // Update size of GeometricBoundaryField
         forAll (mesh_.boundary(), patchI)
         {

@@ -38,7 +38,7 @@ SourceFiles
 
 #include "IOdictionary.H"
 #include "Switch.H"
-#include "scalarField.H"
+#include "volFields.H"
 #include "volFieldsFwd.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -77,7 +77,9 @@ protected:
         Switch chemistry_;
 
         //- Latest estimation of integration step
-        scalarField deltaTChem_;
+        // HR 14.12.18: Upgraded to volScalarField in order to enable automatic
+        // mapping/resizing after a topo change. Also needed for PLB.
+        volScalarField deltaTChem_;
 
 
     // Protected member functions

@@ -370,7 +370,7 @@ void Foam::InjectionModel<CloudType>::inject(TrackData& td)
     // constrainToMeshCentre is inside of an if-statement
     mesh.geometricD();
     mesh.bounds();
-    
+
     // Prepare for next time step
     label parcelsAdded = 0;
     scalar massAdded = 0.0;

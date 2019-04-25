@@ -172,7 +172,7 @@ if ( ! $?WM_NCOMPPROCS ) setenv WM_NCOMPPROCS `$WM_PROJECT_DIR/bin/foamGetSystem
 # Run options (floating-point signal handling and memory initialisation)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 setenv FOAM_SIGFPE
-# setenv FOAM_SETNAN
+setenv FOAM_SETNAN
 
 
 # Detect system type and set environment variables

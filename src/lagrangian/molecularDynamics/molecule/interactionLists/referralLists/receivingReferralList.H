@@ -43,6 +43,13 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+class receivingReferralList;
+
+Istream& operator>>(Istream&, receivingReferralList&);
+Ostream& operator<<(Ostream&, const receivingReferralList&);
+
+
 /*---------------------------------------------------------------------------*\
                     Class receivingReferralList Declaration
 \*---------------------------------------------------------------------------*/

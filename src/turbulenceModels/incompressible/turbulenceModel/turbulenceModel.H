@@ -207,7 +207,7 @@ public:
         virtual tmp<fvVectorMatrix> divDevReff() const = 0;
 
         //- Solve the turbulence equations and correct the turbulence viscosity
-        virtual void correct() = 0;
+        virtual void correct();
 
         //- Read turbulenceProperties dictionary
         virtual bool read() = 0;

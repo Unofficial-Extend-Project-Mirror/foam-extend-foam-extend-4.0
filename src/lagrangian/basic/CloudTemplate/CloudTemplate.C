@@ -507,6 +507,40 @@ void Foam::Cloud<ParticleType>::rebuild
 
 
 template<class ParticleType>
+Foam::labelList Foam::Cloud<ParticleType>::nParticlesPerCell() const
+{
+    Pout << "In nParticlesPerCell" << endl;
+    labelList nppc (pMesh().nCells(), 0);
+
+    forAllConstIter(typename Cloud<ParticleType>, *this, pIter)
+    {
+        const ParticleType& p = pIter();
+        const label celli = p.cell();
+
+        // Check
+        if (celli < 0 || celli >= pMesh().nCells())
+        {
+            FatalErrorIn
+            (
+                "Foam::Cloud<ParticleType>::nParticlesPerCell()"
+            )
+                << "Illegal cell number " << celli
+                << " at position " << p.position() << nl
+                << "Cell number should be between 0 and "
+                << pMesh().nCells()-1 << nl
+                << "On this mesh the particle should be in cell "
+                << pMesh().findCell(p.position())
+                << exit(FatalError);
+        }
+
+        nppc[celli]++;
+    }
+
+    return nppc;
+}
+
+
+template<class ParticleType>
 void Foam::Cloud<ParticleType>::writePositions() const
 {
     OFstream pObj

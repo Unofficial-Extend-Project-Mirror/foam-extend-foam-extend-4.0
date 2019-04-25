@@ -25,6 +25,11 @@ License
 
 #include "processorMeshesReconstructor.H"
 
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+defineTypeNameAndDebug(Foam::processorMeshesReconstructor, 0);
+
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 void Foam::processorMeshesReconstructor::readMeshes(PtrList<Time>& databases)
@@ -71,6 +76,7 @@ Foam::processorMeshesReconstructor::processorMeshesReconstructor
 :
     meshName_(meshName),
     meshes_(),
+    globalPointIndex_(),
     pointProcAddressing_(),
     faceProcAddressing_(),
     cellProcAddressing_(),
@@ -86,6 +92,7 @@ Foam::processorMeshesReconstructor::processorMeshesReconstructor
 :
     meshName_(meshName),
     meshes_(databases.size()),
+    globalPointIndex_(),
     pointProcAddressing_(),
     faceProcAddressing_(),
     cellProcAddressing_(),

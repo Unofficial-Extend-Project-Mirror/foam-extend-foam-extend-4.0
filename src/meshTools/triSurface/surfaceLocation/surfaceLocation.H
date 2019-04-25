@@ -55,6 +55,14 @@ namespace Foam
 // Forward declaration of classes
 class triSurface;
 
+// Forward declaration of friend functions and operators
+class surfaceLocation;
+
+Istream& operator>>(Istream& is, surfaceLocation& sl);
+Ostream& operator<<(Ostream& os, const surfaceLocation& sl);
+Ostream& operator<<(Ostream&, const InfoProxy<surfaceLocation>&);
+
+
 /*---------------------------------------------------------------------------*\
                            Class surfaceLocation Declaration
 \*---------------------------------------------------------------------------*/

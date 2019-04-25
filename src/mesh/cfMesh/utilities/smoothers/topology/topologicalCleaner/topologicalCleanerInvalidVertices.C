@@ -263,7 +263,7 @@ void topologicalCleaner::checkInvalidConnectionsForVerticesFaces
 
             OPstream toOtherProc
             (
-                Pstream::commsTypes::blocking,
+                Pstream::blocking,
                 neiProcs[procI],
                 dataToSend.byteSize()
             );
@@ -273,7 +273,7 @@ void topologicalCleaner::checkInvalidConnectionsForVerticesFaces
         forAll(neiProcs, procI)
         {
             labelList receivedData;
-            IPstream fromOtherProc(Pstream::commsTypes::blocking, neiProcs[procI]);
+            IPstream fromOtherProc(Pstream::blocking, neiProcs[procI]);
                 fromOtherProc >> receivedData;
 
             label counter(0);

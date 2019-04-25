@@ -451,9 +451,160 @@ void Foam::sharedPoints::calcSharedPoints()
 }
 
 
+void Foam::sharedPoints::calcSharedPoints
+(
+    const labelListList& globalPointIndex
+)
+{
+    typedef HashTable<Pair<label>, label, Hash<label> > markTable;
+    markTable marker;
+
+    List<labelHashSet> procSharedPoints(meshes_.size());
+
+    // Mark up points for the first time
+    forAll (meshes_, meshI)
+    {
+        if (meshes_.set(meshI))
+        {
+            const labelList& curGlobalPointIndex = globalPointIndex[meshI];
+
+            labelHashSet& sharedPoints = procSharedPoints[meshI];
+
+            forAll (curGlobalPointIndex, pI)
+            {
+                const label gpi = curGlobalPointIndex[pI];
+
+                markTable::iterator iter = marker.find(gpi);
+                if (iter == Map<label>::end())
+                {
+                    // Record meshI and pI
+                    marker.insert(gpi, Pair<label>(-meshI - 1, pI));
+                }
+                else
+                {
+                    if (iter().first() < 0)
+                    {
+                        if(iter().first() != -meshI - 1)
+                        {
+                            // Shared point detected. Add for both meshes
+
+                            // Add for first mesh
+                            const label firstMesh = -iter().first() - 1;
+                            const label firstPointI = iter().second();
+                            procSharedPoints[firstMesh].insert(firstPointI);
+
+                            // Add for current mesh
+                            sharedPoints.insert(pI);
+
+                            // Count shared points and update bookkeeping
+                            iter().first() = nGlobalPoints_;
+                            nGlobalPoints_++;
+
+                        }
+                    }
+                    else
+                    {
+                        // Existing shared point. Add for current mesh
+                        sharedPoints.insert(pI);
+                    }
+                }
+            }
+        }
+    }
+
+    forAll (meshes_, meshI)
+    {
+        if (meshes_.set(meshI))
+        {
+            const labelList& curGlobalPointIndex = globalPointIndex[meshI];
+
+            labelList& curSharedPoints = sharedPointLabels_[meshI];
+            curSharedPoints = procSharedPoints[meshI].toc();
+
+            labelList& curSharedAddr = sharedPointAddr_[meshI];
+            curSharedAddr.setSize(curSharedPoints.size());
+
+            forAll(curSharedPoints, i)
+            {
+                const label gpi = curSharedPoints[i];
+                curSharedAddr[i] = marker.find(curGlobalPointIndex[gpi])().first();
+            }
+        }
+    }
+
+    // debug
+    {
+        pointField gp(nGlobalPoints_);
+        boolList gpSet(nGlobalPoints_, false);
+
+        forAll (meshes_, meshI)
+        {
+            if (meshes_.set(meshI))
+            {
+                // Get points
+                const pointField& P = meshes_[meshI].points();
+
+                // Get list of local point labels that are globally shared
+                const labelList& curShared = sharedPointLabels_[meshI];
+
+                // Get index in global point list
+                const labelList& curAddr = sharedPointAddr_[meshI];
+
+                // Loop through all local points
+                forAll (curShared, i)
+                {
+                    if (!gpSet[curAddr[i]])
+                    {
+                        // Point not set: set it
+                        gp[curAddr[i]] = P[curShared[i]];
+                        gpSet[curAddr[i]] = true;
+                    }
+                    else
+                    {
+                        // Point already set: check location
+                        if (mag(gp[curAddr[i]] - P[curShared[i]]) > SMALL)
+                        {
+                            Info<< "MERGE MISMATCH: mesh" << meshI
+                                << " point: " << curShared[i]
+                                << " dist: " << gp[curAddr[i]] << " "
+                                << P[curShared[i]]
+                                << endl;
+                        }
+                    }
+                }
+            }
+        }
+
+    /*
+            // Grab marked points
+            OFstream ppp("points.vtk");
+            ppp << "# vtk DataFile Version 2.0" << nl
+                << "points.vtk" << nl
+                << "ASCII" << nl
+                << "DATASET POLYDATA" << nl
+                << "POINTS " << nGlobalPoints_ << " float" << nl;
+
+            Pout << "Global marking " << nGlobalPoints_ << endl;
+            forAll (gp, i)
+            {
+                ppp << float(gp[i].x()) << ' '
+                    << float(gp[i].y()) << ' '
+                    << float(gp[i].z())
+                    << nl;
+
+                Pout << gp[i] << endl;
+            }
+            */
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::sharedPoints::sharedPoints(const PtrList<fvMesh>& meshes)
+Foam::sharedPoints::sharedPoints
+(
+    const PtrList<fvMesh>& meshes
+)
 :
     meshes_(meshes),
     sharedPointAddr_(meshes_.size()),
@@ -463,11 +614,19 @@ Foam::sharedPoints::sharedPoints(const PtrList<fvMesh>& meshes)
     calcSharedPoints();
 }
 
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-// Foam::sharedPoints::~sharedPoints()
-// {}
+Foam::sharedPoints::sharedPoints
+(
+    const PtrList<fvMesh>& meshes,
+    const labelListList& globalPointIndex
+)
+:
+    meshes_(meshes),
+    sharedPointAddr_(meshes_.size()),
+    sharedPointLabels_(meshes_.size()),
+    nGlobalPoints_(0)
+{
+    calcSharedPoints(globalPointIndex);
+}
 
 
 // ************************************************************************* //

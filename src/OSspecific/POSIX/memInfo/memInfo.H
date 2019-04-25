@@ -47,6 +47,17 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
+class Istream;
+class Ostream;
+
+// Forward declaration of friend functions and operators
+class memInfo;
+
+Istream& operator>>(Istream&, memInfo&);
+Ostream& operator<<(Ostream&, const memInfo&);
+
+
 /*---------------------------------------------------------------------------*\
                            Class memInfo Declaration
 \*---------------------------------------------------------------------------*/

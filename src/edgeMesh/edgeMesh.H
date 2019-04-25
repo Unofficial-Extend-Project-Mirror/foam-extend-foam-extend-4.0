@@ -45,6 +45,13 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+class edgeMesh;
+
+Ostream& operator<<(Ostream&, const edgeMesh&);
+Istream& operator>>(Istream&, edgeMesh&);
+
+
 /*---------------------------------------------------------------------------*\
                            Class edgeMesh Declaration
 \*---------------------------------------------------------------------------*/

@@ -298,7 +298,7 @@ public:
         ) const;
 
         //- Solve the turbulence equations and correct the turbulence viscosity
-        virtual void correct() = 0;
+        virtual void correct();
 
         //- Read RASProperties dictionary
         virtual bool read() = 0;
