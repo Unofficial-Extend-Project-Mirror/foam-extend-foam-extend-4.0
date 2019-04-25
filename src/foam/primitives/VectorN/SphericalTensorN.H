@@ -25,8 +25,9 @@ Class
     SphericalTensorN
 
 Description
-    Templated NXN SphericalTensor derived from VectorSpace adding construction from
-    N components, and the inner-product (dot-product) and outer-product operators.
+    Templated NXN SphericalTensor derived from VectorSpace adding construction
+    from N components, and the inner-product (dot-product) and
+    outer-product operators.
 
 SourceFiles
     SphericalTensorNI.H
@@ -44,7 +45,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class DiagTensor Declaration
+                       Class SphericalTensorN Declaration
 \*---------------------------------------------------------------------------*/
 
 template <class Cmpt, int length>
@@ -73,13 +74,20 @@ public:
         static const SphericalTensorN I;
 
 
+    //- Component labeling enumeration
+    enum components { II };
+
+
     // Constructors
 
         //- Construct null
         inline SphericalTensorN();
 
         //- Construct given VectorSpace
-        inline SphericalTensorN(const VectorSpace<SphericalTensorN<Cmpt, length>, Cmpt, 1>&);
+        inline SphericalTensorN
+        (
+            const VectorSpace<SphericalTensorN<Cmpt, length>, Cmpt, 1>&
+        );
 
         //- Construct from Istream
         inline SphericalTensorN(Istream&);
@@ -90,12 +98,47 @@ public:
 
     // Member Functions
 
+        // Access
+
+            //- Return component
+            inline const Cmpt& ii() const;
+
+            //- Return access to component
+            inline Cmpt& ii();
+
+
         //- Diagonal
         inline SphericalTensorN<Cmpt, length> diag() const;
 
         //- Transpose
         inline SphericalTensorN<Cmpt, length> T() const;
 };
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// VectorSpace operations with component loops need specialisation
+// HJ, 24/Apr/2019
+
+template<class Cmpt, int length>
+inline Cmpt cmptMax(const SphericalTensorN<Cmpt, length>& st)
+{
+    return st.ii();
+}
+
+
+template<class Cmpt, int length>
+inline Cmpt cmptMin(const SphericalTensorN<Cmpt, length>& st)
+{
+    return st.ii();
+}
+
+
+template<class Cmpt, int length>
+inline Cmpt cmptSum(const SphericalTensorN<Cmpt, length>& st)
+{
+    return st.ii();
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -128,9 +128,9 @@ void Foam::gradientEnthalpyFvPatchScalarField::updateCoeffs()
 
         if
         (
-            !this->db().objectRegistry::found(UName)
-         || !this->db().objectRegistry::found(URotName)
-         || !this->db().objectRegistry::found(UThetaName)
+            !this->db().objectRegistry::foundObject<volVectorField>(UName)
+         || !this->db().objectRegistry::foundObject<volVectorField>(URotName)
+         || !this->db().objectRegistry::foundObject<volScalarField>(UThetaName)
         )
         {
              // Velocities not available, do not update
@@ -144,6 +144,7 @@ void Foam::gradientEnthalpyFvPatchScalarField::updateCoeffs()
                 << "Performing enthalpy value update for field "
                 << this->dimensionedInternalField().name()
                 << " and patch " << patchi
+                << nl << "objects" << this->db().objectRegistry::sortedToc()
                 << endl;
 
             gradient() = thermo.Cp(Tw, patchi)*Tw.snGrad()

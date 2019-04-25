@@ -71,7 +71,6 @@ class Random;
 
 // Forward declaration of friend functions and operators
 class treeBoundBox;
-
 bool operator==(const treeBoundBox&, const treeBoundBox&);
 bool operator!=(const treeBoundBox&, const treeBoundBox&);
 

@@ -47,7 +47,6 @@ namespace Foam
 
 // Forward declaration of friend functions and operators
 class surfZoneIOList;
-
 Ostream& operator<<(Ostream&, const surfZoneIOList&);
 
 

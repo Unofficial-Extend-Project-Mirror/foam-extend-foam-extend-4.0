@@ -48,7 +48,6 @@ namespace Foam
 
 // Forward declaration of friend functions and operators
 class crAddressing;
-
 Ostream& operator<<(Ostream&, const crAddressing&);
 
 

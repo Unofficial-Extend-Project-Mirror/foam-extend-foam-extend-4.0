@@ -16,4 +16,23 @@ $(reactions)/makeChemkinReactions.C
 $(reactions)/makeReactionThermoReactions.C
 $(reactions)/makeLangmuirHinshelwoodReactions.C
 
+DegussaProcess = reaction/reactionRate/DegussaProcess
+$(DegussaProcess)/DegussaConstants.C
+$(DegussaProcess)/Degussa1ReactionRate.C
+$(DegussaProcess)/Degussa1aReactionRate.C
+$(DegussaProcess)/Degussa2ReactionRate.C
+$(DegussaProcess)/Degussa3ReactionRate.C
+$(DegussaProcess)/Degussa4ReactionRate.C
+$(DegussaProcess)/Degussa5ReactionRate.C
+$(DegussaProcess)/Degussa6ReactionRate.C
+$(DegussaProcess)/Degussa7ReactionRate.C
+$(DegussaProcess)/Degussa8ReactionRate.C
+$(DegussaProcess)/Degussa9ReactionRate.C
+$(DegussaProcess)/Degussa10ReactionRate.C
+$(DegussaProcess)/Degussa11ReactionRate.C
+$(DegussaProcess)/Degussa12ReactionRate.C
+$(DegussaProcess)/Degussa13aReactionRate.C
+$(DegussaProcess)/Degussa13bReactionRate.C
+$(reactions)/makeDegussaProcessReactions.C
+
 LIB = $(FOAM_LIBBIN)/libspecie

@@ -39,10 +39,11 @@ Description
 namespace Foam
 {
 
-// Forward declaration of friend functions and operators
-class boundBox;
 template<class T> class tmp;
 
+// Forward declaration of friend functions and operators
+
+class boundBox;
 Istream& operator>>(Istream& is, boundBox&);
 Ostream& operator<<(Ostream& os, const boundBox&);
 

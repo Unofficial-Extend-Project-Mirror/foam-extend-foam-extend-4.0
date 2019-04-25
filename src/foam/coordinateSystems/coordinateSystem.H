@@ -148,13 +148,12 @@ class boundBox;
 
 // Forward declaration of friend functions and operators
 class coordinateSystem;
-
 bool operator!=(const coordinateSystem&, const coordinateSystem&);
 Ostream& operator<<(Ostream&, const coordinateSystem&);
 
 
 /*---------------------------------------------------------------------------*\
-                     Class coordinateSystem Declaration
+                       Class coordinateSystem Declaration
 \*---------------------------------------------------------------------------*/
 
 class coordinateSystem

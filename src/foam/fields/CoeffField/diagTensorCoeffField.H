@@ -48,7 +48,6 @@ namespace Foam
 {
 
 // Forward declaration of friend functions and operators
-
 Ostream& operator<<(Ostream&, const CoeffField<diagTensor>&);
 Ostream& operator<<(Ostream&, const tmp<CoeffField<diagTensor> >&);
 

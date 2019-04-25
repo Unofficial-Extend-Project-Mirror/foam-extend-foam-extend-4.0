@@ -56,7 +56,6 @@ template<class Type> class octree;
 
 // Forward declaration of friend functions and operators
 class octreeDataPoint;
-
 Ostream& operator<<(Ostream&, const octreeDataPoint&);
 
 

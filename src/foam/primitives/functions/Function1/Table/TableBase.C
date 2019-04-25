@@ -239,6 +239,7 @@ bool Foam::Function1Types::TableBase<Type>::checkMinBounds
                     << endl;
 
                 // fall-through to 'CLAMP'
+                [[fallthrough]];
             }
             case CLAMP:
             {
@@ -289,6 +290,7 @@ bool Foam::Function1Types::TableBase<Type>::checkMaxBounds
                     << endl;
 
                 // fall-through to 'CLAMP'
+                [[fallthrough]];
             }
             case CLAMP:
             {
