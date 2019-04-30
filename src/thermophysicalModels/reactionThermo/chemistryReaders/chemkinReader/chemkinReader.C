@@ -392,7 +392,7 @@ void Foam::chemkinReader::addPressureDependentReaction
 
         default:
         {
-            if (fofType < 4)
+            if (fofType < unknownFallOffFunctionType)
             {
                 FatalErrorIn("chemkinReader::addPressureDependentReaction")
                     << "Fall-off function type "
