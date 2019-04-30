@@ -67,11 +67,20 @@ fixedGradientFvPatchField<Type>::fixedGradientFvPatchField
     const dictionary& dict
 )
 :
-    // HR 15.12.18: Must not call evaluate during construction. Read value
-    // instead. This is needed for PLB.
-    fvPatchField<Type>(p, iF, dict, true),
+    fvPatchField<Type>(p, iF, dict),
     gradient_("gradient", dict, p.size())
-{}
+{
+    // Call evaluate only if the value is not found. Used to avoid evaluating
+    // when we have incomplete meshes during Parallel Load Balancing. When
+    // shipping the field over to another processor, we first call write, making
+    // sure that the value is written and read it on the other side (see
+    // write member function). If this proves to be problematic, we can always
+    // initialize with patch internal field for the start-up. VV, 12/Apr/2019.
+    if (!dict.found("value"))
+    {
+        evaluate();
+    }
+}
 
 
 template<class Type>
@@ -190,6 +199,11 @@ void fixedGradientFvPatchField<Type>::write(Ostream& os) const
 {
     fvPatchField<Type>::write(os);
     gradient_.writeEntry("gradient", os);
+
+    // Write value along with the gradient in order to avoid calling evaluate
+    // on construction (from dictionary constructor) for Parallel Load Balancing
+    // runs. See dictionary constructor for details. VV, 12/Apr/2019.
+    this->writeEntry("value", os);
 }
 
 
