@@ -1343,8 +1343,8 @@ void Foam::refinement::setRefinement(polyTopoChange& ref) const
         mesh_,
         pointLevel_,
         maxEqOp<label>(),
-        0,   // Null value
-        true // Apply separation for parallel cyclics
+        label(0),   // Null value
+        true        // Apply separation for parallel cyclics
     );
 
     // Set refinement and unrefinement
@@ -1512,8 +1512,8 @@ void Foam::refinement::updateMesh(const mapPolyMesh& map)
         mesh_,
         newPointLevel,
         maxEqOp<label>(),
-        0,   // Null value
-        true // Apply separation for parallel cyclics
+        label(0),   // Null value
+        true        // Apply separation for parallel cyclics
     );
 
     // Transfer the new point level into the data member

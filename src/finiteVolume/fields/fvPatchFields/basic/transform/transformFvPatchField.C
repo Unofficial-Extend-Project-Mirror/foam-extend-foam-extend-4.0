@@ -41,7 +41,7 @@ transformFvPatchField<Type>::transformFvPatchField
     const DimensionedField<Type, volMesh>& iF
 )
 :
-   fvPatchField<Type>(p, iF)
+    fvPatchField<Type>(p, iF)
 {}
 
 
