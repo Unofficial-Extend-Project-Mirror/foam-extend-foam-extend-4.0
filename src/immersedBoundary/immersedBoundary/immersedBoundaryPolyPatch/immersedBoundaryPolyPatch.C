@@ -674,7 +674,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                 {
                     // Direct face cut, coupled on live side
 
-                    // Get face index.  Noye the difference between faceI
+                    // Get face index.  Note the difference between faceI
                     // and patchFaceI
                     const label faceI = bMesh[patchI].start() + patchFaceI;
 
@@ -945,8 +945,8 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                 // Wet on wet
                 if
                 (
-                    intersectedCell[patchFaceI] == immersedPoly::WET
-                 && intersectedCell[patchFaceI] == immersedPoly::WET
+                    curOwnCut[patchFaceI] == immersedPoly::WET
+                 && curNbrCut[patchFaceI] == immersedPoly::WET
                 )
                 {
                     intersectedFace[patchStart + patchFaceI] =
@@ -956,8 +956,8 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                 // Dry on dry
                 if
                 (
-                    intersectedCell[patchFaceI] == immersedPoly::DRY
-                 && intersectedCell[patchFaceI] == immersedPoly::DRY
+                    curOwnCut[patchFaceI] == immersedPoly::DRY
+                 && curNbrCut[patchFaceI] == immersedPoly::DRY
                 )
                 {
                     intersectedFace[patchStart + patchFaceI] =
@@ -969,12 +969,12 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                 if
                 (
                     (
-                        intersectedCell[patchFaceI] == immersedPoly::WET
-                     && intersectedCell[patchFaceI] == immersedPoly::CUT
+                        curOwnCut[patchFaceI] == immersedPoly::WET
+                     && curNbrCut[patchFaceI] == immersedPoly::CUT
                     )
                  || (
-                        intersectedCell[patchFaceI] == immersedPoly::CUT
-                     && intersectedCell[patchFaceI] == immersedPoly::WET
+                        curOwnCut[patchFaceI] == immersedPoly::CUT
+                     && curNbrCut[patchFaceI] == immersedPoly::WET
                     )
                 )
                 {
