@@ -64,7 +64,7 @@ void Foam::radiation::viewFactor::initialise()
         }
     }
 
-    selectedPatches_.resize(count--);
+    selectedPatches_.resize(count);
 
     if (debug)
     {
@@ -173,6 +173,82 @@ void Foam::radiation::viewFactor::initialise()
 
     globalIndex globalNumbering(nLocalCoarseFaces_);
 
+    // Calculate global face areas
+    scalarField compactCoarseMagSf(map_->constructSize(), 0.0);
+    DynamicList<scalar> localCoarseMagSf(nLocalCoarseFaces_);
+
+    forAll (selectedPatches_, i)
+    {
+        label patchID = selectedPatches_[i];
+
+        const scalarField& sf = mesh_.magSf().boundaryField()[patchID];
+
+        const polyPatch& pp = coarseMesh_.boundaryMesh()[patchID];
+        const labelList& coarsePatchFace = coarseMesh_.patchFaceMap()[patchID];
+
+        scalarList magSf(pp.size(), 0.0);
+
+        if (pp.size() > 0)
+        {
+            const labelList& agglom = finalAgglom_[patchID];
+            label nAgglom = max(agglom) + 1;
+
+            labelListList coarseToFine(invertOneToMany(nAgglom, agglom));
+
+            forAll (coarseToFine, coarseI)
+            {
+                const label coarseFaceID = coarsePatchFace[coarseI];
+                const labelList& fineFaces = coarseToFine[coarseFaceID];
+                UIndirectList<scalar> fineSf
+                (
+                    sf,
+                    fineFaces
+                );
+                magSf[coarseI] = sum(fineSf());
+            }
+        }
+
+        localCoarseMagSf.append(magSf);
+    }
+
+    // Fill the local values to distribute
+    SubList<scalar>(compactCoarseMagSf, nLocalCoarseFaces_).assign(localCoarseMagSf);
+
+    // Distribute data
+    map_->distribute(compactCoarseMagSf);
+
+    // Distribute local global ID
+    labelList compactGlobalIds(map_->constructSize(), 0.0);
+
+    labelList localGlobalIds(nLocalCoarseFaces_);
+
+    for(label k = 0; k < nLocalCoarseFaces_; k++)
+    {
+        localGlobalIds[k] = globalNumbering.toGlobal(Pstream::myProcNo(), k);
+    }
+
+    SubList<label>
+    (
+        compactGlobalIds,
+        nLocalCoarseFaces_
+    ).assign(localGlobalIds);
+
+    map_->distribute(compactGlobalIds);
+
+    // Create global size vectors
+    scalarField coarseMagSf(totalNCoarseFaces_, 0.0);
+
+    // Fill lists from compact to global indexes.
+    forAll (compactCoarseMagSf, i)
+    {
+        coarseMagSf[compactGlobalIds[i]] = compactCoarseMagSf[i];
+    }
+
+    Pstream::listCombineGather(coarseMagSf, maxEqOp<scalar>());
+
+    Pstream::listCombineScatter(coarseMagSf);
+
+
     if (Pstream::master())
     {
         Fmatrix_.reset
@@ -200,18 +276,173 @@ void Foam::radiation::viewFactor::initialise()
         {
             Info<< "Smoothing the matrix..." << endl;
 
-            for (label i=0; i<totalNCoarseFaces_; i++)
+            // HR 19.02.19: Old smoothing messed up the reciprocity condition:
+            // A_i*F_ij = A_j*F_ji. The new algorithm distributes the error
+            // in two passes moving downwards and upwards through the rows.
+            // On the way down, only the upper triangular is updated from the
+            // closedness condition: sum_j(F_ij) = 1; the lower triangular is
+            // updated from reciprocity. The reverse happen on the way up.
+
+            if(debug)
             {
-                scalar sumF = 0.0;
-                for (label j=0; j<totalNCoarseFaces_; j++)
+                scalar maxErr = -GREAT;
+                scalar minSumF = GREAT;
+                scalar maxSumF = -GREAT;
+                for (label i=0; i<totalNCoarseFaces_; i++)
                 {
-                    sumF += Fmatrix_()[i][j];
+                    scalar sumF = 0.0;
+                    for (label j=0; j<totalNCoarseFaces_; j++)
+                    {
+                        sumF += Fmatrix_()[i][j];
+                    }
+                    maxErr = max(maxErr, mag(sumF - 1.0));
+                    minSumF = min(minSumF, sumF);
+                    maxSumF = max(maxSumF, sumF);
                 }
-                scalar delta = 1.0 - sumF;
-                for (label j=0; j<totalNCoarseFaces_; j++)
+
+                Info << "max err = " << maxErr
+                    << " min sumF = " << minSumF
+                    << " max sumF = " << maxSumF << endl;
+            }
+
+            label iter = 0;
+            label maxIter = 20;
+            while(true)
+            {
+                iter++;
+                for (label i=0; i<totalNCoarseFaces_; i++)
                 {
-                    Fmatrix_()[i][j] *= (1.0 - delta/(sumF + 0.001));
+                    scalar sumF1 = 0.0;
+                    for (label j=0; j<i; j++)
+                    {
+                        sumF1 += Fmatrix_()[i][j];
+                    }
+
+                    if(sumF1 > 1.0)
+                    {
+                        continue;
+                    }
+
+                    scalar sumF2 = 0.0;
+                    for (label j=i+1; j<totalNCoarseFaces_; j++)
+                    {
+                        sumF2 += Fmatrix_()[i][j];
+                    }
+
+                    if(sumF2 < SMALL)
+                    {
+                        continue;
+                    }
+ 
+                    const scalar corr = (1.0 - sumF1)/sumF2;
+                    const scalar magSfi = coarseMagSf[i];
+                    for (label j=i+1; j<totalNCoarseFaces_; j++)
+                    {
+                        Fmatrix_()[i][j] *= corr;
+                        Fmatrix_()[j][i] = Fmatrix_()[i][j]*magSfi/coarseMagSf[j];
+                    }
                 }
+
+                {
+                    scalar maxErr = -GREAT;
+                    scalar minSumF = GREAT;
+                    scalar maxSumF = -GREAT;
+                    for (label i=0; i<totalNCoarseFaces_; i++)
+                    {
+                        scalar sumF = 0.0;
+                        for (label j=0; j<totalNCoarseFaces_; j++)
+                        {
+                            sumF += Fmatrix_()[i][j];
+                        }
+                        maxErr = max(maxErr, mag(sumF - 1.0));
+                        minSumF = min(minSumF, sumF);
+                        maxSumF = max(maxSumF, sumF);
+                    }
+
+                    if(debug)
+                    {
+                        Info << "max err = " << maxErr
+                            << " min sumF = " << minSumF
+                            << " max sumF = " << maxSumF << endl;
+                    }
+
+                    if(maxErr < 1e-6 || iter == maxIter)
+                    {
+                        break;
+                    }
+                }
+
+                iter++;
+                for (label i=totalNCoarseFaces_-1; i>=0; i--)
+                {
+                    scalar sumF1 = 0.0;
+                    for (label j=0; j<i; j++)
+                    {
+                        sumF1 += Fmatrix_()[i][j];
+                    }
+
+                    if(sumF1 < SMALL)
+                    {
+                        continue;
+                    }
+
+                    scalar sumF2 = 0.0;
+                    for (label j=i+1; j<totalNCoarseFaces_; j++)
+                    {
+                        sumF2 += Fmatrix_()[i][j];
+                    }
+
+                    if(sumF2 > 1.0)
+                    {
+                        continue;
+                    }
+
+                    const scalar corr = (1.0 - sumF2)/sumF1;
+                    const scalar magSfi = coarseMagSf[i];
+                    for (label j=0; j<i; j++)
+                    {
+                        Fmatrix_()[i][j] *= corr;
+                        Fmatrix_()[j][i] = Fmatrix_()[i][j]*magSfi/coarseMagSf[j];
+                    }
+                }
+
+                {
+                    scalar maxErr = -GREAT;
+                    scalar minSumF = GREAT;
+                    scalar maxSumF = -GREAT;
+                    for (label i=0; i<totalNCoarseFaces_; i++)
+                    {
+                        scalar sumF = 0.0;
+                        for (label j=0; j<totalNCoarseFaces_; j++)
+                        {
+                            sumF += Fmatrix_()[i][j];
+                        }
+                        maxErr = max(maxErr, mag(sumF - 1.0));
+                        minSumF = min(minSumF, sumF);
+                        maxSumF = max(maxSumF, sumF);
+                    }
+
+                    if(debug)
+                    {
+                        Info << "max err = " << maxErr
+                            << " min sumF = " << minSumF
+                            << " max sumF = " << maxSumF << endl;
+                    }
+
+                    if(maxErr < 1e-6 || iter == maxIter)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if(iter != maxIter)
+            {
+                Info << "converged in " << iter << " iterations" << endl;
+            }
+            else
+            {
+                Info << "not converged in " << iter << " iterations" << endl;
             }
         }
 
