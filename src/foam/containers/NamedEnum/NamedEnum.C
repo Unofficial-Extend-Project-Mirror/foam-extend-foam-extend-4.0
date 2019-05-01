@@ -23,8 +23,14 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "NamedEnum.H"
 #include "stringList.H"
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+
+template<class Enum, int nEnum>
+const char* Foam::NamedEnum<Enum, nEnum>::names[nEnum];
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

@@ -326,7 +326,7 @@ void Foam::sigFpe::set(const bool verbose)
         {
             vm_protect(
                 mach_task_self(),
-                (uintptr_t)zone,
+                reinterpret_cast<uintptr_t>(zone),
                 sizeof(malloc_zone_t),
                 0,
                 VM_PROT_READ | VM_PROT_WRITE
@@ -338,7 +338,7 @@ void Foam::sigFpe::set(const bool verbose)
         {
             vm_protect(
                 mach_task_self(),
-                (uintptr_t)zone,
+                reinterpret_cast<uintptr_t>(zone),
                 sizeof(malloc_zone_t),
                 0,
                 VM_PROT_READ
