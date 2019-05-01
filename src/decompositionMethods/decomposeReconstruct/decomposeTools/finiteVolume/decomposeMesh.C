@@ -639,6 +639,7 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                         // the list of inside boundaries for the owner
                         // processor and try to find this inter-processor
                         // patch.
+                        cyclicParallel_ = true;
 
                         // Insert inter-processor data for ownerProc and return
                         // whether the neighbour was already present in the list
@@ -647,6 +648,7 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                             (
                                 ownerProc,     // Processor to append to
                                 neighbourProc, // Processor to append
+                                
                                 patchStart + patchFaceI, // Face index to append
 
                                 interProcBoundaries,
@@ -661,7 +663,9 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                             (
                                 neighbourProc, // Processor to append to
                                 ownerProc,     // Processor to append
-                                patchStart + patchFaceI, // Face index to append
+                                
+                                // Face index with offset to append
+                                patchStart + cycOffset + patchFaceI,
 
                                 interProcBoundaries,
                                 interProcBFaces
