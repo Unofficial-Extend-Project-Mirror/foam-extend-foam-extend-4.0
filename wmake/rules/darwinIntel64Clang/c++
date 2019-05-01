@@ -1,8 +1,8 @@
 .SUFFIXES: .C .cxx .cc .cpp
 
-c++WARN     = -Wall -Wextra -Wno-unused-parameter -Wold-style-cast -Wnon-virtual-dtor -Wno-overloaded-virtual -Wno-unused-comparison
+c++WARN     = -Wall -Wextra -Wno-unused-parameter -Wold-style-cast -Wno-overloaded-virtual -Wno-unused-comparison -Wno-undefined-var-template -Wno-null-dereference
 
-CC          = $(WM_CXX) -m64  -ftrapping-math
+CC          = $(WM_CXX) -m64 -std=c++11 -ftrapping-math
 # -fsignaling-nans
 
 include $(RULES)/c++$(WM_COMPILE_OPTION)
