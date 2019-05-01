@@ -9,5 +9,5 @@ if [ "$WM_PROJECT" = "OpenFOAM" ]
 then
 runApplication reconstructParMesh -constant -fullMatch
 else
-runApplication reconstructParMesh -zeroTime
+runApplication reconstructParMesh -withZero
 fi
