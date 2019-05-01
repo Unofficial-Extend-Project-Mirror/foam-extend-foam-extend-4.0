@@ -100,12 +100,14 @@ Foam::coupledFvMatrix<Type>::solve(const dictionary& solverControls)
         fvMatrix<Type>& curMatrix =
             static_cast<fvMatrix<Type>& >(matrices[rowI]);
 
+        // HR 12.03.19: Complete assembly before making copies.
+        curMatrix.completeAssembly();
+
         saveDiag.set(rowI, new scalarField(curMatrix.diag()));
         psiCmpt.set(rowI, new scalarField(curMatrix.psi().size()));
         source.set(rowI, new Field<Type>(curMatrix.source()));
         sourceCmpt.set(rowI, new scalarField(curMatrix.psi().size()));
 
-        curMatrix.completeAssembly();
         curMatrix.addBoundarySource(source[rowI]);
 
         interfaces[rowI] = curMatrix.psi().boundaryField().interfaces();
