@@ -3,7 +3,6 @@
 cWARN        = -Wall
 
 cc          = $(WM_CC) -m64   -ftrapping-math
-# -fsignaling-nans
 
 include $(RULES)/c$(WM_COMPILE_OPTION)
 
