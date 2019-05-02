@@ -41,6 +41,7 @@ defineNamedTemplateTypeNameAndDebug(BlockSolverPerformanceVector, 1);
 defineNamedTemplateTypeNameAndDebug(BlockSolverPerformanceSphericalTensor, 1);
 defineNamedTemplateTypeNameAndDebug(BlockSolverPerformanceSymmTensor, 1);
 defineNamedTemplateTypeNameAndDebug(BlockSolverPerformanceTensor, 1);
+
 };
 
 

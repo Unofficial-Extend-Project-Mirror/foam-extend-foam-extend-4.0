@@ -72,7 +72,7 @@ Foam::BlockGaussSeidelSolver<Type>::solve
         this->fieldName()
     );
 
-    scalar norm = this->normFactor(x, b);
+    Type norm = this->normFactor(x, b);
 
     Field<Type> wA(x.size());
 
@@ -80,7 +80,7 @@ Foam::BlockGaussSeidelSolver<Type>::solve
     matrix.Amul(wA, x);
     wA -= b;
 
-    solverPerf.initialResidual() = gSum(cmptMag(wA))/norm;
+    solverPerf.initialResidual() = cmptDivide(gSum(cmptMag(wA)),norm);
     solverPerf.finalResidual() = solverPerf.initialResidual();
 
     // Check convergence, solve if not converged
@@ -103,7 +103,7 @@ Foam::BlockGaussSeidelSolver<Type>::solve
             matrix.Amul(wA, x);
             wA -= b;
 
-            solverPerf.finalResidual() = gSum(cmptMag(wA))/norm;
+            solverPerf.finalResidual() = cmptDivide(gSum(cmptMag(wA)), norm);
         } while (!this->stop(solverPerf));
     }
 

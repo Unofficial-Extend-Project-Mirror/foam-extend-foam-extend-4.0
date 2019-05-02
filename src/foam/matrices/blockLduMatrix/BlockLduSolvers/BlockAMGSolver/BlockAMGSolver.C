@@ -72,10 +72,10 @@ Foam::BlockAMGSolver<Type>::solve
         this->fieldName()
     );
 
-    scalar norm = this->normFactor(x, b);
+    Type norm = this->normFactor(x, b);
 
     // Calculate initial residual
-    solverPerf.initialResidual() = gSum(cmptMag(amg_.residual(x, b)))/norm;
+    solverPerf.initialResidual() = cmptDivide(gSum(cmptMag(amg_.residual(x, b))),norm);
     solverPerf.finalResidual() = solverPerf.initialResidual();
 
     // Stop solver on divergence
@@ -88,8 +88,8 @@ Foam::BlockAMGSolver<Type>::solve
         {
             amg_.cycle(x, b);
 
-            solverPerf.finalResidual() =
-                gSum(cmptMag(amg_.residual(x, b)))/norm;
+              solverPerf.finalResidual() =
+                  cmptDivide(gSum(cmptMag(amg_.residual(x, b))), norm);
 
             solverPerf.nIterations()++;
 

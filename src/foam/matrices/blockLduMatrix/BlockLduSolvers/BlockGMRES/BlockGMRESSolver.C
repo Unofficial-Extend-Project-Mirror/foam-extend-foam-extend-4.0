@@ -111,7 +111,7 @@ Foam::BlockGMRESSolver<Type>::solve
         this->fieldName()
     );
 
-    scalar norm = this->normFactor(x, b);
+    Type norm = this->normFactor(x, b);
 
     Field<Type> wA(x.size());
 
@@ -119,7 +119,7 @@ Foam::BlockGMRESSolver<Type>::solve
     matrix.Amul(wA, x);
     Field<Type> rA(b - wA);
 
-    solverPerf.initialResidual() = gSum(cmptMag(rA))/norm;
+    solverPerf.initialResidual() = cmptDivide(gSum(cmptMag(rA)),norm);
     solverPerf.finalResidual() = solverPerf.initialResidual();
 
     // Check convergence, solve if not converged
@@ -234,7 +234,7 @@ Foam::BlockGMRESSolver<Type>::solve
                 rA[raI] = b[raI] - wA[raI];
             }
 
-            solverPerf.finalResidual() = gSum(cmptMag(rA))/norm;
+            solverPerf.finalResidual() = cmptDivide(gSum(cmptMag(rA)), norm);
             solverPerf.nIterations()++;
         } while (!this->stop(solverPerf));
     }

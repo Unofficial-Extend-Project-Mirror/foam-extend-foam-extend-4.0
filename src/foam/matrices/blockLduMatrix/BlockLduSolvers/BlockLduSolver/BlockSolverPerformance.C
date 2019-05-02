@@ -39,14 +39,9 @@ bool Foam::BlockSolverPerformance<Type>::checkConvergence
     {
         Info<< solverName_
             << ":  Iteration " << nIterations_
-            << " residual = " << finalResidual_;
-
-        if (pTraits<Type>::rank > 0)
-        {
-            Info<< " mag = " << mag(finalResidual_);
-        }
-
-        Info<< " tol = "
+            << " residual = " << finalResidual_
+            << " mag = " << mag(finalResidual_)
+            << " tol = "
             << Foam::max(Tolerance, RelTolerance*mag(initialResidual_))
             << endl;
     }

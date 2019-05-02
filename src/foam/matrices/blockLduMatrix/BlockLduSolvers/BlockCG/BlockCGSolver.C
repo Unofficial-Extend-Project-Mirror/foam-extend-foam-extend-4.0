@@ -75,7 +75,7 @@ typename Foam::BlockSolverPerformance<Type> Foam::BlockCGSolver<Type>::solve
         this->fieldName()
     );
 
-    scalar norm = this->normFactor(x, b);
+    Type norm = this->normFactor(x, b);
 
     Field<Type> wA(x.size());
 
@@ -83,7 +83,8 @@ typename Foam::BlockSolverPerformance<Type> Foam::BlockCGSolver<Type>::solve
     matrix.Amul(wA, x);
     Field<Type> rA(b - wA);
 
-    solverPerf.initialResidual() = gSum(cmptMag(rA))/norm;
+    // NOTE: Normalisation of residual per component! TU, Feb 2019
+    solverPerf.initialResidual() = cmptDivide(gSum(cmptMag(rA)),norm);
     solverPerf.finalResidual() = solverPerf.initialResidual();
 
     // Check convergence, solve if not converged
@@ -120,7 +121,7 @@ typename Foam::BlockSolverPerformance<Type> Foam::BlockCGSolver<Type>::solve
             wApA = gSumProd(wA, pA);
 
             // Check for singularity
-            if (solverPerf.checkSingularity(mag(wApA)/norm))
+            if (solverPerf.checkSingularity(mag(wApA)/mag(norm)))
             {
                 break;
             }
@@ -138,7 +139,7 @@ typename Foam::BlockSolverPerformance<Type> Foam::BlockCGSolver<Type>::solve
                 rA[i] -= alpha*wA[i];
             }
 
-            solverPerf.finalResidual() = gSum(cmptMag(rA))/norm;
+            solverPerf.finalResidual() = cmptDivide(gSum(cmptMag(rA)), norm);
             solverPerf.nIterations()++;
         } while (!this->stop(solverPerf));
     }

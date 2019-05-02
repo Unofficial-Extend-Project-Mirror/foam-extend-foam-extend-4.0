@@ -72,7 +72,7 @@ Foam::BlockILUSolver<Type>::solve
         this->fieldName()
     );
 
-    scalar norm = this->normFactor(x, b);
+    Type norm = this->normFactor(x, b);
 
     Field<Type> residual(x.size());
 
@@ -84,7 +84,7 @@ Foam::BlockILUSolver<Type>::solve
         residual[i] = b[i] - residual[i];
     }
 
-    solverPerf.initialResidual() = gSum(cmptMag(residual))/norm;
+    solverPerf.initialResidual() = cmptDivide(gSum(cmptMag(residual)),norm);
     solverPerf.finalResidual() = solverPerf.initialResidual();
 
     // Check convergence, solve if not converged
@@ -114,7 +114,7 @@ Foam::BlockILUSolver<Type>::solve
                 residual[i] = b[i] - residual[i];
             }
 
-            solverPerf.finalResidual() = gSum(cmptMag(residual))/norm;
+            solverPerf.finalResidual() = cmptDivide(gSum(cmptMag(residual)), norm);
         } while (!this->stop(solverPerf));
     }
 

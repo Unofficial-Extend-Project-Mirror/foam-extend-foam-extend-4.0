@@ -84,7 +84,7 @@ protected:
     // Protected Member Functions
 
         //- Return normalisation factor
-        scalar normFactor
+        Type normFactor
         (
             Field<Type>& x,
             const Field<Type>& b
@@ -107,10 +107,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~BlockIterativeSolver()
-        {}
+    //- Destructor
+    virtual ~BlockIterativeSolver()
+    {}
 
 
     // Member Functions

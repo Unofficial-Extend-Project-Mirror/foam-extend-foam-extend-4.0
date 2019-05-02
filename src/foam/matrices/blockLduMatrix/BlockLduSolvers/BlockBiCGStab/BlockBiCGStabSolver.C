@@ -76,7 +76,7 @@ Foam::BlockBiCGStabSolver<Type>::solve
         this->fieldName()
     );
 
-    scalar norm = this->normFactor(x, b);
+    Type norm = this->normFactor(x, b);
 
     // Multiplication helper
     typename BlockCoeff<Type>::multiply mult;
@@ -87,7 +87,8 @@ Foam::BlockBiCGStabSolver<Type>::solve
     matrix.Amul(p, x);
     Field<Type> r(b - p);
 
-    solverPerf.initialResidual() = gSum(cmptMag(r))/norm;
+    // NOTE: Normalisation of residual per component! TU, Feb 2019
+    solverPerf.initialResidual() = cmptDivide(gSum(cmptMag(r)),norm);
     solverPerf.finalResidual() = solverPerf.initialResidual();
 
     // Check convergence, solve if not converged
@@ -160,7 +161,7 @@ Foam::BlockBiCGStabSolver<Type>::solve
                 r[i] = s[i] - omega*t[i];
             }
 
-            solverPerf.finalResidual() = gSum(cmptMag(r))/norm;
+            solverPerf.finalResidual() = cmptDivide(gSum(cmptMag(r)), norm);
             solverPerf.nIterations()++;
         } while (!this->stop(solverPerf));
     }

@@ -50,7 +50,7 @@ Foam::BlockIterativeSolver<Type>::BlockIterativeSolver
 // * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * * //
 
 template<class Type>
-Foam::scalar Foam::BlockIterativeSolver<Type>::normFactor
+Type Foam::BlockIterativeSolver<Type>::normFactor
 (
     Field<Type>& x,
     const Field<Type>& b
@@ -77,7 +77,13 @@ Foam::scalar Foam::BlockIterativeSolver<Type>::normFactor
         Field<Type>(nRows, xRef)
     );
 
-    scalar normFactor = gSum(mag(wA - pA) + mag(b - pA)) + this->small_;
+    // The components of the normalisation factor cannot be equal to 0 since it
+    // appears in the denominator: replace zero with small_
+    Type small = pTraits<Type>::one*this->small_;
+
+    // Norm factor for the block matrix is not a scalar since each component
+    // should be normalised with a value corresponding to a particular variable
+    Type normFactor = gSum(cmptMag(wA - pA) + cmptMag(b - pA)) + small;
 
     if (blockLduMatrix::debug >= 2)
     {
