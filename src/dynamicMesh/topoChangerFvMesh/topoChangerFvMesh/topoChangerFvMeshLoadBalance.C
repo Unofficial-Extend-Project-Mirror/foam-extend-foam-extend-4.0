@@ -35,9 +35,6 @@ License
 #include "cloudDistribute.H"
 #include "meshObjectBase.H"
 
-#include "IFstream.H"
-#include "OFstream.H"
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
@@ -309,16 +306,11 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
             {
                 Pout<< "Send mesh and fields to processor " << procI << endl;
 
-                OFstream toProc
+                OPstream toProc
                 (
-                    "from" + Foam::name(Pstream::myProcNo())
-                  + "To" + Foam::name(procI)
+                    Pstream::blocking,
+                    procI
                 );
-                // OPstream toProc
-                // (
-                //     Pstream::blocking,
-                //     procI
-                // );
 
                 // Send the mesh and fields to target processor
                 toProc << procMesh << nl;
@@ -470,16 +462,11 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                 Pout<< "Receive mesh and fields from " << procI << endl;
 
                 // Note: communication can be optimised.  HJ, 27/Feb/2018
-                IFstream fromProc
+                IPstream fromProc
                 (
-                    "from" + Foam::name(procI)
-                  + "To" + Foam::name(Pstream::myProcNo())
+                    Pstream::blocking,
+                    procI
                 );
-                // IPstream fromProc
-                // (
-                //     Pstream::blocking,
-                //     procI
-                // );
 
                 // Receive the mesh
                 procMeshes.set
