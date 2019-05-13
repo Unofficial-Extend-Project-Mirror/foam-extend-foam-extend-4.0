@@ -84,7 +84,7 @@ typename Foam::BlockSolverPerformance<Type> Foam::BlockCGSolver<Type>::solve
     Field<Type> rA(b - wA);
 
     // NOTE: Normalisation of residual per component! TU, Feb 2019
-    solverPerf.initialResidual() = cmptDivide(gSum(cmptMag(rA)),norm);
+    solverPerf.initialResidual() = cmptDivide(gSum(cmptMag(rA)), norm);
     solverPerf.finalResidual() = solverPerf.initialResidual();
 
     // Check convergence, solve if not converged
