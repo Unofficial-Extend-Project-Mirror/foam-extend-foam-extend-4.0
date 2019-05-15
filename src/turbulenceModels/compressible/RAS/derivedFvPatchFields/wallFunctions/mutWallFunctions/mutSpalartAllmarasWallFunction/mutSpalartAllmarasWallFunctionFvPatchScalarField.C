@@ -53,9 +53,9 @@ mutSpalartAllmarasWallFunctionFvPatchScalarField::calcMut() const
     const scalarField& rhow = turbModel.rho().boundaryField()[patchI];
     const scalarField& muw = turbModel.mu().boundaryField()[patchI];
 
-    return max
+    return Foam::max
     (
-        0.0,
+        scalar(0),
         rhow*sqr(calcUTau(magGradU))/(magGradU + ROOTVSMALL) - muw
     );
 }
