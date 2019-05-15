@@ -82,7 +82,7 @@ setenv WM_THIRD_PARTY_DIR $WM_PROJECT_DIR/ThirdParty
 
 #
 # For AllMake.stage2
-setenv WM_THIRD_PARTY_USE_OPENMPI_311 1
+setenv WM_THIRD_PARTY_USE_OPENMPI_188 1
 
 #
 # For AllMake.stage3
