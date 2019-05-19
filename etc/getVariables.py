@@ -229,7 +229,7 @@ class BashConvert(ShellConvert):
             val=":".join(v)
         else:
             val=v
-        if val.find(" "):
+        if " " in val:
             return 'export %s="%s"' % (n,val)
         else:
             return 'export %s=%s' % (n,val)
