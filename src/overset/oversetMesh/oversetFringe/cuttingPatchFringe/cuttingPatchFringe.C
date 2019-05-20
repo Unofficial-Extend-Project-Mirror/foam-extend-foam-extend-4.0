@@ -228,7 +228,9 @@ void Foam::cuttingPatchFringe::calcAddressing() const
 
             forAll (ts, tsI)
             {
-                triFaces[tsI] = ts[tsI].reverseFace();
+                // Bugfix: no need to reverse face because the normals point in
+                // the correct direction already. VV, 20/May/2019.
+                triFaces[tsI] = ts[tsI];
             }
         }
 
@@ -369,11 +371,6 @@ void Foam::cuttingPatchFringe::calcAddressing() const
         const unallocLabelList& owner = mesh.faceOwner();
         const unallocLabelList& neighbour = mesh.faceNeighbour();
 
-        // Collect all inside cells either as hole cells or acceptor
-        // cells. For the first iteration, acceptor cells are the cells that
-        // have at least one neighbour cell that is not marked
-        labelHashSet acceptors(myRegionCells.size()/10);
-
         // Bool list for collecting faces with at least one unmarked
         // cell (to determine the acceptors for the first iteration)
         boolList hasUnmarkedCell(mesh.nFaces(), false);
@@ -391,7 +388,6 @@ void Foam::cuttingPatchFringe::calcAddressing() const
                 {
                     // Set the mark for this global face and break out
                     hasUnmarkedCell[cFaces[i]] = true;
-                    break;
                 }
             }
         }
@@ -405,8 +401,12 @@ void Foam::cuttingPatchFringe::calcAddressing() const
             false
         );
 
-        // Mark-up for all hole faces
-        boolList holeFaceMask(mesh.nFaces(), false);
+        // Mark-up for all inside faces
+        boolList insideFaceMask(mesh.nFaces(), false);
+
+        // Collect all acceptors for the first iteration (the cells that
+        // have at least one neighbour cell that is not marked)
+        labelHashSet acceptors(myRegionCells.size()/10);
 
         // Loop again through all cells and collect marked ones into
         // acceptors or holes, depending on whether they have unmarked cell
@@ -418,10 +418,6 @@ void Foam::cuttingPatchFringe::calcAddressing() const
                 // This cell is inside the covered region
                 const cell& cFaces = meshCells[cellI];
 
-                // Helper variable to determine whether this marked cell
-                // should be collected as a hole
-                bool isHole = true;
-
                 forAll (cFaces, i)
                 {
                     // Get global face index
@@ -431,24 +427,26 @@ void Foam::cuttingPatchFringe::calcAddressing() const
                     if (hasUnmarkedCell[faceI])
                     {
                         // This cell has unmarked neighbour, collect it into
-                        // the acceptor list, set isHole to false and break
+                        // the acceptor list
                         acceptors.insert(cellI);
-                        isHole = false;
+
+                        // This cell is no longer "inside cell"
+                        insideMask[cellI] = false;;
+
+                        // Break out since there's nothing to do for this cell
                         break;
                     }
                 }
 
-                // If this is a hole, collect it and mark its faces
-                if (isHole)
+                // If this is still inside cell, collect it and mark its faces
+                if (insideMask[cellI])
                 {
-                    holeCellMask[cellI] = true;
-
                     // Loop through cell faces and mark them
                     const cell& cFaces = meshCells[cellI];
 
                     forAll (cFaces, i)
                     {
-                        holeFaceMask[cFaces[i]] = true;
+                        insideFaceMask[cFaces[i]] = true;
                     }
                 }
             } // End if cell is inside
@@ -464,7 +462,7 @@ void Foam::cuttingPatchFringe::calcAddressing() const
             // Face markup for propagation
             boolList propagateFace(mesh.nFaces(), false);
 
-            // Loop through all donors and mark faces that are around hole
+            // Loop through all acceptors and mark faces that are around hole
             // cells. This way, we make sure that we go towards the correct,
             // inside direction
             forAllConstIter (labelHashSet, acceptors, iter)
@@ -479,7 +477,7 @@ void Foam::cuttingPatchFringe::calcAddressing() const
                     // Get face index (global)
                     const label& faceI = cFaces[i];
 
-                    if (holeFaceMask[faceI])
+                    if (insideFaceMask[faceI])
                     {
                         // This is a hole face, we are moving in the right
                         // direction. Mark the face for propagation
@@ -507,25 +505,25 @@ void Foam::cuttingPatchFringe::calcAddressing() const
                     const label& nei = neighbour[faceI];
 
                     // Either owner or neighbour may be hole, not both
-                    if (holeCellMask[own])
+                    if (insideMask[own])
                     {
                         // Owner cell is a hole, insert it
                         newAcceptors.insert(own);
 
                         // Update hole mask
-                        holeCellMask[own] = false;
+                        insideMask[own] = false;
                     }
-                    else if (holeCellMask[nei])
+                    else if (insideMask[nei])
                     {
                         // Neighbour cell is a hole, insert it
                         newAcceptors.insert(nei);
 
                         // Update hole mask
-                        holeCellMask[nei] = false;
+                        insideMask[nei] = false;
                     }
 
                     // Also update hole face mask for next iteration
-                    holeFaceMask[faceI] = false;
+                    insideFaceMask[faceI] = false;
                 }
             }
 
@@ -543,17 +541,17 @@ void Foam::cuttingPatchFringe::calcAddressing() const
                     // side. Neighbour handled on the other side
                     const label& own = owner[faceI];
 
-                    if (holeCellMask[own])
+                    if (insideMask[own])
                     {
                         // Face cell is a hole, insert it
                         newAcceptors.insert(own);
 
                         // Update hole mask
-                        holeCellMask[own] = false;
+                        insideMask[own] = false;
                     }
 
                     // Also update hole face mask for next iteration
-                    holeFaceMask[faceI] = false;
+                    insideFaceMask[faceI] = false;
                 }
             }
 
@@ -569,9 +567,9 @@ void Foam::cuttingPatchFringe::calcAddressing() const
         // optimized by using dynamic lists)
         labelHashSet fringeHoles(myRegionCells.size()/10);
 
-        forAll (holeCellMask, cellI)
+        forAll (insideMask, cellI)
         {
-            if (holeCellMask[cellI])
+            if (insideMask[cellI])
             {
                 fringeHoles.insert(cellI);
             }
@@ -657,10 +655,10 @@ Foam::cuttingPatchFringe::cuttingPatchFringe
             ")"
         )   << "You have specified nLayers = " << nLayers_
             << nl
-            << "We strongly advise to use at least 2 layers to avoid"
-            << " possibility of having acceptors that cannot find decent"
-            << " donors on the other side."
-            << abort(FatalError);
+            << "We strongly advise to use at least 2 layers to avoid" << nl
+            << "possibility of having acceptors that cannot find decent" << nl
+            << "donors on the other side."
+            << endl;
     }
 }
 
