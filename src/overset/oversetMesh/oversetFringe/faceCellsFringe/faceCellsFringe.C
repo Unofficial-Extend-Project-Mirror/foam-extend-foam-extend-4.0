@@ -72,7 +72,7 @@ void Foam::faceCellsFringe::calcAddressing() const
             (
                 "void faceCellsFringe::calcAddressing() const"
             )   << "Fringe patch " << patchNames_[nameI]
-                << " cannot be found"
+                << " cannot be found."
                 << abort(FatalError);
         }
 
