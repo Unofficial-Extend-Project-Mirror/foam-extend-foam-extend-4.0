@@ -64,7 +64,7 @@ void Foam::cuttingPatchFringe::init() const
         allRegionNames[arI] = allRegions[arI].name();
     }
 
-    // Loop through all regions and check whether the overlap has been found
+    // Loop through all regions, collect region IDs and do sanity checks
     forAll (connectedRegionNames_, crI)
     {
         // Get name of this connected region
@@ -81,12 +81,24 @@ void Foam::cuttingPatchFringe::init() const
                 << abort(FatalError);
         }
 
+        // Check whether the region is already present in the list
+        if (findIndex(connectedRegionIDs_, regionID) != -1)
+        {
+            // Duplicate found. Issue an error
+            FatalErrorIn("void cuttingPatchFringe::init() const")
+                << "Region " << crName << " found in the list of regions"
+                << " more than once." << nl
+                << " This is not allowed." << nl
+                << "Make sure that you don't have duplicate entries."
+                << abort(FatalError);
+        }
+
         // Collect the region index in the list
         connectedRegionIDs_[crI] = regionID;
 
         // Sanity check: if the specified connected donor region has more than 1
         // donor regions, this fringe algorithm is attempted to be used for
-        // something that's not intended for. Issue an error
+        // something that's not intended. Issue an error
         if (allRegions[regionID].donorRegions().size() != 1)
         {
             FatalErrorIn("void cuttingPatchFringe::init() const")
