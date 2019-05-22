@@ -58,14 +58,8 @@ class cuttingPatchFringe
 {
     // Private data
 
-        //- Names of connected regions. Looked up on construction
-        wordList connectedRegionNames_;
-
-        //- Regions IDs from which the donors will be collected as a starting
-        //  point. Note: initialized in init private member function because we
-        //  cannot initialize it in constructor. This is because certain overset
-        //  regions (and their fringes) may not be initialized at this point.
-        mutable labelList connectedRegionIDs_;
+        //- Names of the cuttingPatches
+        wordList cuttingPatchNames_;
 
         //- How many layers to move away from connected region donors to define
         //  acceptor (and holes)
@@ -80,14 +74,8 @@ class cuttingPatchFringe
         //- Final donor/acceptor pairs for this region (fringe)
         mutable donorAcceptorList* finalDonorAcceptorsPtr_;
 
-        //- Initialization helper
-        mutable bool isInitialized_;
-
 
     // Private Member Functions
-
-        //- Initialization
-        void init() const;
 
         //- Calculate hole and acceptor addressing
         void calcAddressing() const;
