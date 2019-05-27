@@ -380,7 +380,7 @@ void Foam::cuttingPatchFringe::calcAddressing() const
         (
             mesh,
             propagateFace,
-            orOp<bool>(),
+            orEqOp<bool>(),
             false
         );
 
@@ -517,7 +517,7 @@ Foam::cuttingPatchFringe::cuttingPatchFringe
         )   << "Invalid number of layers specified, nLayers = " << nLayers_
             << nl
             << "The number should be greater than 0."
-            << abort(FatalError);
+            << exit(FatalError);
     }
 
     // Preferably, the number of layers should be at least 2
