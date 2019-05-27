@@ -253,6 +253,15 @@ void Foam::cuttingPatchFringe::calcAddressing() const
         insideMask[myRegionCells[i]] = myRegionInsideMask[i];
     }
 
+    // Make sure that the cut holes for this region are also properly marked as
+    // "inside". This may not be the case automatically for e.g. simulations
+    // with appendages
+    const labelList& cutRegionHoles = myRegion.cutHoles();
+    forAll (cutRegionHoles, i)
+    {
+        insideMask[cutRegionHoles[i]] = true;
+    }
+
     // Get necessary mesh data (from polyMesh/primitiveMesh)
     const cellList& meshCells = mesh.cells();
     const unallocLabelList& owner = mesh.faceOwner();
@@ -273,7 +282,7 @@ void Foam::cuttingPatchFringe::calcAddressing() const
 
             forAll (cFaces, i)
             {
-                // Set the mark for this global face and break out
+                // Set the mark for this global face
                 hasUnmarkedCell[cFaces[i]] = true;
             }
         }
@@ -284,8 +293,8 @@ void Foam::cuttingPatchFringe::calcAddressing() const
     (
         mesh,
         hasUnmarkedCell,
-        orOp<bool>(),
-        false
+        orEqOp<bool>(),
+        true
     );
 
     // Mark-up for all inside faces
@@ -318,26 +327,19 @@ void Foam::cuttingPatchFringe::calcAddressing() const
                     acceptors.insert(cellI);
 
                     // This cell is no longer "inside cell"
-                    insideMask[cellI] = false;;
-
-                    // Break out since there's nothing to do for this cell
-                    break;
+                    insideMask[cellI] = false;
                 }
-            }
-
-            // If this is still inside cell, collect it and mark its faces
-            if (insideMask[cellI])
-            {
-                // Loop through cell faces and mark them
-                const cell& cFaces = meshCells[cellI];
-
-                forAll (cFaces, i)
+                else
                 {
-                    insideFaceMask[cFaces[i]] = true;
+                    // This is an "inside" face, mark it
+                    insideFaceMask[faceI] = true;
                 }
-            }
+            } // End for all faces
         } // End if cell is inside
     } // End for all cells
+
+    // Note: insideFaceMask already synced across processors because it relies
+    // on hasUnmarkedCell list, which has been synced just above
 
     // Hash set containing new acceptors (for successive iterations)
     labelHashSet newAcceptors(acceptors.size());
@@ -382,7 +384,7 @@ void Foam::cuttingPatchFringe::calcAddressing() const
             false
         );
 
-        // Loop through all faces and append acceptors
+        // Loop through all internal faces and append acceptors
         for (label faceI = 0; faceI < mesh.nInternalFaces(); ++faceI)
         {
             if (propagateFace[faceI])
@@ -450,21 +452,20 @@ void Foam::cuttingPatchFringe::calcAddressing() const
     } // End for specified number of layers
 
     // At this point, we have the final set of acceptors and we marked
-    // all cells that should be holes. Collect holes into hash set (could be
-    // optimized by using dynamic lists)
-    labelHashSet fringeHoles(myRegionCells.size()/10);
+    // all cells that should be holes. Collect them into the list
+    dynamicLabelList fringeHoles(myRegionCells.size()/10);
 
     forAll (insideMask, cellI)
     {
         if (insideMask[cellI])
         {
-            fringeHoles.insert(cellI);
+            fringeHoles.append(cellI);
         }
     }
 
     // Set acceptors and holes from the data for all regions
     acceptorsPtr_ = new labelList(acceptors.sortedToc());
-    fringeHolesPtr_ = new labelList(fringeHoles.sortedToc());
+    fringeHolesPtr_ = new labelList(fringeHoles.xfer());
 
     if (debug)
     {
