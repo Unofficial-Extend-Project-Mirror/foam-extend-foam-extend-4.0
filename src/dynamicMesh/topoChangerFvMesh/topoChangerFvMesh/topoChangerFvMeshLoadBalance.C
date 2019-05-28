@@ -291,7 +291,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                 true    // Create passive processor patches
             );
             fvMesh& procMesh = procMeshPtr();
-            procMesh.write();
+
             // Create a field decomposer
             fvFieldDecomposer fieldDecomposer
             (
@@ -304,7 +304,11 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
 
             if (procI != Pstream::myProcNo())
             {
-                Pout<< "Send mesh and fields to processor " << procI << endl;
+                if (debug)
+                {
+                    Pout<< "Send mesh and fields to processor " << procI
+                        << endl;
+                }
 
                 OPstream toProc
                 (
@@ -449,8 +453,6 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         }
     }
 
-    sleep(2);
-    
     // Collect pieces of mesh and fields from other processors
     for (label procI = 0; procI < meshDecomp.nProcs(); procI++)
     {
@@ -459,7 +461,10 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
             // Check if there is a mesh to send
             if (migratedCells[procI][Pstream::myProcNo()] > 0)
             {
-                Pout<< "Receive mesh and fields from " << procI << endl;
+                if (debug)
+                {
+                    Pout<< "Receive mesh and fields from " << procI << endl;
+                }
 
                 // Note: communication can be optimised.  HJ, 27/Feb/2018
                 IPstream fromProc
