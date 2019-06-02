@@ -48,6 +48,7 @@ License
 #include "processorPointPatch.H"
 #include "globalIndex.H"
 #include "meshTools.H"
+#include "labelIOField.H"
 #include "OFstream.H"
 #include "geomDecomp.H"
 #include "Random.H"
@@ -860,7 +861,7 @@ Foam::meshRefinement::meshRefinement
     meshCutter_
     (
         mesh,
-        labelIOList
+        labelIOField
         (
             IOobject
             (
@@ -872,9 +873,9 @@ Foam::meshRefinement::meshRefinement
                 IOobject::NO_WRITE,
                 false
             ),
-            labelList(mesh_.nCells(), 0)
+            labelField(mesh_.nCells(), 0)
         ),
-        labelIOList
+        labelIOField
         (
             IOobject
             (
@@ -886,7 +887,7 @@ Foam::meshRefinement::meshRefinement
                 IOobject::NO_WRITE,
                 false
             ),
-            labelList(mesh_.nPoints(), 0)
+            labelField(mesh_.nPoints(), 0)
         ),
         refinementHistory
         (
