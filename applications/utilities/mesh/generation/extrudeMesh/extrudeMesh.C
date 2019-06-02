@@ -179,7 +179,10 @@ int main(int argc, char *argv[])
 
     const boundBox& bb = mesh.globalData().bb();
     const vector span = bb.span();
-    const scalar mergeDim = 1e-4 * bb.minDim();
+
+    // Read merge tolerance
+    const scalar mergeTolerance = readScalar(dict.lookup("mergeTolerance"));
+    const scalar mergeDim = mergeTolerance*bb.minDim();
 
     Info<< "Mesh bounding box : " << bb << nl
         << "        with span : " << span << nl
@@ -200,7 +203,7 @@ int main(int argc, char *argv[])
 
     // Collapse edges
     // ~~~~~~~~~~~~~~
-
+    if (mergeTolerance > SMALL)
     {
         Info<< "Collapsing edges < " << mergeDim << " ..." << nl << endl;
 

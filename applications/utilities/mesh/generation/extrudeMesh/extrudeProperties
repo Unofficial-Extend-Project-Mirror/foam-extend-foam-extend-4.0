@@ -70,5 +70,7 @@ sigmaRadialCoeffs
     pStrat          1;
 }
 
+mergeTolerance      1e-4;
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
