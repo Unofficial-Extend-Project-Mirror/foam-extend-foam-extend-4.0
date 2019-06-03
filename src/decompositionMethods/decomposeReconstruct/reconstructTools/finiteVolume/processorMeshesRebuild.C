@@ -1728,7 +1728,34 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
     // due to the presence of old/new patches
     globalMesh.addFvPatches(reconPatches, false);
 
-    // TODO: point, face and cell zones
+    // TODO: point, face and cell zone
+    // Temporarily issue an error if we have point, face and cell zones
+    forAll (meshes_, procI)
+    {
+        if (meshes_.set(procI))
+        {
+            const polyMesh& curMesh = meshes_[procI];
+
+            if
+            (
+                !curMesh.cellZones().empty()
+             || !curMesh.faceZones().empty()
+             || !curMesh.pointZones().empty()
+            )
+            {
+                FatalErrorIn
+                (
+                    "autoPtr<fvMesh> processorMeshesReconstructor::"
+                    "reconstructMesh(const Time& db)"
+                )   << "Reconstructing cellZones, faceZones and pointZones is"
+                    << " currently not supported."
+                    << nl
+                    << "In order to get past this error, you can delete all the"
+                    << " zones in your mesh."
+                    << abort(FatalError);
+            }
+        }
+    }
 
     return globalMeshPtr;
 }
