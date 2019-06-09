@@ -90,9 +90,11 @@ reconstruct
     // Note: hinv inverse must be used to stabilise the inverse on bad meshes
     // but it gives strange failures.  Fixed hinv.  HJ, 22/Mar/2019
     // HJ, 19/Aug/2015
+    // Temporarily reverting hinv: Vuko Vukcevic, 6/Jun/2019
     reconField.internalField() =
     (
-        hinv
+        // hinv
+        inv
         (
             surfaceSum(sqr(mesh.Sf())/mesh.magSf())().internalField()
         )
