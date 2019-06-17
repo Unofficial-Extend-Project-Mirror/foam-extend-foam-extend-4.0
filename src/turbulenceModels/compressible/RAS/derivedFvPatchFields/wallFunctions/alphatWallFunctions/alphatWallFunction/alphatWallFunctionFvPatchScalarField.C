@@ -37,6 +37,15 @@ namespace compressible
 namespace RASModels
 {
 
+// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+
+void alphatWallFunctionFvPatchScalarField::writeLocalEntries(Ostream& os) const
+{
+    writeEntryIfDifferent<word>(os, "mut", "mut", mutName_);
+    os.writeKeyword("Prt") << Prt_ << token::END_STATEMENT << nl;
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 alphatWallFunctionFvPatchScalarField::
@@ -127,8 +136,7 @@ void alphatWallFunctionFvPatchScalarField::updateCoeffs()
 void alphatWallFunctionFvPatchScalarField::write(Ostream& os) const
 {
     fvPatchField<scalar>::write(os);
-    writeEntryIfDifferent<word>(os, "mut", "mut", mutName_);
-    os.writeKeyword("Prt") << Prt_ << token::END_STATEMENT << nl;
+    writeLocalEntries(os);
     writeEntry("value", os);
 }
 
