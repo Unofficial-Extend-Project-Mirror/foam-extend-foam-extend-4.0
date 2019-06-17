@@ -64,17 +64,8 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
 {
     if (!isType<immersedBoundaryFvPatch>(p))
     {
-        FatalIOErrorIn
-        (
-            "immersedBoundaryFvPatchField<Type>::"
-            "immersedBoundaryFvPatchField\n"
-            "(\n"
-            "    const fvPatch& p,\n"
-            "    const Field<Type>& field,\n"
-            "    const dictionary& dict\n"
-            ")\n",
-            dict
-        )   << "\n    patch type '" << p.type()
+        FatalIOErrorInFunction(dict)
+            << "\n    patch type '" << p.type()
             << "' not constraint type '" << typeName << "'"
             << "\n    for patch " << p.name()
             << " of field " << this->dimensionedInternalField().name()
@@ -107,17 +98,8 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
     // HJ, 12/Apr/2012
     if (!isType<immersedBoundaryFvPatch>(p))
     {
-        FatalErrorIn
-        (
-            "immersedBoundaryFvPatchField<Type>::"
-            "immersedBoundaryFvPatchField\n"
-            "(\n"
-            "    const immersedBoundaryFvPatchField<Type>&,\n"
-            "    const fvPatch& p,\n"
-            "    const DimensionedField<Type, volMesh>& iF,\n"
-            "    const fvPatchFieldMapper& mapper\n"
-            ")\n"
-        )   << "\n    patch type '" << p.type()
+        FatalErrorInFunction
+            << "\n    patch type '" << p.type()
             << "' not constraint type '" << typeName << "'"
             << "\n    for patch " << p.name()
             << " of field " << this->dimensionedInternalField().name()
