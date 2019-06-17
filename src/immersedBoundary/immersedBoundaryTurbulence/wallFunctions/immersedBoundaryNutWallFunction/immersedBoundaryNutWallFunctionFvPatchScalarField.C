@@ -61,10 +61,23 @@ immersedBoundaryNutWallFunctionFvPatchScalarField
     const dictionary& dict
 )
 :
-    nutkWallFunctionFvPatchScalarField(p, iF, dict),
+    nutkWallFunctionFvPatchScalarField(p, iF),   // Do not read mixed data
     immersedBoundaryFieldBase<scalar>(p, true, 1e-6)
 {
     this->readPatchType(dict);
+
+    if (!isType<immersedBoundaryFvPatch>(p))
+    {
+        FatalIOErrorInFunction(dict)
+            << "\n    patch type '" << p.type()
+            << "' not constraint type '" << typeName << "'"
+            << "\n    for patch " << p.name()
+            << " of field " << this->dimensionedInternalField().name()
+            << " in file " << this->dimensionedInternalField().objectPath()
+            << exit(FatalIOError);
+    }
+
+    scalarField::operator=(this->patchInternalField());
 }
 
 
@@ -77,10 +90,28 @@ immersedBoundaryNutWallFunctionFvPatchScalarField
     const fvPatchFieldMapper& mapper
 )
 :
-    nutkWallFunctionFvPatchScalarField(ptf, p, iF, mapper),
+    nutkWallFunctionFvPatchScalarField(p, iF), // Do not map mixed data.  Set patchType later
     immersedBoundaryFieldBase<scalar>(p, true, 1e-6)
 {
+    // Note: NO MAPPING.  Fields are created on the immersed boundary
+    // HJ, 12/Apr/2012
+    if (!isType<immersedBoundaryFvPatch>(p))
+    {
+        FatalErrorInFunction
+            << "\n    patch type '" << p.type()
+            << "' not constraint type '" << typeName << "'"
+            << "\n    for patch " << p.name()
+            << " of field " << this->dimensionedInternalField().name()
+            << " in file " << this->dimensionedInternalField().objectPath()
+            << exit(FatalIOError);
+    }
+
     this->setPatchType(ptf);
+
+    // On creation of the mapped field, the internal field is dummy and
+    // cannot be used.  Initialise the value to avoid errors
+    // HJ, 1/Dec/2017
+    scalarField::operator=(scalar(0));
 }
 
 

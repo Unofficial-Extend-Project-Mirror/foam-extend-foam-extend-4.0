@@ -62,14 +62,31 @@ immersedBoundaryEpsilonWallFunctionFvPatchScalarField
     const dictionary& dict
 )
 :
-    epsilonWallFunctionFvPatchScalarField(p, iF, dict),
+    epsilonWallFunctionFvPatchScalarField(p, iF),   // Do not read mixed data
     immersedBoundaryFieldBase<scalar>
     (
         p,
         Switch(dict.lookup("setDeadValue")),
         readScalar(dict.lookup("deadValue"))
     )
-{}
+{
+    // Since patch does not read a dictionary, the patch type needs to be read
+    // manually.  HJ, 6/Sep/2018
+    this->readPatchType(dict);
+
+    if (!isType<immersedBoundaryFvPatch>(p))
+    {
+        FatalIOErrorInFunction(dict)
+            << "\n    patch type '" << p.type()
+            << "' not constraint type '" << typeName << "'"
+            << "\n    for patch " << p.name()
+            << " of field " << this->dimensionedInternalField().name()
+            << " in file " << this->dimensionedInternalField().objectPath()
+            << exit(FatalIOError);
+    }
+
+    scalarField::operator=(this->patchInternalField());
+}
 
 
 immersedBoundaryEpsilonWallFunctionFvPatchScalarField::
@@ -81,14 +98,35 @@ immersedBoundaryEpsilonWallFunctionFvPatchScalarField
     const fvPatchFieldMapper& mapper
 )
 :
-    epsilonWallFunctionFvPatchScalarField(ptf, p, iF, mapper),
+    epsilonWallFunctionFvPatchScalarField(p, iF), // Do not map mixed data.  Set patchType later
     immersedBoundaryFieldBase<scalar>
     (
         p,
         ptf.setDeadValue(),
         ptf.deadValue()
     )
-{}
+{
+    // Note: NO MAPPING.  Fields are created on the immersed boundary
+    // HJ, 12/Apr/2012
+    if (!isType<immersedBoundaryFvPatch>(p))
+    {
+        FatalErrorInFunction
+            << "\n    patch type '" << p.type()
+            << "' not constraint type '" << typeName << "'"
+            << "\n    for patch " << p.name()
+            << " of field " << this->dimensionedInternalField().name()
+            << " in file " << this->dimensionedInternalField().objectPath()
+            << exit(FatalIOError);
+    }
+
+    // Copy the patch type since mixed data was not mapped
+    this->setPatchType(ptf);
+
+    // On creation of the mapped field, the internal field is dummy and
+    // cannot be used.  Initialise the value to avoid errors
+    // HJ, 1/Dec/2017
+    scalarField::operator=(SMALL);
+}
 
 
 immersedBoundaryEpsilonWallFunctionFvPatchScalarField::
@@ -182,7 +220,6 @@ void immersedBoundaryEpsilonWallFunctionFvPatchScalarField::updateCoeffs()
     // HJ, 20/May/2018
     if (db().foundObject<volScalarField>(GName()))
     {
-        Info<< "Updating epsilon" << endl;
         epsilonWallFunctionFvPatchScalarField::updateCoeffs();
     }
 }

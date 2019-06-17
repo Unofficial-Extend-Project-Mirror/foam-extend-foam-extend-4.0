@@ -82,7 +82,7 @@ immersedBoundaryKqRWallFunctionFvPatchField
     const dictionary& dict
 )
 :
-    kqRWallFunctionFvPatchField<Type>(p, iF, dict),
+    kqRWallFunctionFvPatchField<Type>(p, iF),   // Do not read mixed data
     immersedBoundaryFieldBase<Type>
     (
         p,
@@ -90,10 +90,10 @@ immersedBoundaryKqRWallFunctionFvPatchField
         pTraits<Type>(dict.lookup("deadValue"))
     )
 {
-    this->checkType();
     this->readPatchType(dict);
+    this->checkType();
 
-    *this == this->patchInternalField();
+    Field<Type>::operator=(this->patchInternalField());
 }
 
 
@@ -107,7 +107,7 @@ immersedBoundaryKqRWallFunctionFvPatchField
     const fvPatchFieldMapper& mapper
 )
 :
-    kqRWallFunctionFvPatchField<Type>(ptf, p, iF, mapper),
+    kqRWallFunctionFvPatchField<Type>(p, iF), // Do not map mixed data.  Set patchType later
     immersedBoundaryFieldBase<Type>
     (
         p,
@@ -117,6 +117,10 @@ immersedBoundaryKqRWallFunctionFvPatchField
 {
     this->setPatchType(ptf);
     this->checkType();
+
+    // cannot be used.  Initialise the value to avoid errors
+    // HJ, 1/Dec/2017
+    Field<Type>::operator=(pTraits<Type>::zero);
 }
 
 
