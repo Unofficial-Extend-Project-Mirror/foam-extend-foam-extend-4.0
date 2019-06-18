@@ -25,11 +25,10 @@
 #     CMakeLists.txt file for libraries and applications
 #
 # Author
-#     Henrik Rusche, Wikki GmbH, 2017. All rights reserved
+#     Hrvoje Jasak, Wikki Ltd, 2019. All rights reserved
 #
 #
 # --------------------------------------------------------------------------
 
-add_subdirectory(immersedBoundary)
-add_subdirectory(immersedBoundaryDynamicMesh)
-add_subdirectory(immersedBoundaryTurbulence)
+add_subdirectory(incompressible)
+add_subdirectory(compressible)

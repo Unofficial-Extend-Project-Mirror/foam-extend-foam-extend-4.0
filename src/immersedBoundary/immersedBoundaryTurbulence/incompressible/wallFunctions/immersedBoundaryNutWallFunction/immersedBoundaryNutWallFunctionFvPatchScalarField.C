@@ -182,7 +182,7 @@ void immersedBoundaryNutWallFunctionFvPatchScalarField::evaluate
         Info<< "Resizing immersedBoundaryNutWallFunction in evaluate"
             << endl;
 
-        *this == patchInternalField();
+        scalarField::operator=(patchInternalField());
     }
 
     // Get non-constant reference to internal field
