@@ -33,6 +33,7 @@ Description
 #include "fvc.H"
 #include "fvMatrices.H"
 #include "immersedBoundaryFvPatch.H"
+#include "cellSet.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,6 +60,9 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
     label minLiveCell = -1;
     const scalarField& gammaIn = gamma.internalField();
 
+    // Collect dead cells
+    labelHashSet deadCellsHash;
+    
     forAll (mesh.boundary(), patchI)
     {
         if (isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
@@ -79,6 +83,9 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
                     minLiveCell = ibCells[dcI];
                 }
             }
+
+            // Collect dead cells
+            deadCellsHash.insert(ibPatch.ibPolyPatch().deadCells());
         }
     }
 
@@ -124,6 +131,17 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
     sGamma.write();
     gamma.write();
 
+
+    // Create dead cells set
+    {
+        cellSet
+        (
+            mesh,
+            "deadCells",
+            deadCellsHash
+        ).write();
+    }
+    
     // Check consistency of face area vectors
 
     Info<< nl << "Calculating divSf" << endl;
@@ -240,8 +258,6 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
             << "Sum normal areas: " << sum(openFaceAreas) << nl
             << "Sum iB areas: " << sum(ibVectors) << nl
             << endl;
-
-
     }
 
     Info<< endl;
