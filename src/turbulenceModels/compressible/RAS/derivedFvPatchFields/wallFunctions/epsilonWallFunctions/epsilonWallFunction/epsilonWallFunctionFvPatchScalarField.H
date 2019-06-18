@@ -37,7 +37,7 @@ SourceFiles
 #ifndef compressibleEpsilonWallFunctionFvPatchScalarField_H
 #define compressibleEpsilonWallFunctionFvPatchScalarField_H
 
-#include "fixedInternalValueFvPatchField.H"
+#include "fixedInternalValueFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -90,6 +90,20 @@ class epsilonWallFunctionFvPatchScalarField
 
         //- Check the type of the patch
         void checkType();
+
+
+protected:
+
+    // Protected Member Functions
+
+        //- Write local wall function variables
+        virtual void writeLocalEntries(Ostream&) const;
+
+        //- Return name of turbulence generation field
+        inline const word& GName() const
+        {
+            return GName_;
+        }
 
 
 public:
@@ -169,7 +183,10 @@ public:
             virtual void updateCoeffs();
 
             //- Evaluate the patchField
-            virtual void evaluate(const Pstream::commsTypes);
+            virtual void evaluate
+            (
+                const Pstream::commsTypes  = Pstream::blocking
+            );
 
 
         // I-O

@@ -54,6 +54,21 @@ void epsilonWallFunctionFvPatchScalarField::checkType()
 }
 
 
+// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+
+void epsilonWallFunctionFvPatchScalarField::writeLocalEntries(Ostream& os) const
+{
+    writeEntryIfDifferent<word>(os, "U", "U", UName_);
+    writeEntryIfDifferent<word>(os, "k", "k", kName_);
+    writeEntryIfDifferent<word>(os, "G", "RASModel::G", GName_);
+    writeEntryIfDifferent<word>(os, "mu", "mu", muName_);
+    writeEntryIfDifferent<word>(os, "mut", "mut", mutName_);
+    os.writeKeyword("Cmu") << Cmu_ << token::END_STATEMENT << nl;
+    os.writeKeyword("kappa") << kappa_ << token::END_STATEMENT << nl;
+    os.writeKeyword("E") << E_ << token::END_STATEMENT << nl;
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 epsilonWallFunctionFvPatchScalarField::epsilonWallFunctionFvPatchScalarField
@@ -251,7 +266,7 @@ void epsilonWallFunctionFvPatchScalarField::updateCoeffs()
 
     // TODO: perform averaging for cells sharing more than one boundary face
 
-    fixedInternalValueFvPatchField<scalar>::updateCoeffs();
+    fixedInternalValueFvPatchScalarField::updateCoeffs();
 }
 
 
@@ -260,22 +275,14 @@ void epsilonWallFunctionFvPatchScalarField::evaluate
     const Pstream::commsTypes commsType
 )
 {
-    fixedInternalValueFvPatchField<scalar>::evaluate(commsType);
+    fixedInternalValueFvPatchScalarField::evaluate(commsType);
 }
 
 
 void epsilonWallFunctionFvPatchScalarField::write(Ostream& os) const
 {
-    fixedInternalValueFvPatchField<scalar>::write(os);
-    writeEntryIfDifferent<word>(os, "U", "U", UName_);
-    writeEntryIfDifferent<word>(os, "k", "k", kName_);
-    writeEntryIfDifferent<word>(os, "G", "RASModel::G", GName_);
-    writeEntryIfDifferent<word>(os, "rho", "rho", rhoName_);
-    writeEntryIfDifferent<word>(os, "mu", "mu", muName_);
-    writeEntryIfDifferent<word>(os, "mut", "mut", mutName_);
-    os.writeKeyword("Cmu") << Cmu_ << token::END_STATEMENT << nl;
-    os.writeKeyword("kappa") << kappa_ << token::END_STATEMENT << nl;
-    os.writeKeyword("E") << E_ << token::END_STATEMENT << nl;
+    fixedInternalValueFvPatchScalarField::write(os);
+    writeLocalEntries(os);
 }
 
 

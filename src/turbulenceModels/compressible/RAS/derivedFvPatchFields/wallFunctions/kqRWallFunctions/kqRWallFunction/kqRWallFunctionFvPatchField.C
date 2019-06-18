@@ -47,7 +47,8 @@ void kqRWallFunctionFvPatchField<Type>::checkType()
             << "Invalid wall function specification" << nl
             << "    Patch type for patch " << this->patch().name()
             << " must be wall" << nl
-            << "    Current patch type is " << this->patch().type() << nl << endl
+            << "    Current patch type is " << this->patch().type()
+            << nl << endl
             << abort(FatalError);
     }
 }
@@ -123,16 +124,6 @@ kqRWallFunctionFvPatchField<Type>::kqRWallFunctionFvPatchField
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-template<class Type>
-void kqRWallFunctionFvPatchField<Type>::evaluate
-(
-    const Pstream::commsTypes commsType
-)
-{
-    zeroGradientFvPatchField<Type>::evaluate(commsType);
-}
-
 
 template<class Type>
 void kqRWallFunctionFvPatchField<Type>::write(Ostream& os) const
