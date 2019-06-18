@@ -43,6 +43,7 @@ SourceFiles
 #include "removeFaces.H"
 #include "refinementHistory.H"
 #include "PackedList.H"
+#include "labelIOField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -68,10 +69,10 @@ class hexRef8
         const polyMesh& mesh_;
 
         //- Per cell the refinement level
-        labelIOList cellLevel_;
+        labelIOField cellLevel_;
 
         //- Per point the refinement level
-        labelIOList pointLevel_;
+        labelIOField pointLevel_;
 
         //- Typical edge length between unrefined points
         const scalar level0Edge_;
@@ -326,8 +327,8 @@ public:
         hexRef8
         (
             const polyMesh& mesh,
-            const labelList& cellLevel,
-            const labelList& pointLevel,
+            const labelField& cellLevel,
+            const labelField& pointLevel,
             const refinementHistory& history
         );
 
@@ -335,8 +336,8 @@ public:
         hexRef8
         (
             const polyMesh& mesh,
-            const labelList& cellLevel,
-            const labelList& pointLevel
+            const labelField& cellLevel,
+            const labelField& pointLevel
         );
 
 
@@ -344,12 +345,12 @@ public:
 
         // Access
 
-            const labelIOList& cellLevel() const
+            const labelIOField& cellLevel() const
             {
                 return cellLevel_;
             }
 
-            const labelIOList& pointLevel() const
+            const labelIOField& pointLevel() const
             {
                 return pointLevel_;
             }

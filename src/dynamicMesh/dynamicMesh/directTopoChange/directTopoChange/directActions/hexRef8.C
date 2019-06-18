@@ -1698,7 +1698,7 @@ Foam::hexRef8::hexRef8(const polyMesh& mesh)
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        labelList(mesh_.nCells(), 0)
+        labelField(mesh_.nCells(), 0)
     ),
     pointLevel_
     (
@@ -1711,7 +1711,7 @@ Foam::hexRef8::hexRef8(const polyMesh& mesh)
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        labelList(mesh_.nPoints(), 0)
+        labelField(mesh_.nPoints(), 0)
     ),
     level0Edge_(getLevel0EdgeLength()),
     history_
@@ -1779,8 +1779,8 @@ Foam::hexRef8::hexRef8(const polyMesh& mesh)
 Foam::hexRef8::hexRef8
 (
     const polyMesh& mesh,
-    const labelList& cellLevel,
-    const labelList& pointLevel,
+    const labelField& cellLevel,
+    const labelField& pointLevel,
     const refinementHistory& history
 )
 :
@@ -1833,8 +1833,8 @@ Foam::hexRef8::hexRef8
     {
         FatalErrorIn
         (
-            "hexRef8::hexRef8(const polyMesh&, const labelList&"
-            ", const labelList&, const refinementHistory&)"
+            "hexRef8::hexRef8(const polyMesh&, const labelField&"
+            ", const labelField&, const refinementHistory&)"
         )   << "History enabled but number of visible cells in it "
             << history_.visibleCells().size()
             << " is not equal to the number of cells in the mesh "
@@ -1849,8 +1849,8 @@ Foam::hexRef8::hexRef8
     {
         FatalErrorIn
         (
-            "hexRef8::hexRef8(const polyMesh&, const labelList&"
-            ", const labelList&, const refinementHistory&)"
+            "hexRef8::hexRef8(const polyMesh&, const labelField&"
+            ", const labelField&, const refinementHistory&)"
         )   << "Incorrect cellLevel or pointLevel size." << endl
             << "Number of cells in mesh:" << mesh_.nCells()
             << " does not equal size of cellLevel:" << cellLevel_.size() << endl
@@ -1876,8 +1876,8 @@ Foam::hexRef8::hexRef8
 Foam::hexRef8::hexRef8
 (
     const polyMesh& mesh,
-    const labelList& cellLevel,
-    const labelList& pointLevel
+    const labelField& cellLevel,
+    const labelField& pointLevel
 )
 :
     mesh_(mesh),
