@@ -240,6 +240,16 @@ void fixedValueIbFvPatchField<Type>::evaluate
 
 
 template<class Type>
+void Foam::fixedValueIbFvPatchField<Type>::manipulateMatrix
+(
+    fvMatrix<Type>& matrix
+)
+{
+    this->setDeadValues(matrix);
+}
+
+
+template<class Type>
 void fixedValueIbFvPatchField<Type>::write(Ostream& os) const
 {
     // Resolve post-processing issues.  HJ, 1/Dec/2017

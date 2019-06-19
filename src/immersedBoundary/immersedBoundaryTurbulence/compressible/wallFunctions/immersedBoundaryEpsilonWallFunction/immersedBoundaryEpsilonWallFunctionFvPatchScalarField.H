@@ -170,6 +170,9 @@ public:
                 const Pstream::commsTypes  = Pstream::blocking
             );
 
+            //- Manipulate a matrix
+            virtual void manipulateMatrix(fvScalarMatrix& matrix);
+
 
         // I-O
 

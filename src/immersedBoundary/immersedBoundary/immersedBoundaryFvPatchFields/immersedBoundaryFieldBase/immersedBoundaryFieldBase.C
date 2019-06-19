@@ -64,6 +64,39 @@ void Foam::immersedBoundaryFieldBase<Type>::setDeadValues
 
 
 template<class Type>
+void Foam::immersedBoundaryFieldBase<Type>::setDeadValues
+(
+    fvMatrix<Type>& matrix
+) const
+{
+    // Fix the value in dead cells
+    if (setDeadValue_)
+    {
+        const labelList& dc = ibPatch_.ibPolyPatch().deadCells();
+
+        // Boost the diagonal of dead cells by the volume ratio
+        // Volume ratio is set to SMALL; revert for diagonal
+        // This should also guarantee strong diagonal dominance.
+        // HJ, 19/Jun/2019
+
+        scalarField& diag = matrix.diag();
+
+        forAll (dc, dcI)
+        {
+            diag[dc[dcI]] *= GREAT;
+        }
+
+        // Set values
+        matrix.setValues
+        (
+            dc,
+            Field<Type>(dc.size(), deadValue_)
+        );
+    }
+}
+
+
+template<class Type>
 void Foam::immersedBoundaryFieldBase<Type>::writeDeadData(Ostream& os) const
 {
     os.writeKeyword("setDeadValue")

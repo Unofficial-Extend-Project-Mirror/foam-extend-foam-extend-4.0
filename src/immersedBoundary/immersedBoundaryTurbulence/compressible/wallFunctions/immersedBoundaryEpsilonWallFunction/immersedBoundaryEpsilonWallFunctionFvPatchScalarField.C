@@ -250,6 +250,17 @@ void immersedBoundaryEpsilonWallFunctionFvPatchScalarField::evaluate
 }
 
 
+void immersedBoundaryEpsilonWallFunctionFvPatchScalarField::manipulateMatrix
+(
+    fvScalarMatrix& matrix
+)
+{
+    setDeadValues(matrix);
+
+    epsilonWallFunctionFvPatchScalarField::manipulateMatrix(matrix);
+}
+
+
 void immersedBoundaryEpsilonWallFunctionFvPatchScalarField::write
 (
     Ostream& os

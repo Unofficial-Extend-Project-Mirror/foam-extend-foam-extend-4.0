@@ -258,6 +258,16 @@ void mixedIbFvPatchField<Type>::evaluate
 
 
 template<class Type>
+void Foam::mixedIbFvPatchField<Type>::manipulateMatrix
+(
+    fvMatrix<Type>& matrix
+)
+{
+    this->setDeadValues(matrix);
+}
+
+
+template<class Type>
 void mixedIbFvPatchField<Type>::write(Ostream& os) const
 {
     // Resolve post-processing issues.  HJ, 1/Dec/2017

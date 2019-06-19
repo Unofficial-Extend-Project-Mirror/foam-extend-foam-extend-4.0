@@ -66,7 +66,7 @@ immersedBoundaryOmegaWallFunctionFvPatchScalarField
         p,
         Switch(dict.lookup("setDeadValue")),
         readScalar(dict.lookup("deadValue"))
-    )    
+    )
 {
     this->readPatchType(dict);
 
@@ -246,6 +246,17 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::evaluate
     this->setDeadValues(intField);
 
     omegaWallFunctionFvPatchScalarField::evaluate(commsType);
+}
+
+
+void immersedBoundaryOmegaWallFunctionFvPatchScalarField::manipulateMatrix
+(
+    fvScalarMatrix& matrix
+)
+{
+    setDeadValues(matrix);
+
+    omegaWallFunctionFvPatchScalarField::manipulateMatrix(matrix);
 }
 
 

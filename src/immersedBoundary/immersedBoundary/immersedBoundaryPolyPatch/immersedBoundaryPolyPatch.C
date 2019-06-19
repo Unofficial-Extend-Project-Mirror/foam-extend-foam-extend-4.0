@@ -1262,8 +1262,8 @@ void Foam::immersedBoundaryPolyPatch::calcCorrectedGeometry() const
 
     forAll (dc, dcI)
     {
-        // Set dead volume to small
-        V[dc[dcI]] = SMALL;
+        // Scale dead volume to small
+        V[dc[dcI]] *= SMALL;
     }
 
     // Correct for all cut faces
@@ -1286,7 +1286,7 @@ void Foam::immersedBoundaryPolyPatch::calcCorrectedGeometry() const
 
     forAll (df, dfI)
     {
-        // Set dead area to small
+        // Scale dead area to small
         Sf[df[dfI]] *= SMALL;
     }
 

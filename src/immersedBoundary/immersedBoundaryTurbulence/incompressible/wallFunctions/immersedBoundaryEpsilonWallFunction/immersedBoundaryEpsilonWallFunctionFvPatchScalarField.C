@@ -222,10 +222,6 @@ void immersedBoundaryEpsilonWallFunctionFvPatchScalarField::updateCoeffs()
     {
         epsilonWallFunctionFvPatchScalarField::updateCoeffs();
     }
-
-    const RASModel& rasModel = db().lookupObject<RASModel>("RASProperties");
-    const scalarField& y = rasModel.y()[patch().index()];
-    Info<< "Patch y: (" << min(y) << " " << max(y) << ")" << endl;
 }
 
 
@@ -251,6 +247,17 @@ void immersedBoundaryEpsilonWallFunctionFvPatchScalarField::evaluate
     this->setDeadValues(intField);
 
     epsilonWallFunctionFvPatchScalarField::evaluate(commsType);
+}
+
+
+void immersedBoundaryEpsilonWallFunctionFvPatchScalarField::manipulateMatrix
+(
+    fvScalarMatrix& matrix
+)
+{
+    setDeadValues(matrix);
+
+    epsilonWallFunctionFvPatchScalarField::manipulateMatrix(matrix);
 }
 
 

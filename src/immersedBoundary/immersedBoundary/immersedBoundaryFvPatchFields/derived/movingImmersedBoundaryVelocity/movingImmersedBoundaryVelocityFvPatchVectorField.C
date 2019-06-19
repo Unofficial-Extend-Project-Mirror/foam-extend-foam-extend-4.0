@@ -220,6 +220,15 @@ void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::evaluate
 }
 
 
+void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::manipulateMatrix
+(
+    fvVectorMatrix& matrix
+)
+{
+    setDeadValues(matrix);
+}
+
+
 void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::write
 (
     Ostream& os

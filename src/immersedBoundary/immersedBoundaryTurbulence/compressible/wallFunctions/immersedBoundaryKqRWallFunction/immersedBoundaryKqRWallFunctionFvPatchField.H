@@ -167,6 +167,9 @@ public:
                 const Pstream::commsTypes commsType = Pstream::blocking
             );
 
+            //- Manipulate a matrix
+            virtual void manipulateMatrix(fvMatrix<Type>& matrix);
+
 
         // I-O
 

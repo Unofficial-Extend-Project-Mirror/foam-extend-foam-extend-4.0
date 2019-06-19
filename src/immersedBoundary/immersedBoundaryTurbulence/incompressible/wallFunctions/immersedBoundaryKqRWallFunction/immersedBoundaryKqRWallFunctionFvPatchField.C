@@ -221,6 +221,16 @@ void immersedBoundaryKqRWallFunctionFvPatchField<Type>::evaluate
 
 
 template<class Type>
+void immersedBoundaryKqRWallFunctionFvPatchField<Type>::manipulateMatrix
+(
+    fvMatrix<Type>& matrix
+)
+{
+    this->setDeadValues(matrix);
+}
+
+
+template<class Type>
 void immersedBoundaryKqRWallFunctionFvPatchField<Type>::write(Ostream& os) const
 {
     fvPatchField<Type>::write(os);
