@@ -19,6 +19,6 @@ EXE_LIBS = \
     -lincompressibleTurbulenceModel \
     -lincompressibleRASModels \
     -lincompressibleLESModels \
-    -limmersedBoundaryTurbulence \
+    -lincompressibleImmersedBoundaryTurbulence \
     -llduSolvers \
     -L$(MESQUITE_LIB_DIR) -lmesquite
