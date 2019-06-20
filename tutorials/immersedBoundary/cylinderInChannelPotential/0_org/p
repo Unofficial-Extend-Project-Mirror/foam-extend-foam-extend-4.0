@@ -28,7 +28,7 @@ boundaryField
         triGradient uniform 0;
         triValueFraction uniform 0;
 
-        setDeadValue   no;
+        setDeadValue   yes;
         deadValue      0;
     }
 
