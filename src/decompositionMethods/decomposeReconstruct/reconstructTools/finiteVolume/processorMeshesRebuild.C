@@ -1915,18 +1915,23 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                         // Get the face index in the new, reconstructed mesh
                         const label& newFaceI = curFaceProcAddr[oldFaceI];
 
-                        // Check if the face is mapped (if the index is >= 0)
-                        if (newFaceI > -1)
+                        // Check if the face is mapped.
+                        // Note:
+                        // 1. Need to decrement by 1 because of the face turning
+                        // 2. No need to handle negative new indices coming from
+                        //    slave processor because we'd end up with
+                        //    duplicate entries (two faces on two processors
+                        //    merged into a single one)
+                        if (newFaceI > 0)
                         {
                             // This is a face that's been correctly
                             // mapped, insert the face in the new zone
-                            zoneReconFaces[nFaces] = newFaceI;
+                            zoneReconFaces[nFaces] = newFaceI - 1;
 
-                            // Also store the flip map of the face. Note: I'm
-                            // pretty sure that we don't need to check whether
-                            // the flip map has been preserved because the
-                            // combined faces are inserted from master side
-                            // always.
+                            // Also store the flip map of the face. We don't
+                            // need to check whether the flip map has been
+                            // preserved because we only get the combined faces
+                            // that are inserted from master side.
                             zoneReconFaceFlips[nFaces] = zoneFlipMap[i];
 
                             // Increment the number of faces for this zone
