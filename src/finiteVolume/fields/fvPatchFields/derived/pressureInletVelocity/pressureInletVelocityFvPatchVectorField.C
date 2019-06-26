@@ -113,7 +113,7 @@ void Foam::pressureInletVelocityFvPatchVectorField::updateCoeffs()
         // Flux not available, do not update
         InfoIn
         (
-            "void ::pressureInletVelocityFvPatchVectorField::updateCoeffs()"
+            "void pressureInletVelocityFvPatchVectorField::updateCoeffs()"
         )   << "Flux field " << phiName_ << " not found.  "
             << "Performing fixed value update" << endl;
 
