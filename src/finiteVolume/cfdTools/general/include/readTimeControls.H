@@ -36,7 +36,7 @@ maxCo =
     runTime.controlDict().lookupOrDefault<scalar>("maxCo", 1.0);
 
 minDeltaT =
-    runTime.controlDict().lookupOrDefault<scalar>("minDeltaT", GREAT);
+    runTime.controlDict().lookupOrDefault<scalar>("minDeltaT", SMALL);
 
 maxDeltaT =
     runTime.controlDict().lookupOrDefault<scalar>("maxDeltaT", GREAT);
