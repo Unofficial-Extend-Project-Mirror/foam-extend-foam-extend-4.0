@@ -35,6 +35,9 @@ bool adjustTimeStep =
 scalar maxCo =
     runTime.controlDict().lookupOrDefault<scalar>("maxCo", 1.0);
 
+scalar minDeltaT =
+    runTime.controlDict().lookupOrDefault<scalar>("minDeltaT", SMALL);
+
 scalar maxDeltaT =
     runTime.controlDict().lookupOrDefault<scalar>("maxDeltaT", GREAT);
 
