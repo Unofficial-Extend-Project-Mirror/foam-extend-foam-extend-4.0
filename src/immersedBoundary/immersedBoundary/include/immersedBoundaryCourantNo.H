@@ -36,7 +36,7 @@ scalar velMag = 0.0;
 
 if (mesh.nInternalFaces())
 {
-    surfaceScalarField magPhi = pos(sGamma - 0.5)*mag(phi);
+    surfaceScalarField magPhi = sGamma*mag(phi);
 
     surfaceScalarField SfUfbyDelta =
         mesh.surfaceInterpolation::deltaCoeffs()*magPhi;
@@ -50,7 +50,7 @@ if (mesh.nInternalFaces())
     velMag = max(magPhi/mesh.magSf()).value();
 }
 
-Info<< "Courant Number mean: " << meanCoNum
+Info<< "Immersed boundary Courant Number mean: " << meanCoNum
     << " max: " << CoNum
     << " velocity magnitude: " << velMag
     << endl;
