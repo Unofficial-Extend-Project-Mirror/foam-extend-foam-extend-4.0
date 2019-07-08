@@ -50,15 +50,12 @@ Foam::List<T>::List(const label s)
 {
     if (this->size_ < 0)
     {
-        FatalErrorIn("List<T>::List(const label size)")
+        FatalErrorInFunction
             << "bad size " << this->size_
             << abort(FatalError);
     }
 
-    if (this->size_)
-    {
-        this->v_ = new T[this->size_];
-    }
+    alloc();
 }
 
 
@@ -70,15 +67,15 @@ Foam::List<T>::List(const label s, const T& a)
 {
     if (this->size_ < 0)
     {
-        FatalErrorIn("List<T>::List(const label size, const T&)")
+        FatalErrorInFunction
             << "bad size " << this->size_
             << abort(FatalError);
     }
 
+    alloc();
+
     if (this->size_)
     {
-        this->v_ = new T[this->size_];
-
         List_ACCESS(T, (*this), vp);
         List_FOR_ALL((*this), i)
             List_ELEM((*this), vp, i) = a;
@@ -95,15 +92,15 @@ Foam::List<T>::List(const List<T>& a)
 {
     if (this->size_)
     {
-        this->v_ = new T[this->size_];
+        alloc();
 
-#       ifdef USEMEMCPY
+        #ifdef USEMEMCPY
         if (contiguous<T>())
         {
             memcpy(this->v_, a.v_, this->byteSize());
         }
         else
-#       endif
+        #endif
         {
             List_ACCESS(T, (*this), vp);
             List_CONST_ACCESS(T, a, ap);
@@ -125,11 +122,11 @@ Foam::List<T>::List(const Xfer< List<T> >& lst)
 
 // Construct as copy or re-use as specified.
 template<class T>
-Foam::List<T>::List(List<T>& a, bool reUse)
+Foam::List<T>::List(List<T>& a, bool reuse)
 :
     UList<T>(nullptr, a.size_)
 {
-    if (reUse)
+    if (reuse)
     {
         this->v_ = a.v_;
         a.v_ = 0;
@@ -137,15 +134,15 @@ Foam::List<T>::List(List<T>& a, bool reUse)
     }
     else if (this->size_)
     {
-        this->v_ = new T[this->size_];
+        alloc();
 
-#       ifdef USEMEMCPY
+        #ifdef USEMEMCPY
         if (contiguous<T>())
         {
             memcpy(this->v_, a.v_, this->byteSize());
         }
         else
-#       endif
+        #endif
         {
             List_ACCESS(T, (*this), vp);
             List_CONST_ACCESS(T, a, ap);
@@ -167,11 +164,11 @@ Foam::List<T>::List(const UList<T>& a, const unallocLabelList& map)
     {
         // Note:cannot use List_ELEM since third argument has to be index.
 
-        this->v_ = new T[this->size_];
+        alloc();
 
         forAll(*this, i)
         {
-            this->v_[i] = a[map[i]];
+            this->operator[](i) = a[map[i]];
         }
     }
 }
@@ -181,32 +178,9 @@ Foam::List<T>::List(const UList<T>& a, const unallocLabelList& map)
 template<class T>
 template<class InputIterator>
 Foam::List<T>::List(InputIterator first, InputIterator last)
-{
-    label s = 0;
-    for
-    (
-        InputIterator iter = first;
-        iter != last;
-        ++iter
-    )
-    {
-        s++;
-    }
-
-    setSize(s);
-
-    s = 0;
-
-    for
-    (
-        InputIterator iter = first;
-        iter != last;
-        ++iter
-    )
-    {
-        this->operator[](s++) = iter();
-    }
-}
+:
+    List<T>(first, last, std::distance(first, last))
+{}
 
 
 // Construct as copy of FixedList<T, Size>
@@ -216,15 +190,7 @@ Foam::List<T>::List(const FixedList<T, Size>& lst)
 :
     UList<T>(nullptr, Size)
 {
-    if (this->size_)
-    {
-        this->v_ = new T[this->size_];
-
-        forAll(*this, i)
-        {
-            this->operator[](i) = lst[i];
-        }
-    }
+    allocCopyList(lst);
 }
 
 
@@ -234,15 +200,7 @@ Foam::List<T>::List(const PtrList<T>& lst)
 :
     UList<T>(nullptr, lst.size())
 {
-    if (this->size_)
-    {
-        this->v_ = new T[this->size_];
-
-        forAll(*this, i)
-        {
-            this->operator[](i) = lst[i];
-        }
-    }
+    allocCopyList(lst);
 }
 
 
@@ -254,7 +212,7 @@ Foam::List<T>::List(const SLList<T>& lst)
 {
     if (this->size_)
     {
-        this->v_ = new T[this->size_];
+        alloc();
 
         label i = 0;
         for
@@ -276,15 +234,7 @@ Foam::List<T>::List(const IndirectList<T>& lst)
 :
     UList<T>(nullptr, lst.size())
 {
-    if (this->size_)
-    {
-        this->v_ = new T[this->size_];
-
-        forAll(*this, i)
-        {
-            this->operator[](i) = lst[i];
-        }
-    }
+    allocCopyList(lst);
 }
 
 
@@ -294,15 +244,7 @@ Foam::List<T>::List(const UIndirectList<T>& lst)
 :
     UList<T>(nullptr, lst.size())
 {
-    if (this->size_)
-    {
-        this->v_ = new T[this->size_];
-
-        forAll(*this, i)
-        {
-            this->operator[](i) = lst[i];
-        }
-    }
+    allocCopyList(lst);
 }
 
 
@@ -312,15 +254,7 @@ Foam::List<T>::List(const BiIndirectList<T>& lst)
 :
     UList<T>(nullptr, lst.size())
 {
-    if (this->size_)
-    {
-        this->v_ = new T[this->size_];
-
-        forAll(*this, i)
-        {
-            this->operator[](i) = lst[i];
-        }
-    }
+    allocCopyList(lst);
 }
 
 

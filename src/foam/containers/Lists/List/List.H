@@ -80,6 +80,27 @@ class List
     public UList<T>
 {
 
+    // Private member functions
+
+        //- Allocate list storage
+        inline void alloc();
+
+        //- Reallocate list storage to the given size
+        inline void reAlloc(const label s);
+
+        //- Copy list of given type
+        template<class List2>
+        inline void copyList(const List2&);
+
+        //- Allocate storage and copy list of given type
+        template<class List2>
+        inline void allocCopyList(const List2&);
+
+        //- Construct given start and end iterators and number of elements
+        template<class InputIterator>
+        inline List(InputIterator first, InputIterator last, const label s);
+
+
 protected:
 
     //- Override size to be inconsistent with allocated storage.
@@ -118,7 +139,7 @@ public:
         List(const Xfer< List<T> >&);
 
         //- Construct as copy or re-use as specified.
-        List(List<T>&, bool reUse);
+        List(List<T>&, bool reuse);
 
         //- Construct as subset.
         List(const UList<T>&, const unallocLabelList& mapAddressing);

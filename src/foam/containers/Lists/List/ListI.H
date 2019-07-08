@@ -23,6 +23,81 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+template<class T>
+inline void Foam::List<T>::alloc()
+{
+    if (this->size_ > 0)
+    {
+        this->v_ = new T[this->size_];
+    }
+}
+
+
+template<class T>
+inline void Foam::List<T>::reAlloc(const label s)
+{
+    if (this->size_ != s)
+    {
+        clear();
+        this->size_ = s;
+        alloc();
+    }
+}
+
+
+template<class T>
+template<class List2>
+inline void Foam::List<T>::copyList(const List2& lst)
+{
+    if (this->size_)
+    {
+        forAll(*this, i)
+        {
+            this->operator[](i) = lst[i];
+        }
+    }
+}
+
+
+template<class T>
+template<class List2>
+inline void Foam::List<T>::allocCopyList(const List2& lst)
+{
+    if (this->size_)
+    {
+        alloc();
+        copyList(lst);
+    }
+}
+
+
+template<class T>
+template<class InputIterator>
+inline Foam::List<T>::List
+(
+    InputIterator first,
+    InputIterator last,
+    const label s
+)
+:
+    UList<T>(nullptr, s)
+{
+    if (this->size_)
+    {
+        alloc();
+
+        InputIterator iter = first;
+        forAll(*this, i)
+        {
+            this->operator[](i) = *iter;
+            ++iter;
+        }
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class T>
