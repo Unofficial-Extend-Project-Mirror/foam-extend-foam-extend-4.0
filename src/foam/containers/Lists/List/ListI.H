@@ -91,8 +91,7 @@ inline Foam::List<T>::List
         InputIterator iter = first;
         forAll(*this, i)
         {
-            this->operator[](i) = *iter;
-            ++iter;
+            this->operator[](i) = *iter++;
         }
     }
 }
@@ -118,6 +117,19 @@ template<class T>
 inline const Foam::List<T>& Foam::List<T>::null()
 {
     return zero;
+}
+
+
+template<class T>
+inline void Foam::List<T>::clear()
+{
+    if (this->v_)
+    {
+        delete[] this->v_;
+        this->v_ = 0;
+    }
+
+    this->size_ = 0;
 }
 
 

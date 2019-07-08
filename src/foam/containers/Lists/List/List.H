@@ -205,8 +205,8 @@ public:
             //- Reset size of List and value for new elements.
             void setSize(const label, const T&);
 
-            //- Clear the list, i.e. set size to zero.
-            void clear();
+            //- Clear the list, i.e. set size to zero
+            inline void clear();
 
             //- Append an element at the end of the list
             inline void append(const T&);
