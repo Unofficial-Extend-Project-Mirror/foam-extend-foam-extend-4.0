@@ -2,6 +2,9 @@
 
 c++WARN     = -Wall -Wextra -Wno-unused-parameter -Wold-style-cast -Wno-undefined-var-template -Wno-deprecated-register -Wno-overloaded-virtual -Wno-null-dereference
 
+# Suppress some warnings for flex++ and CGAL
+c++LESSWARN = -Wno-old-style-cast -Wno-unused-local-typedefs -Wno-array-bounds
+
 CC          = armclang++ -std=c++11 -DARM_CLANG
 
 include $(RULES)/c++$(WM_COMPILE_OPTION)
