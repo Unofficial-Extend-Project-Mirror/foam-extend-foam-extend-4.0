@@ -76,34 +76,66 @@ reconstruct
     GeometricField<GradType, fvPatchField, volMesh>& reconField =
         treconField();
 
-    // Note:
-    // 1) Reconstruction is only available in cell centres: there is no need
+    // Notes regarding boundary:
+    // 1. Reconstruction is only available in cell centres: there is no need
     //    to invert the tensor on the boundary
-    // 2) For boundaries, the only reconstructed data is the flux times
-    //    normal.  Based on this guess, boundary conditions can adjust
-    //    patch values
-    // HJ, 12/Aug/2011
+    // 2. For boundaries, the only reconstructed data is the flux times
+    //    normal. Based on this guess, boundary conditions can adjust
+    //    patch values. HJ, 12/Aug/2011
 
-    GeometricField<GradType, fvPatchField, volMesh> fluxTimesNormal =
-        surfaceSum((mesh.Sf()/mesh.magSf())*ssf);
+    // Notes regarding procedure:
+    // 1. hinv inverse must be used to stabilise the inverse on bad meshes
+    //    but it gives strange failures because it unnecessarily avoids
+    //    performing ordinary inverse for meshes with reasonably sized
+    //    determinant (e.g. if SfSf/magSf is small). HJ, 19/Aug/2015
+    // 2. hinv has been stabilised now. HJ, 22/Mar/2019
+    // 3. But we still need to make sure that the determinant is not extremely
+    //    small, which may happen for extremely small meshes. We avoid this
+    //    issue by dividing the reconstruction equation with magSf^2 (instead of
+    //    magSf), which basically makes the dyadic tensor that we need to invert
+    //    dimensionless. VV, 13/Jun/2019
 
-    // Note: hinv inverse must be used to stabilise the inverse on bad meshes
-    // but it gives strange failures.  Fixed hinv.  HJ, 22/Mar/2019
-    // HJ, 19/Aug/2015
-    // Temporarily reverting hinv: Vuko Vukcevic, 6/Jun/2019
+    // Here's a short derivation in a Latex--like notation, where:
+    // - Sf is the surface area vector
+    // - uf is the face velocity factor (or field to be reconstructed)
+    // - Ff is the face flux
+    // - magSf is the magnitude of the surface area vector
+    // - uP is the velocity field in the cell centre
+    // - G is the surface area dyadic tensor
+    // - Fn is the vector representing surface sum of directional fluxes
+    // - \dprod is a dot product
+
+    // 1. Sf \dprod uf = Ff
+    //    Multiply Eq (1) with Sf/magSf^2
+    // 2. \frac{Sf Sf}{magSf^2} \dprod uf = \frac{Sf Ff}{magSf^2}
+    //    Sum Eq (2) over all the faces
+    // 3. \sum_f(\frac{Sf Sf}{magSf^2} \dprod uf) = \sum_f(\frac{Sf Ff}{magSf^2})
+    //    Assume first order extrapolation of uf, e.g. uP = uf
+    // 4. \sum_f(\frac{Sf Sf}{magSf^2}) \dprod uP) = \sum_f(\frac{Sf Ff}{magSf^2})
+    //    Use shorthand notation
+    // 5. G \dprod uP = Fn
+    // 6. uP = G^-1 \dprod Fn
+
+    // Fn -> fluxTimesNormal
+    // G  -> G
+
+    // Calculate sum of the directional fluxes
+    const surfaceScalarField magSfSqr = sqr(mesh.magSf());
+    const GeometricField<GradType, fvPatchField, volMesh> fluxTimesNormal =
+        surfaceSum((mesh.Sf()/magSfSqr)*ssf);
+
+    // Calculate the G tensor
+    const volSymmTensorField G = surfaceSum(sqr(mesh.Sf())/magSfSqr);
+
+    // Finally calculate the reconstructed field using hinv for stabilisation on
+    // really bad fvMesh bits (uses ordinary inverse most of the time, see
+    // tensor.C)
     reconField.internalField() =
-    (
-        // hinv
-        inv
-        (
-            surfaceSum(sqr(mesh.Sf())/mesh.magSf())().internalField()
-        )
-      & fluxTimesNormal.internalField()
-    );
+        hinv(G.internalField()) & fluxTimesNormal.internalField();
 
+    // Boundary value update
     reconField.boundaryField() = fluxTimesNormal.boundaryField();
-
-    treconField().correctBoundaryConditions();
+    reconField.correctBoundaryConditions();
 
     return treconField;
 }

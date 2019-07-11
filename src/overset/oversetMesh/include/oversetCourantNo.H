@@ -36,9 +36,11 @@ scalar velMag = 0.0;
 
 if (mesh.nInternalFaces())
 {
-    surfaceScalarField magPhi = mag(faceOversetMask*phi);
+    const oversetMesh& om = oversetMesh::New(mesh);
 
-    surfaceScalarField SfUfbyDelta =
+    const surfaceScalarField magPhi = mag(om.sGamma()*phi);
+
+    const surfaceScalarField SfUfbyDelta =
         mesh.surfaceInterpolation::deltaCoeffs()*magPhi;
 
     CoNum = max(SfUfbyDelta/mesh.magSf())

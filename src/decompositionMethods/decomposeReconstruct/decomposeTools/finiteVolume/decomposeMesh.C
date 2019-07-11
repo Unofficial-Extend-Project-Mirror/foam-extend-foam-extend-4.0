@@ -459,7 +459,7 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                 // cell with multiple faces, we need to collect neighbour cell
                 // indices on the other side and possibly swap the order of
                 // adding faces. The same "swapping" of insertion order needs to
-                // happend on the slave side, but now we sort on the remote
+                // happen on the slave side, but now we sort on the remote
                 // (master) data and not on the local (slave) data as we do for
                 // master processor. VV, 16/Feb/2019.
 
@@ -588,7 +588,7 @@ void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                         // above, owner and neighbour proc are the same. In
                         // order to avoid using cellToProc list for slave
                         // processor (where ownCellI is actually found on the
-                        // other side), use curNbrPtc with patchFace indes
+                        // other side), use curNbrPtc with patchFace index
                         const label& ownerProc = curNbrPtc[patchFaceI];
 
                         // Add the patch face into the list in the correct
