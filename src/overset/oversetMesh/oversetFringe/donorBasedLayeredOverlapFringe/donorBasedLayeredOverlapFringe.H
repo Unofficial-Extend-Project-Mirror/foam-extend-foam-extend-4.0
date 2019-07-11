@@ -22,24 +22,38 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    faceCellsFringe
+    donorBasedLayeredOverlapFringe
 
 Description
-    Face-cells fringe algorithm
+    Fringe algorithm based on donors from different regions. The algorithm waits
+    until the final donor/acceptor assembly has been performed for all regions
+    whose donor region is this region. Then, all donors are collected and the
+    acceptors are cells neighbouring the donors nLayers towards the interior.
+    Interior is defined either by user-specified points for each region or as a
+    centre of volume of the donor cells in particular region.
+
+    This fringe algorithm is intended to be used along with the faceCells fringe
+    on the other side, where the cell sizes are not significantly different from
+    each other (e.g. 10:1 cell ratio, where the finer cells are found on the
+    background mesh will probably be problematic to correctly set-up).
+
+    Note: based on distance tolerance (see distTol_ member), specified number of
+    layers and the bounding box of the connected donor region, it is possible
+    that acceptors end also on the wrong side (from the region centre as opposed
+    to towards the region centre). I do all I can to prevent this by looking at
+    the bounding box and hinting that at least 2 layers should be used. Be sure
+    to check the overset assembly for this region using calcOverset utility.
 
 Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
-
-Contributor
     Vuko Vukcevic, Wikki Ltd.  All rights reserved.
 
 SourceFiles
-    faceCellsFringe.C
+    donorBasedLayeredOverlapFringe.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef faceCellsFringe_H
-#define faceCellsFringe_H
+#ifndef donorBasedLayeredOverlapFringe_H
+#define donorBasedLayeredOverlapFringe_H
 
 #include "oversetFringe.H"
 
@@ -49,17 +63,33 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                       Class faceCellsFringe Declaration
+                Class donorBasedLayeredOverlapFringe Declaration
 \*---------------------------------------------------------------------------*/
 
-class faceCellsFringe
+class donorBasedLayeredOverlapFringe
 :
     public oversetFringe
 {
     // Private data
 
-        //- Patch names
-        wordList patchNames_;
+        //- Names of connected regions. Looked up on construction
+        wordList connectedRegionNames_;
+
+        //- Regions IDs from which the donors will be collected as a starting
+        //  point. Note: initialized in init private member function because we
+        //  cannot initialize it in constructor. This is because certain overset
+        //  regions (and their fringes) may not be initialized at this point.
+        mutable labelList connectedRegionIDs_;
+
+        //- Optional list of points representing a rough estimate of the centre
+        //  for each underlying connected region. If these are not provided, the
+        //  centre is calculated as the centre of all donors for a given
+        //  connected region
+        List<point> regionCentrePoints_;
+
+        //- How many layers to move away from connected region donors to define
+        //  acceptor (and holes)
+        label nLayers_;
 
         //- Fringe hole cells
         mutable labelList* fringeHolesPtr_;
@@ -70,56 +100,61 @@ class faceCellsFringe
         //- Final donor/acceptor pairs for this region (fringe)
         mutable donorAcceptorList* finalDonorAcceptorsPtr_;
 
-        //- Switch whether to update acceptors/donors for possible changes in
-        //  patch cells (switched off by default)
-        const Switch updateFringe_;
+        //- Initialization helper
+        mutable bool isInitialized_;
+
+
+    // Private static data
+
+        //- Distance tolerance to determine propagation direction. Note:
+        //  absolute value, default = 0. Might be useful is some strange cases
+        static const debug::tolerancesSwitch distTol_;
 
 
     // Private Member Functions
 
-        //- Disallow default bitwise copy construct
-        faceCellsFringe(const faceCellsFringe&);
+        //- Initialization
+        void init() const;
 
-        //- Disallow default bitwise assignment
-        void operator=(const faceCellsFringe&);
-
-
-        // Calculate hole and acceptor addressing
+        //- Calculate hole and acceptor addressing
         void calcAddressing() const;
 
-        // Clear addressing
+        //- Clear addressing
         void clearAddressing() const;
 
 
 public:
 
     //- Runtime type information
-    TypeName("faceCells");
+    TypeName("donorBasedLayeredOverlap");
 
 
     // Constructors
 
         //- Construct from dictionary
-        faceCellsFringe
+        donorBasedLayeredOverlapFringe
         (
             const fvMesh& mesh,
             const oversetRegion& region,
             const dictionary& dict
         );
 
+        //- Disallow default bitwise copy construct
+        donorBasedLayeredOverlapFringe
+        (
+            const donorBasedLayeredOverlapFringe&
+        ) = delete;
+
+        //- Disallow default bitwise assignment
+        void operator=(const donorBasedLayeredOverlapFringe&) = delete;
+
 
     // Destructor
 
-        virtual ~faceCellsFringe();
+        virtual ~donorBasedLayeredOverlapFringe();
 
 
     // Member Functions
-
-        //- Access to patch names
-        const wordList& patchNames() const
-        {
-            return patchNames_;
-        }
 
         //- Update iteration. Note: invalidates parameter
         virtual bool updateIteration

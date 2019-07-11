@@ -60,7 +60,7 @@ void Foam::regionWiseOversetAdjustPhi
     const unallocLabelList& neighbour = mesh.neighbour();
 
     // Get region split to identify separate mesh components
-    const labelList& regionID = om.regionID();
+    const scalarField& regionID = om.regionID().internalField();
 
     // Incoming and outgoing region fluxes
     scalarField regionIn(om.regions().size(), 0);
@@ -94,7 +94,7 @@ void Foam::regionWiseOversetAdjustPhi
             // scaled
             forAll (phip, i)
             {
-                // Get current region index
+                // Get current region index. Note: conversion to label
                 const label curRegion = regionID[fc[i]];
 
                 if (phip[i] < 0.0)
@@ -124,11 +124,12 @@ void Foam::regionWiseOversetAdjustPhi
         {
             // Internal face
 
-            // Get region index
+            // Get region index. Note: conversion to label
             const label curRegion = regionID[owner[curFace]];
 
-            // Check whether owner and neighbour belong to the same region
-            if (curRegion != regionID[neighbour[curFace]])
+            // Check whether owner and neighbour belong to the same region.
+            // Note: use notEqual function since we are comparing two scalars
+            if (notEqual(curRegion, regionID[neighbour[curFace]]))
             {
                 FatalErrorIn
                 (
@@ -210,7 +211,7 @@ void Foam::regionWiseOversetAdjustPhi
                 {
                     // Processor patch, master side
 
-                    // Get region index
+                    // Get region index. Note: conversion to label
                     const label curRegion =
                         regionID[mesh.boundary()[patchI].faceCells()[faceI]];
 
@@ -321,7 +322,7 @@ void Foam::regionWiseOversetAdjustPhi
         {
             // Internal face
 
-            // Get region index
+            // Get region index. Note: conversion to label
             const label curRegion = regionID[owner[curFace]];
 
             // Get reference to the flux for scaling
@@ -358,7 +359,7 @@ void Foam::regionWiseOversetAdjustPhi
 
             if (procPatch.master()) // Owner side
             {
-                // Get region index
+                // Get region index. Note: conversion to label
                 const label curRegion =
                     regionID[mesh.boundary()[patchI].faceCells()[faceI]];
 
@@ -374,7 +375,7 @@ void Foam::regionWiseOversetAdjustPhi
             }
             else // Neighbouring processor side
             {
-                // Get region index
+                // Get region index. Note: conversion to label
                 const label curRegion =
                     regionID[mesh.boundary()[patchI].faceCells()[faceI]];
 

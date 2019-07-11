@@ -22,24 +22,24 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    faceCellsFringe
+    cuttingPatchFringe
 
 Description
-    Face-cells fringe algorithm
+    Fringe algorithm based on collecting all the cells cut by its donor region
+    patch (assuming faceCells algorithm is used). Inside cells are marked and
+    moved nLayers towards the interior to define the acceptors as robustly as
+    possible.
 
 Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
-
-Contributor
     Vuko Vukcevic, Wikki Ltd.  All rights reserved.
 
 SourceFiles
-    faceCellsFringe.C
+    cuttingPatchFringe.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef faceCellsFringe_H
-#define faceCellsFringe_H
+#ifndef cuttingPatchFringe_H
+#define cuttingPatchFringe_H
 
 #include "oversetFringe.H"
 
@@ -49,17 +49,21 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                       Class faceCellsFringe Declaration
+                   Class cuttingPatchFringe Declaration
 \*---------------------------------------------------------------------------*/
 
-class faceCellsFringe
+class cuttingPatchFringe
 :
     public oversetFringe
 {
     // Private data
 
-        //- Patch names
-        wordList patchNames_;
+        //- Names of the cuttingPatches
+        wordList cuttingPatchNames_;
+
+        //- How many layers to move away from connected region donors to define
+        //  acceptor (and holes)
+        label nLayers_;
 
         //- Fringe hole cells
         mutable labelList* fringeHolesPtr_;
@@ -70,56 +74,48 @@ class faceCellsFringe
         //- Final donor/acceptor pairs for this region (fringe)
         mutable donorAcceptorList* finalDonorAcceptorsPtr_;
 
-        //- Switch whether to update acceptors/donors for possible changes in
-        //  patch cells (switched off by default)
-        const Switch updateFringe_;
-
 
     // Private Member Functions
 
-        //- Disallow default bitwise copy construct
-        faceCellsFringe(const faceCellsFringe&);
-
-        //- Disallow default bitwise assignment
-        void operator=(const faceCellsFringe&);
-
-
-        // Calculate hole and acceptor addressing
+        //- Calculate hole and acceptor addressing
         void calcAddressing() const;
 
-        // Clear addressing
+        //- Clear addressing
         void clearAddressing() const;
 
 
 public:
 
     //- Runtime type information
-    TypeName("faceCells");
+    TypeName("cuttingPatch");
 
 
     // Constructors
 
         //- Construct from dictionary
-        faceCellsFringe
+        cuttingPatchFringe
         (
             const fvMesh& mesh,
             const oversetRegion& region,
             const dictionary& dict
         );
 
+        //- Disallow default bitwise copy construct
+        cuttingPatchFringe
+        (
+            const cuttingPatchFringe&
+        ) = delete;
+
+        //- Disallow default bitwise assignment
+        void operator=(const cuttingPatchFringe&) = delete;
+
 
     // Destructor
 
-        virtual ~faceCellsFringe();
+        virtual ~cuttingPatchFringe();
 
 
     // Member Functions
-
-        //- Access to patch names
-        const wordList& patchNames() const
-        {
-            return patchNames_;
-        }
 
         //- Update iteration. Note: invalidates parameter
         virtual bool updateIteration
