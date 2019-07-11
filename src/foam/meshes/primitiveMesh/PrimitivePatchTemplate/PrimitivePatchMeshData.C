@@ -73,12 +73,11 @@ calcMeshData() const
     // number of faces in the patch
     Map<label> markedPoints(4*this->size());
 
-    // Important:
-    // ~~~~~~~~~~
-    // In <= 1.5 the meshPoints would be in increasing order but this gives
-    // problems in processor point synchronisation where we have to find out
-    // how the opposite side would have allocated points. We'll use unsorted
-    // version to avoid certain ordering problems
+    // Note: foam-extend was relying on strong ordering of meshPoints on
+    // processor patches which causes point ordering errors when doing Dynamic
+    // Load Balancing. Because of this ordering error on two sides of processor
+    // boundaries, point fields ended up having wrong values near processor
+    // boundaries. Revert to unsorted version. VV, 11/July/2019.
     dynamicLabelList meshPoints(2*this->size());
     forAll(*this, facei)
     {
