@@ -26,8 +26,6 @@ License
 #include "cuttingPatchFringe.H"
 #include "oversetMesh.H"
 #include "oversetRegion.H"
-#include "faceCellsFringe.H"
-#include "oversetRegion.H"
 #include "polyPatchID.H"
 #include "addToRunTimeSelectionTable.H"
 #include "syncTools.H"
@@ -48,80 +46,6 @@ namespace Foam
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::cuttingPatchFringe::init() const
-{
-    // Set size of the list containing IDs
-    connectedRegionIDs_.setSize(connectedRegionNames_.size());
-
-    // Get list of all overset regions
-    const PtrList<oversetRegion>& allRegions =
-        this->region().overset().regions();
-
-    // Create list of all region names for easy lookup
-    wordList allRegionNames(allRegions.size());
-    forAll (allRegionNames, arI)
-    {
-        allRegionNames[arI] = allRegions[arI].name();
-    }
-
-    // Loop through all regions, collect region IDs and do sanity checks
-    forAll (connectedRegionNames_, crI)
-    {
-        // Get name of this connected region
-        const word& crName = connectedRegionNames_[crI];
-
-        // Find this region in the list of all regions
-        const label regionID = findIndex(allRegionNames, crName);
-
-        if (regionID == -1)
-        {
-            FatalErrorIn("void cuttingPatchFringe::init() const")
-                << "Region " << crName << " not found in list of regions."
-                << "List of overset regions: " << allRegionNames
-                << abort(FatalError);
-        }
-
-        // Check whether the region is already present in the list
-        if (findIndex(connectedRegionIDs_, regionID) != -1)
-        {
-            // Duplicate found. Issue an error
-            FatalErrorIn("void cuttingPatchFringe::init() const")
-                << "Region " << crName << " found in the list of regions"
-                << " more than once." << nl
-                << " This is not allowed." << nl
-                << "Make sure that you don't have duplicate entries."
-                << abort(FatalError);
-        }
-
-        // Collect the region index in the list
-        connectedRegionIDs_[crI] = regionID;
-
-        // Sanity check: if the specified connected donor region has more than 1
-        // donor regions, this fringe algorithm is attempted to be used for
-        // something that's not intended. Issue an error
-        if (allRegions[regionID].donorRegions().size() != 1)
-        {
-            FatalErrorIn("void cuttingPatchFringe::init() const")
-                << "Region " << crName << " specified as connected region, but"
-                << " that region has "
-                << allRegions[regionID].donorRegions().size()
-                << " donor regions."
-                << abort(FatalError);
-        }
-
-        // Sanity check whether the donor region of connected region is actually
-        // this region
-        if (allRegions[regionID].donorRegions()[0] != this->region().index())
-        {
-            FatalErrorIn("void cuttingPatchFringe::init() const")
-                << "The donor region of region " << crName
-                << " should be only region " << this->region().name()
-                << abort(FatalError);
-        }
-    }
-}
-
-
 void Foam::cuttingPatchFringe::calcAddressing() const
 {
     // Make sure that either acceptorsPtr is unnalocated or if it is allocated,
@@ -135,468 +59,413 @@ void Foam::cuttingPatchFringe::calcAddressing() const
             << abort(FatalError);
     }
 
-    if (!isInitialized_)
-    {
-        // This is the first call, initialize the data and set flag to true
-        init();
-        isInitialized_ = true;
-    }
-
-    // Get list of all overset regions
-    const PtrList<oversetRegion>& allRegions =
-        this->region().overset().regions();
-
-    // Sets containing all acceptors and all holes for all connected regions
+    // Get polyMesh
     const polyMesh& mesh = this->mesh();
-    labelHashSet allAcceptors(0.02*mesh.nCells());
-    labelHashSet allFringeHoles(0.02*mesh.nCells());
 
-    if (debug)
+    // Collect all cutting patches
+    labelHashSet patchIDs(cuttingPatchNames_.size());
+
+    forAll (cuttingPatchNames_, nameI)
     {
-        Info<< "All dependent fringes are ready."
-            << " Starting face cells cut patch fringe assembly..." << endl;
-    }
+        // Get polyPatchID and check if valid
+        const polyPatchID cutPatch
+        (
+            cuttingPatchNames_[nameI],
+            mesh.boundaryMesh()
+        );
 
-    // Loop through connected regions
-    forAll (connectedRegionIDs_, crI)
-    {
-        // Get ID of this region
-        const label& regionID = connectedRegionIDs_[crI];
-
-        // Get fringe of the connected region
-        const oversetFringe& fringe = allRegions[regionID].fringe();
-
-        // If this is not faceCells fringe, issue an Error. This fringe
-        // selection algorithm is intended to work only with faceCells fringe on
-        // the other side. VV, 9/Apr/2019
-        if (!isA<faceCellsFringe>(fringe))
+        if (!cutPatch.active())
         {
             FatalErrorIn
             (
-                "void Foam::cuttingPatchFringe::"
-                "updateIteration(donorAcceptorList&) const"
-            )   << "cuttingPatch fringe is designed to work"
-                << " with faceCells fringe as a connected region fringe."
-                << nl
-                << "Connected overset region " << allRegions[regionID].name()
-                << " has " << fringe.type() << " fringe type. "
-                << nl
-                << "Proceed with care!"
+                "void cuttingPatchFringe::calcAddressing const"
+            )   << "Cutting patch " << cuttingPatchNames_[nameI]
+                << " cannot be found."
                 << abort(FatalError);
         }
-        const faceCellsFringe& fcFringe =
-            refCast<const faceCellsFringe>(fringe);
 
-        // Get patch names from faceCells fringe
-        const wordList& fcPatchNames = fcFringe.patchNames();
+        // Store patch ID in the set
+        patchIDs.insert(cutPatch.index());
+    }
 
-        // Find the patches
-        labelHashSet patchIDs;
+    if (debug)
+    {
+        Info<< "Starting cutting patch fringe assembly..." << endl;
+    }
 
-        forAll (fcPatchNames, nameI)
+    // Note: similar code as in oversetRegion::calcHoleTriMesh. Consider
+    // refactoring. VV, 20/May/2019
+
+    // Make and invert local triSurface
+    triFaceList triFaces;
+    pointField triPoints;
+
+    // Memory management
+    {
+        triSurface ts = triSurfaceTools::triangulate
+        (
+            mesh.boundaryMesh(),
+            patchIDs
+        );
+
+        // Clean mutiple points and zero-sized triangles
+        ts.cleanup(false);
+
+        triFaces.setSize(ts.size());
+        triPoints = ts.points();
+
+        forAll (ts, tsI)
         {
-            // Get polyPatchID and check if valid
-            const polyPatchID fringePatch
-            (
-                fcPatchNames[nameI],
-                mesh.boundaryMesh()
-            );
+            // Bugfix: no need to reverse the face because the normals point in
+            // the correct direction already. VV, 20/May/2019.
+            triFaces[tsI] = ts[tsI];
+        }
+    }
 
-            if (!fringePatch.active())
-            {
-                FatalErrorIn
-                (
-                    "void cuttingPatchFringe::calcAddressing const"
-                )   << "Fringe patch " << fcPatchNames[nameI]
-                    << " for region " << allRegions[regionID].name()
-                    << " cannot be found."
-                    << abort(FatalError);
-            }
+    if (Pstream::parRun())
+    {
+        // Combine all faces and points into a single list
 
-            // Store patch ID in the set
-            patchIDs.insert(fringePatch.index());
+        List<triFaceList> allTriFaces(Pstream::nProcs());
+        List<pointField> allTriPoints(Pstream::nProcs());
+
+        allTriFaces[Pstream::myProcNo()] = triFaces;
+        allTriPoints[Pstream::myProcNo()] = triPoints;
+
+        Pstream::gatherList(allTriFaces);
+        Pstream::scatterList(allTriFaces);
+
+        Pstream::gatherList(allTriPoints);
+        Pstream::scatterList(allTriPoints);
+
+        // Re-pack points and faces
+
+        label nTris = 0;
+        label nPoints = 0;
+
+        forAll (allTriFaces, procI)
+        {
+            nTris += allTriFaces[procI].size();
+            nPoints += allTriPoints[procI].size();
         }
 
-        // Note: same code as in oversetRegion::calcHoleTriMesh. Consider
-        // refactoring. VV, 20/May/2019
+        // Pack points
+        triPoints.setSize(nPoints);
 
-        // Make and invert local triSurface
-        triFaceList triFaces;
-        pointField triPoints;
+        // Prepare point renumbering array
+        labelListList renumberPoints(Pstream::nProcs());
 
-        // Memory management
+        nPoints = 0;
+
+        forAll (allTriPoints, procI)
         {
-            triSurface ts = triSurfaceTools::triangulate
-            (
-                mesh.boundaryMesh(),
-                patchIDs
-            );
+            const pointField& ptp = allTriPoints[procI];
 
-            // Clean mutiple points and zero-sized triangles
-            ts.cleanup(false);
+            renumberPoints[procI].setSize(ptp.size());
 
-            triFaces.setSize(ts.size());
-            triPoints = ts.points();
+            labelList& procRenumberPoints = renumberPoints[procI];
 
-            forAll (ts, tsI)
+            forAll (ptp, ptpI)
             {
-                // Bugfix: no need to reverse face because the normals point in
-                // the correct direction already. VV, 20/May/2019.
-                triFaces[tsI] = ts[tsI];
+                triPoints[nPoints] = ptp[ptpI];
+                procRenumberPoints[ptpI] = nPoints;
+
+                nPoints++;
             }
         }
 
-        if (Pstream::parRun())
+        // Pack triangles and renumber into complete points on the fly
+        triFaces.setSize(nTris);
+
+        nTris = 0;
+
+        forAll (allTriFaces, procI)
         {
-            // Combine all faces and points into a single list
+            const triFaceList& ptf = allTriFaces[procI];
 
-            List<triFaceList> allTriFaces(Pstream::nProcs());
-            List<pointField> allTriPoints(Pstream::nProcs());
+            const labelList& procRenumberPoints = renumberPoints[procI];
 
-            allTriFaces[Pstream::myProcNo()] = triFaces;
-            allTriPoints[Pstream::myProcNo()] = triPoints;
-
-            Pstream::gatherList(allTriFaces);
-            Pstream::scatterList(allTriFaces);
-
-            Pstream::gatherList(allTriPoints);
-            Pstream::scatterList(allTriPoints);
-
-            // Re-pack points and faces
-
-            label nTris = 0;
-            label nPoints = 0;
-
-            forAll (allTriFaces, procI)
+            forAll (ptf, ptfI)
             {
-                nTris += allTriFaces[procI].size();
-                nPoints += allTriPoints[procI].size();
-            }
+                const triFace& procFace = ptf[ptfI];
 
-            // Pack points
-            triPoints.setSize(nPoints);
+                triFace& renumberFace = triFaces[nTris];
 
-            // Prepare point renumbering array
-            labelListList renumberPoints(Pstream::nProcs());
-
-            nPoints = 0;
-
-            forAll (allTriPoints, procI)
-            {
-                const pointField& ptp = allTriPoints[procI];
-
-                renumberPoints[procI].setSize(ptp.size());
-
-                labelList& procRenumberPoints = renumberPoints[procI];
-
-                forAll (ptp, ptpI)
+                forAll (renumberFace, rfI)
                 {
-                    triPoints[nPoints] = ptp[ptpI];
-                    procRenumberPoints[ptpI] = nPoints;
-
-                    nPoints++;
+                    renumberFace[rfI] =
+                        procRenumberPoints[procFace[rfI]];
                 }
-            }
 
-            // Pack triangles and renumber into complete points on the fly
-            triFaces.setSize(nTris);
-
-            nTris = 0;
-
-            forAll (allTriFaces, procI)
-            {
-                const triFaceList& ptf = allTriFaces[procI];
-
-                const labelList& procRenumberPoints = renumberPoints[procI];
-
-                forAll (ptf, ptfI)
-                {
-                    const triFace& procFace = ptf[ptfI];
-
-                    triFace& renumberFace = triFaces[nTris];
-
-                    forAll (renumberFace, rfI)
-                    {
-                        renumberFace[rfI] =
-                            procRenumberPoints[procFace[rfI]];
-                    }
-
-                    nTris++;
-                }
+                nTris++;
             }
         }
+    }
 
-        // Make a complete triSurface from local data
-        triSurface patchTriMesh(triFaces, triPoints);
+    // Make a complete triSurface from local data
+    triSurface patchTriMesh(triFaces, triPoints);
 
-        // Clean up duplicate points and zero sized triangles
-        patchTriMesh.cleanup(false);
+    // Clean up duplicate points and zero sized triangles
+    patchTriMesh.cleanup(false);
 
-        // Get this region
-        const oversetRegion& myRegion = this->region();
+    // Get this region
+    const oversetRegion& myRegion = this->region();
 
-        // Debug: write down the tri mesh
-        if (Pstream::master())
-        {
-            patchTriMesh.write
+    // Debug: write down the tri mesh
+    if (Pstream::master())
+    {
+        patchTriMesh.write
+        (
+            word
             (
-                word
-                (
-                    "patchTriSurface_region" + myRegion.name() +
-                    "_connectedRegion" + allRegions[regionID].name() + ".vtk"
-                )
-            );
-        }
+                "patchTriSurface_region" + myRegion.name() + ".vtk"
+            )
+        );
+    }
 
-        // Create the tri surface search object
-        triSurfaceSearch patchTriSearch(patchTriMesh);
+    // Create the tri surface search object
+    triSurfaceSearch patchTriSearch(patchTriMesh);
 
-        // Get cells in this region
-        const labelList& myRegionCells = myRegion.regionCells();
+    // Get cells in this region
+    const labelList& myRegionCells = myRegion.regionCells();
 
-        // Get cell centres for inside-outside search using search object
-        vectorField myCC(myRegionCells.size());
+    // Get cell centres for inside-outside search using search object
+    vectorField myCC(myRegionCells.size());
 
-        // Cell centres from polyMesh
-        const vectorField& cc = mesh.cellCentres();
+    // Cell centres from polyMesh
+    const vectorField& cc = mesh.cellCentres();
 
-        forAll (myCC, i)
+    forAll (myCC, i)
+    {
+        myCC[i] = cc[myRegionCells[i]];
+    }
+
+    // Inside mask: all cells within search object will be marked
+    boolList insideMask(mesh.nCells(), false);
+
+    // Get inside cells for cells in my region only
+    boolList myRegionInsideMask = patchTriSearch.calcInside(myCC);
+
+    // Note: insideMask has the size of all mesh cells and
+    // myRegionInsideMask has the size of cells in this region
+    forAll (myRegionInsideMask, i)
+    {
+        insideMask[myRegionCells[i]] = myRegionInsideMask[i];
+    }
+
+    // Make sure that the cut holes for this region are also properly marked as
+    // "inside". This may not be the case automatically for e.g. simulations
+    // with appendages
+    const labelList& cutRegionHoles = myRegion.cutHoles();
+    forAll (cutRegionHoles, i)
+    {
+        insideMask[cutRegionHoles[i]] = true;
+    }
+
+    // Get necessary mesh data (from polyMesh/primitiveMesh)
+    const cellList& meshCells = mesh.cells();
+    const unallocLabelList& owner = mesh.faceOwner();
+    const unallocLabelList& neighbour = mesh.faceNeighbour();
+
+    // Bool list for collecting faces with at least one unmarked
+    // cell (to determine the acceptors for the first iteration)
+    boolList hasUnmarkedCell(mesh.nFaces(), false);
+
+    // Loop through all cells
+    forAll (insideMask, cellI)
+    {
+        if (!insideMask[cellI])
         {
-            myCC[i] = cc[myRegionCells[i]];
-        }
+            // This cell is not inside (it is unmarked). Loop through
+            // its faces and set the flag
+            const cell& cFaces = meshCells[cellI];
 
-        // Inside mask: all cells within search object will be marked
-        boolList insideMask(mesh.nCells(), false);
-
-        // Get inside cells for cells in my region only
-        boolList myRegionInsideMask = patchTriSearch.calcInside(myCC);
-
-        // Note: insideMask has the size of all mesh cells and
-        // myRegionInsideMask has the size of cells in this region
-        forAll (myRegionInsideMask, i)
-        {
-            insideMask[myRegionCells[i]] = myRegionInsideMask[i];
-        }
-
-        // Get necessary mesh data (from polyMesh/primitiveMesh)
-        const cellList& meshCells = mesh.cells();
-        const unallocLabelList& owner = mesh.faceOwner();
-        const unallocLabelList& neighbour = mesh.faceNeighbour();
-
-        // Bool list for collecting faces with at least one unmarked
-        // cell (to determine the acceptors for the first iteration)
-        boolList hasUnmarkedCell(mesh.nFaces(), false);
-
-        // Loop through all cells
-        forAll (insideMask, cellI)
-        {
-            if (!insideMask[cellI])
+            forAll (cFaces, i)
             {
-                // This cell is not inside (it is unmarked). Loop through
-                // its faces and set the flag
-                const cell& cFaces = meshCells[cellI];
-
-                forAll (cFaces, i)
-                {
-                    // Set the mark for this global face and break out
-                    hasUnmarkedCell[cFaces[i]] = true;
-                }
+                // Set the mark for this global face
+                hasUnmarkedCell[cFaces[i]] = true;
             }
         }
+    }
+
+    // Sync the face list across processor boundaries
+    syncTools::syncFaceList
+    (
+        mesh,
+        hasUnmarkedCell,
+        orEqOp<bool>(),
+        true
+    );
+
+    // Mark-up for all inside faces
+    boolList insideFaceMask(mesh.nFaces(), false);
+
+    // Collect all acceptors for the first iteration (the cells that
+    // have at least one neighbour cell that is not marked)
+    labelHashSet acceptors(myRegionCells.size()/10);
+
+    // Loop again through all cells and collect marked ones into
+    // acceptors or holes, depending on whether they have unmarked cell
+    // as a neighbour (indicating an acceptor)
+    forAll (insideMask, cellI)
+    {
+        if (insideMask[cellI])
+        {
+            // This cell is inside the covered region
+            const cell& cFaces = meshCells[cellI];
+
+            forAll (cFaces, i)
+            {
+                // Get global face index
+                const label& faceI = cFaces[i];
+
+                // Check whether this neighbour is unmarked
+                if (hasUnmarkedCell[faceI])
+                {
+                    // This cell has unmarked neighbour, collect it into
+                    // the acceptor list
+                    acceptors.insert(cellI);
+
+                    // This cell is no longer "inside cell"
+                    insideMask[cellI] = false;
+                }
+                else
+                {
+                    // This is an "inside" face, mark it
+                    insideFaceMask[faceI] = true;
+                }
+            } // End for all faces
+        } // End if cell is inside
+    } // End for all cells
+
+    // Note: insideFaceMask already synced across processors because it relies
+    // on hasUnmarkedCell list, which has been synced just above
+
+    // Hash set containing new acceptors (for successive iterations)
+    labelHashSet newAcceptors(acceptors.size());
+
+    // Now that we have the initial set of acceptors (and holes), loop
+    // nLayers away from initial donors
+    for (label i = 0; i < nLayers_; ++i)
+    {
+        // Face markup for propagation
+        boolList propagateFace(mesh.nFaces(), false);
+
+        // Loop through all acceptors and mark faces that are around hole
+        // cells. This way, we make sure that we go towards the correct,
+        // inside direction
+        forAllConstIter (labelHashSet, acceptors, iter)
+        {
+            // Get the cell index and the cell
+            const label& cellI = iter.key();
+            const cell& cFaces = meshCells[cellI];
+
+            // Loop through all faces of the cell
+            forAll (cFaces, i)
+            {
+                // Get face index (global)
+                const label& faceI = cFaces[i];
+
+                if (insideFaceMask[faceI])
+                {
+                    // This is a hole face, we are moving in the right
+                    // direction. Mark the face for propagation
+                    propagateFace[faceI] = true;
+                }
+            } // End for all faces of the cell
+        } // End for all donor cells
 
         // Sync the face list across processor boundaries
         syncTools::syncFaceList
         (
             mesh,
-            hasUnmarkedCell,
-            orOp<bool>(),
+            propagateFace,
+            orEqOp<bool>(),
             false
         );
 
-        // Mark-up for all inside faces
-        boolList insideFaceMask(mesh.nFaces(), false);
-
-        // Collect all acceptors for the first iteration (the cells that
-        // have at least one neighbour cell that is not marked)
-        labelHashSet acceptors(myRegionCells.size()/10);
-
-        // Loop again through all cells and collect marked ones into
-        // acceptors or holes, depending on whether they have unmarked cell
-        // as a neighbour (indicating an acceptor)
-        forAll (insideMask, cellI)
+        // Loop through all internal faces and append acceptors
+        for (label faceI = 0; faceI < mesh.nInternalFaces(); ++faceI)
         {
-            if (insideMask[cellI])
+            if (propagateFace[faceI])
             {
-                // This cell is inside the covered region
-                const cell& cFaces = meshCells[cellI];
+                // Face is marked, select owner or neighbour
+                const label& own = owner[faceI];
+                const label& nei = neighbour[faceI];
 
-                forAll (cFaces, i)
+                // Either owner or neighbour may be hole, not both
+                if (insideMask[own])
                 {
-                    // Get global face index
-                    const label& faceI = cFaces[i];
+                    // Owner cell is a hole, insert it
+                    newAcceptors.insert(own);
 
-                    // Check whether this neighbour is unmarked
-                    if (hasUnmarkedCell[faceI])
-                    {
-                        // This cell has unmarked neighbour, collect it into
-                        // the acceptor list
-                        acceptors.insert(cellI);
+                    // Update hole mask
+                    insideMask[own] = false;
+                }
+                else if (insideMask[nei])
+                {
+                    // Neighbour cell is a hole, insert it
+                    newAcceptors.insert(nei);
 
-                        // This cell is no longer "inside cell"
-                        insideMask[cellI] = false;;
-
-                        // Break out since there's nothing to do for this cell
-                        break;
-                    }
+                    // Update hole mask
+                    insideMask[nei] = false;
                 }
 
-                // If this is still inside cell, collect it and mark its faces
-                if (insideMask[cellI])
-                {
-                    // Loop through cell faces and mark them
-                    const cell& cFaces = meshCells[cellI];
-
-                    forAll (cFaces, i)
-                    {
-                        insideFaceMask[cFaces[i]] = true;
-                    }
-                }
-            } // End if cell is inside
-        } // End for all cells
-
-        // Hash set containing new acceptors (for successive iterations)
-        labelHashSet newAcceptors(acceptors.size());
-
-        // Now that we have the initial set of acceptors (and holes), loop
-        // nLayers away from initial donors
-        for (label i = 0; i < nLayers_; ++i)
-        {
-            // Face markup for propagation
-            boolList propagateFace(mesh.nFaces(), false);
-
-            // Loop through all acceptors and mark faces that are around hole
-            // cells. This way, we make sure that we go towards the correct,
-            // inside direction
-            forAllConstIter (labelHashSet, acceptors, iter)
-            {
-                // Get the cell index and the cell
-                const label& cellI = iter.key();
-                const cell& cFaces = meshCells[cellI];
-
-                // Loop through all faces of the cell
-                forAll (cFaces, i)
-                {
-                    // Get face index (global)
-                    const label& faceI = cFaces[i];
-
-                    if (insideFaceMask[faceI])
-                    {
-                        // This is a hole face, we are moving in the right
-                        // direction. Mark the face for propagation
-                        propagateFace[faceI] = true;
-                    }
-                } // End for all faces of the cell
-            } // End for all donor cells
-
-            // Sync the face list across processor boundaries
-            syncTools::syncFaceList
-            (
-                mesh,
-                propagateFace,
-                orOp<bool>(),
-                false
-            );
-
-            // Loop through all faces and append acceptors
-            for (label faceI = 0; faceI < mesh.nInternalFaces(); ++faceI)
-            {
-                if (propagateFace[faceI])
-                {
-                    // Face is marked, select owner or neighbour
-                    const label& own = owner[faceI];
-                    const label& nei = neighbour[faceI];
-
-                    // Either owner or neighbour may be hole, not both
-                    if (insideMask[own])
-                    {
-                        // Owner cell is a hole, insert it
-                        newAcceptors.insert(own);
-
-                        // Update hole mask
-                        insideMask[own] = false;
-                    }
-                    else if (insideMask[nei])
-                    {
-                        // Neighbour cell is a hole, insert it
-                        newAcceptors.insert(nei);
-
-                        // Update hole mask
-                        insideMask[nei] = false;
-                    }
-
-                    // Also update hole face mask for next iteration
-                    insideFaceMask[faceI] = false;
-                }
-            }
-
-            // Loop through boundary faces
-            for
-            (
-                label faceI = mesh.nInternalFaces();
-                faceI < mesh.nFaces();
-              ++faceI
-            )
-            {
-                if (propagateFace[faceI])
-                {
-                    // Face is marked, select owner if this is the right
-                    // side. Neighbour handled on the other side
-                    const label& own = owner[faceI];
-
-                    if (insideMask[own])
-                    {
-                        // Face cell is a hole, insert it
-                        newAcceptors.insert(own);
-
-                        // Update hole mask
-                        insideMask[own] = false;
-                    }
-
-                    // Also update hole face mask for next iteration
-                    insideFaceMask[faceI] = false;
-                }
-            }
-
-            // Transfer newAcceptors into acceptors for next iteration or
-            // for final assembly. Resize newAcceptors accordingly
-            acceptors.transfer(newAcceptors);
-            newAcceptors.resize(acceptors.size());
-
-        } // End for specified number of layers
-
-        // At this point, we have the final set of acceptors and we marked
-        // all cells that should be holes. Collect holes into hash set (could be
-        // optimized by using dynamic lists)
-        labelHashSet fringeHoles(myRegionCells.size()/10);
-
-        forAll (insideMask, cellI)
-        {
-            if (insideMask[cellI])
-            {
-                fringeHoles.insert(cellI);
+                // Also update hole face mask for next iteration
+                insideFaceMask[faceI] = false;
             }
         }
 
-        // Finally, we have fringe holes and acceptors and we need to add them
-        // to the list containing all acceptors and holes (for all connected
-        // regions)
-        allAcceptors += acceptors;
-        allFringeHoles += fringeHoles;
+        // Loop through boundary faces
+        for
+        (
+            label faceI = mesh.nInternalFaces();
+            faceI < mesh.nFaces();
+          ++faceI
+        )
+        {
+            if (propagateFace[faceI])
+            {
+                // Face is marked, select owner if this is the right
+                // side. Neighbour handled on the other side
+                const label& own = owner[faceI];
+
+                if (insideMask[own])
+                {
+                    // Face cell is a hole, insert it
+                    newAcceptors.insert(own);
+
+                    // Update hole mask
+                    insideMask[own] = false;
+                }
+
+                // Also update hole face mask for next iteration
+                insideFaceMask[faceI] = false;
+            }
+        }
+
+        // Transfer newAcceptors into acceptors for next iteration or
+        // for final assembly. Resize newAcceptors accordingly
+        acceptors.transfer(newAcceptors);
+        newAcceptors.resize(acceptors.size());
+
+    } // End for specified number of layers
+
+    // At this point, we have the final set of acceptors and we marked
+    // all cells that should be holes. Collect them into the list
+    dynamicLabelList fringeHoles(myRegionCells.size()/10);
+
+    forAll (insideMask, cellI)
+    {
+        if (insideMask[cellI])
+        {
+            fringeHoles.append(cellI);
+        }
     }
 
     // Set acceptors and holes from the data for all regions
-    acceptorsPtr_ = new labelList(allAcceptors.sortedToc());
-    fringeHolesPtr_ = new labelList(allFringeHoles.sortedToc());
+    acceptorsPtr_ = new labelList(acceptors.sortedToc());
+    fringeHolesPtr_ = new labelList(fringeHoles.xfer());
 
     if (debug)
     {
@@ -626,13 +495,11 @@ Foam::cuttingPatchFringe::cuttingPatchFringe
 )
 :
     oversetFringe(mesh, region, dict),
-    connectedRegionNames_(dict.lookup("connectedRegions")),
-    connectedRegionIDs_(),
+    cuttingPatchNames_(dict.lookup("cuttingPatches")),
     nLayers_(readLabel(dict.lookup("nLayers"))),
     fringeHolesPtr_(nullptr),
     acceptorsPtr_(nullptr),
-    finalDonorAcceptorsPtr_(nullptr),
-    isInitialized_(false)
+    finalDonorAcceptorsPtr_(nullptr)
 {
     // Sanity check number of layers: must be greater than 0
     if (nLayers_ < 1)
@@ -650,7 +517,7 @@ Foam::cuttingPatchFringe::cuttingPatchFringe
         )   << "Invalid number of layers specified, nLayers = " << nLayers_
             << nl
             << "The number should be greater than 0."
-            << abort(FatalError);
+            << exit(FatalError);
     }
 
     // Preferably, the number of layers should be at least 2
