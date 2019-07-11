@@ -41,13 +41,13 @@ regions
             initPatchNames       ();
 
             // Number of iterations for adaptive overlap search
-            specifiedIterationsNumber 12; // 5 by default
+            specifiedIterationsNumber 3; // 5 by default
 
             // Whether to try additional iterations
             additionalIterations yes; // yes by default
 
             // Orphan suitability
-            orphanSuitability 0; // 1 by default
+            orphanSuitability 1; // 1 by default
 
             donorSuitability
             {
@@ -78,7 +78,7 @@ regions
             additionalIterations yes; // yes by default
 
             // Orphan suitability
-            orphanSuitability 0; // 1 by default
+            orphanSuitability 1; // 1 by default
 
             donorSuitability
             {
@@ -109,7 +109,7 @@ regions
             additionalIterations yes; // yes by default
 
             // Orphan suitability
-            orphanSuitability 0; // 1 by default
+            orphanSuitability 1; // 1 by default
 
             donorSuitability
             {
