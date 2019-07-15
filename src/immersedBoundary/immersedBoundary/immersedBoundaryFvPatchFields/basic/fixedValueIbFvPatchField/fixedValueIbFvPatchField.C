@@ -81,17 +81,8 @@ fixedValueIbFvPatchField<Type>::fixedValueIbFvPatchField
 
     if (!isType<immersedBoundaryFvPatch>(p))
     {
-        FatalIOErrorIn
-        (
-            "fixedValueIbFvPatchField<Type>::"
-            "fixedValueIbFvPatchField\n"
-            "(\n"
-            "    const fvPatch& p,\n"
-            "    const Field<Type>& field,\n"
-            "    const dictionary& dict\n"
-            ")\n",
-            dict
-        )   << "\n    patch type '" << p.type()
+        FatalIOErrorInFunction(dict)
+            << "\n    patch type '" << p.type()
             << "' not constraint type '" << typeName << "'"
             << "\n    for patch " << p.name()
             << " of field " << this->dimensionedInternalField().name()
@@ -128,17 +119,8 @@ fixedValueIbFvPatchField<Type>::fixedValueIbFvPatchField
     // HJ, 12/Apr/2012
     if (!isType<immersedBoundaryFvPatch>(p))
     {
-        FatalErrorIn
-        (
-            "fixedValueIbFvPatchField<Type>::"
-            "fixedValueIbFvPatchField\n"
-            "(\n"
-            "    const fixedValueIbFvPatchField<Type>&,\n"
-            "    const fvPatch& p,\n"
-            "    const DimensionedField<Type, volMesh>& iF,\n"
-            "    const fvPatchFieldMapper& mapper\n"
-            ")\n"
-        )   << "\n    patch type '" << p.type()
+        FatalErrorInFunction
+            << "\n    patch type '" << p.type()
             << "' not constraint type '" << typeName << "'"
             << "\n    for patch " << p.name()
             << " of field " << this->dimensionedInternalField().name()
@@ -254,6 +236,16 @@ void fixedValueIbFvPatchField<Type>::evaluate
 
     // Evaluate fixed value condition
     fixedValueFvPatchField<Type>::evaluate();
+}
+
+
+template<class Type>
+void Foam::fixedValueIbFvPatchField<Type>::manipulateMatrix
+(
+    fvMatrix<Type>& matrix
+)
+{
+    this->setDeadValues(matrix);
 }
 
 

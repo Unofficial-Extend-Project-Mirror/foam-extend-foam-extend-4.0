@@ -28,7 +28,7 @@ boundaryField
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
-        setDeadValue    true;
+        setDeadValue    yes;
         deadValue       14.855;
         value           uniform 14.855;
     }

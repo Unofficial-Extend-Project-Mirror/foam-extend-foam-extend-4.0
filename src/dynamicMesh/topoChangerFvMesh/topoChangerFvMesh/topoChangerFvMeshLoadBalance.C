@@ -291,7 +291,7 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
                 true    // Create passive processor patches
             );
             fvMesh& procMesh = procMeshPtr();
-            procMesh.write();
+
             // Create a field decomposer
             fvFieldDecomposer fieldDecomposer
             (
@@ -304,7 +304,11 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
 
             if (procI != Pstream::myProcNo())
             {
-                Pout<< "Send mesh and fields to processor " << procI << endl;
+                if (debug)
+                {
+                    Pout<< "Send mesh and fields to processor " << procI
+                        << endl;
+                }
 
                 OPstream toProc
                 (
@@ -449,8 +453,6 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         }
     }
 
-    sleep(2);
-    
     // Collect pieces of mesh and fields from other processors
     for (label procI = 0; procI < meshDecomp.nProcs(); procI++)
     {
@@ -459,7 +461,10 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
             // Check if there is a mesh to send
             if (migratedCells[procI][Pstream::myProcNo()] > 0)
             {
-                Pout<< "Receive mesh and fields from " << procI << endl;
+                if (debug)
+                {
+                    Pout<< "Receive mesh and fields from " << procI << endl;
+                }
 
                 // Note: communication can be optimised.  HJ, 27/Feb/2018
                 IPstream fromProc
@@ -839,6 +844,9 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         oldPatchNMeshPoints         // oldPatchNMeshPoints
     );
 
+    // Remove point, face and cell zones from the original mesh
+    removeZones();
+
     // Reset fvMesh and patches
     resetFvPrimitives
     (
@@ -851,6 +859,55 @@ bool Foam::topoChangerFvMesh::loadBalance(const dictionary& decompDict)
         resetFvPatchFlag,
         true                       // Valid boundary
     );
+
+    // Get pointers to cell/face/point zones from reconstructed mesh and "link"
+    // them to the new mesh
+
+    // Cell zones
+    const cellZoneMesh& reconCellZones = reconMesh.cellZones();
+    List<cellZone*> czs(reconCellZones.size());
+    forAll (czs, zoneI)
+    {
+        czs[zoneI] = new cellZone
+        (
+            reconCellZones[zoneI].name(),
+            reconCellZones[zoneI],
+            zoneI,
+            this->cellZones()
+        );
+    }
+
+    // Face zones
+    const faceZoneMesh& reconFaceZones = reconMesh.faceZones();
+    List<faceZone*> fzs(reconFaceZones.size());
+    forAll (fzs, zoneI)
+    {
+        fzs[zoneI] = new faceZone
+        (
+            reconFaceZones[zoneI].name(),
+            reconFaceZones[zoneI],
+            reconFaceZones[zoneI].flipMap(),
+            zoneI,
+            this->faceZones()
+        );
+    }
+
+    // Point zones
+    const pointZoneMesh& reconPointZones = reconMesh.pointZones();
+    List<pointZone*> pzs(reconPointZones.size());
+    forAll (pzs, zoneI)
+    {
+        pzs[zoneI] = new pointZone
+        (
+            reconPointZones[zoneI].name(),
+            reconPointZones[zoneI],
+            zoneI,
+            this->pointZones()
+        );
+    }
+
+    // Add the zones to the mesh
+    addZones(pzs, fzs, czs);
 
     // Create field reconstructor
     fvFieldReconstructor fieldReconstructor

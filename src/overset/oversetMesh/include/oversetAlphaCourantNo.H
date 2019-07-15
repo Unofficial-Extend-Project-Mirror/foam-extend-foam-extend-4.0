@@ -38,21 +38,28 @@ scalar maxAlphaCo
 scalar alphaCoNum = 0.0;
 scalar meanAlphaCoNum = 0.0;
 
-surfaceScalarField alpha1f =
+const surfaceScalarField alpha1f =
     fvc::interpolate(min(max(alpha1, scalar(0)), scalar(1)));
 
-const dimensionedScalar alphaOffset("alphaOffset", dimless, dAlpha);
+const dimensionedScalar alphaOffset
+(
+    "alphaOffset",
+    dimless,
+    runTime.controlDict().lookupOrDefault("dAlpha", 0.01)
+);
 
 if (mesh.nInternalFaces())
 {
-    surfaceScalarField magAlphaPhi
+    const oversetMesh& om = oversetMesh::New(mesh);
+
+    const surfaceScalarField magAlphaPhi
     (
         pos(alpha1f - alphaOffset)*
         pos(scalar(1) - alphaOffset - alpha1f)*
-        mag(faceOversetMask*phi)
+        mag(om.sGamma()*phi)
     );
 
-    surfaceScalarField SfUfbyDelta =
+    const surfaceScalarField SfUfbyDelta =
         mesh.surfaceInterpolation::deltaCoeffs()*magAlphaPhi;
 
     const scalar deltaT = runTime.deltaT().value();

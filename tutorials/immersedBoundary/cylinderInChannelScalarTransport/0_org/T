@@ -29,7 +29,7 @@ boundaryField
         triValueFraction uniform 0;
         value uniform 0;
 
-        setDeadValue   no;
+        setDeadValue   yes;
         deadValue      0;
     }
     in

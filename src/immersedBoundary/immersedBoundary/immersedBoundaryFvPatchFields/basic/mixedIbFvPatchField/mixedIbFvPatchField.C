@@ -87,17 +87,8 @@ mixedIbFvPatchField<Type>::mixedIbFvPatchField
 
     if (!isType<immersedBoundaryFvPatch>(p))
     {
-        FatalIOErrorIn
-        (
-            "mixedIbFvPatchField<Type>::"
-            "mixedIbFvPatchField\n"
-            "(\n"
-            "    const fvPatch& p,\n"
-            "    const Field<Type>& field,\n"
-            "    const dictionary& dict\n"
-            ")\n",
-            dict
-        )   << "\n    patch type '" << p.type()
+        FatalIOErrorInFunction(dict)
+            << "\n    patch type '" << p.type()
             << "' not constraint type '" << typeName << "'"
             << "\n    for patch " << p.name()
             << " of field " << this->dimensionedInternalField().name()
@@ -109,13 +100,11 @@ mixedIbFvPatchField<Type>::mixedIbFvPatchField
     // the patch is active
     // Initialise the value to avoid errors
     // HJ, 1/Dec/2017
-//    if (this->ibPatch().ibPolyPatch().active())
-    {
-        // Re-interpolate the data related to immersed boundary
-        this->updateIbValues();
 
-        mixedFvPatchField<Type>::evaluate();
-    }
+    // Re-interpolate the data related to immersed boundary
+    this->updateIbValues();
+
+    mixedFvPatchField<Type>::evaluate();
 }
 
 
@@ -143,17 +132,8 @@ mixedIbFvPatchField<Type>::mixedIbFvPatchField
     // HJ, 12/Apr/2012
     if (!isType<immersedBoundaryFvPatch>(p))
     {
-        FatalErrorIn
-        (
-            "mixedIbFvPatchField<Type>::"
-            "mixedIbFvPatchField\n"
-            "(\n"
-            "    const mixedIbFvPatchField<Type>&,\n"
-            "    const fvPatch& p,\n"
-            "    const DimensionedField<Type, volMesh>& iF,\n"
-            "    const fvPatchFieldMapper& mapper\n"
-            ")\n"
-        )   << "\n    patch type '" << p.type()
+        FatalErrorInFunction
+            << "\n    patch type '" << p.type()
             << "' not constraint type '" << typeName << "'"
             << "\n    for patch " << p.name()
             << " of field " << this->dimensionedInternalField().name()
@@ -274,6 +254,16 @@ void mixedIbFvPatchField<Type>::evaluate
 
     // Evaluate mixed condition
     mixedFvPatchField<Type>::evaluate();
+}
+
+
+template<class Type>
+void Foam::mixedIbFvPatchField<Type>::manipulateMatrix
+(
+    fvMatrix<Type>& matrix
+)
+{
+    this->setDeadValues(matrix);
 }
 
 

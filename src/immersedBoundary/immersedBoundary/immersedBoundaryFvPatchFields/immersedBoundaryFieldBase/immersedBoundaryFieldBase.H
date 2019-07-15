@@ -123,6 +123,9 @@ public:
             //- Set values in dead cells
             void setDeadValues(Field<Type>& psiI) const;
 
+            //- Set matrix constraints in dead cells
+            void setDeadValues(fvMatrix<Type>& matrix) const;
+
 
         // I/O
 

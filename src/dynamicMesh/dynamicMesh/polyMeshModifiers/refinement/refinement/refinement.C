@@ -1333,20 +1333,6 @@ bool Foam::refinement::changeTopology() const
 
 void Foam::refinement::setRefinement(polyTopoChange& ref) const
 {
-    // Make sure that the point levels are updated across coupled patches before
-    // setting refinement and unrefinement. Note: not sure why the sync is not
-    // performed correctly if I do it in updateMesh. This is a temporary
-    // solution, need to investigate in detail, but I assume something is not
-    // updated yet in that case. VV, 31/Jan/2018.
-    syncTools::syncPointList
-    (
-        mesh_,
-        pointLevel_,
-        maxEqOp<label>(),
-        label(0),   // Null value
-        true        // Apply separation for parallel cyclics
-    );
-
     // Set refinement and unrefinement
     this->setRefinementInstruction(ref);
     this->setUnrefinementInstruction(ref);

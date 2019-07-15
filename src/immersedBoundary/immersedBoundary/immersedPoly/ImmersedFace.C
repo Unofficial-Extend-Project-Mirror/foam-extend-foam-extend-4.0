@@ -257,10 +257,11 @@ void Foam::ImmersedFace<Distance>::createSubfaces
         // than 3 points
         if (nDry < 3)
         {
-            FatalErrorInFunction
-                << "There are fewer than three points"
-                << " on the wet part of the face."
-                << abort(FatalError);
+            // The face is wet
+            isAllWet_ = true;
+            isAllDry_ = false;
+
+            drySubface_.clear();
         }
         else
         {
@@ -272,10 +273,11 @@ void Foam::ImmersedFace<Distance>::createSubfaces
 
         if (nWet < 3)
         {
-            FatalErrorInFunction
-                << "There are fewer than three points"
-                << " on the dry part of the face."
-                << abort(FatalError);
+            // The face is dry
+            isAllWet_ = false;
+            isAllDry_ = true;
+
+            wetSubface_.clear();
         }
         else
         {
@@ -341,7 +343,6 @@ Foam::ImmersedFace<Distance>::ImmersedFace
 
         absTol = minEdgeLength*immersedPoly::tolerance_();
     }
-
 
     // Check if all points are wet or dry, using absolute tolerance
     if (max(depth) < absTol)

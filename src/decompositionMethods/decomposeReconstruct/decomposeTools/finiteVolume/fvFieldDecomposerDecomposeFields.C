@@ -158,9 +158,17 @@ fvFieldDecomposer::decomposeField
 
         const label patchStart = field.mesh().boundaryMesh()[patchI].start();
 
-        forAll (p, i)
+        // Bugfix
+        // Special patches soch as overset and immersed boundary have
+        // their faces and values in a separate list; the list of
+        // values does not correspond to faces.  Skip such patches.
+        // HJ, 4/Jul/2019
+        if (p.size() == field.mesh().boundaryMesh()[patchI].size())
         {
-            allFaceField[patchStart + i] = p[i];
+            forAll (p, i)
+            {
+                allFaceField[patchStart + i] = p[i];
+            }
         }
     }
 

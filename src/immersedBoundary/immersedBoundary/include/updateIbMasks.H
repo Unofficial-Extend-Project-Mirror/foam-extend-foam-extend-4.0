@@ -8,50 +8,13 @@
     gamma.correctBoundaryConditions();
     sGamma.correctBoundaryConditions();
 
+
+    // Reset gamma and sGamma
+    gamma == dimensionedScalar("one", dimless, 1);
+    sGamma == dimensionedScalar("one", dimless, 1);
+
     scalarField& gammaIn = gamma.internalField();
-
-    gammaIn = mesh.V()/mesh.cellVolumes();
-
     scalarField& sGammaIn = sGamma.internalField();
-
-    const surfaceScalarField& magSf = mesh.magSf();
-    const scalarField magFaceAreas = mag(mesh.faceAreas());
-
-    sGammaIn =  magSf.internalField()/
-        scalarField::subField(magFaceAreas, mesh.nInternalFaces());
-
-    const scalar maxGamma = max(gammaIn);
-    const scalar maxSGamma = min(sGammaIn);
-    if (maxGamma > 1 || maxSGamma > 1)
-    {
-        WarningIn
-        (
-            "updateIbMasks.H"
-        )
-            << "Unbounded gamma: max(gamma) = "
-            << maxGamma << ", max(sGamma) = " << maxSGamma << endl;
-    }
-
-    forAll (mesh.boundary(), patchI)
-    {
-        if (!isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
-        {
-            sGamma.boundaryField()[patchI] =
-                magSf.boundaryField()[patchI]/
-                mesh.boundary()[patchI].patchSlice(magFaceAreas);
-
-            gamma.boundaryField()[patchI] =
-                sGamma.boundaryField()[patchI];
-        }
-        else
-        {
-            sGamma.boundaryField()[patchI] =
-                scalarField(mesh.boundary()[patchI].size(), 1);
-
-            gamma.boundaryField()[patchI] =
-                scalarField(mesh.boundary()[patchI].size(), 1);
-        }
-    }
 
     // Adjust the mask in dead faces and dead cells
     forAll (mesh.boundary(), patchI)

@@ -66,6 +66,14 @@ class alphatWallFunctionFvPatchScalarField
         scalar Prt_;
 
 
+protected:
+
+    // Protected Member Functions
+
+        //- Write local wall function variables
+        virtual void writeLocalEntries(Ostream&) const;
+
+
 public:
 
     //- Runtime type information
@@ -146,7 +154,7 @@ public:
         // I-O
 
             //- Write
-            void write(Ostream&) const;
+            virtual void write(Ostream&) const;
 };
 
 

@@ -2614,15 +2614,6 @@ void Foam::prismatic2DRefinement::setCellsToRefine
         }
     }
 
-    // Remove all cells that exceed the maximum refinement level
-    forAll (refineCell, cellI)
-    {
-        if (refineCell[cellI] && (cellLevel_[cellI] + 1 > maxRefinementLevel_))
-        {
-            refineCell[cellI] = false;
-        }
-    }
-
     // Make sure that the refinement is face consistent (2:1 consistency) and
     // point consistent (4:1 consistency) if necessary
 

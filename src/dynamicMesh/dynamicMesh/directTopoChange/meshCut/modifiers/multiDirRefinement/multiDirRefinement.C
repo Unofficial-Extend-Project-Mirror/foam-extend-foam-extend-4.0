@@ -264,8 +264,8 @@ void Foam::multiDirRefinement::refineHex8
     hexRef8 hexRefiner
     (
         mesh,
-        labelList(mesh.nCells(), 0),    // cellLevel
-        labelList(mesh.nPoints(), 0),   // pointLevel
+        labelField(mesh.nCells(), 0),    // cellLevel
+        labelField(mesh.nPoints(), 0),   // pointLevel
         refinementHistory
         (
             IOobject

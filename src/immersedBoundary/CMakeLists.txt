@@ -32,3 +32,4 @@
 
 add_subdirectory(immersedBoundary)
 add_subdirectory(immersedBoundaryDynamicMesh)
+add_subdirectory(immersedBoundaryTurbulence)

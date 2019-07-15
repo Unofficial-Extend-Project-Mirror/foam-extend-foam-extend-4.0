@@ -25,7 +25,8 @@ Description
     Extrude mesh from existing patch (by default outwards facing normals;
     optional flips faces) or from patch read from file.
 
-    Note: Merges close points so be careful.
+    Note: Merges close points so be careful. This can be controlled with the
+    optional mergeTolerance parameter (1e-4) by default.
 
     Type of extrusion prescribed by run-time selectable model.
 
@@ -179,7 +180,11 @@ int main(int argc, char *argv[])
 
     const boundBox& bb = mesh.globalData().bb();
     const vector span = bb.span();
-    const scalar mergeDim = 1e-4 * bb.minDim();
+
+    // Read merge tolerance
+    const scalar mergeTolerance =
+        dict.lookupOrDefault<scalar>("mergeTolerance", 1e-4);
+    const scalar mergeDim = mergeTolerance*bb.minDim();
 
     Info<< "Mesh bounding box : " << bb << nl
         << "        with span : " << span << nl
@@ -200,7 +205,7 @@ int main(int argc, char *argv[])
 
     // Collapse edges
     // ~~~~~~~~~~~~~~
-
+    if (mergeTolerance > SMALL)
     {
         Info<< "Collapsing edges < " << mergeDim << " ..." << nl << endl;
 

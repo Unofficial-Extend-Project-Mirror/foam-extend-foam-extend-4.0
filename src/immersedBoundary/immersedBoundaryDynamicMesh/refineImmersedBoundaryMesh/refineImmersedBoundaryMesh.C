@@ -321,6 +321,7 @@ Foam::refineImmersedBoundaryMesh::refinementCells
         case IB_CELL_CELLS:
         {
             addIbCellCells(refCellSet);
+            [[fallthrough]];
         }
 
         case IB_CELLS:

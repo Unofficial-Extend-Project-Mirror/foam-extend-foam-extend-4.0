@@ -124,7 +124,7 @@ void Foam::immersedBoundaryFvPatch::updatePhi
     scalar rDeltaT = 1.0/deltaT;
 
     // Multiply the raw mesh motion flux with the masking function
-    scalarField sGamma =
+    scalarField ibAreaRatio =
         mag(ibPolyPatch_.correctedFaceAreas())/mag(mesh.faceAreas());
 
     // Scaling of internal mesh flux field should be done only for the current
@@ -140,7 +140,7 @@ void Foam::immersedBoundaryFvPatch::updatePhi
         const label faceI = deadFaces[dfI];
         if (mesh.isInternalFace(faceI))
         {
-            phiIn[faceI] *= sGamma[faceI];
+            phiIn[faceI] = scalar(0);
         }
     }
  
@@ -150,7 +150,7 @@ void Foam::immersedBoundaryFvPatch::updatePhi
         const label faceI = cutFaces[cfI];
         if (mesh.isInternalFace(faceI))
         {
-            phiIn[faceI] *= sGamma[faceI];
+            phiIn[faceI] *= ibAreaRatio[faceI];
         }
     }
 
@@ -160,7 +160,7 @@ void Foam::immersedBoundaryFvPatch::updatePhi
         if (!isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
         {
             phi.boundaryField()[patchI] *=
-                mesh.boundary()[patchI].patchSlice(sGamma);
+                mesh.boundary()[patchI].patchSlice(ibAreaRatio);
         }
     }
 
@@ -231,12 +231,11 @@ void Foam::immersedBoundaryFvPatch::updatePhi
             // Attempt to correct via old volume
             scalar corrOldVol = newVols[cellI] - divPhi[cellI]*deltaT;
 
-            // Info<< "Flux maneouvre for cell " << cellI << ": "
+            // Pout<< "Flux maneouvre for cell " << cellI << ": "
             //     << " error: " << magDivPhi[cellI]
             //     << " V: " << newVols[cellI]
             //     << " V0: " << oldVols[cellI]
-            //     << " divPhi: " << divPhi[cellI]
-            //     << endl;
+            //     << " divPhi: " << divPhi[cellI];
 
             if (corrOldVol < SMALL)
             {
@@ -248,6 +247,10 @@ void Foam::immersedBoundaryFvPatch::updatePhi
             {
                 oldVols[cellI] = corrOldVol;
             }
+
+            // scalar corrDivMeshPhi =
+            //     mag((newVols[cellI] - oldVols[cellI]) - divPhi[cellI]*deltaT);
+            // Pout<< " Corrected: " << corrDivMeshPhi << endl;
         }
     }
 }

@@ -128,7 +128,6 @@ void gradientInternalEnergyFvPatchScalarField::updateCoeffs()
 void Foam::gradientInternalEnergyFvPatchScalarField::write(Ostream& os) const
 {
     fixedGradientFvPatchScalarField::write(os);
-    writeEntry("value", os);
 }
 
 

@@ -64,6 +64,39 @@ void Foam::immersedBoundaryFieldBase<Type>::setDeadValues
 
 
 template<class Type>
+void Foam::immersedBoundaryFieldBase<Type>::setDeadValues
+(
+    fvMatrix<Type>& matrix
+) const
+{
+    // Fix the value in dead cells
+    if (setDeadValue_)
+    {
+        const labelList& dc = ibPatch_.ibPolyPatch().deadCells();
+
+        // Boost the diagonal of dead cells by the volume ratio
+        // Volume ratio is set to SMALL; revert for diagonal
+        // This should also guarantee strong diagonal dominance.
+        // HJ, 19/Jun/2019
+
+        scalarField& diag = matrix.diag();
+
+        forAll (dc, dcI)
+        {
+            diag[dc[dcI]] *= GREAT;
+        }
+
+        // Set values
+        matrix.setValues
+        (
+            dc,
+            Field<Type>(dc.size(), deadValue_)
+        );
+    }
+}
+
+
+template<class Type>
 void Foam::immersedBoundaryFieldBase<Type>::writeDeadData(Ostream& os) const
 {
     os.writeKeyword("setDeadValue")
@@ -107,30 +140,65 @@ void Foam::immersedBoundaryFieldBase<Type>::writeField
         if (Pstream::master())
         {
             // Assemble unique lists to correspond to a single surface
-            pointField allPoints(0);
-            Field<Type> completeField(0);
-            faceList allFaces(0);
-            label prevProcPatchSize = 0;
 
-            forAll(procPoints, procI)
+            // Count points and faces; currently unmerged
+            label nAllPoints = 0;
+            label nAllFaces = 0;
+
+            forAll (procPoints, procI)
             {
-                allPoints.append(procPoints[procI]);
-                completeField.append(procFields[procI]);
+                nAllPoints += procPoints[procI].size();
+                nAllFaces += procFaces[procI].size();
+            }
 
-                // Point labels in faces need to be incremented with respect to
-                // the size of the size of the previous processore patch
-                forAll(procFaces[procI], faceI)
+            pointField allPoints(nAllPoints);
+            faceList allFaces(nAllFaces);
+            Field<Type> completeField(nAllFaces);
+
+            // Reset counters
+            nAllPoints = 0;
+            nAllFaces = 0;
+
+            forAll (procPoints, procI)
+            {
+                const pointField& curPoints = procPoints[procI];
+                labelList renumberPoints(curPoints.size());
+
+                forAll (curPoints, cpI)
                 {
-                    face curFace = procFaces[procI][faceI];
-                    forAll(curFace, pointI)
-                    {
-                        curFace[pointI] += prevProcPatchSize;
-                    }
-                    allFaces.append(curFace);
+                    allPoints[nAllPoints] = curPoints[cpI];
+                    renumberPoints[cpI] = nAllPoints;
+                    nAllPoints++;
                 }
 
-                // Increment the total number of points
-                prevProcPatchSize += procPoints[procI].size();
+                const faceList& curFaces = procFaces[procI];
+                const Field<Type>& curField = procFields[procI];
+
+                forAll (curFaces, cfI)
+                {
+                    // Point labels in faces need to be renumbered with respect
+                    // to the size of the size of the previous processore patch
+                    const face& oldFace = curFaces[cfI];
+
+                    // Make a copy of face to renumber
+                    face renumberedFace(oldFace.size());
+
+                    forAll (oldFace, fpI)
+                    {
+                        renumberedFace[fpI] = renumberPoints[oldFace[fpI]];
+                    }
+
+                    allFaces[nAllFaces] = renumberedFace;
+                    completeField[nAllFaces] = curField[cfI];
+                    nAllFaces++;
+                }
+            }
+
+            if (nAllPoints != allPoints.size() || nAllFaces != allFaces.size())
+            {
+                FatalErrorInFunction
+                    << "Problem with merge of immersed boundary patch data"
+                    << abort(FatalError);
             }
 
             writerPtr->write

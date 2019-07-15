@@ -25,7 +25,7 @@ boundaryField
     {
         type            immersedBoundaryKqRWallFunction;
         patchType       immersedBoundary;
-        setDeadValue    true;
+        setDeadValue    yes;
         deadValue       0.375;
         value           uniform 0.375;
     }

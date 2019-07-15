@@ -192,7 +192,6 @@ void Foam::gradientEnthalpyFvPatchScalarField::updateCoeffs()
 void Foam::gradientEnthalpyFvPatchScalarField::write(Ostream& os) const
 {
     fixedGradientFvPatchScalarField::write(os);
-    writeEntry("value", os);
 }
 
 

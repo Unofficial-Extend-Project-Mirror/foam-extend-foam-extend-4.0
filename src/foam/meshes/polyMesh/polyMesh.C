@@ -43,6 +43,20 @@ defineTypeNameAndDebug(Foam::polyMesh, 0);
 Foam::word Foam::polyMesh::defaultRegion = "region0";
 Foam::word Foam::polyMesh::meshSubDir = "polyMesh";
 
+const Foam::debug::tolerancesSwitch
+Foam::polyMesh::emptyDirTol_
+(
+    "emptyDirectionTolerance",
+    1e-10
+);
+
+const Foam::debug::tolerancesSwitch
+Foam::polyMesh::wedgeDirTol_
+(
+    "wedgeDirectionTolerance",
+    1e-10
+);
+
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -93,20 +107,27 @@ void Foam::polyMesh::calcDirections() const
         globalEmptyDirVec /= mag(globalEmptyDirVec);
 
         // Check if all processors see the same 2-D from empty patches
-        if (mag(globalEmptyDirVec - emptyDirVec) > SMALL)
+        if (mag(globalEmptyDirVec - emptyDirVec) > emptyDirTol_())
         {
             FatalErrorIn
             (
                 "void polyMesh::calcDirections() const"
             )   << "Some processors detect different empty (2-D) "
                 << "directions.  Probably using empty patches on a "
-                << "bad parallel decomposition." << nl
-                << "Please check your geometry and empty patches"
+                << "bad parallel decomposition." << nl << nl
+                << "Global empty direction vector: " << globalEmptyDirVec << nl
+                << "Local empty direction vector: " << emptyDirVec << nl
+                << "If global and local empty direction vectors are different"
+                << " to a round-off error, try increasing the"
+                << " emptyDirectionTolerance in controlDict::Tolerances" << nl
+                << "The emptyDirectionTolerance for this run is: "
+                << emptyDirTol_() << nl << nl
+                << "Otherwise please check your geometry and empty patches."
                 << abort(FatalError);
         }
     }
 
-    if (mag(emptyDirVec) > SMALL)
+    if (mag(emptyDirVec) > emptyDirTol_())
     {
         for (direction cmpt = 0; cmpt < vector::nComponents; cmpt++)
         {
@@ -139,7 +160,7 @@ void Foam::polyMesh::calcDirections() const
         globalWedgeDirVec /= mag(globalWedgeDirVec);
 
         // Check if all processors see the same 2-D from wedge patches
-        if (mag(globalWedgeDirVec - wedgeDirVec) > SMALL)
+        if (mag(globalWedgeDirVec - wedgeDirVec) > wedgeDirTol_())
         {
             FatalErrorIn
             (
@@ -147,12 +168,20 @@ void Foam::polyMesh::calcDirections() const
             )   << "Some processors detect different wedge (2-D) "
                 << "directions.  Probably using wedge patches on a "
                 << "bad parallel decomposition." << nl
+                << "Global wedge direction vector: " << globalWedgeDirVec << nl
+                << "Local wedge direction vector: " << wedgeDirVec << nl
+                << "If global and local wedge direction vectors are different"
+                << " to a round-off error, try increasing the"
+                << " wedgeDirectionTolerance in controlDict::Tolerances" << nl
+                << "The wedgeDirectionTolerance for this run is: "
+                << wedgeDirTol_() << nl << nl
+                << "Otherwise please check your geometry and empty patches."
                 << "Please check your geometry and wedge patches"
                 << abort(FatalError);
         }
     }
 
-    if (mag(wedgeDirVec) > SMALL)
+    if (mag(wedgeDirVec) > wedgeDirTol_())
     {
         for (direction cmpt = 0; cmpt < vector::nComponents; cmpt++)
         {

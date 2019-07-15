@@ -25,7 +25,7 @@ boundaryField
     {
         type            immersedBoundaryNutWallFunction;
         patchType       immersedBoundary;
-        setDeadValue    true;
+        setDeadValue    yes;
         deadValue       1e-5;
         value           uniform 0;
     }

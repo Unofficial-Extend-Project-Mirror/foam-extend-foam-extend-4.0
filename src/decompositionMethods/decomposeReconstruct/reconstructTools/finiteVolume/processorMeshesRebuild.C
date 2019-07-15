@@ -1728,8 +1728,337 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
     // due to the presence of old/new patches
     globalMesh.addFvPatches(reconPatches, false);
 
-    // TODO: point, face and cell zones
+    // Recombine cell, face and point zones.
+    // Note 1: all zones have to be present on same processors in the same
+    // order. This is the result of the decomposition. See
+    // domainDecomposition::processorMesh member function
+    // Note 2: the code below could be written in a generic way by using a
+    // template helper member function, but it's not straightforward since we
+    // don't have a list of ZoneMeshes for all processors
 
+    // Get index for the first valid mesh
+    const label fvmID = firstValidMesh();
+
+    // First pass: count maximum number of cells, faces and points in zones
+    labelList nCellsPerZone(meshes_[fvmID].cellZones().size(), 0);
+    labelList nFacesPerZone(meshes_[fvmID].faceZones().size(), 0);
+    labelList nPointsPerZone(meshes_[fvmID].pointZones().size(), 0);
+
+    forAll (meshes_, procI)
+    {
+        if (meshes_.set(procI))
+        {
+            // Grab the current mesh
+            const polyMesh& curMesh = meshes_[procI];
+
+            // PART 1: Cell zones. Scope for clarity and safety
+            {
+                const cellZoneMesh& cz = curMesh.cellZones();
+
+                forAll (cz, zoneI)
+                {
+                    // Count number of cells in the zone
+                    nCellsPerZone[zoneI] += cz[zoneI].size();
+                }
+            }
+
+            // PART 2: Face zones. Scope for clarity and safety
+            {
+                const faceZoneMesh& fz = curMesh.faceZones();
+
+                forAll (fz, zoneI)
+                {
+                    // Count number of faces in the zone
+                    nFacesPerZone[zoneI] += fz[zoneI].size();
+                }
+            }
+
+            // PART 3: Point zones. Scope for clarity and safety
+            {
+                const pointZoneMesh& pz = curMesh.pointZones();
+
+                forAll (pz, zoneI)
+                {
+                    // Count number of points in the zone
+                    nPointsPerZone[zoneI] += pz[zoneI].size();
+                }
+            }
+        } // End if processor mesh set
+    } // End for all processor meshes
+
+    // Second pass: redistribute cells, faces and points in zones
+
+    // Create lists that contain labels of all cells/faces/points in a given
+    // zone coming from different processor meshes. Index is the zoneID, which
+    // is the same for all processor bits, while the other list collects all the
+    // cells/faces/points in a given zone.
+    labelListList reconCellZones(nCellsPerZone.size());
+    labelListList reconFaceZones(nFacesPerZone.size());
+    List<boolList> reconFaceZoneFlips(nFacesPerZone.size());
+    labelListList reconPointZones(nPointsPerZone.size());
+
+    // Size the lists appropriatelly for each zone
+    forAll (reconCellZones, zoneI)
+    {
+        reconCellZones[zoneI].setSize(nCellsPerZone[zoneI], -1);
+    }
+    forAll (reconFaceZones, zoneI)
+    {
+        reconFaceZones[zoneI].setSize(nFacesPerZone[zoneI], -1);
+        reconFaceZoneFlips[zoneI].setSize(nFacesPerZone[zoneI], false);
+    }
+    forAll (reconPointZones, zoneI)
+    {
+        reconPointZones[zoneI].setSize(nPointsPerZone[zoneI], -1);
+    }
+
+    // Reset counting lists for indexing during list item assignement and for
+    // collecting the final number of faces/points in face/pointZones (since
+    // these can be actually fewer if e.g. a processor face becomes an internal
+    // face).
+    nCellsPerZone = 0;
+    nFacesPerZone = 0;
+    nPointsPerZone = 0;
+
+    // Loop through all the meshes and collect cells/faces/points in the zones
+    forAll (meshes_, procI)
+    {
+        if (meshes_.set(procI))
+        {
+            // Grab the current mesh
+            const polyMesh& curMesh = meshes_[procI];
+
+            // PART 1: Cell zones. Scope for clarity and safety
+            {
+                const cellZoneMesh& cz = curMesh.cellZones();
+
+                // Get old-to-new cell addressing for this mesh
+                const labelList& curCellProcAddr = cellProcAddressing_[procI];
+
+                forAll (cz, zoneI)
+                {
+                    // Get "new" zone cell index
+                    label& nCells = nCellsPerZone[zoneI];
+
+                    // Reference to the new recon zone
+                    labelList& zoneReconCells = reconCellZones[zoneI];
+
+                    // Get all the cells in this zone
+                    const labelList& zoneCells = cz[zoneI];
+
+                    // Loop through the cells
+                    forAll (zoneCells, i)
+                    {
+                        // Get cell index in the processor mesh
+                        const label& oldCellI = zoneCells[i];
+
+                        // Get cell index in the new mesh
+                        const label& newCellI = curCellProcAddr[oldCellI];
+
+                        // Redundancy check: check if the the newCellI is
+                        // -1. This should not happen because cells have perfect
+                        // 1-to-1 mapping
+                        if (newCellI != -1)
+                        {
+                            // Insert the cell in the new recon zone and
+                            // increment the counter
+                            zoneReconCells[nCells++] = newCellI;
+                        }
+                        else
+                        {
+                            FatalErrorIn
+                            (
+                                "autoPtr<fvMesh>"
+                                "\n processorMeshesReconstructor::"
+                                "reconstructMesh(const Time& db)"
+                            )   << "Found unmapped cell while reconstructing"
+                                << " cell zones."
+                                << nl
+                                << "Cell from processor: " << procI << nl
+                                << "Cell zone name: " << cz[zoneI].name() << nl
+                                << "Index in the cell zone: " << i << nl
+                                << "Old cell index: " << oldCellI << nl
+                                << "New cell index: " << newCellI
+                                << abort(FatalError);
+                        }
+
+                    } // End for all cells in the zone
+                } // End for all cell zones
+            } // End scope for cell zone handling
+
+            // PART 2: Face zones. Scope for clarity and safety
+            {
+                const faceZoneMesh& fz = curMesh.faceZones();
+
+                // Get old-to-new face addressing for this mesh
+                const labelList& curFaceProcAddr = faceProcAddressing_[procI];
+
+                forAll (fz, zoneI)
+                {
+                    // Get "new" zone face index
+                    label& nFaces = nFacesPerZone[zoneI];
+
+                    // Reference to the new recon zone and flips in the zone
+                    labelList& zoneReconFaces = reconFaceZones[zoneI];
+                    boolList& zoneReconFaceFlips = reconFaceZoneFlips[zoneI];
+
+                    // Get all the faces in this zone and also their flips
+                    const labelList& zoneFaces = fz[zoneI];
+                    const boolList& zoneFlipMap = fz[zoneI].flipMap();
+
+                    // Loop through the faces
+                    forAll (zoneFaces, i)
+                    {
+                        // Get the face index in the processor mesh
+                        const label& oldFaceI = zoneFaces[i];
+
+                        // Get the face index in the new, reconstructed mesh
+                        const label& newFaceI = curFaceProcAddr[oldFaceI];
+
+                        // Check if the face is mapped.
+                        // Note:
+                        // 1. Need to decrement by 1 because of the face turning
+                        // 2. No need to handle negative new indices coming from
+                        //    slave processor because we'd end up with
+                        //    duplicate entries (two faces on two processors
+                        //    merged into a single one)
+                        if (newFaceI > 0)
+                        {
+                            // This is a face that's been correctly
+                            // mapped, insert the face in the new zone
+                            zoneReconFaces[nFaces] = newFaceI - 1;
+
+                            // Also store the flip map of the face. We don't
+                            // need to check whether the flip map has been
+                            // preserved because we only get the combined faces
+                            // that are inserted from master side.
+                            zoneReconFaceFlips[nFaces] = zoneFlipMap[i];
+
+                            // Increment the number of faces for this zone
+                            ++nFaces;
+                        }
+                    } // End for all faces in the zone
+                } // End for all face zones
+            } // End scope for face zone handling
+
+            // PART 3: Point zones. Scope for clarity and safety
+            {
+                const pointZoneMesh& fz = curMesh.pointZones();
+
+                // Get old-to-new point addressing for this mesh
+                const labelList& curPointProcAddr = pointProcAddressing_[procI];
+
+                forAll (fz, zoneI)
+                {
+                    // Get "new" zone point index
+                    label& nPoints = nPointsPerZone[zoneI];
+
+                    // Reference to the new recon zone
+                    labelList& zoneReconPoints = reconPointZones[zoneI];
+
+                    // Get all the points in this zone
+                    const labelList& zonePoints = fz[zoneI];
+
+                    // Loop through the points
+                    forAll (zonePoints, i)
+                    {
+                        // Get point index in the processor mesh
+                        const label& oldPointI = zonePoints[i];
+
+                        // Get point index in the new mesh
+                        const label& newPointI = curPointProcAddr[oldPointI];
+
+                        // Check if the point is mapped
+                        if (newPointI != -1)
+                        {
+                            // Insert the point in the new recon zone and
+                            // increment the counter
+                            zoneReconPoints[nPoints++] = newPointI;
+                        }
+
+                    } // End for all points in the zone
+                } // End for all point zones
+            } // End scope for point zone handling
+        } // End if the processor mesh is set
+    } // End for all processor meshes
+
+    // We need to resize the face and point zones to number of inserted
+    // faces/points because not all faces and points need to be
+    // inserted. There's nothing to do for cell zones because these are always
+    // mapped uniquely one-to-one
+    forAll (reconFaceZones, zoneI)
+    {
+        reconFaceZones[zoneI].setSize(nFacesPerZone[zoneI]);
+        reconFaceZoneFlips[zoneI].setSize(nFacesPerZone[zoneI]);
+    }
+    forAll (reconPointZones, zoneI)
+    {
+        reconPointZones[zoneI].setSize(nPointsPerZone[zoneI]);
+    }
+
+    // Now we have all the zones as ordinary lists without possible duplicate
+    // faces and points due to merging of processor boundaries. Create zone
+    // meshes
+
+    // PART 1: Cell zones
+    List<cellZone*> reconCz(reconCellZones.size());
+
+    // Loop through all the cell zones and create them
+    forAll (reconCz, zoneI)
+    {
+        // Notes:
+        // 1. Grab the name from the respective zone in the first valid mesh
+        // 2. Transfer the list of cell IDs, invalidating reconCellZones[zoneI]
+        reconCz[zoneI] = new cellZone
+        (
+            meshes_[fvmID].cellZones()[zoneI].name(),
+            reconCellZones[zoneI].xfer(),
+            zoneI,
+            globalMesh.cellZones()
+        );
+    }
+
+    // PART 2: Face zones
+    List<faceZone*> reconFz(reconFaceZones.size());
+
+    // Loop through all the face zones and create them
+    forAll (reconFz, zoneI)
+    {
+        // Notes:
+        // 1. Grab the name from the respective zone in the first valid mesh
+        // 2. Transfer the list of face IDs, invalidating reconFaceZones[zoneI]
+        reconFz[zoneI] = new faceZone
+        (
+            meshes_[fvmID].faceZones()[zoneI].name(),
+            reconFaceZones[zoneI].xfer(),
+            reconFaceZoneFlips[zoneI].xfer(),
+            zoneI,
+            globalMesh.faceZones()
+        );
+    }
+
+    // PART 3: Point zones
+    List<pointZone*> reconPz(reconPointZones.size());
+
+    // Loop through all the point zones and create them
+    forAll (reconPz, zoneI)
+    {
+        // Notes:
+        // 1. Grab the name from the respective zone in the first valid mesh
+        // 2. Transfer the list of point IDs, invalidating reconPointZones[zoneI]
+        reconPz[zoneI] = new pointZone
+        (
+            meshes_[fvmID].pointZones()[zoneI].name(),
+            reconPointZones[zoneI].xfer(),
+            zoneI,
+            globalMesh.pointZones()
+        );
+    }
+
+    // Add the zones into the mesh
+    globalMesh.addZones(reconPz, reconFz, reconCz);
+
+    // All done, return the global mesh pointer
     return globalMeshPtr;
 }
 

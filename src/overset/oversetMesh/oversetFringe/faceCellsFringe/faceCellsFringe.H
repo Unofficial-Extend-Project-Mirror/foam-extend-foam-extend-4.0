@@ -115,6 +115,12 @@ public:
 
     // Member Functions
 
+        //- Access to patch names
+        const wordList& patchNames() const
+        {
+            return patchNames_;
+        }
+
         //- Update iteration. Note: invalidates parameter
         virtual bool updateIteration
         (

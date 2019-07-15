@@ -42,7 +42,7 @@ namespace RASModels
 
 void epsilonWallFunctionFvPatchScalarField::checkType()
 {
-    if (!this->patch().isWall())
+    if (!patch().isWall())
     {
         FatalErrorIn("epsilonWallFunctionFvPatchScalarField::checkType()")
             << "Invalid wall function specification" << nl

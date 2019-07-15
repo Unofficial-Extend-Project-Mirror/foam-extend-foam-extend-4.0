@@ -80,7 +80,8 @@ wmake libso solidModels
 wmake libso dbns
 
 wmake libso immersedBoundary/immersedBoundary
-wmake libso immersedBoundary/immersedBoundaryTurbulence
+wmake libso immersedBoundary/immersedBoundaryTurbulence/incompressible
+wmake libso immersedBoundary/immersedBoundaryTurbulence/compressible
 wmake libso immersedBoundary/immersedBoundaryDynamicMesh
 
 wmake libso overset/oversetMesh
