@@ -45,6 +45,11 @@ Description
             d   d [0 -2 0 0 0]  (-1000 -1000 0.50753e+08);
             f   f [0 -1 0 0 0]  (-1000 -1000 12.83);
         }
+        heatTransfer
+        {
+            Qtot      50;        //[J/s]
+            Tref      273.15;    //[K]
+        }
     }
     )
     @endverbatim
@@ -148,6 +153,28 @@ public:
         (
             const fvVectorMatrix& UEqn,
             volTensorField& AU
+        ) const;
+
+        //- Add the heat source contribution to enalphy equation (energy
+        // equation)
+        void addHeatResistance
+        (
+            fvScalarMatrix& hTEqn,
+            const volScalarField& T,
+            volScalarField& Taux,
+            volScalarField& Qaux,
+            const volVectorField& U,
+            const volScalarField& Macro,
+            const volScalarField& posFlux
+        ) const;
+
+        //- Order cells for Dual Stream model
+        void macroCellOrder
+        (
+            volScalarField& Taux,
+            volScalarField& Macro,
+            volScalarField& posFlux,
+            const surfaceScalarField& phi
         ) const;
 
         //- read modified data

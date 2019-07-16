@@ -132,4 +132,72 @@ void Foam::porousZone::addViscousInertialResistance
 }
 
 
+template<class RhoFieldType>
+void Foam::porousZone::addHeatSource
+(
+    const scalarField& Macro,
+    const scalarField& posFlux,
+    scalarField& QSource,
+    scalarField& Qauxi,
+    const scalarField& T,
+    scalarField& Tauxi,
+    const vectorField& U,
+    const RhoFieldType& rho
+) const
+{
+    // - Dual stream model (Single Effectiveness Model)
+    const scalarField Tauxi_old = Tauxi; // create storePrevIter()
+    const scalarField dT = Tauxi - T;
+
+
+    const label nMacro(nCellsAuxInlet_*nVerticalCells_);
+    scalarList Tmacro(nMacro, 0.0);
+    scalarList dTaux(nMacro, 0.0);
+    scalar QSum(0.0);
+
+    const scalar Taux_relax(Tauxrelax_);
+    const scalar c_aux(caux_);
+    const scalar c_pri(1009.0);
+    const scalar qm_aux(Maux_);
+    const scalar qm_auxi = qm_aux/nCellsAuxInlet_;
+    const scalar T_aux(Taux_);
+    const scalar rho_pri(1.1021);
+    const scalar Qeps(Qepsilon_);
+
+    const labelList& cells = mesh_.cellZones()[cellZoneID_];
+
+    forAll(cells, i)
+    {
+        scalar Qcell = Qeps*rho_pri*c_pri*posFlux[cells[i]]*dT[cells[i]];
+
+        Qauxi[cells[i]] = Qcell;                            // heat in each macro(cell)
+        const int macro = Macro[cells[i]];
+        dTaux[macro] = Qcell/(c_aux*qm_auxi);             // deltaTaux in each macro(cell)
+        QSource[cells[i]] += Qcell/(rho_pri*c_pri);       // adding Heat to equation
+        QSum += Qcell;                                    // summing for total heat of HX
+    }
+
+    reduce(dTaux, sumOp<scalarList>());
+    Tmacro[0] = T_aux;
+    forAll (Tmacro, i)
+    {
+        if (i > 0) Tmacro[i] = Tmacro[i-1] - dTaux[i-1];
+        if ((i > 0) && (i % nVerticalCells_ == 0)) Tmacro[i] = T_aux;
+    }
+
+    reduce(QSum, sumOp<scalar>());
+    Info << "Heat exchanger: " << name_ << endl;
+    Info << "Q = " << QSum << endl;
+    Info << "deltaT = " << QSum/(qm_aux*c_aux) << endl;
+
+    forAll(cells, i)
+    {
+        const int macro = Macro[cells[i]];
+        Tauxi[cells[i]] = Tauxi_old[cells[i]]
+            // upwind scheme for Aux fluid (Tmacro = inlet temp)
+          + Taux_relax*(Tmacro[macro] - Tauxi_old[cells[i]]);
+    }
+}
+
+
 // ************************************************************************* //

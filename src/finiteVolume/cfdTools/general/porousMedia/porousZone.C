@@ -76,7 +76,17 @@ Foam::porousZone::porousZone
     C0_(0),
     C1_(0),
     D_("D", dimensionSet(0, -2, 0, 0, 0), tensor::zero),
-    F_("F", dimensionSet(0, -1, 0, 0, 0), tensor::zero)
+    F_("F", dimensionSet(0, -1, 0, 0, 0), tensor::zero),
+    Maux_(0),
+    Taux_(0),
+    caux_(0),
+    Qepsilon_(0),
+    Tauxrelax_(0),
+    nCellsAuxInlet_(0),
+    firstCell_(0),
+    auxUnitVector_(vector::zero),
+    nVerticalCells_(0)
+
 {
     Info<< "Creating porous zone: " << name_ << endl;
 
@@ -191,6 +201,37 @@ Foam::porousZone::porousZone
                "nor Darcy-Forchheimer law (d/f) specified"
             << exit(FatalIOError);
     }
+
+    // Heat rate value and temperature of heat exchanger
+    if (const dictionary* dictPtr = dict_.subDictPtr("heatTransfer"))
+    {
+        Info<< "Reading porous heatTransfer: Maux and Taux" << nl;
+        dictPtr->lookup("Maux") >> Maux_;
+        dictPtr->lookup("Taux") >> Taux_;
+        dictPtr->lookup("caux") >> caux_;
+        dictPtr->lookup("Qepsilon") >> Qepsilon_;
+        dictPtr->lookup("firstCell") >> firstCell_;
+        dictPtr->lookup("auxUnitVector") >> auxUnitVector_;
+        dictPtr->lookup("nVerticalCells") >> nVerticalCells_;
+        dictPtr->lookup("nCellsAuxInlet") >> nCellsAuxInlet_;
+        dictPtr->lookup("TauxRelax") >> Tauxrelax_;
+        Info<< "Maux = " << Maux_ <<
+        " ,Taux = " << Taux_ <<
+        " ,caux = " << caux_ <<
+        " ,nCellsAuxInlet = " << nCellsAuxInlet_ <<
+        " ,Qepsilon = " << Qepsilon_ << nl;
+    }
+    else
+    {
+        FatalIOErrorIn
+        (
+            "Foam::porousZone::porousZone"
+            "(const fvMesh&, const word&, const dictionary&)",
+            dict_
+        )   << "\"heatTransfer\" dictionary not specified"
+            << exit(FatalIOError);
+    }
+
 }
 
 
@@ -360,6 +401,245 @@ void Foam::porousZone::addResistance
 }
 
 
+void Foam::porousZone::addHeatResistance
+(
+    fvScalarMatrix& hTEqn,
+    const volScalarField& T,
+    volScalarField& Taux,
+    volScalarField& Qaux,
+    const volVectorField& U,
+    const volScalarField& Macro,
+    const volScalarField& posFlux
+) const
+{
+    if (cellZoneID_ == -1 && mag(Maux_) < SMALL)
+    {
+        return;
+    }
+
+    scalarField& QSource = hTEqn.source();
+    const scalarField& Ti = T.internalField();
+    scalarField& Tauxi = Taux.internalField();
+    scalarField& Qauxi = Qaux.internalField();
+    const vectorField& Ui = U.internalField();
+    const scalarField& Macroi = Macro.internalField();
+    const scalarField& posFluxi = posFlux.internalField();
+
+
+
+    if (hTEqn.dimensions() == dimensionSet(1, -2, -3, 0, 0))
+    {
+        addHeatSource
+        (
+            Macroi,
+            posFluxi,
+            QSource,
+            Qauxi,
+            Ti,
+            Tauxi,
+            Ui,
+            mesh_.lookupObject<volScalarField>("rho")
+        );
+    }
+    else if (hTEqn.dimensions() == dimensionSet(0, 3, -1, 1, 0))
+    {
+        addHeatSource
+        (
+            Macroi,
+            posFluxi,
+            QSource,
+            Qauxi,
+            Ti,
+            Tauxi,
+            Ui,
+            geometricOneField()
+        );
+    }
+    else
+    {
+        Info<< "No hEqn or TEqn, exiting" << nl;
+        return;
+    }
+}
+
+void Foam::porousZone::macroCellOrder
+(
+    volScalarField& Taux,
+    volScalarField& Macro,
+    volScalarField& posFlux,
+    const surfaceScalarField& phi
+) const
+{
+    Info << "Creating cellsOrdered list " << nl << endl;
+
+    const labelList& cells = mesh_.cellZones()[cellZoneID_];
+    const vectorField& cellsCellCenter = mesh_.cellCentres();
+
+    scalarField& Tauxi = Taux.internalField();
+
+    label nCellsAuxInlet(nCellsAuxInlet_);
+    label firstCell(firstCell_);
+    label nVerticalCells(nVerticalCells_);
+    vector auxUnitVector(auxUnitVector_);
+
+    labelList cellsAuxInlet(nCellsAuxInlet, -1);
+    cellsAuxInlet[0] = firstCell;
+
+    // - Creating horizontal list of cells, cellsAuxInlet[nCellsAuxInlet]
+    label newcounter = 1;
+    forAll (cellsAuxInlet, i)
+    {
+        const labelList& cellNb = mesh_.cellCells(cellsAuxInlet[i]);
+
+        forAll (cellNb, ii)
+        {
+            bool isInsideNb = false;
+            forAll (cellsAuxInlet, iii)
+            {
+                if (cellNb[ii] == cellsAuxInlet[iii]) isInsideNb = true;
+            }
+            if (!isInsideNb)
+            {
+                if (mesh_.cellZones()[cellZoneID_].whichCell(cellNb[ii]) != -1)
+                {
+                    if
+                    (
+                        mag
+                        (
+                            (
+                                (
+                                    cellsCellCenter[cellsAuxInlet[i]]
+                                  - cellsCellCenter[cellNb[ii]]
+                                )/
+                                mag
+                                (
+                                    cellsCellCenter[cellsAuxInlet[i]]
+                                  - cellsCellCenter[cellNb[ii]]
+                                )
+                            )
+                          & auxUnitVector
+                        ) < 0.5
+                    )
+                    {
+                        cellsAuxInlet[newcounter] = cellNb[ii];
+                        ++newcounter;
+                    }
+                }
+            }
+        }
+    }
+
+    scalarField& Macroi = Macro.internalField();
+
+    labelList cellsOrdered(cells.size(), -1);
+
+    // Writing horizontal cells into list cellsOrdered[cells.size()]
+    forAll (cellsAuxInlet, i)
+    {
+        cellsOrdered[i*nVerticalCells] = cellsAuxInlet[i];
+    }
+
+    // Creating cellsOrdered list of ordered horizontal cells
+    label counter = 1;
+    forAll (cellsOrdered, i)
+    {
+        Macroi[cellsOrdered[i]] = i;
+        Tauxi[cellsOrdered[i]] = Taux_;
+        
+        if ((i > 1) && (i % nVerticalCells == 0))
+        {
+            ++counter;
+        }
+
+        const labelList& cellNb = mesh_.cellCells(cellsOrdered[i]);
+
+        forAll (cellNb, iii)
+        {
+            bool isInsideNb = false;
+            forAll (cellsOrdered, iiii)
+            {
+                if (cellNb[iii] == cellsOrdered[iiii])
+                {
+                    isInsideNb = true;
+                }
+            }
+
+            if (!isInsideNb)
+            {
+                if (mesh_.cellZones()[cellZoneID_].whichCell(cellNb[iii]) != -1)
+                {
+                    if
+                    (
+                        mag
+                        (
+                            (
+                                (
+                                    cellsCellCenter[cellsOrdered[i]]
+                                  - cellsCellCenter[cellNb[iii]]
+                                )/
+                                mag
+                                (
+                                    cellsCellCenter[cellsOrdered[i]]
+                                  - cellsCellCenter[cellNb[iii]]
+                                )
+                            )
+                          & auxUnitVector
+                        ) > 0.85
+                    )
+                    {
+                        cellsOrdered[counter] = cellNb[iii];
+                        ++counter;
+                    }
+                }
+            }
+        }
+    }
+
+    scalarField& posFluxi = posFlux.internalField();
+    // - Calculating mass flow through each cell
+    forAll (cellsOrdered, i)
+    {
+        const labelList& cellFaces = mesh_.cells()[cellsOrdered[i]];
+        forAll (cellFaces,ii)
+        {
+            label faceI = cellFaces[ii];
+            if (mesh_.isInternalFace(faceI))
+            {
+                if (mesh_.faceOwner()[faceI] == cellsOrdered[i])
+                {
+                    if (phi.internalField()[faceI] > 0.0)
+                    {
+                        posFluxi[cellsOrdered[i]] += phi.internalField()[faceI];
+                    }
+                }
+                else
+                {
+                    if (phi.internalField()[faceI] < 0.0)
+                    {
+                        posFluxi[cellsOrdered[i]] += -phi.internalField()[faceI];
+                    }
+                }
+            }
+            else
+            {
+                const label patchI = mesh_.boundaryMesh().whichPatch(faceI);
+                const label faceIL = mesh_.boundaryMesh()[patchI].whichFace(faceI);
+
+                if (patchI < 0)
+                {
+                    Info << "patchI < 0 " << endl;
+                    return;
+                }
+
+                if (phi.boundaryField()[patchI][faceIL] > 0.0)
+                {
+                    posFluxi[cellsOrdered[i]] += phi.boundaryField()[patchI][faceIL];
+                }
+            }
+        }
+    }
+}
+
 void Foam::porousZone::writeDict(Ostream& os, bool subDict) const
 {
     if (subDict)
@@ -399,6 +679,13 @@ void Foam::porousZone::writeDict(Ostream& os, bool subDict) const
     if (const dictionary* dictPtr = dict_.subDictPtr("Darcy"))
     {
         os << indent << "Darcy";
+        dictPtr->write(os);
+    }
+
+    // Heat transfer inputs
+    if (const dictionary* dictPtr = dict_.subDictPtr("heatTransfer"))
+    {
+        os << indent << "heatTransfer";
         dictPtr->write(os);
     }
 
