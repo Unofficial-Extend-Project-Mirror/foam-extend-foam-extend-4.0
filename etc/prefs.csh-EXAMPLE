@@ -210,10 +210,10 @@ setenv WM_THIRD_PARTY_USE_CMAKE_3114 1
 # For AllMake.stage2
 #setenv WM_THIRD_PARTY_USE_OPENMPI_400 1
 #setenv WM_THIRD_PARTY_USE_OPENMPI_400_ConfigureAdditionalArgs '--enable-mpi-cxx --with-verbs'
-setenv WM_THIRD_PARTY_USE_OPENMPI_311 1
+#setenv WM_THIRD_PARTY_USE_OPENMPI_311 1
 #setenv WM_THIRD_PARTY_USE_OPENMPI_311_ConfigureAdditionalArgs '--enable-mpi-cxx --with-verbs'
-#setenv WM_THIRD_PARTY_USE_OPENMPI_188 1
-#setenv WM_THIRD_PARTY_USE_OPENMPI_188_ConfigureAdditionalArgs '--enable-mpi-cxx --with-verbs'
+setenv WM_THIRD_PARTY_USE_OPENMPI_188 1
+setenv WM_THIRD_PARTY_USE_OPENMPI_188_ConfigureAdditionalArgs '--enable-mpi-cxx --with-verbs'
 #setenv WM_THIRD_PARTY_USE_OPENMPI_165 1
 #setenv WM_THIRD_PARTY_USE_OPENMPI_165_ConfigureAdditionalArgs '--enable-mpi-cxx --with-openib'
 #setenv WM_THIRD_PARTY_USE_OPENMPI_15 1
