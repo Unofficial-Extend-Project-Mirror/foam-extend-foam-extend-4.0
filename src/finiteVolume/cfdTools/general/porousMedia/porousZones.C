@@ -88,6 +88,38 @@ void Foam::porousZones::addResistance
 }
 
 
+void Foam::porousZones::addHeatResistance
+(
+    fvScalarMatrix& hTEqn,
+    const volScalarField& T,
+    volScalarField& Taux,
+    volScalarField& Qaux,
+    const volVectorField& U,
+    const volScalarField& Macro,
+    const volScalarField& posFlux
+) const
+{
+    forAll(*this, i)
+    {
+        operator[](i).addHeatResistance(hTEqn, T, Taux, Qaux, U, Macro, posFlux);
+    }
+}
+
+//- Order cells for Dual Stream model
+void Foam::porousZones::macroCellOrder
+(
+    volScalarField& Taux,
+    volScalarField& Macro,
+    volScalarField& posFlux,
+    const surfaceScalarField& phi
+) const
+{
+    forAll(*this, i)
+    {
+        operator[](i).macroCellOrder(Taux, Macro, posFlux, phi);
+    }
+}
+
 bool Foam::porousZones::readData(Istream& is)
 {
     clear();

@@ -39,6 +39,15 @@ Description
         S = - \rho C_0 |U|^{(C_1 - 1)/2} U
     @f]
 
+    In the porous zone a heat source using the single stream heat exchanger
+    approach:
+
+    heatTransfer
+    @f[
+        Qtot = const            //[J/s]
+        Tref = const            //[K]
+    @f]
+
     Darcy-Forchheimer (@e d and @e f parameters)
     @f[
         S = - (\mu \, d + \frac{\rho |U|}{2} \, f) U
@@ -129,6 +138,36 @@ class porousZone
         //- Forchheimer coefficient
         dimensionedTensor F_;
 
+        //- Mass flow of aux fluid
+        scalar Maux_;
+
+        //- Inlet temperature of aux fluid
+        scalar Taux_;
+
+        //- Specific heat capacity of coolant
+        scalar caux_;
+
+        //- Epsilon for Single Effectiveness HX
+        scalar Qepsilon_;
+
+        //- Relaxation factor for Taux
+        scalar Tauxrelax_;
+
+
+        // Geometrical description of the porous heat exchanger
+
+        //- Number of inlet cells for aux fluid
+        label nCellsAuxInlet_;
+
+        //- First inlet cell for aux fluid
+        label firstCell_;
+
+        //- Inlet direction for auxiliary fluid
+        vector auxUnitVector_;
+
+        //- Number of vertical cells for auxiliary fluid
+        label nVerticalCells_;
+
 
     // Private Member Functions
 
@@ -159,7 +198,6 @@ class porousZone
             const vectorField& U
         ) const;
 
-
         //- Power-law resistance
         template<class RhoFieldType>
         void addPowerLawResistance
@@ -179,6 +217,20 @@ class porousZone
             const RhoFieldType& rho,
             const scalarField& mu,
             const vectorField& U
+        ) const;
+
+        //- Heat source
+        template<class RhoFieldType>
+        void addHeatSource
+        (
+            const scalarField& Macro,
+            const scalarField& posFlux,
+            scalarField& QSource,
+            scalarField& Qaux,
+            const scalarField& T,
+            scalarField& Taux,
+            const vectorField& U,
+            const RhoFieldType& rho
         ) const;
 
 
@@ -312,6 +364,27 @@ public:
             const fvVectorMatrix& UEqn,
             volTensorField& AU,
             bool correctAUprocBC = true
+        ) const;
+
+        //- Add the heat source in enthalpy equation
+        void addHeatResistance
+        (
+            fvScalarMatrix& hTEqn,
+            const volScalarField& T,
+            volScalarField& Taux,
+            volScalarField& Qaux,
+            const volVectorField& U,
+            const volScalarField& Macro,
+            const volScalarField& posFlux
+        ) const;
+
+        //- Order cells for Dual Stream model
+        void macroCellOrder
+        (
+            volScalarField& Taux,
+            volScalarField& Macro,
+            volScalarField& posFlux,
+            const surfaceScalarField& phi
         ) const;
 
         //- Write the porousZone dictionary
