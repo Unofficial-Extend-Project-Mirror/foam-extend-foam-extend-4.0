@@ -101,11 +101,20 @@ void Foam::porousZones::addHeatResistance
 {
     forAll(*this, i)
     {
-        operator[](i).addHeatResistance(hTEqn, T, Taux, Qaux, U, Macro, posFlux);
+        operator[](i).addHeatResistance
+        (
+            hTEqn,
+            T,
+            Taux,
+            Qaux,
+            U,
+            Macro,
+            posFlux
+        );
     }
 }
 
-//- Order cells for Dual Stream model
+// Order cells for Dual Stream model
 void Foam::porousZones::macroCellOrder
 (
     volScalarField& Taux,

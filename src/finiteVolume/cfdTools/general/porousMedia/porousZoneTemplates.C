@@ -149,7 +149,6 @@ void Foam::porousZone::addHeatSource
     const scalarField Tauxi_old = Tauxi; // create storePrevIter()
     const scalarField dT = Tauxi - T;
 
-
     const label nMacro(nCellsAuxInlet_*nVerticalCells_);
     scalarList Tmacro(nMacro, 0.0);
     scalarList dTaux(nMacro, 0.0);
@@ -170,19 +169,35 @@ void Foam::porousZone::addHeatSource
     {
         scalar Qcell = Qeps*rho_pri*c_pri*posFlux[cells[i]]*dT[cells[i]];
 
-        Qauxi[cells[i]] = Qcell;                            // heat in each macro(cell)
+        // heat in each macro(cell)
+        Qauxi[cells[i]] = Qcell;
+
+        // make an int out of a macro
         const int macro = Macro[cells[i]];
-        dTaux[macro] = Qcell/(c_aux*qm_auxi);             // deltaTaux in each macro(cell)
-        QSource[cells[i]] += Qcell/(rho_pri*c_pri);       // adding Heat to equation
-        QSum += Qcell;                                    // summing for total heat of HX
+
+        // deltaTaux in each macro(cell)
+        dTaux[macro] = Qcell/(c_aux*qm_auxi);
+
+        // adding Heat to equation
+        QSource[cells[i]] += Qcell/(rho_pri*c_pri);
+
+        // summing for total heat of HX
+        QSum += Qcell;
     }
 
     reduce(dTaux, sumOp<scalarList>());
     Tmacro[0] = T_aux;
     forAll (Tmacro, i)
     {
-        if (i > 0) Tmacro[i] = Tmacro[i-1] - dTaux[i-1];
-        if ((i > 0) && (i % nVerticalCells_ == 0)) Tmacro[i] = T_aux;
+        if (i > 0)
+        {
+            Tmacro[i] = Tmacro[i-1] - dTaux[i-1];
+        }
+
+        if ((i > 0) && (i % nVerticalCells_ == 0))
+        {
+            Tmacro[i] = T_aux;
+        }
     }
 
     reduce(QSum, sumOp<scalar>());

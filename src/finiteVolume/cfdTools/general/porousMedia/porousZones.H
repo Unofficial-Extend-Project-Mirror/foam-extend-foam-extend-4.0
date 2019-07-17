@@ -177,10 +177,10 @@ public:
             const surfaceScalarField& phi
         ) const;
 
-        //- read modified data
+        //- Read modified data
         virtual bool readData(Istream&);
 
-        //- write data
+        //- Write data
         bool writeData(Ostream&, bool subDict = true) const;
 };
 

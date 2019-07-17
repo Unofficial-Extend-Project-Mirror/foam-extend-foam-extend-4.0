@@ -216,10 +216,10 @@ Foam::porousZone::porousZone
         dictPtr->lookup("nCellsAuxInlet") >> nCellsAuxInlet_;
         dictPtr->lookup("TauxRelax") >> Tauxrelax_;
         Info<< "Maux = " << Maux_ <<
-        " ,Taux = " << Taux_ <<
-        " ,caux = " << caux_ <<
-        " ,nCellsAuxInlet = " << nCellsAuxInlet_ <<
-        " ,Qepsilon = " << Qepsilon_ << nl;
+        ", Taux = " << Taux_ <<
+        ", caux = " << caux_ <<
+        ", nCellsAuxInlet = " << nCellsAuxInlet_ <<
+        ", Qepsilon = " << Qepsilon_ << nl;
     }
     else
     {
@@ -470,7 +470,8 @@ void Foam::porousZone::macroCellOrder
     const surfaceScalarField& phi
 ) const
 {
-    Info << "Creating cellsOrdered list " << nl << endl;
+    Info<< "Creating cellsOrdered list for porous heat transfer zone "
+        << name_ << nl << endl;
 
     const labelList& cells = mesh_.cellZones()[cellZoneID_];
     const vectorField& cellsCellCenter = mesh_.cellCentres();
@@ -545,7 +546,7 @@ void Foam::porousZone::macroCellOrder
     {
         Macroi[cellsOrdered[i]] = i;
         Tauxi[cellsOrdered[i]] = Taux_;
-        
+
         if ((i > 1) && (i % nVerticalCells == 0))
         {
             ++counter;
@@ -596,7 +597,8 @@ void Foam::porousZone::macroCellOrder
     }
 
     scalarField& posFluxi = posFlux.internalField();
-    // - Calculating mass flow through each cell
+
+    // Calculating mass flow through each cell
     forAll (cellsOrdered, i)
     {
         const labelList& cellFaces = mesh_.cells()[cellsOrdered[i]];
@@ -616,14 +618,16 @@ void Foam::porousZone::macroCellOrder
                 {
                     if (phi.internalField()[faceI] < 0.0)
                     {
-                        posFluxi[cellsOrdered[i]] += -phi.internalField()[faceI];
+                        posFluxi[cellsOrdered[i]] +=
+                            -phi.internalField()[faceI];
                     }
                 }
             }
             else
             {
                 const label patchI = mesh_.boundaryMesh().whichPatch(faceI);
-                const label faceIL = mesh_.boundaryMesh()[patchI].whichFace(faceI);
+                const label faceIL =
+                    mesh_.boundaryMesh()[patchI].whichFace(faceI);
 
                 if (patchI < 0)
                 {
@@ -633,7 +637,8 @@ void Foam::porousZone::macroCellOrder
 
                 if (phi.boundaryField()[patchI][faceIL] > 0.0)
                 {
-                    posFluxi[cellsOrdered[i]] += phi.boundaryField()[patchI][faceIL];
+                    posFluxi[cellsOrdered[i]] +=
+                        phi.boundaryField()[patchI][faceIL];
                 }
             }
         }
