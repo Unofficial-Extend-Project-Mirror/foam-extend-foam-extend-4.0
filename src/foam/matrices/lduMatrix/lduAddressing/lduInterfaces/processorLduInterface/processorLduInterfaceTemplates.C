@@ -107,7 +107,7 @@ void Foam::processorLduInterface::receive
     }
     else if (commsType == Pstream::nonBlocking)
     {
-        memcpy(f.begin(), receiveBuf_.begin(), f.byteSize());
+        memcpy(static_cast<void*>(f.begin()), receiveBuf_.begin(), f.byteSize());
     }
     else
     {

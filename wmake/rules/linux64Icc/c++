@@ -2,6 +2,9 @@
 
 c++WARN     = -wd327,584,654,819,1125,1476,1505,1572
 
+# Suppress some warnings for flex++ and CGAL
+c++LESSWARN = -diag-disable 1224,2026,2305
+
 CC          = icpc -DIntel
 
 include $(RULES)/c++$(WM_COMPILE_OPTION)
