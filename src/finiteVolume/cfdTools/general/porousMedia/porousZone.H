@@ -39,13 +39,15 @@ Description
         S = - \rho C_0 |U|^{(C_1 - 1)/2} U
     @f]
 
-    In the porous zone a heat source using the single stream heat exchanger
+    In the porous zone a heat source using the dual stream heat exchanger
     approach:
 
     heatTransfer
     @f[
-        Qtot = const            //[J/s]
-        Tref = const            //[K]
+        Maux = Mass flow of aux fluid                         // [kg/s]
+        Qaux = Heat to be eliminated                          // [W]
+        Caux = Specific heat capacity of aux fluid            // [J / kg K]
+        Taux = initial guess for aux fluid inlet temperature  // [K]
     @f]
 
     Darcy-Forchheimer (@e d and @e f parameters)
@@ -138,35 +140,44 @@ class porousZone
         //- Forchheimer coefficient
         dimensionedTensor F_;
 
+        //- Density of primary fluid
+        scalar rhoPri_;
+
+        //- Specific heat capacity of primary fluid
+        scalar Cpri_;
+    
         //- Mass flow of aux fluid
         scalar Maux_;
 
-        //- Inlet temperature of aux fluid
-        scalar Taux_;
+        //- Heat to be eliminated
+        scalar Qaux_;
 
         //- Specific heat capacity of coolant
-        scalar caux_;
+        scalar Caux_;
+
+        //- Inlet temperature of aux fluid
+        mutable scalar Taux_;
 
         //- Epsilon for Single Effectiveness HX
         scalar Qepsilon_;
 
         //- Relaxation factor for Taux
-        scalar Tauxrelax_;
+        scalar TauxRelax_;
 
 
         // Geometrical description of the porous heat exchanger
 
-        //- Number of inlet cells for aux fluid
-        label nCellsAuxInlet_;
+            //- Number of inlet cells for aux fluid
+            label nCellsAuxInlet_;
 
-        //- First inlet cell for aux fluid
-        label firstCell_;
+            //- First inlet cell for aux fluid
+            label firstCell_;
 
-        //- Inlet direction for auxiliary fluid
-        vector auxUnitVector_;
+            //- Inlet direction for auxiliary fluid
+            vector auxUnitVector_;
 
-        //- Number of vertical cells for auxiliary fluid
-        label nVerticalCells_;
+            //- Number of vertical cells for auxiliary fluid
+            label nVerticalCells_;
 
 
     // Private Member Functions

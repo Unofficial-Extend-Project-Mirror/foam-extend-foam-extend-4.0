@@ -33,12 +33,12 @@ void Foam::porousZone::modifyDdt(fvMatrix<Type>& m) const
 {
     if (porosity_ < 1)
     {
-        const labelList& cells = mesh_.cellZones()[cellZoneID_];
+        const labelList& zoneCells = mesh_.cellZones()[cellZoneID_];
 
-        forAll(cells, i)
+        forAll (zoneCells, i)
         {
-            m.diag()[cells[i]]   *= porosity_;
-            m.source()[cells[i]] *= porosity_;
+            m.diag()[zoneCells[i]] *= porosity_;
+            m.source()[zoneCells[i]] *= porosity_;
         }
     }
 }
@@ -150,68 +150,86 @@ void Foam::porousZone::addHeatSource
     const scalarField dT = Tauxi - T;
 
     const label nMacro(nCellsAuxInlet_*nVerticalCells_);
-    scalarList Tmacro(nMacro, 0.0);
-    scalarList dTaux(nMacro, 0.0);
-    scalar QSum(0.0);
+    scalarField Tmacro(nMacro, scalar(0));
+    scalarField dTaux(nMacro, scalar(0));
+    scalar QSum = 0;
 
-    const scalar Taux_relax(Tauxrelax_);
-    const scalar c_aux(caux_);
-    const scalar c_pri(1009.0);
-    const scalar qm_aux(Maux_);
-    const scalar qm_auxi = qm_aux/nCellsAuxInlet_;
-    const scalar T_aux(Taux_);
-    const scalar rho_pri(1.1021);
-    const scalar Qeps(Qepsilon_);
+    // Mass flow rate for individual channels
+    const scalar qmAuxi = Maux_/nCellsAuxInlet_;
 
-    const labelList& cells = mesh_.cellZones()[cellZoneID_];
+    // Get zone cells
+    const labelList& zoneCells = mesh_.cellZones()[cellZoneID_];
 
-    forAll(cells, i)
+    forAll (zoneCells, i)
     {
-        scalar Qcell = Qeps*rho_pri*c_pri*posFlux[cells[i]]*dT[cells[i]];
+        scalar Qcell =
+            Qepsilon_*rhoPri_*Cpri_*posFlux[zoneCells[i]]*dT[zoneCells[i]];
 
-        // heat in each macro(cell)
-        Qauxi[cells[i]] = Qcell;
+        // Heat in each macro (cell)
+        Qauxi[zoneCells[i]] = Qcell;
 
         // make an int out of a macro
-        const int macro = Macro[cells[i]];
+        const int macro = Macro[zoneCells[i]];
 
         // deltaTaux in each macro(cell)
-        dTaux[macro] = Qcell/(c_aux*qm_auxi);
+        dTaux[macro] = Qcell/(Caux_*qmAuxi);
 
         // adding Heat to equation
-        QSource[cells[i]] += Qcell/(rho_pri*c_pri);
+        QSource[zoneCells[i]] += Qcell/(rhoPri_*Cpri_);
 
         // summing for total heat of HX
         QSum += Qcell;
     }
 
-    reduce(dTaux, sumOp<scalarList>());
-    Tmacro[0] = T_aux;
+    reduce(dTaux, sumOp<scalarField>());
+
+    Tmacro[0] = Taux_;
+
     forAll (Tmacro, i)
     {
         if (i > 0)
         {
-            Tmacro[i] = Tmacro[i-1] - dTaux[i-1];
-        }
-
-        if ((i > 0) && (i % nVerticalCells_ == 0))
-        {
-            Tmacro[i] = T_aux;
+            if (i % nVerticalCells_ == 0)
+            {
+                Tmacro[i] = Taux_;
+            }
+            else
+            {
+                Tmacro[i] = Tmacro[i - 1] - dTaux[i - 1];
+            }
         }
     }
 
     reduce(QSum, sumOp<scalar>());
-    Info << "Heat exchanger: " << name_ << endl;
-    Info << "Q = " << QSum << endl;
-    Info << "deltaT = " << QSum/(qm_aux*c_aux) << endl;
 
-    forAll(cells, i)
+    // Adjust Taux_ to match the specified transferred heat
+
+    scalar deltaTAux = (Qaux_ - QSum)/(Maux_*Caux_);
+
+    Info<< "Heat exchanger: " << name_
+        << ": Q = " << QSum
+        << " Taux = " << Taux_
+        << " delta Taux = " << deltaTAux
+        << endl;
+
+    // Relax the heat source
+    forAll (zoneCells, i)
     {
-        const int macro = Macro[cells[i]];
-        Tauxi[cells[i]] = Tauxi_old[cells[i]]
-            // upwind scheme for Aux fluid (Tmacro = inlet temp)
-          + Taux_relax*(Tmacro[macro] - Tauxi_old[cells[i]]);
+        const int macro = Macro[zoneCells[i]];
+
+        Tauxi[zoneCells[i]] = Tauxi_old[zoneCells[i]]
+          + TauxRelax_*(Tmacro[macro] - Tauxi_old[zoneCells[i]]);
     }
+
+    // Note: need better relaxation to speed up convergence close
+    // to the matching value, when deltaTAux -> 0
+    // HJ, 17/Jul/2019
+    
+    // Limit deltaTAux to 10% of Taux_
+    deltaTAux = sign(deltaTAux)*Foam::min(0.1*Taux_, mag(deltaTAux));
+    
+    // Update Taux for next iteration
+    Taux_ += TauxRelax_*deltaTAux;
 }
 
 

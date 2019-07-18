@@ -77,16 +77,18 @@ Foam::porousZone::porousZone
     C1_(0),
     D_("D", dimensionSet(0, -2, 0, 0, 0), tensor::zero),
     F_("F", dimensionSet(0, -1, 0, 0, 0), tensor::zero),
+    rhoPri_(0),
+    Cpri_(0),
     Maux_(0),
+    Qaux_(0),
+    Caux_(0),
     Taux_(0),
-    caux_(0),
     Qepsilon_(0),
-    Tauxrelax_(0),
+    TauxRelax_(1),
     nCellsAuxInlet_(0),
     firstCell_(0),
     auxUnitVector_(vector::zero),
     nVerticalCells_(0)
-
 {
     Info<< "Creating porous zone: " << name_ << endl;
 
@@ -184,7 +186,7 @@ Foam::porousZone::porousZone
     // provide some feedback for the user
     // writeDict(Info, false);
 
-    // it is an error not to define anything
+    // It is an error not to define anything
     if
     (
         C0_ <= VSMALL
@@ -206,32 +208,41 @@ Foam::porousZone::porousZone
     if (const dictionary* dictPtr = dict_.subDictPtr("heatTransfer"))
     {
         Info<< "Reading porous heatTransfer: Maux and Taux" << nl;
+        dictPtr->lookup("rhoPri") >> rhoPri_;
+        dictPtr->lookup("Cpri") >> Cpri_;
+
         dictPtr->lookup("Maux") >> Maux_;
+        dictPtr->lookup("Qaux") >> Qaux_;
+        dictPtr->lookup("Caux") >> Caux_;
         dictPtr->lookup("Taux") >> Taux_;
-        dictPtr->lookup("caux") >> caux_;
         dictPtr->lookup("Qepsilon") >> Qepsilon_;
+
         dictPtr->lookup("firstCell") >> firstCell_;
         dictPtr->lookup("auxUnitVector") >> auxUnitVector_;
         dictPtr->lookup("nVerticalCells") >> nVerticalCells_;
         dictPtr->lookup("nCellsAuxInlet") >> nCellsAuxInlet_;
-        dictPtr->lookup("TauxRelax") >> Tauxrelax_;
-        Info<< "Maux = " << Maux_ <<
-        ", Taux = " << Taux_ <<
-        ", caux = " << caux_ <<
-        ", nCellsAuxInlet = " << nCellsAuxInlet_ <<
-        ", Qepsilon = " << Qepsilon_ << nl;
-    }
-    else
-    {
-        FatalIOErrorIn
-        (
-            "Foam::porousZone::porousZone"
-            "(const fvMesh&, const word&, const dictionary&)",
-            dict_
-        )   << "\"heatTransfer\" dictionary not specified"
-            << exit(FatalIOError);
-    }
 
+        dictPtr->lookup("TauxRelax") >> TauxRelax_;
+
+        Info<< "Maux = " << Maux_
+            << ", Taux = " << Taux_
+            << ", Caux = " << Caux_
+            << ", nCellsAuxInlet = " << nCellsAuxInlet_
+            << ", Qepsilon = " << Qepsilon_
+            << endl;
+
+        if (mag(auxUnitVector_) < SMALL)
+        {
+            FatalIOErrorInFunction(dict)
+                << "auxUnitVector for heat transfer zone "
+                << name_ << " has zero length"
+                << exit(FatalIOError);
+        }
+        else
+        {
+            auxUnitVector_ /= mag(auxUnitVector_);
+        }
+    }
 }
 
 
@@ -330,6 +341,7 @@ void Foam::porousZone::addResistance
     }
 
     bool compressible = false;
+
     if (UEqn.dimensions() == dimensionSet(1, 1, -2, 0, 0))
     {
         compressible = true;
@@ -473,35 +485,60 @@ void Foam::porousZone::macroCellOrder
     Info<< "Creating cellsOrdered list for porous heat transfer zone "
         << name_ << nl << endl;
 
-    const labelList& cells = mesh_.cellZones()[cellZoneID_];
-    const vectorField& cellsCellCenter = mesh_.cellCentres();
+    // Get current zone
+    const cellZone& curZone = mesh_.cellZones()[cellZoneID_];
+
+    // Get cell centres
+    const vectorField& cellCentres = mesh_.C().internalField();
+
+    // Get cell-cell addressing
+    const labelListList& cc = mesh_.cellCells();
 
     scalarField& Tauxi = Taux.internalField();
 
-    label nCellsAuxInlet(nCellsAuxInlet_);
-    label firstCell(firstCell_);
-    label nVerticalCells(nVerticalCells_);
-    vector auxUnitVector(auxUnitVector_);
+    // Get inlet cells
+    labelList cellsAuxInlet(nCellsAuxInlet_, -1);
 
-    labelList cellsAuxInlet(nCellsAuxInlet, -1);
-    cellsAuxInlet[0] = firstCell;
+    if (nCellsAuxInlet_ > 0)
+    {
+        cellsAuxInlet[0] = firstCell_;
+    }
+    else
+    {
+        WarningInFunction
+            << "Number of aux inlet cells is set to zero: " << nCellsAuxInlet_
+            << "Reconsider the definition of macro cell order"
+            << endl;
+    }
 
-    // - Creating horizontal list of cells, cellsAuxInlet[nCellsAuxInlet]
-    label newcounter = 1;
+    // Creating horizontal list of cells, cellsAuxInlet[nCellsAuxInlet_]
+    label newCounter = 1;
+
+    // Note
+    // Terrible search algorithms
+    // Will work only in serial.  Rewrite required
+    // HJ, 17/Jul/2019
+
     forAll (cellsAuxInlet, i)
     {
-        const labelList& cellNb = mesh_.cellCells(cellsAuxInlet[i]);
+        const labelList& cellNb = cc[cellsAuxInlet[i]];
 
         forAll (cellNb, ii)
         {
             bool isInsideNb = false;
+
             forAll (cellsAuxInlet, iii)
             {
-                if (cellNb[ii] == cellsAuxInlet[iii]) isInsideNb = true;
+                if (cellNb[ii] == cellsAuxInlet[iii])
+                {
+                    isInsideNb = true;
+                    break;
+                }
             }
+
             if (!isInsideNb)
             {
-                if (mesh_.cellZones()[cellZoneID_].whichCell(cellNb[ii]) != -1)
+                if (curZone.whichCell(cellNb[ii]) != -1)
                 {
                     if
                     (
@@ -509,21 +546,21 @@ void Foam::porousZone::macroCellOrder
                         (
                             (
                                 (
-                                    cellsCellCenter[cellsAuxInlet[i]]
-                                  - cellsCellCenter[cellNb[ii]]
+                                    cellCentres[cellsAuxInlet[i]]
+                                  - cellCentres[cellNb[ii]]
                                 )/
                                 mag
                                 (
-                                    cellsCellCenter[cellsAuxInlet[i]]
-                                  - cellsCellCenter[cellNb[ii]]
+                                    cellCentres[cellsAuxInlet[i]]
+                                  - cellCentres[cellNb[ii]]
                                 )
                             )
-                          & auxUnitVector
+                          & auxUnitVector_
                         ) < 0.5
                     )
                     {
-                        cellsAuxInlet[newcounter] = cellNb[ii];
-                        ++newcounter;
+                        cellsAuxInlet[newCounter] = cellNb[ii];
+                        ++newCounter;
                     }
                 }
             }
@@ -532,42 +569,45 @@ void Foam::porousZone::macroCellOrder
 
     scalarField& Macroi = Macro.internalField();
 
-    labelList cellsOrdered(cells.size(), -1);
+    labelList cellsOrdered(curZone.size(), -1);
 
     // Writing horizontal cells into list cellsOrdered[cells.size()]
     forAll (cellsAuxInlet, i)
     {
-        cellsOrdered[i*nVerticalCells] = cellsAuxInlet[i];
+        cellsOrdered[i*nVerticalCells_] = cellsAuxInlet[i];
     }
 
     // Creating cellsOrdered list of ordered horizontal cells
     label counter = 1;
+
     forAll (cellsOrdered, i)
     {
         Macroi[cellsOrdered[i]] = i;
         Tauxi[cellsOrdered[i]] = Taux_;
 
-        if ((i > 1) && (i % nVerticalCells == 0))
+        if ((i > 1) && (i % nVerticalCells_ == 0))
         {
             ++counter;
         }
 
-        const labelList& cellNb = mesh_.cellCells(cellsOrdered[i]);
+        const labelList& cellNb =cc[cellsOrdered[i]];
 
         forAll (cellNb, iii)
         {
             bool isInsideNb = false;
+
             forAll (cellsOrdered, iiii)
             {
                 if (cellNb[iii] == cellsOrdered[iiii])
                 {
                     isInsideNb = true;
+                    break;
                 }
             }
 
             if (!isInsideNb)
             {
-                if (mesh_.cellZones()[cellZoneID_].whichCell(cellNb[iii]) != -1)
+                if (curZone.whichCell(cellNb[iii]) != -1)
                 {
                     if
                     (
@@ -575,16 +615,16 @@ void Foam::porousZone::macroCellOrder
                         (
                             (
                                 (
-                                    cellsCellCenter[cellsOrdered[i]]
-                                  - cellsCellCenter[cellNb[iii]]
+                                    cellCentres[cellsOrdered[i]]
+                                  - cellCentres[cellNb[iii]]
                                 )/
                                 mag
                                 (
-                                    cellsCellCenter[cellsOrdered[i]]
-                                  - cellsCellCenter[cellNb[iii]]
+                                    cellCentres[cellsOrdered[i]]
+                                  - cellCentres[cellNb[iii]]
                                 )
                             )
-                          & auxUnitVector
+                          & auxUnitVector_
                         ) > 0.85
                     )
                     {
@@ -602,9 +642,11 @@ void Foam::porousZone::macroCellOrder
     forAll (cellsOrdered, i)
     {
         const labelList& cellFaces = mesh_.cells()[cellsOrdered[i]];
-        forAll (cellFaces,ii)
+
+        forAll (cellFaces, ii)
         {
             label faceI = cellFaces[ii];
+
             if (mesh_.isInternalFace(faceI))
             {
                 if (mesh_.faceOwner()[faceI] == cellsOrdered[i])
@@ -626,14 +668,9 @@ void Foam::porousZone::macroCellOrder
             else
             {
                 const label patchI = mesh_.boundaryMesh().whichPatch(faceI);
+
                 const label faceIL =
                     mesh_.boundaryMesh()[patchI].whichFace(faceI);
-
-                if (patchI < 0)
-                {
-                    Info << "patchI < 0 " << endl;
-                    return;
-                }
 
                 if (phi.boundaryField()[patchI][faceIL] > 0.0)
                 {
@@ -644,6 +681,7 @@ void Foam::porousZone::macroCellOrder
         }
     }
 }
+
 
 void Foam::porousZone::writeDict(Ostream& os, bool subDict) const
 {

@@ -47,8 +47,10 @@ Description
         }
         heatTransfer
         {
-            Qtot      50;        //[J/s]
-            Tref      273.15;    //[K]
+            Maux = Mass flow of aux fluid                         // [kg/s]
+            Qaux = Heat to be eliminated                          // [W]
+            Caux = Specific heat capacity of aux fluid            // [J / kg K]
+            Taux = initial guess for aux fluid inlet temperature  // [K]
         }
     }
     )
@@ -168,7 +170,7 @@ public:
             const volScalarField& posFlux
         ) const;
 
-        //- Order cells for Dual Stream model
+        //- Order cells for the Dual Stream model
         void macroCellOrder
         (
             volScalarField& Taux,
