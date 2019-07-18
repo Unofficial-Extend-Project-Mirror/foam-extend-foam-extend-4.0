@@ -221,17 +221,6 @@ Foam::porousZone::porousZone
         " ,nCellsAuxInlet = " << nCellsAuxInlet_ <<
         " ,Qepsilon = " << Qepsilon_ << nl;
     }
-    else
-    {
-        FatalIOErrorIn
-        (
-            "Foam::porousZone::porousZone"
-            "(const fvMesh&, const word&, const dictionary&)",
-            dict_
-        )   << "\"heatTransfer\" dictionary not specified"
-            << exit(FatalIOError);
-    }
-
 }
 
 
