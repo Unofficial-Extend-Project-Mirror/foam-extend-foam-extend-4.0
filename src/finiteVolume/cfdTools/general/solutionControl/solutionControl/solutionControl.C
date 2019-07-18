@@ -1019,18 +1019,11 @@ void Foam::solutionControl::reconstructTransientVelocity
     const volScalarField& p
 ) const
 {
-    // If the mesh is moving, flux needs to be relative before boundary
-    // conditions for velocity are corrected. VV and IG, 4/Jan/2016.
-    fvc::makeRelative(phi, U);
-
     // Reconstruct the velocity using all the components from original equation
     U = 1.0/(1.0/rAU + ddtUEqn.A())*
         (
             U/rAU + ddtUEqn.H() - fvc::grad(p)
         );
-    
-    // Correct boundary conditions with relative flux
-    U.correctBoundaryConditions();
 
     // Get name and the corresponding index
     const word& UName = U.name();
@@ -1074,6 +1067,13 @@ void Foam::solutionControl::reconstructTransientVelocity
     // Now that the normal component is zero, add the normal component from
     // conservative flux
     faceU += phi*rSf;
+
+    // If the mesh is moving, flux needs to be relative before boundary
+    // conditions for velocity are corrected. VV and IG, 4/Jan/2016.
+    fvc::makeRelative(phi, U);
+
+    // Correct boundary conditions with relative flux
+    U.correctBoundaryConditions();
 }
 
 
