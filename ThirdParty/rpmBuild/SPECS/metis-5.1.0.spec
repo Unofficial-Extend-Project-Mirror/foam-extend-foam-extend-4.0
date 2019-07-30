@@ -109,10 +109,10 @@ fi
 %ifos darwin
     make config
     # The parameter -D_POSIX_C_SOURCE=200809 has a side effect on Mac OS X
-    make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC" CC=$CC
+    make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC" CC="$CC"
 %else
     make config
-    make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC -D_POSIX_C_SOURCE=200809" CC=$CC
+    make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC -D_POSIX_C_SOURCE=200809" CC="$CC"
 %endif
 
 %install

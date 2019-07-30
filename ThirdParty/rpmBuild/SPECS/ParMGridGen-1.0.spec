@@ -106,7 +106,7 @@ fi
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
 
-    make -j $WM_NCOMPPROCS CC=$CC
+    make -j $WM_NCOMPPROCS CC="$WM_CC"
 
 %install
     # Manual installation

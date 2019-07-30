@@ -170,7 +170,7 @@ receivePointField
             outstandingSendRequest_ = -1;
             outstandingRecvRequest_ = -1;
 
-            memcpy(tf().begin(), receiveBuf_.begin(), tf().byteSize());
+            memcpy(static_cast<void*>(tf().begin()), receiveBuf_.begin(), tf().byteSize());
         }
         else
         {
