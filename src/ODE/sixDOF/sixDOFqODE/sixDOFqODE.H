@@ -233,7 +233,11 @@ class sixDOFqODE
             void constrainTranslation(vector& vec) const;
 
             //- Update Aitkens relaxation parameters
-            void aitkensRelaxation(const scalar min, const scalar max);
+            void aitkensRelaxation
+            (
+                const scalar minRelFactor,
+                const scalar maxRelFactor
+            );
 
 
 public:

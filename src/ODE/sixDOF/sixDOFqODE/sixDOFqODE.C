@@ -209,15 +209,15 @@ void Foam::sixDOFqODE::constrainTranslation(vector& vec) const
 
 void Foam::sixDOFqODE::aitkensRelaxation
 (
-    const scalar min,
-    const scalar max
+    const scalar minRelFactor,
+    const scalar maxRelFactor
 )
 {
     // Calculate translational relax factor
     const scalar saveOldRelFacT = oldRelaxFactorT_;
     oldRelaxFactorT_ = relaxFactorT_;
 
-    if(magSqr(A_[0] - An_[1] - A_[1] - An_[2]) > SMALL)
+    if (magSqr(A_[0] - An_[1] - A_[1] - An_[2]) > SMALL)
     {
         relaxFactorT_ = saveOldRelFacT + (saveOldRelFacT - 1)*
         (
@@ -228,17 +228,17 @@ void Foam::sixDOFqODE::aitkensRelaxation
     }
     else
     {
-        relaxFactorT_ = min;
+        relaxFactorT_ = minRelFactor;
     }
 
     // Bound the relaxation factor for stability
-    if (relaxFactorT_ > max)
+    if (relaxFactorT_ > maxRelFactor)
     {
-        relaxFactorT_ = max;
+        relaxFactorT_ = maxRelFactor;
     }
-    else if (relaxFactorT_ < min)
+    else if (relaxFactorT_ < minRelFactor)
     {
-        relaxFactorT_ = min;
+        relaxFactorT_ = minRelFactor;
     }
 
     // Calculate rotational relax factor
@@ -259,17 +259,17 @@ void Foam::sixDOFqODE::aitkensRelaxation
     }
     else
     {
-        relaxFactorR_ = min;
+        relaxFactorR_ = minRelFactor;
     }
 
     // Bound the relaxation factor for stability
-    if(relaxFactorR_ > max)
+    if(relaxFactorR_ > maxRelFactor)
     {
-        relaxFactorR_ = max;
+        relaxFactorR_ = maxRelFactor;
     }
-    else if(relaxFactorR_ < min)
+    else if(relaxFactorR_ < minRelFactor)
     {
-        relaxFactorR_ = min;
+        relaxFactorR_ = minRelFactor;
     }
 }
 
