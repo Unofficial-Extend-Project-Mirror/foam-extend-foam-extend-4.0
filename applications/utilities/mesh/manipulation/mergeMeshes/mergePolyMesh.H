@@ -114,10 +114,9 @@ public:
         mergePolyMesh(const IOobject& io);
 
 
-    // Destructor
-
-        virtual ~mergePolyMesh()
-        {}
+    //- Destructor
+    virtual ~mergePolyMesh()
+    {}
 
 
     // Member Functions
