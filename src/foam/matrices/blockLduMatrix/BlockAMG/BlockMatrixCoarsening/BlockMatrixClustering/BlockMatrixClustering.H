@@ -93,8 +93,6 @@ class BlockMatrixClustering
         //- Can a coarse level be constructed?
         bool coarsen_;
 
-        cpuTime lTime_;
-
 
     // Private Member Functions
 

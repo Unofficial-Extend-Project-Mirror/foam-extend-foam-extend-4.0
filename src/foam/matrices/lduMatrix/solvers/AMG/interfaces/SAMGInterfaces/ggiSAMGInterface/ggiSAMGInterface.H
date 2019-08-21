@@ -89,8 +89,6 @@ class ggiSAMGInterface
             //- Map-distribute comms tool
             mutable mapDistribute* mapPtr_;
 
-            cpuTime lTime_;
-
 
     // Private Member Functions
 

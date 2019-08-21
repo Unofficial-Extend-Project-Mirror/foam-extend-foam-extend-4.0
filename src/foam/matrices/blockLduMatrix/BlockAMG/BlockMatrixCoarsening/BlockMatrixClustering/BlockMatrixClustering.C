@@ -799,8 +799,7 @@ Foam::BlockMatrixClustering<Type>::BlockMatrixClustering
     groupSize_(groupSize),
     nSolo_(0),
     nCoarseEqns_(0),
-    coarsen_(false),
-    lTime_()
+    coarsen_(false)
 {
     calcClustering();
 }

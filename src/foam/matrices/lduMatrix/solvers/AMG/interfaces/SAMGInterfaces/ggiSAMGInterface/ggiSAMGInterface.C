@@ -240,8 +240,7 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
     procMasterFaces_(),
     comm_(fineGgiInterface_.comm()),
     tag_(fineGgiInterface_.tag()),
-    mapPtr_(nullptr),
-    lTime_()
+    mapPtr_(nullptr)
 {
     // New algorithm will assemble local clusters on the master side and
     // create zone ordering by collecting all faces (coarse pairs) from proc0,
