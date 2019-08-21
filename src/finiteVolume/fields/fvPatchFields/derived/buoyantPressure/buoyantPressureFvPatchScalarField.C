@@ -159,8 +159,7 @@ void buoyantPressureFvPatchScalarField::updateCoeffs()
 void buoyantPressureFvPatchScalarField::write(Ostream& os) const
 {
     fixedGradientFvPatchScalarField::write(os);
-    os.writeKeyword("rho") << rhoName_ << token::END_STATEMENT << nl;
-    writeEntry("value", os);
+    writeEntryIfDifferent(os, "rho", word("rho"), rhoName_);
 }
 
 
