@@ -79,8 +79,8 @@ void Foam::leastSquaresGradientInterpolation::calcWeights() const
     const vectorField& neiLsIn = lsv.nVectors().internalField();
 
     // Create a local weight field
-    localWeightsPtr_ = new ScalarFieldField(ld.size());
-    ScalarFieldField& localWeights = *localWeightsPtr_;
+    localWeightsPtr_ = new scalarFieldField(ld.size());
+    scalarFieldField& localWeights = *localWeightsPtr_;
 
     // Loop through local donors, setting the weights
     forAll (ld, ldI)
@@ -155,15 +155,15 @@ void Foam::leastSquaresGradientInterpolation::calcWeights() const
         const labelListList& rnd = overset().remoteNeighbouringDonors();
 
         // Create a global weights list for remote donor weights
-        remoteWeightsPtr_ = new ListScalarFieldField(Pstream::nProcs());
-        ListScalarFieldField& remoteWeights = *remoteWeightsPtr_;
+        remoteWeightsPtr_ = new scalarFieldFieldList(Pstream::nProcs());
+        scalarFieldFieldList& remoteWeights = *remoteWeightsPtr_;
 
         // Get the corresponding acceptor cell centres for remote donors on this
         // processor
         const vectorField& procRemAccCC = remoteAccCC()[Pstream::myProcNo()];
 
         // Set the size of the weight field for this processor
-        ScalarFieldField& myProcRemoteWeights =
+        scalarFieldField& myProcRemoteWeights =
             remoteWeights[Pstream::myProcNo()];
         myProcRemoteWeights.setSize(rd.size());
 
@@ -266,7 +266,7 @@ Foam::leastSquaresGradientInterpolation::~leastSquaresGradientInterpolation()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const Foam::oversetInterpolation::ScalarFieldField&
+const Foam::scalarFieldField&
 Foam::leastSquaresGradientInterpolation::localWeights() const
 {
     if (!localWeightsPtr_)
@@ -278,7 +278,7 @@ Foam::leastSquaresGradientInterpolation::localWeights() const
 }
 
 
-const Foam::oversetInterpolation::ListScalarFieldField&
+const Foam::oversetInterpolation::scalarFieldFieldList&
 Foam::leastSquaresGradientInterpolation::remoteWeights() const
 {
     // We cannot calculate the remoteWeights using usual lazy evaluation
@@ -288,7 +288,7 @@ Foam::leastSquaresGradientInterpolation::remoteWeights() const
     {
         FatalErrorIn
         (
-            "const oversetInterpolation::ListScalarFieldField&\n"
+            "const oversetInterpolation::scalarFieldFieldList&\n"
             "averageValueInterpolation::remoteWeights() const"
         )   << "Attempted to calculate remoteWeights for a serial run."
             << "This is not allowed."
@@ -298,7 +298,7 @@ Foam::leastSquaresGradientInterpolation::remoteWeights() const
     {
         FatalErrorIn
         (
-            "const oversetInterpolation::ListScalarFieldField&\n"
+            "const oversetInterpolation::scalarFieldFieldList&\n"
             "averageValueInterpolation::remoteWeights() const"
         )   << "Attempted to calculate remoteWeights for a slave processor. "
             << "This is not allowed."
@@ -308,7 +308,7 @@ Foam::leastSquaresGradientInterpolation::remoteWeights() const
     {
         FatalErrorIn
         (
-            "const oversetInterpolation::ListScalarFieldField&\n"
+            "const oversetInterpolation::scalarFieldFieldList&\n"
             "averageValueInterpolation::remoteWeights() const"
         )   << "Calculation of remoteWeights not possible because the data \n"
             << "exists only on the master processor. Please calculate \n"

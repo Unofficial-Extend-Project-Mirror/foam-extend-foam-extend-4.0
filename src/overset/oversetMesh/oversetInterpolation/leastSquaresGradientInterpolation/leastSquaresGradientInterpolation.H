@@ -48,7 +48,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                     Class leastSquaresGradientInterpolation Declaration
+              Class leastSquaresGradientInterpolation Declaration
 \*---------------------------------------------------------------------------*/
 
 class leastSquaresGradientInterpolation
@@ -65,14 +65,14 @@ class leastSquaresGradientInterpolation
 
             //- Weights for local donor/acceptor pairs (all donors and acceptor
             //  are on the same processor)
-            mutable ScalarFieldField* localWeightsPtr_;
+            mutable scalarFieldField* localWeightsPtr_;
 
             // Master processor data (only accessible on master processor)
 
                 //- Weights for remote donor/acceptor pairs (all donors are on a
                 //  remote processor). List for all processors is stored on
                 //  master processor (trading off memory for CPU performance)
-                mutable ListScalarFieldField* remoteWeightsPtr_;
+                mutable scalarFieldFieldList* remoteWeightsPtr_;
 
 
     // Private Member Functions
@@ -118,10 +118,10 @@ public:
     // Member Functions
 
         //- Return local donor weights
-        virtual const ScalarFieldField& localWeights() const;
+        virtual const scalarFieldField& localWeights() const;
 
         //- Return remote donor weights
-        virtual const ListScalarFieldField& remoteWeights() const;
+        virtual const scalarFieldFieldList& remoteWeights() const;
 
         //- Update the interpolation
         virtual void update() const;

@@ -77,7 +77,7 @@ void Foam::oversetMesh::interpolate
 
     // Get interpolation weights for all donors for a given local acceptor in a
     // given region
-    const oversetInterpolation::ListScalarFieldField& weights =
+    const oversetInterpolation::scalarFieldFieldList& weights =
         interpolation.weights();
 
     // Note: accF field indexed by number of acceptors (region-wise
@@ -91,8 +91,7 @@ void Foam::oversetMesh::interpolate
         const donorAcceptorList& curAcceptors = regions_[regionI].acceptors();
 
         // Get weights for this region
-        const oversetInterpolation::ScalarFieldField& regionWeights =
-            weights[regionI];
+        const scalarFieldField& regionWeights = weights[regionI];
 
         // Loop through all acceptors of this region
         forAll (curAcceptors, regionAccI)

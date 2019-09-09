@@ -211,6 +211,12 @@ public:
                 return acceptorPoint_;
             }
 
+            //- Return access to acceptor location
+            point& acceptorPoint()
+            {
+                return acceptorPoint_;
+            }
+
 
         // Donor side
 
@@ -257,14 +263,32 @@ public:
                 }
             }
 
+            //- Return access to donor point
+            point& donorPoint()
+            {
+                return donorPoint_;
+            }
+
             //- Return extended donor cell numbers
             const DynamicLabelList& extendedDonorCells() const
             {
                 return extendedDonorCells_;
             }
 
+            //- Return access to extended donor cell numbers
+            DynamicLabelList& extendedDonorCells()
+            {
+                return extendedDonorCells_;
+            }
+
             //- Return extended donor cell centres
             const DynamicPointList& extendedDonorPoints() const
+            {
+                return extendedDonorPoints_;
+            }
+
+            //- Return access to extended donor cell centres
+            DynamicPointList& extendedDonorPoints()
             {
                 return extendedDonorPoints_;
             }

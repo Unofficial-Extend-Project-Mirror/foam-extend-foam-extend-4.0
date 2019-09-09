@@ -997,6 +997,7 @@ void Foam::oversetMesh::calcInterpolationMap() const
             ...
             ...
             ...
+        )
     */
 
     // Create construct map
@@ -1092,8 +1093,8 @@ void Foam::oversetMesh::calcInterpolationMap() const
         // Get the corresponding subList
         const labelList::subList procDonorIDs
         (
-            donorIDs, // Original list
-            nCurProcRec, // Size of the data
+            donorIDs,      // Original list
+            nCurProcRec,   // Size of the received data
             startProcIndex // Start index
         );
 

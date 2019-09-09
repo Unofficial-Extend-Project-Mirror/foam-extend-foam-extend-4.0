@@ -59,7 +59,7 @@ class oversetFvPatch
     // Private Data
 
         //- Reference to overset patch
-        const oversetPolyPatch& overPolyPatch_;
+        const oversetPolyPatch& oversetPatch_;
 
 
 protected:
@@ -104,6 +104,9 @@ public:
             //- Return access to overset mesh
             const oversetMesh& overset() const;
 
+            //- Const access to overset poly patch
+            const oversetPolyPatch& oversetPatch() const;
+
             //- Return true: coupled patch
             virtual bool coupled() const
             {
@@ -113,7 +116,7 @@ public:
         // Interface transfer functions
 
             //- Return the values of the given internal data adjacent to
-            //  the interface as a field
+            //  the interface as a field.  For overset, this is acceptor data
             virtual tmp<labelField> interfaceInternalField
             (
                 const unallocLabelList& internalData
@@ -141,6 +144,7 @@ public:
             ) const;
 
             //- Return neighbour field
+            //  For overset, this is donor data for each acceptor
             virtual tmp<labelField> internalFieldTransfer
             (
                 const Pstream::commsTypes commsType,

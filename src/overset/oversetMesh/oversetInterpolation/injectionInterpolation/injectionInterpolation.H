@@ -65,7 +65,7 @@ class injectionInterpolation
             // Note: for each acceptor in each region, we have a list of scalars
             // for all donors: master + neighbouring. Master weight is the first
             // [index 0], followed by neighbouring weights.
-            mutable ListScalarFieldField* weightsPtr_;
+            mutable scalarFieldFieldList* weightsPtr_;
 
 
     // Private Member Functions
@@ -102,9 +102,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~injectionInterpolation();
+    //- Destructor
+    virtual ~injectionInterpolation();
 
 
     // Member Functions
@@ -112,7 +111,7 @@ public:
         // Access
 
             //- Return weights
-            virtual const ListScalarFieldField& weights() const;
+            virtual const scalarFieldFieldList& weights() const;
 
 
         //- Update the interpolation

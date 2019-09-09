@@ -72,8 +72,7 @@ public:
 
     // Public data types
 
-        typedef FieldField<Field, scalar> ScalarFieldField;
-        typedef List<ScalarFieldField> ListScalarFieldField;
+        typedef List<scalarFieldField> scalarFieldFieldList;
 
 
 private:
@@ -134,10 +133,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~oversetInterpolation()
-        {}
+    //- Destructor
+    virtual ~oversetInterpolation()
+    {}
 
 
     // Member Functions
@@ -151,7 +149,7 @@ public:
             }
 
             //- Return weights
-            virtual const ListScalarFieldField& weights() const = 0;
+            virtual const scalarFieldFieldList& weights() const = 0;
 
 
         //- Update the interpolation

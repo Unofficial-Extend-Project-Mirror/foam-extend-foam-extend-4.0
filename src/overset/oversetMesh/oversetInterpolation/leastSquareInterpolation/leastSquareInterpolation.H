@@ -98,9 +98,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~leastSquareInterpolation();
+    //- Destructor
+    virtual ~leastSquareInterpolation();
 
 
     // Member Functions
