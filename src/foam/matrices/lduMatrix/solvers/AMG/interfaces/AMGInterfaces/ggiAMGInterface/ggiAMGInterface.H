@@ -42,8 +42,6 @@ SourceFiles
 #include "ggiLduInterface.H"
 #include "mapDistribute.H"
 
-#include "cpuTime.H"
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
