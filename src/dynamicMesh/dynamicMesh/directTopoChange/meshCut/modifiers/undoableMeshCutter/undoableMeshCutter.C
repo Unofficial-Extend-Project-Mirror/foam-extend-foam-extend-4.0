@@ -634,10 +634,16 @@ Foam::labelList Foam::undoableMeshCutter::removeSplitFaces
 
     // Insert all commands to combine cells. Never fails so don't have to
     // test for success.
+
+    // Added dummy pointRegionMaster, which will be ignored.
+    // HJ, 6/Sep/2019
+    labelList pointRegionMaster(cellRegionMaster.size(), label(-1));
+    
     faceRemover().setRefinement
     (
         facesToRemove,
         cellRegion,
+        pointRegionMaster,
         cellRegionMaster,
         meshMod
     );

@@ -28,8 +28,6 @@ Description
     Given list of faces to remove insert all the topology changes. Contains
     helper function to get consistent set of faces to remove.
 
-    Not very well tested in parallel.
-
 SourceFiles
     removeFaces.C
 
@@ -185,6 +183,7 @@ public:
         //  and always merge (if on same patch)
         removeFaces(const polyMesh&, const scalar minCos);
 
+
     // Member Functions
 
         //- Given a set of faces to pierce calculates:
@@ -210,7 +209,9 @@ public:
         (
             const labelList& piercedFaces,
             const labelList& cellRegion,
-            const labelList& cellRegionMaster,
+            const labelList& pointRegionMaster,
+            labelList& cellRegionMaster,
+
             TopoChangeEngine& ref
         ) const;
 

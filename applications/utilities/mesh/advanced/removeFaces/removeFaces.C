@@ -147,11 +147,15 @@ int main(int argc, char *argv[])
     // Topo changes container
     directTopoChange meshMod(mesh);
 
+    // Dummy point region master
+    labelList pointRegionMaster(cellRegionMaster.size(), -1);
+    
     // Insert mesh refinement into directTopoChange.
     faceRemover.setRefinement
     (
         facesToRemove,
         cellRegion,
+        pointRegionMaster,
         cellRegionMaster,
         meshMod
     );

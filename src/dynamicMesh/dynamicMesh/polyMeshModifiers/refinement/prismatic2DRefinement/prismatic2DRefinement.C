@@ -2329,7 +2329,7 @@ void Foam::prismatic2DRefinement::setRefinementInstruction
 
         if (minPointI != labelMax && minPointI != mesh_.nPoints())
         {
-            FatalErrorIn("prismatic2DRefinement::setRefinementInstruction(...)")
+            FatalErrorInFunction
                 << "Added point labels not consecutive to existing mesh points."
                 << nl
                 << "mesh_.nPoints():" << mesh_.nPoints()
@@ -2352,10 +2352,8 @@ void Foam::prismatic2DRefinement::setUnrefinementInstruction
     // Check whether the refinementLevelIndicator is valid
     if (refinementLevelIndicator_.size() != mesh_.nCells())
     {
-        FatalErrorIn
-        (
-            "prismatic2DRefinement::setUnrefinementInstruction(...)"
-        )   << "Refinement level indicator list has invalid size: "
+        FatalErrorInFunction
+            << "Refinement level indicator list has invalid size: "
             << refinementLevelIndicator_.size()
             << ", number of cells: " << mesh_.nCells()
             << nl
@@ -2379,11 +2377,8 @@ void Foam::prismatic2DRefinement::setUnrefinementInstruction
         {
             if (cellLevel_[cellI] < 0)
             {
-                FatalErrorIn
-                (
-                    "prismatic2DRefinement::setUnrefinementInstruction"
-                    "(polyTopoChange& ref)"
-                )   << "Illegal cell level " << cellLevel_[cellI]
+                FatalErrorInFunction
+                    << "Illegal cell level " << cellLevel_[cellI]
                     << " for cell " << cellI
                     << abort(FatalError);
             }
@@ -2526,11 +2521,70 @@ void Foam::prismatic2DRefinement::setUnrefinementInstruction
         }
     }
 
+    // Find point region master for every cell region.  This is the central point
+    // from which the coarse cell will be made
+    // The property of the point region master is that all cells that touch it
+    // have the same cell region index
+    // HJ, 6/Sep/2019
+    labelList pointRegionMaster(cellRegionMaster.size(), label(-1));
+
+    // Get point-cell addressing
+    const labelListList& pc = mesh_.pointCells();
+    
+    forAll (splitPointsToUnrefine_, i)
+    {
+        const labelList& curPc = pc[splitPointsToUnrefine_[i]];
+
+        label curRegion = -1;
+
+        forAll (curPc, curPcI)
+        {
+            if (curRegion == -1)
+            {
+                // First region found.  Grab it
+                curRegion = cellRegion[curPc[curPcI]];
+            }
+            else
+            {
+                // Region already found.  Check that all other cells that
+                // touch this point have the same region
+                if (curRegion != cellRegion[curPc[curPcI]])
+                {
+                    // Error: different region cells touching in split point
+                    // This is not a valid unrefinement pattern
+                    FatalErrorIn
+                    (
+                        "polyhedralRefinement::setUnrefinementInstruction"
+                        "(polyTopoChange& ref)"
+                    )   << "Different region cells touching in split point."
+                        << abort(FatalError);
+                }
+            }
+        }
+
+        // Record point region master
+        if (curRegion > -1)
+        {
+            pointRegionMaster[curRegion] = splitPointsToUnrefine_[i];
+        }
+        else
+        {
+            // Error: Cannot find region for point
+            FatalErrorIn
+            (
+                "polyhedralRefinement::setUnrefinementInstruction"
+                "(polyTopoChange& ref)"
+            )   << "Different region cells touching in split point."
+                << abort(FatalError);
+        }
+    }
+
     // Insert all commands to combine cells
     faceRemover_.setRefinement
     (
         facesToRemove,
         cellRegion,
+        pointRegionMaster,
         cellRegionMaster,
         ref
     );

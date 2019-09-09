@@ -67,18 +67,9 @@ void Foam::removeFaces::mergeFaces
     if (fp.edgeLoops().size() != 1)
     {
         writeOBJ(fp, mesh_.time().path()/"facesToBeMerged.obj");
-        FatalErrorIn
-        (
-            "template<class TopoChangeEngine>"
-            "void removeFaces::mergeFaces"
-            "\n("
-            "\n    const labelList& cellRegion,"
-            "\n    const labelList& cellRegionMaster,"
-            "\n    const labelHashSet& pointsToRemove,"
-            "\n    const labelList& faceLabels,"
-            "\n    const TopoChangeEngine& ref"
-            "\n) const"
-        )   << "Cannot merge faces " << faceLabels
+
+        FatalErrorInFunction
+            << "Cannot merge faces " << faceLabels
             << " into single face since outside vertices " << fp.edgeLoops()
             << " do not form single loop but form " << fp.edgeLoops().size()
             << " loops instead." << abort(FatalError);
@@ -131,18 +122,9 @@ void Foam::removeFaces::mergeFaces
     if (masterIndex == -1)
     {
         writeOBJ(fp, mesh_.time().path()/"facesToBeMerged.obj");
-        FatalErrorIn
-        (
-            "template<class TopoChangeEngine>"
-            "void removeFaces::mergeFaces"
-            "\n("
-            "\n    const labelList& cellRegion,"
-            "\n    const labelList& cellRegionMaster,"
-            "\n    const labelHashSet& pointsToRemove,"
-            "\n    const labelList& faceLabels,"
-            "\n    const TopoChangeEngine& ref"
-            "\n) const"
-        )  << "Problem." << abort(FatalError);
+
+        FatalErrorInFunction
+            << "Problem." << abort(FatalError);
     }
 
 
@@ -312,7 +294,8 @@ void Foam::removeFaces::setRefinement
 (
     const labelList& faceLabels,
     const labelList& cellRegion,
-    const labelList& cellRegionMaster,
+    const labelList& pointRegionMaster,
+    labelList& cellRegionMaster,
 
     TopoChangeEngine& ref
 ) const
@@ -343,18 +326,8 @@ void Foam::removeFaces::setRefinement
 
         if (!mesh_.isInternalFace(faceI))
         {
-            FatalErrorIn
-            (
-                "template<class TopoChangeEngine>"
-                "\n"
-                "void removeFaces::setRefinement"
-                "\n("
-                "\n    const labelList& faceLabels,"
-                "\n    const labelList& cellRegion,"
-                "\n    const labelList& cellRegionMaster,"
-                "\n    TopoChangeEngine& ref"
-                "\n)"
-            )   << "Face " << faceI << " is not an internal faces, therefore"
+            FatalErrorInFunction
+                << "Face " << faceI << " is not an internal faces, therefore"
                 << " it cannot be removed. Check faceLabels argument."
                 << abort(FatalError);
         }
@@ -446,18 +419,8 @@ void Foam::removeFaces::setRefinement
                     mesh_.write();
 
                     // Write data for debugging
-                    FatalErrorIn
-                    (
-                        "template<class TopoChangeEngine>"
-                        "\n"
-                        "void removeFaces::setRefinement"
-                        "\n("
-                        "\n    const labelList& faceLabels,"
-                        "\n    const labelList& cellRegion,"
-                        "\n    const labelList& cellRegionMaster,"
-                        "\n    TopoChangeEngine& ref"
-                        "\n)"
-                    )   << "Problem : edge has too few face neighbours:"
+                    FatalErrorInFunction
+                        << "Problem : edge has too few face neighbours:"
                         << eFaces << endl
                         << "edge:" << edgeI
                         << " vertices:" << e
@@ -586,18 +549,8 @@ void Foam::removeFaces::setRefinement
                     const edge& e = mesh_.edges()[edgeI];
 
                     // Only found one boundary face. Problem
-                    FatalErrorIn
-                    (
-                        "template<class TopoChangeEngine>"
-                        "\n"
-                        "void removeFaces::setRefinement"
-                        "\n("
-                        "\n    const labelList& faceLabels,"
-                        "\n    const labelList& cellRegion,"
-                        "\n    const labelList& cellRegionMaster,"
-                        "\n    TopoChangeEngine& ref"
-                        "\n)"
-                    )   << "Problem : edge would have one boundary face"
+                    FatalErrorInFunction
+                        << "Problem : edge would have one boundary face"
                         << " and one internal face using it." << endl
                         << "Your remove pattern is probably incorrect." << endl
                         << "edge:" << edgeI
@@ -620,18 +573,7 @@ void Foam::removeFaces::setRefinement
             {
                 const edge& e = mesh_.edges()[edgeI];
 
-                    FatalErrorIn
-                    (
-                        "template<class TopoChangeEngine>"
-                        "\n"
-                        "void removeFaces::setRefinement"
-                        "\n("
-                        "\n    const labelList& faceLabels,"
-                        "\n    const labelList& cellRegion,"
-                        "\n    const labelList& cellRegionMaster,"
-                        "\n    TopoChangeEngine& ref"
-                        "\n)"
-                    )
+                FatalErrorInFunction
                     << "Problem : edge would get 1 face using it only"
                     << " edge:" << edgeI
                     << " nFaces:" << nFacesPerEdge[edgeI]
@@ -779,18 +721,8 @@ void Foam::removeFaces::setRefinement
 
             if (nRegion < 1)
             {
-                FatalErrorIn
-                (
-                    "template<class TopoChangeEngine>"
-                    "\n"
-                    "void removeFaces::setRefinement"
-                    "\n("
-                    "\n    const labelList& faceLabels,"
-                    "\n    const labelList& cellRegion,"
-                    "\n    const labelList& cellRegionMaster,"
-                    "\n    TopoChangeEngine& ref"
-                    "\n)"
-                ) << "Problem with region number." << abort(FatalError);
+                FatalErrorInFunction
+                    << "Problem with region number." << abort(FatalError);
             }
             else if (nRegion == 1)
             {
@@ -837,18 +769,8 @@ void Foam::removeFaces::setRefinement
             {
                 if (nbrRegion != myRegion)
                 {
-                    FatalErrorIn
-                    (
-                        "template<class TopoChangeEngine>"
-                        "\n"
-                        "void removeFaces::setRefinement"
-                        "\n("
-                        "\n    const labelList& faceLabels,"
-                        "\n    const labelList& cellRegion,"
-                        "\n    const labelList& cellRegionMaster,"
-                        "\n    TopoChangeEngine& ref"
-                        "\n)"
-                    )   << "Inconsistent face region across coupled patches."
+                    FatalErrorInFunction
+                        << "Inconsistent face region across coupled patches."
                         << endl
                         << "This side has for faceI:" << faceI
                         << " region:" << myRegion << endl
@@ -868,18 +790,8 @@ void Foam::removeFaces::setRefinement
                 // Second visit of this region
                 if (toNbrRegion[myRegion] != nbrRegion)
                 {
-                    FatalErrorIn
-                    (
-                        "template<class TopoChangeEngine>"
-                        "\n"
-                        "void removeFaces::setRefinement"
-                        "\n("
-                        "\n    const labelList& faceLabels,"
-                        "\n    const labelList& cellRegion,"
-                        "\n    const labelList& cellRegionMaster,"
-                        "\n    TopoChangeEngine& ref"
-                        "\n)"
-                    )   << "Inconsistent face region across coupled patches."
+                    FatalErrorInFunction
+                        << "Inconsistent face region across coupled patches."
                         << endl
                         << "This side has for faceI:" << faceI
                         << " region:" << myRegion
@@ -938,18 +850,8 @@ void Foam::removeFaces::setRefinement
         {
             if (nEdgesPerPoint[pointI] == 1)
             {
-                FatalErrorIn
-                (
-                    "template<class TopoChangeEngine>"
-                    "\n"
-                    "void removeFaces::setRefinement"
-                    "\n("
-                    "\n    const labelList& faceLabels,"
-                    "\n    const labelList& cellRegion,"
-                    "\n    const labelList& cellRegionMaster,"
-                    "\n    TopoChangeEngine& ref"
-                    "\n)"
-                )   << "Problem : point would get 1 edge using it only."
+                FatalErrorInFunction
+                    << "Problem : point would get 1 edge using it only."
                     << " pointI:" << pointI
                     << " coord:" << mesh_.points()[pointI]
                     << abort(FatalError);
@@ -1060,11 +962,43 @@ void Foam::removeFaces::setRefinement
         ref.setAction(polyRemovePoint(pointI, -1));
     }
 
+    // Add master cells for correct mapping
+    forAll (cellRegionMaster, regionI)
+    {
+        // Note: it is legal to have cellRegionMaster = -1 if the region
+        // has been created and them marged into another region.
+        // Such masters will also have pointRegionMaster = -1 and should
+        // be ignored.  HJ, 6/Sep/2019
+
+        // Additionally protect for old directTopoChangers which do not
+        // identify points for mapping.  Non-existent pointRegionMaster
+        // is rejected
+        if (cellRegionMaster[regionI] > -1 && pointRegionMaster[regionI] > -1)
+        {
+            // Add master cell from master point for correct mapping
+            cellRegionMaster[regionI] =
+                ref.setAction
+                (
+                    polyAddCell
+                    (
+                        pointRegionMaster[regionI], // masterPointID
+                        -1,                         // masterEdgeID
+                        -1,                         // masterFaceID
+                        -1,                         // masterCellID
+                        mesh_.cellZones().whichZone(cellRegionMaster[regionI])
+                    )
+                );
+        }
+    }
+
     // Remove cells
     forAll(cellRegion, cellI)
     {
         label region = cellRegion[cellI];
 
+        // Old check is acceptable: for mapping from point, the cellRegionMaster
+        // has been replaced in polyAddPoint
+        // HJ, 6/Sep/2019
         if (region != -1 && (cellI != cellRegionMaster[region]))
         {
             ref.setAction(polyRemoveCell(cellI, cellRegionMaster[region]));
@@ -1087,18 +1021,8 @@ void Foam::removeFaces::setRefinement
 
             if (rFaces.size() <= 1)
             {
-                FatalErrorIn
-                (
-                    "template<class TopoChangeEngine>"
-                    "\n"
-                    "void removeFaces::setRefinement"
-                    "\n("
-                    "\n    const labelList& faceLabels,"
-                    "\n    const labelList& cellRegion,"
-                    "\n    const labelList& cellRegionMaster,"
-                    "\n    TopoChangeEngine& ref"
-                    "\n)"
-                )   << "Region: " << regionI
+                FatalErrorInFunction
+                    << "Region: " << regionI
                     << " contains only these faces: " << rFaces
                     << abort(FatalError);
             }

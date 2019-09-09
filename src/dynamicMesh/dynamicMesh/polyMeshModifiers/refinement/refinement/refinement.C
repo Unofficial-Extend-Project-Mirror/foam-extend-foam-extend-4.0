@@ -23,6 +23,7 @@ License
 
 Author
     Vuko Vukcevic, Wikki Ltd.  All rights reserved.
+    Hrvoje Jasak, Wikki Ltd.
 
 Notes
     Generalisation of hexRef8 for polyhedral cells and refactorisation into mesh
@@ -421,6 +422,54 @@ Foam::label Foam::refinement::countAnchors
         }
     }
     return nAnchors;
+}
+
+void Foam::refinement::adjustRefLevel
+(
+    label& curNewCellLevel,
+    const label oldCellI
+)
+{
+    if (oldCellI == -1)
+    {
+        // This cell is inflated (does not originate from other cell), set
+        // cell level to -1
+        curNewCellLevel = -1;
+    }
+    else
+    {
+        // This cell has either been added based on another cell or it
+        // hasn't changed. Update new cell level according to refinement
+        // level indicator and old cell level
+
+        // Get refinement status of the old cell
+        const label& refStatus = refinementLevelIndicator_[oldCellI];
+
+        if (refStatus == UNREFINED)
+        {
+            // New cell has been obtained by unrefining other cells - this
+            // is the remaining "master" cell. Decrement cell level
+            curNewCellLevel = cellLevel_[oldCellI] - 1;
+        }
+        else if (refStatus == UNCHANGED)
+        {
+            // Cell hasn't been changed during this refinement, copy old
+            // cell level
+            curNewCellLevel = cellLevel_[oldCellI];
+        }
+        else if (refStatus == REFINED)
+        {
+            // Cell has been refined, increment cell level
+            curNewCellLevel = cellLevel_[oldCellI] + 1;
+        }
+        else
+        {
+            FatalErrorInFunction
+                << "Invalid refinement status detected: "
+                << refStatus << nl
+                << "Old cell index: " << oldCellI << abort(FatalError);
+        }
+    }
 }
 
 
@@ -1386,51 +1435,21 @@ void Foam::refinement::updateMesh(const mapPolyMesh& map)
     // Loop through all new cells
     forAll (cellMap, newCellI)
     {
-        // Get index of the corresponding old cell
-        const label& oldCellI = cellMap[newCellI];
+        adjustRefLevel(newCellLevel[newCellI], cellMap[newCellI]);
+    }
 
-        if (oldCellI == -1)
-        {
-            // This cell is inflated (does not originate from other cell), set
-            // cell level to -1
-            newCellLevel[newCellI] = -1;
-        }
-        else
-        {
-            // This cell has either been added based on another cell or it
-            // hasn't changed. Update new cell level according to refinement
-            // level indicator and old cell level
+    // Do cells from points: unrefinement
+    // Note: should other types be done as well?
+    // HJ, 9/Sep/2019
+    const List<objectMap>& cellsFromPoints =  map.cellsFromPointsMap();
 
-            // Get refinement status of the old cell
-            const label& refStatus = refinementLevelIndicator_[oldCellI];
-
-            if (refStatus == UNREFINED)
-            {
-                // New cell has been obtained by unrefining other cells - this
-                // is the remaining "master" cell. Decrement cell level
-                newCellLevel[newCellI] = cellLevel_[oldCellI] - 1;
-            }
-            else if (refStatus == UNCHANGED)
-            {
-                // Cell hasn't been changed during this refinement, copy old
-                // cell level
-                newCellLevel[newCellI] = cellLevel_[oldCellI];
-            }
-            else if (refStatus == REFINED)
-            {
-                // Cell has been refined, increment cell level
-                newCellLevel[newCellI] = cellLevel_[oldCellI] + 1;
-            }
-            else
-            {
-                FatalErrorIn
-                (
-                    "refinement::updateMesh(const mapPolyMesh& map)"
-                )   << "Invalid refinement status detected: " << refStatus << nl
-                    << "Old cell index: " << oldCellI << nl
-                    << "New cell index: " << newCellI << abort(FatalError);
-            }
-        }
+    forAll (cellsFromPoints, cfpI)
+    {
+        adjustRefLevel
+        (
+            newCellLevel[cellsFromPoints[cfpI].index()],
+            cellsFromPoints[cfpI].masterObjects()[0]
+        );
     }
 
     // Transfer the new cell level into the data member

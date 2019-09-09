@@ -232,7 +232,14 @@ protected:
                 const label anchorLevel
             ) const;
 
+            //- Adjust cell refinement level after topo change
+            void adjustRefLevel
+            (
+                label& curNewCellLevel,
+                const label oldCellI
+            );
 
+    
         // Debug functions
 
             //- Check orientation of added internal face

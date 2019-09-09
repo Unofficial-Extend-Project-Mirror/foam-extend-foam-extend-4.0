@@ -149,10 +149,14 @@ Foam::Xfer<Foam::boolList> Foam::removeFaces::affectedFaces
     {
         const label& region = cellRegion[cellI];
 
-        if (region != -1 && (cellI != cellRegionMaster[region]))
+        // Bug fix: map coarse cell from all fine neighbours
+        // All cells will be removed and replacew with a new one from
+        // the central point.  HJ, 9/Sep/2019
+        if (region != -1)
         {
             // Get this cell (list of cell faces) and mark all of its faces
             const labelList& cFaces = meshCells[cellI];
+
             forAll(cFaces, cFaceI)
             {
                 affectedFace[cFaces[cFaceI]] = true;
@@ -284,7 +288,7 @@ Foam::label Foam::removeFaces::compatibleRemoves
 (
     const labelList& facesToRemove,
     labelList& cellRegion,
-    labelList& regionMaster,
+    labelList& cellRegionMaster,
     labelList& newFacesToRemove
 ) const
 {
@@ -298,8 +302,8 @@ Foam::label Foam::removeFaces::compatibleRemoves
     cellRegion.setSize(nCells);
     cellRegion = -1;
 
-    regionMaster.setSize(nCells);
-    regionMaster = -1;
+    cellRegionMaster.setSize(nCells);
+    cellRegionMaster = -1;
 
     // Count regions
     label nRegions = 0;
@@ -342,7 +346,7 @@ Foam::label Foam::removeFaces::compatibleRemoves
 
                 // Make owner (lowest numbered!) the master of the region and
                 // increment the number of regions
-                regionMaster[nRegions] = own;
+                cellRegionMaster[nRegions] = own;
                 ++nRegions;
             }
             else
@@ -352,7 +356,7 @@ Foam::label Foam::removeFaces::compatibleRemoves
 
                 // See if owner becomes the master of the region (if its index
                 // is lower than the current master of the region)
-                regionMaster[region1] = min(own, regionMaster[region1]);
+                cellRegionMaster[region1] = min(own, cellRegionMaster[region1]);
             }
         }
         else
@@ -400,24 +404,29 @@ Foam::label Foam::removeFaces::compatibleRemoves
                     freedRegion = region0;
                 }
 
-                label master0 = regionMaster[region0];
-                label master1 = regionMaster[region1];
+                label master0 = cellRegionMaster[region0];
+                label master1 = cellRegionMaster[region1];
 
-                regionMaster[freedRegion] = -1;
-                regionMaster[keptRegion] = min(master0, master1);
+                cellRegionMaster[freedRegion] = -1;
+                cellRegionMaster[keptRegion] = min(master0, master1);
             }
         }
     }
 
     // Set size
-    regionMaster.setSize(nRegions);
+    cellRegionMaster.setSize(nRegions);
 
+    // Note:
+    // It is legal to have cellRegionMaster = -1 if the region has been created
+    // and then abandoned because it has been merged with another region
+    // HJ, 6/Sep/2019
+    
     // Various checks, additional scope for clarity and memory management
     // - master is lowest numbered in any region
     // - regions have more than 1 cell
     {
         // Number of cells per region
-        labelList nCells(regionMaster.size(), 0);
+        labelList nCells(cellRegionMaster.size(), 0);
 
         // Loop through cell regions
         forAll(cellRegion, cellI)
@@ -430,15 +439,12 @@ Foam::label Foam::removeFaces::compatibleRemoves
                 // Region found, increment number of cells per region
                 ++nCells[r];
 
-                if (cellI < regionMaster[r])
+                if (cellI < cellRegionMaster[r])
                 {
-                    FatalErrorIn
-                    (
-                        "removeFaces::compatibleRemoves(const labelList&"
-                        ", labelList&, labelList&, labelList&)"
-                    )   << "Not lowest numbered! Cell: " << cellI
+                    FatalErrorInFunction
+                        << "Not lowest numbered!  Cell: " << cellI
                         << " region: " << r
-                        << " region master: " << regionMaster[r]
+                        << " region master: " << cellRegionMaster[r]
                         << abort(FatalError);
                 }
             }
@@ -449,11 +455,8 @@ Foam::label Foam::removeFaces::compatibleRemoves
         {
             if (nCells[regionI] == 1)
             {
-                FatalErrorIn
-                (
-                    "removeFaces::compatibleRemoves(const labelList&"
-                    ", labelList&, labelList&, labelList&)"
-                )   << "Region " << regionI
+                FatalErrorInFunction
+                    << "Region " << regionI
                     << " has only " << nCells[regionI] << " cell in it."
                     << abort(FatalError);
             }
@@ -464,9 +467,9 @@ Foam::label Foam::removeFaces::compatibleRemoves
     // Count number of used regions
     label nUsedRegions = 0;
 
-    forAll(regionMaster, i)
+    forAll(cellRegionMaster, i)
     {
-        if (regionMaster[i] != -1)
+        if (cellRegionMaster[i] != -1)
         {
             ++nUsedRegions;
         }

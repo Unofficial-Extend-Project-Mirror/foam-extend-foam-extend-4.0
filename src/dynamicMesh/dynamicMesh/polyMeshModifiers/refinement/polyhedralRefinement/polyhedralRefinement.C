@@ -1260,10 +1260,8 @@ void Foam::polyhedralRefinement::setRefinementInstruction
                 // cell points
                 const labelList& cPoints = meshCellPoints[cellI];
 
-                FatalErrorIn
-                (
-                    "polyhedralRefinement::setRefinementInstruction(...)"
-                )   << "Cell " << cellI
+                FatalErrorInFunction
+                   << "Cell " << cellI
                     << " of level " << cellLevel_[cellI]
                     << " does not seem to have enough points of "
                     << " lower level" << endl
@@ -1967,11 +1965,73 @@ void Foam::polyhedralRefinement::setUnrefinementInstruction
         }
     }
 
+    // Find point region master for every cell region.  This is the central point
+    // from which the coarse cell will be made
+    // The property of the point region master is that all cells that touch it
+    // have the same cell region index
+    // HJ, 6/Sep/2019
+    labelList pointRegionMaster(cellRegionMaster.size(), label(-1));
+
+    // Get point-cell addressing
+    const labelListList& pc = mesh_.pointCells();
+    
+    forAll (splitPointsToUnrefine_, i)
+    {
+        const labelList& curPc = pc[splitPointsToUnrefine_[i]];
+
+        label curRegion = -1;
+
+        forAll (curPc, curPcI)
+        {
+            if (curRegion == -1)
+            {
+                // First region found.  Grab it
+                curRegion = cellRegion[curPc[curPcI]];
+            }
+            else
+            {
+                // Region already found.  Check that all other cells that
+                // touch this point have the same region
+                if (curRegion != cellRegion[curPc[curPcI]])
+                {
+                    // Error: different region cells touching in split point
+                    // This is not a valid unrefinement pattern
+                    FatalErrorIn
+                    (
+                        "polyhedralRefinement::setUnrefinementInstruction"
+                        "(polyTopoChange& ref)"
+                    )   << "Different region cells touching in split point."
+                        << abort(FatalError);
+                }
+            }
+        }
+
+        // Record point region master
+        if (curRegion > -1)
+        {
+            pointRegionMaster[curRegion] = splitPointsToUnrefine_[i];
+        }
+        else
+        {
+            // Error: Cannot find region for point
+            FatalErrorIn
+            (
+                "polyhedralRefinement::setUnrefinementInstruction"
+                "(polyTopoChange& ref)"
+            )   << "Different region cells touching in split point."
+                << abort(FatalError);
+        }
+    }
+
+    Info<< "pointRegionMaster: " << pointRegionMaster << nl
+        << " cellRegionMaster: " << cellRegionMaster << endl;   
+
     // Insert all commands to combine cells
     faceRemover_.setRefinement
     (
         facesToRemove,
         cellRegion,
+        pointRegionMaster,
         cellRegionMaster,
         ref
     );
