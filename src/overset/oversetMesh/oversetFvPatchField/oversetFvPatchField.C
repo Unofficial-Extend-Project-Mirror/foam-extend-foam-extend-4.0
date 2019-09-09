@@ -121,8 +121,8 @@ void oversetFvPatchField<Type>::setAcceptorValues(Field<Type2>& f) const
     // Get acceptor values by interpolation. Note that we assume that the field
     // we are operating on uses the same overset interpolation scheme as the
     // field referred by this fvPatchField. This might be problematic for GFM
-    // interpolation schemes becayse f can be some arbitrary field depending on
-    // the linear solver that is used. VV, 15/Feb/2017.
+    // interpolation schemes because the parameter f can be some arbitrary field
+    // depending on the linear solver that is used. VV, 15/Feb/2017.
     Field<Type2> accValues = oversetPatch_.overset().interpolate
     (
         f,
