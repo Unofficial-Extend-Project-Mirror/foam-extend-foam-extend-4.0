@@ -43,7 +43,6 @@ SourceFiles
 #include "BlockCoeffNorm.H"
 #include "BlockCoeff.H"
 #include "tolerancesSwitch.H"
-#include "cpuTime.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
