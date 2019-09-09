@@ -46,6 +46,8 @@ SourceFiles
 namespace Foam
 {
 
+typedef FieldField<Field, scalar> scalarFieldField;
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<template<class> class Field>
