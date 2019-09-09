@@ -43,7 +43,6 @@ SourceFiles
 #include "mapDistribute.H"
 #include "crMatrix.H"
 #include "lduInterface.H"
-#include "cpuTime.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
