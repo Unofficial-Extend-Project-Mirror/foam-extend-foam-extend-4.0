@@ -577,7 +577,7 @@ public:
         );
 
 
-    // Destructor
+    //- Destructor
     ~GGIInterpolation();
 
 
