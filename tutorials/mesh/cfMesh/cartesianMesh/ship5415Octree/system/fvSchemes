@@ -28,12 +28,6 @@ divSchemes
     div(phi,U)  Gauss limitedLinearV 1;
 }
 
-fluxRequired
-{
-    default no;
-    p   p;
-}
-
 gradSchemes
 {
     default Gauss linear;

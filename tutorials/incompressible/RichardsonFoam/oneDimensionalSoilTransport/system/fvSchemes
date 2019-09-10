@@ -48,11 +48,5 @@ snGradSchemes
     default         Gauss vanLeer;
 }
 
-fluxRequired
-{
-    default         yes;
-    U;
-}
-
 
 // ************************************************************************* //

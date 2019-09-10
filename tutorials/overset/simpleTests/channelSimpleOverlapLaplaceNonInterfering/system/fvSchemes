@@ -21,35 +21,28 @@ ddtSchemes
 
 gradSchemes
 {
-    default         Gauss linear;
+    default Gauss linear;
 }
 
 divSchemes
 {
-    default               none;
+    default none;
 }
 
 laplacianSchemes
 {
-    default                        none;
-    laplacian(DT,T)             Gauss linear corrected;
+    default none;
+    laplacian(DT,T) Gauss linear corrected;
 }
 
 interpolationSchemes
 {
-    default         linear;
+    default linear;
 }
 
 snGradSchemes
 {
-    default         corrected;
-}
-
-fluxRequired
-{
-    default         no;
-    pStar;
-    p;
+    default corrected;
 }
 
 
