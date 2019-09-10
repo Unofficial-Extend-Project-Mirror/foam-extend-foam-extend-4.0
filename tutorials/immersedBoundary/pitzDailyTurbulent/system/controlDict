@@ -17,7 +17,7 @@ FoamFile
 libs
 (
     "libimmersedBoundary.so"
-    "libimmersedBoundaryTurbulence.so"
+    "libincompressibleImmersedBoundaryTurbulence.so"
     "liblduSolvers.so"
 )
 
@@ -43,7 +43,7 @@ writeFormat     ascii;
 
 writePrecision  6;
 
-writeCompression uncompressed;
+writeCompression compressed;
 
 timeFormat      general;
 
