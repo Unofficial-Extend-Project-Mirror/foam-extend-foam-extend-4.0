@@ -45,7 +45,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                  Class processorAMGInterface Declaration
+                     Class processorAMGInterface Declaration
 \*---------------------------------------------------------------------------*/
 
 class processorAMGInterface
@@ -79,6 +79,7 @@ public:
 
     //- Runtime type information
     TypeName("processor");
+
 
     // Constructors
 
