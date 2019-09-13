@@ -151,13 +151,14 @@ Foam::cyclicAMGInterface::cyclicAMGInterface
     // On master side, the owner addressing is stored in table of contents
     forAll (contents, masterI)
     {
-        SLList<label>& curNbrs = neighboursTable.find(contents[masterI])();
+        const SLList<label>& curNbrs = neighboursTable.find(contents[masterI])();
 
-        SLList<SLList<label> >& curFaceFaces =
+        const SLList<SLList<label> >& curFaceFaces =
             faceFaceTable.find(contents[masterI])();
 
-        SLList<label>::iterator nbrsIter = curNbrs.begin();
-        SLList<SLList<label> >::iterator faceFacesIter = curFaceFaces.begin();
+        SLList<label>::const_iterator nbrsIter = curNbrs.begin();
+        SLList<SLList<label> >::const_iterator faceFacesIter =
+            curFaceFaces.begin();
 
         for
         (
@@ -170,7 +171,8 @@ Foam::cyclicAMGInterface::cyclicAMGInterface
 
             for
             (
-                SLList<label>::iterator facesIter = faceFacesIter().begin();
+                SLList<label>::const_iterator facesIter =
+                    faceFacesIter().begin();
                 facesIter != faceFacesIter().end();
                 ++facesIter
             )
@@ -186,13 +188,15 @@ Foam::cyclicAMGInterface::cyclicAMGInterface
     // On slave side, the owner addressing is stored in linked lists
     forAll (contents, masterI)
     {
-        SLList<label>& curNbrs = neighboursTable.find(contents[masterI])();
+        const SLList<label>& curNbrs =
+            neighboursTable.find(contents[masterI])();
 
-        SLList<SLList<label> >& curFaceFaces =
+        const SLList<SLList<label> >& curFaceFaces =
             faceFaceTable.find(contents[masterI])();
 
-        SLList<label>::iterator nbrsIter = curNbrs.begin();
-        SLList<SLList<label> >::iterator faceFacesIter = curFaceFaces.begin();
+        SLList<label>::const_iterator nbrsIter = curNbrs.begin();
+        SLList<SLList<label> >::const_iterator faceFacesIter =
+            curFaceFaces.begin();
 
         for
         (
@@ -205,7 +209,8 @@ Foam::cyclicAMGInterface::cyclicAMGInterface
 
             for
             (
-                SLList<label>::iterator facesIter = faceFacesIter().begin();
+                SLList<label>::const_iterator facesIter =
+                    faceFacesIter().begin();
                 facesIter != faceFacesIter().end();
                 ++facesIter
             )

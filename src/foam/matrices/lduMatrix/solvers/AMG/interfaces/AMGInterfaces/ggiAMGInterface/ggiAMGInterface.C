@@ -329,7 +329,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
         Foam::max(128, fineGgiInterface_.interfaceSize()/4)
     );
 
-    // Neignbour processor index
+    // Neighbour processor index
     HashTable<DynamicList<label, 4>, label, Hash<label> > nbrsProcTable
     (
         Foam::max(128, fineGgiInterface_.interfaceSize()/4)
@@ -381,7 +381,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
             const label ffI = fineZa[fineZaI];
 
             const labelList& curFineNbrs = fineAddr[ffI];
-            const scalarList& curFineWeigts = fineWeights[ffI];
+            const scalarList& curFineWeights = fineWeights[ffI];
 
             forAll (curFineNbrs, nbrI)
             {
@@ -406,11 +406,13 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 // cells each.  For larger numbers, I need a
                 // larger max int, which can be changed on request
                 // HJ, 1/Apr/2009
+                // Note: curMaster and curSlave extended to long
+                // HJ, 6/Oct/2016
 
                 // My label = ffI
                 // Nbr label = nnI
                 const label nnI = curFineNbrs[nbrI];
-                const scalar curNW = curFineWeigts[nbrI];
+                const scalar curNW = curFineWeights[nbrI];
 
                 if (fineGgiInterface_.master())
                 {
@@ -592,6 +594,8 @@ Foam::ggiAMGInterface::ggiAMGInterface
             // cells each.  For larger numbers, I need a
             // larger max int, which can be changed on request
             // HJ, 1/Apr/2009
+            // Note: curMaster and curSlave extended to long
+            // HJ, 6/Oct/2016
 
             if (fineGgiInterface_.master())
             {
@@ -831,16 +835,16 @@ Foam::ggiAMGInterface::ggiAMGInterface
         // On master side, the owner addressing is stored in table of contents
         forAll (contents, masterI)
         {
-            DynamicList<long, 4>& curNbrs =
+            const DynamicList<long, 4>& curNbrs =
                 neighboursTable.find(contents[masterI])();
 
-            DynamicList<label, 4>& curNbrsProc =
+            const DynamicList<label, 4>& curNbrsProc =
                 nbrsProcTable.find(contents[masterI])();
 
-            DynamicList<DynamicList<label, 4>, 4>& curFaceFaces =
+            const DynamicList<DynamicList<label, 4>, 4>& curFaceFaces =
                 faceFaceTable.find(contents[masterI])();
 
-            DynamicList<DynamicList<scalar, 4>, 4>& curFaceWeights =
+            const DynamicList<DynamicList<scalar, 4>, 4>& curFaceWeights =
                 faceFaceWeightsTable.find(contents[masterI])();
 
             forAll (curNbrs, curNbrI)
@@ -849,9 +853,11 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 // as only local processor is being searched.  HJ, 13/Jun/2016
 
                 // Get faces and weights
-                DynamicList<label, 4>& facesIter = curFaceFaces[curNbrI];
+                const DynamicList<label, 4>& facesIter =
+                    curFaceFaces[curNbrI];
 
-                DynamicList<scalar, 4>& weightsIter = curFaceWeights[curNbrI];
+                const DynamicList<scalar, 4>& weightsIter =
+                    curFaceWeights[curNbrI];
 
                 // Record that this face belongs locally
                 // Use offset to indicate its position in the list
@@ -974,16 +980,16 @@ Foam::ggiAMGInterface::ggiAMGInterface
         // On slave side, the owner addressing is stored in linked lists
         forAll (contents, masterI)
         {
-            DynamicList<long, 4>& curNbrs =
+            const DynamicList<long, 4>& curNbrs =
                 neighboursTable.find(contents[masterI])();
 
-            DynamicList<DynamicList<label, 4>, 4>& curFaceFaces =
+            const DynamicList<DynamicList<label, 4>, 4>& curFaceFaces =
                 faceFaceTable.find(contents[masterI])();
 
-            DynamicList<DynamicList<label, 4>, 4>& curFaceFaceNbrs =
+            const DynamicList<DynamicList<label, 4>, 4>& curFaceFaceNbrs =
                 faceFaceNbrTable.find(contents[masterI])();
 
-            DynamicList<DynamicList<scalar, 4>, 4>& curFaceWeights =
+            const DynamicList<DynamicList<scalar, 4>, 4>& curFaceWeights =
                 faceFaceWeightsTable.find(contents[masterI])();
 
             forAll (curNbrs, curNbrI)
@@ -991,11 +997,14 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 // Check if the face is on local processor: no longer needed,
                 // as only local processor is being searched.  HJ, 13/Jun/2016
 
-                DynamicList<label, 4>& facesIter = curFaceFaces[curNbrI];
+                const DynamicList<label, 4>& facesIter =
+                    curFaceFaces[curNbrI];
 
-                DynamicList<label, 4>& faceNbrsIter = curFaceFaceNbrs[curNbrI];
+                const DynamicList<label, 4>& faceNbrsIter =
+                    curFaceFaceNbrs[curNbrI];
 
-                DynamicList<scalar, 4>& weightsIter = curFaceWeights[curNbrI];
+                const DynamicList<scalar, 4>& weightsIter =
+                    curFaceWeights[curNbrI];
 
                 // Find neighbour proc index from the first face
                 // on the other side

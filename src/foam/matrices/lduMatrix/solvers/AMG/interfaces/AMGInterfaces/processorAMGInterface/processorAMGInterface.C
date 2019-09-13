@@ -169,14 +169,15 @@ Foam::processorAMGInterface::processorAMGInterface
         // On master side, the owner addressing is stored in table of contents
         forAll (contents, masterI)
         {
-            SLList<label>& curNbrs = neighboursTable.find(contents[masterI])();
+            const SLList<label>& curNbrs =
+                neighboursTable.find(contents[masterI])();
 
-            SLList<SLList<label> >& curFaceFaces =
+            const SLList<SLList<label> >& curFaceFaces =
                 faceFaceTable.find(contents[masterI])();
 
-            SLList<label>::iterator nbrsIter = curNbrs.begin();
+            SLList<label>::const_iterator nbrsIter = curNbrs.begin();
 
-            SLList<SLList<label> >::iterator faceFacesIter =
+            SLList<SLList<label> >::const_iterator faceFacesIter =
                 curFaceFaces.begin();
 
             for
@@ -190,7 +191,7 @@ Foam::processorAMGInterface::processorAMGInterface
 
                 for
                 (
-                    SLList<label>::iterator facesIter =
+                    SLList<label>::const_iterator facesIter =
                         faceFacesIter().begin();
                     facesIter != faceFacesIter().end();
                     ++facesIter
@@ -209,14 +210,15 @@ Foam::processorAMGInterface::processorAMGInterface
         // On slave side, the owner addressing is stored in linked lists
         forAll (contents, masterI)
         {
-            SLList<label>& curNbrs = neighboursTable.find(contents[masterI])();
+            const SLList<label>& curNbrs =
+                neighboursTable.find(contents[masterI])();
 
-            SLList<SLList<label> >& curFaceFaces =
+            const SLList<SLList<label> >& curFaceFaces =
                 faceFaceTable.find(contents[masterI])();
 
-            SLList<label>::iterator nbrsIter = curNbrs.begin();
+            SLList<label>::const_iterator nbrsIter = curNbrs.begin();
 
-            SLList<SLList<label> >::iterator faceFacesIter =
+            SLList<SLList<label> >::const_iterator faceFacesIter =
                 curFaceFaces.begin();
 
             for
@@ -230,7 +232,8 @@ Foam::processorAMGInterface::processorAMGInterface
 
                 for
                 (
-                    SLList<label>::iterator facesIter = faceFacesIter().begin();
+                    SLList<label>::const_iterator facesIter =
+                        faceFacesIter().begin();
                     facesIter != faceFacesIter().end();
                     ++facesIter
                 )
