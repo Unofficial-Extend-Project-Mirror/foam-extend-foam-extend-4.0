@@ -63,7 +63,8 @@ void Foam::oversetRegion::calcDonorRegions() const
             (
                 "void oversetRegion::calcDonorRegions() const"
             )   << "Region " << name_ << " specified as the donor "
-                << "of itself.  List of donor regions: " << donorRegionNames_ << nl
+                << "of itself.  List of donor regions: "
+                << donorRegionNames_ << nl
                 << "This is not allowed: check oversetMesh definition"
                 << abort(FatalError);
         }

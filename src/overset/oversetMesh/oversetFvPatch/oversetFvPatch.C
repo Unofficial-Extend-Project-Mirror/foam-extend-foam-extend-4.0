@@ -75,14 +75,58 @@ const Foam::oversetPolyPatch& Foam::oversetFvPatch::oversetPatch() const
 }
 
 
+bool Foam::oversetFvPatch::master() const
+{
+    return oversetPatch_.master();
+}
+
+
+bool Foam::oversetFvPatch::fineLevel() const
+{
+    return true;
+}
+
+
+Foam::label Foam::oversetFvPatch::interfaceSize() const
+{
+    return boundaryMesh().mesh().nCells();
+}
+
+
+const Foam::labelList& Foam::oversetFvPatch::acceptorCells() const
+{
+    return overset().acceptorCells();
+}
+
+
+const Foam::labelList& Foam::oversetFvPatch::donorCells() const
+{
+    return overset().donorCells();
+}
+
+
+const Foam::labelList& Foam::oversetFvPatch::donorCellsProc() const
+{
+    return overset().donorCellsProc();
+}
+
+
+const Foam::mapDistribute& Foam::oversetFvPatch::map() const
+{
+    return overset().map();
+}
+
+
 Foam::tmp<Foam::labelField> Foam::oversetFvPatch::interfaceInternalField
 (
     const unallocLabelList& internalData
 ) const
 {
-    // Return the copy of the parameter since we need all the mapping for
-    // overset
-    return tmp<labelField>(new labelField(internalData));
+    // Return all internal values
+    return tmp<labelField>
+    (
+        new labelField(internalData)
+    );
 }
 
 
@@ -119,11 +163,12 @@ Foam::tmp<Foam::labelField> Foam::oversetFvPatch::internalFieldTransfer
 ) const
 {
     // Repackage donor data to acceptors
+
     // Note: result is copied as internal field, re-scaled and passed across
     tmp<labelField> tresult(new labelField(iF));
     labelList& result = tresult();
     
-    overset().map().distribute(result);
+    result = overset().acceptorMasterData(result);
 
     return tresult;
 }

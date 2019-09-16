@@ -44,7 +44,7 @@ void oversetFvPatchField<Type>::setCoupledFringe
     const bool coupled
 )
 {
-    forAll(psi.boundaryField(), patchI)
+    forAll (psi.boundaryField(), patchI)
     {
         fvPatchField<Type>& psip = psi.boundaryField()[patchI];
 
@@ -66,7 +66,7 @@ void oversetFvPatchField<Type>::oversetInterpolate
 )
 {
     // Loop through boundary field and find overset patch
-    forAll(psi.boundaryField(), patchI)
+    forAll (psi.boundaryField(), patchI)
     {
         fvPatchField<Type>& psip = psi.boundaryField()[patchI];
 
@@ -568,6 +568,34 @@ void oversetFvPatchField<Type>::correctOffDiag
                     }
                 }
             }
+        }
+    }
+
+    // Record the coefficients into internal/boundary coeffs for AMG
+    // coarsening
+    
+    Field<Type>& bouCoeffs = eqn.boundaryCoeffs()[this->patch().index()];
+
+    bouCoeffs.setSize(fringeFaces.size());
+    // intCoeffs remain at zero size: one-sided multiplication
+
+    // Careful with sign.  HJ, 16/Sep/2019
+    forAll (fringeFaceFlips, fringeI)
+    {
+        if (fringeFaceFlips[fringeI])
+        {
+            // Face pointing into live cell
+            // Add overset off-diagonal contribution to live cell
+            bouCoeffs[fringeI] =
+                -pTraits<Type>::one*fringeLowerCoeffs_[fringeI];
+        }
+        else
+        {
+            // Face pointing out of live cell
+            // Add overset off-diagonal contribution to live cell
+            bouCoeffs[fringeI] =
+                -pTraits<Type>::one*fringeUpperCoeffs_[fringeI];
+
         }
     }
 }

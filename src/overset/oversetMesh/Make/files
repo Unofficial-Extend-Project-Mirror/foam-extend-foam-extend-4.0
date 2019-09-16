@@ -31,6 +31,9 @@ oversetMesh/oversetMeshAddressing.C
 oversetLduInterface/oversetLduInterface.C
 oversetLduInterfaceField/oversetLduInterfaceField.C
 
+oversetAMGInterface/oversetAMGInterface.C
+oversetAMGInterfaceField/oversetAMGInterfaceField.C
+
 oversetPolyPatch/oversetPolyPatch.C
 oversetPointPatch/oversetPointPatch.C
 

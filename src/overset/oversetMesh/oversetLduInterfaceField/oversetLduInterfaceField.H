@@ -66,9 +66,8 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~oversetLduInterfaceField();
+    //- Destructor
+    virtual ~oversetLduInterfaceField();
 
 
     // Member Functions

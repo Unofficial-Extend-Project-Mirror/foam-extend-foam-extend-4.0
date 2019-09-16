@@ -46,8 +46,12 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
+class oversetMesh;
+class mapDistribute;
+
 /*---------------------------------------------------------------------------*\
-                    Class oversetLduInterface Declaration
+                      Class oversetLduInterface Declaration
 \*---------------------------------------------------------------------------*/
 
 class oversetLduInterface
@@ -58,15 +62,63 @@ public:
     //- Runtime type information
     TypeName("oversetLduInterface");
 
+
     // Constructors
 
-    // Destructor
+        //- Construct null
+        oversetLduInterface()
+        {}
 
-        virtual ~oversetLduInterface();
+
+    //- Destructor
+    virtual ~oversetLduInterface();
 
 
     // Member Functions
-    // Not currently needed.  HJ, 14/Jan/2009
+
+        //- Is this the master side?
+        virtual bool master() const = 0;
+
+        //- Is this the fine level?
+        virtual bool fineLevel() const = 0;
+
+        //- Return interface size.  Different on fine and coarse level
+        //  due to different comms pattern
+        virtual label interfaceSize() const = 0;
+
+        //- Return oversetMesh for fine-level addressing
+        virtual const oversetMesh& overset() const = 0;
+
+        //- Return acceptor cells
+        virtual const labelList& acceptorCells() const = 0;
+
+        //- Return donor cells for coarse-level addressing
+        virtual const labelList& donorCells() const = 0;
+
+        //- Return donor cells processor (to which donor is sent)
+        virtual const labelList& donorCellsProc() const = 0;
+
+        //- Return mapDistribute
+        virtual const mapDistribute& map() const = 0;
+
+
+        // Interface transfer functions
+
+            //- Initialise transfer of internal field adjacent to the interface
+            //  For overset, this is fringe cell data
+            virtual void initInternalFieldTransfer
+            (
+                const Pstream::commsTypes commsType,
+                const unallocLabelList& iF
+            ) const = 0;
+
+            //- Transfer and return internal field adjacent to the interface
+            //  For overset, this is fringe cell data
+            virtual tmp<labelField> internalFieldTransfer
+            (
+                const Pstream::commsTypes commsType,
+                const unallocLabelList& iF
+            ) const = 0;
 };
 
 

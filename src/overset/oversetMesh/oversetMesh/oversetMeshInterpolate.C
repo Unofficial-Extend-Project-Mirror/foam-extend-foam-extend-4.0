@@ -28,10 +28,209 @@ License
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
+void Foam::oversetMesh::acceptorMasterData
+(
+    UList<Type>& accF,
+    const UList<Type>& cellF
+) const
+{
+    // Check sizes
+    if
+    (
+        accF.size() != this->acceptorCells().size()
+     || cellF.size() != this->mesh().nCells()
+    )
+    {
+        FatalErrorInFunction
+            << "Size of fields does not correspond to interpolation" << nl
+            << "Source field size = " << cellF.size()
+            << " mesh size = " << this->mesh().nCells()
+            << " target field size = " << accF.size()
+            << " acceptor list size = " << this->acceptorCells().size()
+            << abort(FatalError);
+    }
+
+    // Create a copy of the field to interpolate and distribute its donor data
+    // across processors.
+    List<Type> donorField(cellF);
+
+    // Note: mapDistribute::distribute changes the size of the field it operates
+    // on to correspond to the size of received donor data
+    map().distribute(donorField);
+
+    // Get remote donor to local acceptor map. Allows easy indexing of donor
+    // that came from a (possibly) remote processor via its processor number and
+    // cell number.
+    const List<labelField>& remoteDAAddressing =
+        remoteDonorToLocalAcceptorAddr();
+
+    // Note: accF field indexed by number of acceptors (region-wise
+    // incremental, see oversetMesh::calcCellClassification() for details)
+    label aI = 0;
+
+    // Loop through all regions to account for all acceptors
+    forAll (regions_, regionI)
+    {
+        // Get acceptors for this region
+        const donorAcceptorList& curAcceptors = regions_[regionI].acceptors();
+
+        // Loop through all acceptors of this region
+        forAll (curAcceptors, regionAccI)
+        {
+            // Get necessary acceptor information
+            const donorAcceptor& curDA = curAcceptors[regionAccI];
+
+            // Get necessary donor information
+            const label donorCellI = curDA.donorCell();
+
+            // Get remote donor to local acceptor addressing for this donor
+            // processor. Note: it is assumed that all donors for an acceptor
+            // come from the same processor (though it can be remote processor)
+            const labelField& donorProcAddr =
+                remoteDAAddressing[curDA.donorProcNo()];
+
+            // Master donor contribution
+            accF[aI] = donorField[donorProcAddr[donorCellI]];
+
+            // Increment acceptor index
+            ++aI;
+        }
+    }
+}
+
+
+template<class Type>
+Foam::tmp<Foam::Field<Type> > Foam::oversetMesh::acceptorMasterData
+(
+    const UList<Type>& cellF
+) const
+{
+    tmp<Field<Type> > tresult(new Field<Type>(this->acceptorCells().size()));
+    UList<Type>& result = tresult();
+
+    acceptorMasterData(result, cellF);
+
+    return tresult;
+}
+
+
+template<class Type>
+void Foam::oversetMesh::acceptorAllData
+(
+    FieldField<Field, Type>& accF,
+    const UList<Type>& cellF
+) const
+{
+    // Check sizes
+    if
+    (
+        accF.size() != this->acceptorCells().size()
+     || cellF.size() != this->mesh().nCells()
+    )
+    {
+        FatalErrorInFunction
+            << "Size of fields does not correspond to interpolation" << nl
+            << "Source field size = " << cellF.size()
+            << " mesh size = " << this->mesh().nCells()
+            << " target field size = " << accF.size()
+            << " acceptor list size = " << this->acceptorCells().size()
+            << abort(FatalError);
+    }
+
+    // Create a copy of the field to interpolate and distribute its donor data
+    // across processors.
+    List<Type> donorField(cellF);
+
+    // Note: mapDistribute::distribute changes the size of the field it operates
+    // on to correspond to the size of received donor data
+    map().distribute(donorField);
+
+    // Get remote donor to local acceptor map. Allows easy indexing of donor
+    // that came from a (possibly) remote processor via its processor number and
+    // cell number.
+    const List<labelField>& remoteDAAddressing =
+        remoteDonorToLocalAcceptorAddr();
+
+    // Note: accF field indexed by number of acceptors (region-wise
+    // incremental, see oversetMesh::calcCellClassification() for details)
+    label aI = 0;
+
+    // Loop through all regions to account for all acceptors
+    forAll (regions_, regionI)
+    {
+        // Get acceptors for this region
+        const donorAcceptorList& curAcceptors = regions_[regionI].acceptors();
+
+        // Loop through all acceptors of this region
+        forAll (curAcceptors, regionAccI)
+        {
+            // Get necessary acceptor information
+            const donorAcceptor& curDA = curAcceptors[regionAccI];
+
+            // Get necessary donor information
+            const label donorCellI = curDA.donorCell();
+
+            // Neighbouring donor contributions
+            const donorAcceptor::DynamicLabelList& nbrDonors =
+                curDA.extendedDonorCells();
+
+            // Get remote donor to local acceptor addressing for this donor
+            // processor. Note: it is assumed that all donors for an acceptor
+            // come from the same processor (though it can be remote processor)
+            const labelField& donorProcAddr =
+                remoteDAAddressing[curDA.donorProcNo()];
+
+            // Collect donor contributions for this acceptor
+            // Note that accF is addressed by aI instead of acceptor cell
+            // indices. See oversetMesh::calcCellClassification for details
+            accF[aI].setSize(nbrDonors.size() + 1);
+
+            // Master donor contribution (first entry corresponds to
+            // the weight for master donor)
+            accF[aI][0] = donorField[donorProcAddr[donorCellI]];
+
+            forAll (nbrDonors, nbrDonorI)
+            {
+                // Get extended neighbour cell label
+                const label nbrDonorCellI = nbrDonors[nbrDonorI];
+
+                // Note indexing with + 1 offset since the first entry
+                // is for the master donor and is already accounted for
+                accF[aI][nbrDonorI + 1] =
+                    donorField[donorProcAddr[nbrDonorCellI]];
+            }
+
+            // Increment acceptor index
+            ++aI;
+        }
+    }
+}
+
+
+template<class Type>
+Foam::tmp<Foam::FieldField<Foam::Field, Type> >
+Foam::oversetMesh::acceptorAllData
+(
+    const UList<Type>& cellF
+) const
+{
+    tmp<Field<Type> > tresult
+    (
+        new FieldField<Field, Type>(this->acceptorCells().size())
+    );
+    FieldField<Field, Type>& result = tresult();
+
+    acceptorAllData(result, cellF);
+
+    return tresult;
+}
+
+
+template<class Type>
 void Foam::oversetMesh::interpolate
 (
-    Field<Type>& accF,
-    const Field<Type>& cellF,
+    UList<Type>& accF,
+    const UList<Type>& cellF,
     const word& fieldName
 ) const
 {
@@ -42,14 +241,8 @@ void Foam::oversetMesh::interpolate
      || cellF.size() != this->mesh().nCells()
     )
     {
-        FatalErrorIn
-        (
-            "void oversetMesh::donorToAcceptor\n"
-            "(\n"
-            "    Field<Type>& accF,\n"
-            "    const Field<Type>& ,cellF\n"
-            ") const"
-        )   << "Size of fields does not correspond to interpolation" << nl
+        FatalErrorInFunction
+            << "Size of fields does not correspond to interpolation" << nl
             << "Source field size = " << cellF.size()
             << " mesh size = " << this->mesh().nCells()
             << " target field size = " << accF.size()
@@ -59,7 +252,7 @@ void Foam::oversetMesh::interpolate
 
     // Create a copy of the field to interpolate and distribute its donor data
     // across processors.
-    Field<Type> donorField = cellF;
+    List<Type> donorField(cellF);
 
     // Note: mapDistribute::distribute changes the size of the field it operates
     // on to correspond to the size of received donor data
@@ -145,12 +338,12 @@ void Foam::oversetMesh::interpolate
 template<class Type>
 Foam::tmp<Foam::Field<Type> > Foam::oversetMesh::interpolate
 (
-    const Field<Type>& cellF,
+    const UList<Type>& cellF,
     const word& fieldName
 ) const
 {
     tmp<Field<Type> > tresult(new Field<Type>(this->acceptorCells().size()));
-    Field<Type>& result = tresult();
+    UList<Type>& result = tresult();
 
     interpolate(result, cellF, fieldName);
 

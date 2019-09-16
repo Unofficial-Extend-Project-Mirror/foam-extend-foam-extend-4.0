@@ -112,6 +112,9 @@ private:
             //- Donor cell labels
             mutable labelList* donorCellsPtr_;
 
+            //- Donor cell processor (to which donor is sent)
+            mutable labelList* donorCellsProcPtr_;
+
             //- Hole cell labels
             mutable labelList* holeCellsPtr_;
 
@@ -276,6 +279,9 @@ public:
             //- Return donor cells
             const labelList& donorCells() const;
 
+            //- Return donor cells processor (to which donor is sent)
+            const labelList& donorCellsProc() const;
+
             //- Return hole cells
             const labelList& holeCells() const;
 
@@ -351,20 +357,52 @@ public:
                 const word& fieldName
             ) const;
 
-            //- Interpolate to acceptors
+            //- Expand from master donor to acceptor: injection
+            template<class Type>
+            void acceptorMasterData
+            (
+                UList<Type>& accF,
+                const UList<Type>& cellField
+            ) const;
+
+            //- Expand from master donor to acceptor: injection
+            template<class Type>
+            tmp<Field<Type> > acceptorMasterData
+            (
+                const UList<Type>& cellField
+            ) const;
+
+            //- Expand from all donors to acceptor: raw donor data
+            template<class Type>
+            void acceptorAllData
+            (
+                FieldField<Field, Type>& accF,
+                const UList<Type>& cellField
+            ) const;
+
+            //- Expand from master donor to acceptor: injection
+            template<class Type>
+            tmp<FieldField<Field, Type> > acceptorAllData
+            (
+                const UList<Type>& cellField
+            ) const;
+
+            //- Interpolate to acceptors.  Supports interpolation weight
+            //  and extended addressing on a per-field basis
             template<class Type>
             void interpolate
             (
-                Field<Type>& accF,
-                const Field<Type>& cellField,
+                UList<Type>& accF,
+                const UList<Type>& cellField,
                 const word& fieldName
             ) const;
 
-            //- Interpolate to acceptors
+            //- Interpolate to acceptors.  Supports interpolation weight
+            //  and extended addressing on a per-field basis
             template<class Type>
             tmp<Field<Type> > interpolate
             (
-                const Field<Type>& cellField,
+                const UList<Type>& cellField,
                 const word& fieldName
             ) const;
 

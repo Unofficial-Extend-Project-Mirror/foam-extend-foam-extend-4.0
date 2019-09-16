@@ -30,14 +30,11 @@ License
 #include "oversetFvPatchFields.H"
 #include "demandDrivenData.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 void Foam::oversetMesh::calcCellClassification() const
 {
-    if (acceptorCellsPtr_ || donorCellsPtr_ || holeCellsPtr_)
+    if (acceptorCellsPtr_ || donorCellsPtr_ || donorCellsPtr_ || holeCellsPtr_)
     {
         FatalErrorIn("void oversetMesh::calcCellClassification() const")
             << "Cell classification already calculated"
@@ -61,6 +58,9 @@ void Foam::oversetMesh::calcCellClassification() const
 
     donorCellsPtr_ = new labelList(nDonorCells);
     labelList& donor = *donorCellsPtr_;
+
+    donorCellsProcPtr_ = new labelList(nDonorCells);
+    labelList& donorProc = *donorCellsProcPtr_;
 
     holeCellsPtr_ = new labelList(nHoleCells);
     labelList& hole = *holeCellsPtr_;
@@ -105,6 +105,7 @@ void Foam::oversetMesh::calcCellClassification() const
         forAll (curDonors, dI)
         {
             donor[nDonorCells] = curDonors[dI].donorCell();
+            donorProc[nDonorCells] = curDonors[dI].acceptorProcNo();
             nDonorCells++;
         }
 
@@ -1126,6 +1127,7 @@ void Foam::oversetMesh::clearOut() const
 {
     deleteDemandDrivenData(acceptorCellsPtr_);
     deleteDemandDrivenData(donorCellsPtr_);
+    deleteDemandDrivenData(donorCellsProcPtr_);
     deleteDemandDrivenData(holeCellsPtr_);
 
     deleteDemandDrivenData(oversetTypesPtr_);
@@ -1171,6 +1173,17 @@ const Foam::labelList& Foam::oversetMesh::donorCells() const
     }
 
     return *donorCellsPtr_;
+}
+
+
+const Foam::labelList& Foam::oversetMesh::donorCellsProc() const
+{
+    if (!donorCellsProcPtr_)
+    {
+        calcCellClassification();
+    }
+
+    return *donorCellsProcPtr_;
 }
 
 

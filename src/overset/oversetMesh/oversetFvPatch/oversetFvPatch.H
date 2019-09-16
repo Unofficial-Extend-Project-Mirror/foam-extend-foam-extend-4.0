@@ -85,7 +85,7 @@ public:
         oversetFvPatch(const polyPatch& patch, const fvBoundaryMesh& bm)
         :
             coupledFvPatch(patch, bm),
-            overPolyPatch_(refCast<const oversetPolyPatch>(patch))
+            oversetPatch_(refCast<const oversetPolyPatch>(patch))
         {}
 
 
@@ -102,7 +102,7 @@ public:
             virtual tmp<vectorField> delta() const;
 
             //- Return access to overset mesh
-            const oversetMesh& overset() const;
+            virtual const oversetMesh& overset() const;
 
             //- Const access to overset poly patch
             const oversetPolyPatch& oversetPatch() const;
@@ -113,23 +113,46 @@ public:
                 return true;
             }
 
+
         // Interface transfer functions
 
+            //- Is this the master side?
+            virtual bool master() const;
+
+            //- Is this the fine level?
+            virtual bool fineLevel() const;
+
+            //- Return interface size. On the fine level, this is the size
+            //  of internal field
+            virtual label interfaceSize() const;
+
+            //- Return acceptor cells
+            virtual const labelList& acceptorCells() const;
+
+            //- Return donor cells
+            virtual const labelList& donorCells() const;
+
+            //- Return donor cells processor (to which donor is sent)
+            virtual const labelList& donorCellsProc() const;
+
+            //- Return mapDistribute
+            virtual const mapDistribute& map() const;
+
             //- Return the values of the given internal data adjacent to
-            //  the interface as a field.  For overset, this is acceptor data
+            //  the interface as a field.  For overset, this is fringe cell data
             virtual tmp<labelField> interfaceInternalField
             (
                 const unallocLabelList& internalData
             ) const;
 
-            //- Initialise interface data transfer
+            //- Initialise interface data transfer (face field).  Dummy
             virtual void initTransfer
             (
                 const Pstream::commsTypes commsType,
                 const unallocLabelList& interfaceData
             ) const;
 
-            //- Transfer and return neighbour field
+            //- Transfer and return neighbour field (face field).  Dummy
             virtual tmp<labelField> transfer
             (
                 const Pstream::commsTypes commsType,
@@ -137,6 +160,7 @@ public:
             ) const;
 
             //- Initialise neighbour field transfer
+            // For overset, this is donor data
             virtual void initInternalFieldTransfer
             (
                 const Pstream::commsTypes commsType,
@@ -144,7 +168,7 @@ public:
             ) const;
 
             //- Return neighbour field
-            //  For overset, this is donor data for each acceptor
+            //  For overset, this is donor data
             virtual tmp<labelField> internalFieldTransfer
             (
                 const Pstream::commsTypes commsType,

@@ -64,6 +64,7 @@ Foam::oversetMesh::oversetMesh(const fvMesh& mesh)
 
     acceptorCellsPtr_(nullptr),
     donorCellsPtr_(nullptr),
+    donorCellsProcPtr_(nullptr),
     holeCellsPtr_(nullptr),
 
     oversetTypesPtr_(nullptr),
