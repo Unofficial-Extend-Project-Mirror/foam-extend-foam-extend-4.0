@@ -984,7 +984,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::clusterAmgPolicy::restrictMatrix() const
             }
         }
     }
-    Info<< "Finished restricting matrix" << endl;
+
     // Create and return amgMatrix
     return autoPtr<amgMatrix>
     (
