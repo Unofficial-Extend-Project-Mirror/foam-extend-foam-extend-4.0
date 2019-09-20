@@ -47,6 +47,7 @@ namespace Foam
 {
 
 // Forward declaration of classes
+class lduMesh;
 class oversetMesh;
 class mapDistribute;
 
@@ -85,6 +86,9 @@ public:
         //- Return interface size.  Different on fine and coarse level
         //  due to different comms pattern
         virtual label interfaceSize() const = 0;
+
+        //- Return lduMesh for owner-neighbour addressing
+        virtual const lduMesh& ldu() const = 0;
 
         //- Return oversetMesh for fine-level addressing
         virtual const oversetMesh& overset() const = 0;

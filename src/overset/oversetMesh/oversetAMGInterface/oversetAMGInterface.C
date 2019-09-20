@@ -309,9 +309,11 @@ Foam::oversetAMGInterface::oversetAMGInterface
 
         // Get mesh owner-neighbour addressing to visit cells around fringe
         // faces
-        const unallocLabelList& own = lduMesh.lowerAddr();
+        const unallocLabelList& own =
+            fineOversetInterface_.ldu().lduAddr().lowerAddr();
 
-        const unallocLabelList& nei = lduMesh.upperAddr();
+        const unallocLabelList& nei =
+            fineOversetInterface_.ldu().lduAddr().upperAddr();
 
         const labelList& fringeFaces =
             fineOversetInterface_.overset().fringeFaces();
@@ -797,6 +799,13 @@ Foam::label Foam::oversetAMGInterface::interfaceSize() const
 {
     return interfaceSize_;
 }
+
+
+const Foam::lduMesh& Foam::oversetAMGInterface::ldu() const
+{
+    return AMGInterface::ldu();
+}
+
 
 const Foam::oversetMesh& Foam::oversetAMGInterface::overset() const
 {

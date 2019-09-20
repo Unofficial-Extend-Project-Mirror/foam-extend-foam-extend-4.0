@@ -126,6 +126,9 @@ public:
             //  of internal field
             virtual label interfaceSize() const;
 
+            //- Return lduMesh for owner-neighbour addressing
+            virtual const lduMesh& ldu() const;
+
             //- Return acceptor cells
             virtual const labelList& acceptorCells() const;
 

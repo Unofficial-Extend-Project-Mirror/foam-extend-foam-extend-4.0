@@ -170,6 +170,9 @@ public:
 
         // Interface transfer functions
 
+            //- Return lduMesh for owner-neighbour addressing
+            virtual const lduMesh& ldu() const;
+
             //- Return access to overset mesh.
             //  Available only on the finest level
             virtual const oversetMesh& overset() const;

@@ -93,6 +93,12 @@ Foam::label Foam::oversetFvPatch::interfaceSize() const
 }
 
 
+const Foam::lduMesh& Foam::oversetFvPatch::ldu() const
+{
+    return boundaryMesh().mesh();
+}
+
+
 const Foam::labelList& Foam::oversetFvPatch::acceptorCells() const
 {
     return overset().acceptorCells();
