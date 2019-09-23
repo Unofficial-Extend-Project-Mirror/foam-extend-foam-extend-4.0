@@ -573,7 +573,7 @@ void oversetFvPatchField<Type>::correctOffDiag
 
     // Record the coefficients into internal/boundary coeffs for AMG
     // coarsening
-    
+
     Field<Type>& bouCoeffs = eqn.boundaryCoeffs()[this->patch().index()];
 
     bouCoeffs.setSize(fringeFaces.size());
@@ -998,7 +998,11 @@ void oversetFvPatchField<Type>::manipulateMatrix
     );
 
     eqn.setValues(holeCells, holeCellsPsi);
+    Field<Type>& bouCoeffs = eqn.boundaryCoeffs()[this->patch().index()];
+    Field<Type>& intCoeffs = eqn.internalCoeffs()[this->patch().index()];
 
+    Info<< "In manipulateMatrix: " << coupledFringe_
+        << " bou: " << bouCoeffs.size() << " int: " << intCoeffs.size() << endl;
     // If the fringe is not coupled, set values in acceptor cells and do not
     // perform overset interpolation during the solution process. Note that the
     // fringeUpper/Lower coefficients are collected in correctOffDiag member
@@ -1017,6 +1021,9 @@ void oversetFvPatchField<Type>::manipulateMatrix
         const labelList& accCells = oversetPatch_.overset().acceptorCells();
 
         eqn.setValues(accCells, accValues);
+
+        // Kill boundary coefficients: explicit coupling
+        eqn.boundaryCoeffs()[this->patch().index()].setSize(0);;
     }
 }
 
