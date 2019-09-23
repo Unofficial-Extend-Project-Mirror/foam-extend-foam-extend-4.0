@@ -40,6 +40,7 @@ SourceFiles
 
 #include "lduInterface.H"
 #include "primitiveFieldsFwd.H"
+#include "crMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -57,6 +58,19 @@ class mapDistribute;
 
 class oversetLduInterface
 {
+protected:
+
+    // Protected data
+
+        //- Transfer buffer
+        mutable labelField labelTransferBuffer_;
+
+        //- Field transfer buffer
+        mutable scalarField fieldTransferBuffer_;
+
+        //- crMatrix transfer buffer
+        mutable crMatrix crMatrixTransferBuffer_;
+
 
 public:
 
@@ -123,6 +137,27 @@ public:
                 const Pstream::commsTypes commsType,
                 const unallocLabelList& iF
             ) const = 0;
+
+
+        // Transfer buffer access
+
+            //- Return contents of the label transfer buffer
+            const labelField& labelTransferBuffer() const
+            {
+                return labelTransferBuffer_;
+            }
+
+            //- Return contents of the field transfer buffer
+            const scalarField& fieldTransferBuffer() const
+            {
+                return fieldTransferBuffer_;
+            }
+
+            //- Return contents of the crMatrix transfer buffer
+            const crMatrix& crMatrixTransferBuffer() const
+            {
+                return crMatrixTransferBuffer_;
+            }
 };
 
 

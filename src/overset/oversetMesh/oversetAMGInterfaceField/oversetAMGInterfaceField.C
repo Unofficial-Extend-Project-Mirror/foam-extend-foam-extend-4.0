@@ -60,10 +60,30 @@ Foam::oversetAMGInterfaceField::oversetAMGInterfaceField
 void Foam::oversetAMGInterfaceField::initInterfaceMatrixUpdate
 (
     const scalarField& psiInternal,
+    scalarField&,
+    const lduMatrix& m,
+    const scalarField& coeffs,
+    const direction,
+    const Pstream::commsTypes commsType,
+    const bool
+) const
+{
+    // Send psi to donors
+    oversetInterface_.initInternalFieldTransfer
+    (
+        commsType,
+        psiInternal
+    );
+}
+
+
+void Foam::oversetAMGInterfaceField::updateInterfaceMatrix
+(
+    const scalarField& psiInternal,
     scalarField& result,
     const lduMatrix& m,
     const scalarField& coeffs,
-    const direction cmpt,
+    const direction,
     const Pstream::commsTypes commsType,
     const bool switchToLhs
 ) const
@@ -92,21 +112,6 @@ void Foam::oversetAMGInterfaceField::initInterfaceMatrixUpdate
             result[acceptorCells[elemI]] -= coeffs[elemI]*pnf[elemI];
         }
     }
-}
-
-
-void Foam::oversetAMGInterfaceField::updateInterfaceMatrix
-(
-    const scalarField&,
-    scalarField&,
-    const lduMatrix&,
-    const scalarField&,
-    const direction,
-    const Pstream::commsTypes commsType,
-    const bool switchToLhs
-) const
-{
-    // Nothing to do
 }
 
 

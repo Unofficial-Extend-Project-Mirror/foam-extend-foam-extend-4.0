@@ -159,7 +159,12 @@ void Foam::oversetFvPatch::initInternalFieldTransfer
     const Pstream::commsTypes commsType,
     const unallocLabelList& iF
 ) const
-{}
+{
+    // Repackage donor data to acceptors
+
+    // Note: result is copied as internal field, re-scaled and passed across
+    labelTransferBuffer_ = overset().acceptorMasterData(iF);
+}
 
 
 Foam::tmp<Foam::labelField> Foam::oversetFvPatch::internalFieldTransfer
@@ -168,15 +173,7 @@ Foam::tmp<Foam::labelField> Foam::oversetFvPatch::internalFieldTransfer
     const unallocLabelList& iF
 ) const
 {
-    // Repackage donor data to acceptors
-
-    // Note: result is copied as internal field, re-scaled and passed across
-    tmp<labelField> tresult(new labelField(iF));
-    labelList& result = tresult();
-    
-    result = overset().acceptorMasterData(result);
-
-    return tresult;
+    return tmp<labelField>(new labelField(labelTransferBuffer_));
 }
 
 

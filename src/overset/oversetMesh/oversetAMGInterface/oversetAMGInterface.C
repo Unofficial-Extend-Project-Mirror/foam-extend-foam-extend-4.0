@@ -25,6 +25,8 @@ License
 
 #include "oversetAMGInterface.H"
 #include "oversetMesh.H"
+#include "IPstream.H"
+#include "OPstream.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -60,64 +62,110 @@ void Foam::oversetAMGInterface::initMap() const
             << abort(FatalError);
     }
 
-    // Create send map: what I am sending to which processor
+    // Algorithm follows oversetMeshAddressing.C calcInterpolationMap
+    // with changes.  Here, the information only exists on the acceptor
+    // side.  HJ, 21/Sep/2019
+    // Looping is performed over local acceptors
 
-    // There is no need to use a map: guess and resize
-    labelListList sendMap(Pstream::nProcs());
+    const label nAcceptors = donorCellForAcceptor_.size();
 
-    // Memory management
-    {
-        forAll (sendMap, procI)
-        {
-            sendMap[procI].setSize(donorCells_.size());
-        }
+    // Record number of donors from any processor.  This list will
+    // be reduced
+    labelListList nDonorsFromProcessorMap(Pstream::nProcs());
 
-        // Count number of entries
-        labelList nSendMap(Pstream::nProcs(), 0);
-
-        forAll (donorCellsProc_, dcpI)
-        {
-            // First index = proc
-            const label toProc = donorCellsProc_[dcpI];
-            // Second index = fill size
-            // Content = donor cell index
-            sendMap[toProc][nSendMap[toProc]] = dcpI;
-            nSendMap[toProc]++;
-        }
-
-        // Resize
-        forAll (sendMap, procI)
-        {
-            sendMap[procI].setSize(nSendMap[procI]);
-        }
-    }
+    // Collect donor cell index on the given processor
+    labelListList donorFromProcessor(Pstream::nProcs());
 
     // Create construct map: what I am receiving from each processor
     labelListList constructMap(Pstream::nProcs());
 
-    // Memory management
+    // Create list containing number of donors A processor is sending to other
+    // processors.
+    forAll (nDonorsFromProcessorMap, procI)
     {
-        forAll (constructMap, procI)
+        nDonorsFromProcessorMap[procI].setSize(Pstream::nProcs(), 0);
+
+        donorFromProcessor[procI].setSize(nAcceptors);
+        constructMap[procI].setSize(nAcceptors);
+    }
+
+    // Get the nDonorsFromProcessorMap for my processor
+    labelList& numberOfLocalDonorsFromProcs =
+        nDonorsFromProcessorMap[Pstream::myProcNo()];
+
+    labelList nConstructMap(Pstream::nProcs(), 0);
+
+    forAll (donorCellForAcceptor_, accI)
+    {
+        // Record donor cell from donor proc
+        donorFromProcessor[donorProcForAcceptor_[accI]]
+            [numberOfLocalDonorsFromProcs[donorProcForAcceptor_[accI]]] =
+            donorProcIndexForAcceptor_[accI];
+
+        // Record that the processor is giving data
+        constructMap[donorProcForAcceptor_[accI]]
+            [numberOfLocalDonorsFromProcs[donorProcForAcceptor_[accI]]] =
+            accI;
+
+        // Increment number of donors from this proc
+        numberOfLocalDonorsFromProcs[donorProcForAcceptor_[accI]]++;
+    }
+
+    // Resize lists
+    forAll (donorFromProcessor, procI)
+    {
+        donorFromProcessor[procI].setSize
+        (
+            numberOfLocalDonorsFromProcs[procI]
+        );
+
+        constructMap[procI].setSize
+        (
+            numberOfLocalDonorsFromProcs[procI]
+        );
+    }
+
+    // Reduce the number of cells.  This will allow the receiving
+    // processor to know it will receive the sendMap
+    Pstream::gatherList(nDonorsFromProcessorMap);
+    Pstream::scatterList(nDonorsFromProcessorMap);
+
+    // Send the donor cell indices to other processor
+    // Lookup MY ROW
+    forAll (numberOfLocalDonorsFromProcs, nbrProcI)
+    {
+        // If there are entries, send them across
+        if (numberOfLocalDonorsFromProcs[nbrProcI] > 0)
         {
-            constructMap[procI].setSize(acceptorCells().size());
+            OPstream toNbrProc
+            (
+                Pstream::blocking,
+                nbrProcI
+            );
+
+            toNbrProc << donorFromProcessor[nbrProcI];
         }
+    }
 
-        labelList nConstructMap(Pstream::nProcs(), 0);
+    // Create sendMap.  All data will be received from nbr
+    // processors
+    labelListList sendMap(Pstream::nProcs());
 
-        forAll (donorProcForAcceptor_, dpaI)
+    // Receive data from the other side.  Loop through second
+    // index
+    forAll (nDonorsFromProcessorMap, nbrProcI)
+    {
+        if (nDonorsFromProcessorMap[nbrProcI][Pstream::myProcNo()] > 0)
         {
-            // First index = proc
-            const label fromProc = donorProcForAcceptor_[dpaI];
-            // Second index = fill size
-            // Content = acceptor cell index
-            constructMap[fromProc][nConstructMap[fromProc]] = dpaI;
-            nConstructMap[fromProc]++;
-        }
+            // There is data to receive
+            IPstream fromNbrProc
+            (
+                Pstream::blocking,
+                nbrProcI
+            );
 
-        // Resize
-        forAll (constructMap, procI)
-        {
-            constructMap[procI].setSize(nConstructMap[procI]);
+            // Insert into sendMap for nbrProc
+            sendMap[nbrProcI] = labelList(fromNbrProc);
         }
     }
 
@@ -127,6 +175,35 @@ void Foam::oversetAMGInterface::initMap() const
         sendMap,
         constructMap
     );
+
+    // // Collect donor cells.  Use sendMap and unpack it
+    label nDonorCells = 0;
+
+    forAll (sendMap, procI)
+    {
+        nDonorCells += sendMap[procI].size();
+    }
+
+    // Set donor cells and donor proc
+    donorCells_.setSize(nDonorCells);
+    donorCellsProc_.setSize(nDonorCells);
+
+    // Reset counter
+    nDonorCells = 0;
+
+    // Collect donor cells
+    forAll (sendMap, procI)
+    {
+        const labelList& curSend = sendMap[procI];
+
+        forAll (curSend, csI)
+        {
+            donorCells_[nDonorCells] = curSend[csI];
+            donorCellsProc_[nDonorCells] = procI;
+
+            nDonorCells++;
+        }
+    }
 }
 
 
@@ -174,6 +251,17 @@ Foam::oversetAMGInterface::oversetAMGInterface
     // Coarsen local donor cells and renumber.  Record local donor index
     // and communicate across
 
+    // Note
+    // For serial runs donors are calculated here
+    // For parallel runs, they will be over-ridden in initMap
+    // There are 2 ways of calculating donors
+    // - go to fine donors and pick up restrict addressing
+    // - take sendMap and unpack.  The coarse donor will have the same value
+    //   but the donor that provides data to multiple neighbouring processors
+    //   will be recorded multiple times.  However, its restrict index is
+    //   the same.
+    // Reconsider.  HJ, 23/Sep/2019
+    
     // Get fine donors
     const labelList& fineDonors = fineOversetInterface_.donorCells();
 
@@ -182,32 +270,51 @@ Foam::oversetAMGInterface::oversetAMGInterface
 
     // Memory management
     {
+        // Note: donor collection must be done per-processor: a single
+        // donor may need to be passed to multiple acceptors on
+        // multiple processors.  HJ, 23/Sep/2019
+
         // Into the hash table, using the coarse donor, record coarse processor
         // from fine donor.  They must be the same
-        HashTable<label, label, Hash<label> > coarseDonorProcMap;
+        List<labelHashSet> coarseDonorProcMap(Pstream::nProcs());
 
         // For all fine donors, find and collect restrict addressing.
         // This will be the coarse donor
         forAll (fineDonors, fdI)
         {
-            coarseDonorProcMap.insert
+            coarseDonorProcMap[fineDonorsProc[fdI]].insert
             (
-                localRestrictAddressing[fineDonors[fdI]],
-                fineDonorsProc[fdI]
+                localRestrictAddressing[fineDonors[fdI]]
             );
         }
 
         // Collect coarse donor cells
-        donorCells_ = coarseDonorProcMap.sortedToc();
 
-        // Pick up coarse donorCellsProc from the fine
-        donorCellsProc_.setSize(donorCells_.size());
+        // Count donor cells
+        label nDonors = 0;
 
-        // This could be done with an iterator as well
-        // HJ, 13/Sep/2019
-        forAll (donorCells_, dcI)
+        forAll (coarseDonorProcMap, procI)
         {
-            donorCellsProc_[dcI] = coarseDonorProcMap.find(donorCells_[dcI])();
+            nDonors+= coarseDonorProcMap[procI].size();
+        }
+
+        donorCells_.setSize(nDonors);
+        donorCellsProc_.setSize(nDonors);
+
+        // Reset counter
+        nDonors = 0;
+
+        forAll (coarseDonorProcMap, procI)
+        {
+            const labelList& curDonors = coarseDonorProcMap[procI].sortedToc();
+
+            forAll (curDonors, cdI)
+            {
+                donorCells_[nDonors] = curDonors[cdI];
+                donorCellsProc_[nDonors] = procI;
+
+                nDonors++;
+            }
         }
     }
 
@@ -243,6 +350,11 @@ Foam::oversetAMGInterface::oversetAMGInterface
     }
 
     // Communicate coarse donor
+    fineOversetInterface_.initInternalFieldTransfer
+    (
+        Pstream::blocking,
+        acceptorCellDonorIndex
+    );
 
     acceptorCellDonorIndex =
         fineOversetInterface_.internalFieldTransfer
@@ -260,6 +372,12 @@ Foam::oversetAMGInterface::oversetAMGInterface
     );
 
     // Communicate donor proc
+    fineOversetInterface_.initInternalFieldTransfer
+    (
+        Pstream::blocking,
+        acceptorCellDonorProc
+    );
+
     acceptorCellDonorProc =
         fineOversetInterface_.internalFieldTransfer
         (
@@ -376,7 +494,7 @@ Foam::oversetAMGInterface::oversetAMGInterface
                 curSlaveProcDonorId =
                     acceptorCellDonorIndex[fringeFaceCells[ffI]];
 
-                // Info<< "A: " << curMaster << tab << curMasterProc << tab << curSlave << tab << curSlaveProc << tab << curSlaveProcDonorId << endl;
+                // Pout<< "A: " << curMaster << tab << curMasterProc << tab << curSlave << tab << curSlaveProc << tab << curSlaveProcDonorId << endl;
                 // Code in current master and slave
                 curMaster += procOffset*curMasterProc;
                 curSlave += procOffset*curSlaveProc;
@@ -544,7 +662,7 @@ Foam::oversetAMGInterface::oversetAMGInterface
             curSlaveProc = acceptorCellDonorProc[ffI];
             curSlaveProcDonorId = acceptorCellDonorIndex[ffI];
 
-            // Info<< "B: " << curMaster << tab << curMasterProc << tab << curSlave << tab << curSlaveProc << tab << curSlaveProcDonorId << endl;
+            // Pout<< "B: " << curMaster << tab << curMasterProc << tab << curSlave << tab << curSlaveProc << tab << curSlaveProcDonorId << endl;
             // Code in current master and slave
             curMaster += procOffset*curMasterProc;
             curSlave += procOffset*curSlaveProc;
@@ -698,7 +816,8 @@ Foam::oversetAMGInterface::oversetAMGInterface
         forAll (curNbrs, curNbrI)
         {
             // Record new coarse acceptor
-            faceCells_[nCoarseFaces] = curMaster;
+            faceCells_[nCoarseFaces] =
+                curMaster - procOffset*Pstream::myProcNo();
 
             // Record donor for coarse acceptor (can be on different processor)
             donorCellForAcceptor_[nCoarseFaces] = curNbrs[curNbrI];
@@ -726,13 +845,18 @@ Foam::oversetAMGInterface::oversetAMGInterface
     }
 
     // Info<< "Finished level.  Sizes " << nl
-    //     << "faceCells_: " << faceCells_.size()
+    //     << "faceCells_: " << faceCells_
     //     << " fineAddressing_: " << fineAddressing_.size()
     //     << " restrictAddressing_: " << restrictAddressing_.size()
     //     << " donorCells_: " << donorCells_.size()
     //     << " donorCellForAcceptor_: " << donorCellForAcceptor_.size()
     //     << " donorProcIndexForAcceptor_: " << donorProcIndexForAcceptor_.size()
     //     << endl;
+
+    if (Pstream::parRun())
+    {
+        initMap();
+    }
 }
 
 
@@ -853,30 +977,29 @@ void Foam::oversetAMGInterface::initInternalFieldTransfer
     const Pstream::commsTypes commsType,
     const unallocLabelList& iF
 ) const
-{}
-
-
-Foam::tmp<Foam::labelField> Foam::oversetAMGInterface::internalFieldTransfer
-(
-    const Pstream::commsTypes commsType,
-    const unallocLabelList& iF
-) const
 {
     // Repackage donor data to acceptors
     // Note: result is copied as internal field, re-scaled and passed across
     if (Pstream::parRun())
     {
-        tmp<labelField> tresult(new labelField(iF));
-        labelList& result = tresult();
+        labelTransferBuffer_ = iF;
 
-        map().distribute(result);
-
-        return tresult;
+        map().distribute(labelTransferBuffer_);
     }
     else
     {
-        return tmp<labelField>(new labelField(iF, donorCellForAcceptor_));
+        labelTransferBuffer_ = labelField(iF, donorCellForAcceptor_);
     }
+}
+
+
+Foam::tmp<Foam::labelField> Foam::oversetAMGInterface::internalFieldTransfer
+(
+    const Pstream::commsTypes commsType,
+    const unallocLabelList&
+) const
+{
+    return tmp<labelField>(new labelField(labelTransferBuffer_));
 }
 
 
@@ -885,30 +1008,32 @@ void Foam::oversetAMGInterface::initInternalFieldTransfer
     const Pstream::commsTypes commsType,
     const scalarField& iF
 ) const
-{}
+{
+    // Repackage donor data to acceptors
+    // Note: result is copied as internal field, re-scaled and passed across
+
+    // Repackage donor data to acceptors
+    // Note: result is copied as internal field, re-scaled and passed across
+    if (Pstream::parRun())
+    {
+        fieldTransferBuffer_ = iF;
+
+        map().distribute(fieldTransferBuffer_);
+    }
+    else
+    {
+        fieldTransferBuffer_ = scalarField(iF, donorCellForAcceptor_);
+    }
+}
 
 
 Foam::tmp<Foam::scalarField> Foam::oversetAMGInterface::internalFieldTransfer
 (
     const Pstream::commsTypes,
-    const scalarField& iF
+    const scalarField&
 ) const
 {
-    // Repackage donor data to acceptors
-    // Note: result is copied as internal field, re-scaled and passed across
-    if (Pstream::parRun())
-    {
-        tmp<scalarField> tresult(new scalarField(iF));
-        scalarList& result = tresult();
-
-        map().distribute(result);
-
-        return tresult;
-    }
-    else
-    {
-        return tmp<scalarField>(new scalarField(iF, donorCellForAcceptor_));
-    }
+    return tmp<scalarField>(new scalarField(fieldTransferBuffer_));
 }
 
 

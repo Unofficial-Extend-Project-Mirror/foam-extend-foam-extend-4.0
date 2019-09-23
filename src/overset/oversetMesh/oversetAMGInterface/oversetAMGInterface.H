@@ -64,7 +64,7 @@ class oversetAMGInterface
 
         //- Coarse interface size
         label interfaceSize_;
-    
+
         // Local acceptor data
 
             // Local acceptor index is stored in faceCells_
@@ -79,17 +79,17 @@ class oversetAMGInterface
             //- Donor processor donor index for local acceptor
             labelList donorProcIndexForAcceptor_;
 
-            //- Local donor cells
-            labelList donorCells_;
-
-            //- Donor cell processor (to which donor is sent)
-            labelList donorCellsProc_;
-
 
         // Parallel communication
 
             //- Map-distribute comms tool
             mutable mapDistribute* mapPtr_;
+
+            //- Local donor cells
+            mutable labelList donorCells_;
+
+            //- Donor cell processor (to which donor is sent)
+            mutable labelList donorCellsProc_;
 
 
     // Private Member Functions

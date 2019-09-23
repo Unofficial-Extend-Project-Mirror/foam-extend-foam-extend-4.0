@@ -855,7 +855,7 @@ void Foam::oversetMesh::calcInterpolationMap() const
     //    donor values I need to send to which processor:
     //    - Loop through all regions and then through all donors for that region
     //    - Mark all donors associated with donor/acceptor pair and see to which
-    //      processor I need to send its data. Handle the possiblity that a
+    //      processor I need to send its data.  Handle the possibility that a
     //      single donor may be used by multiple acceptors on the same processor
     //    - While looping through donors, count how many donors I'm sending to
     //      each processor
@@ -957,7 +957,7 @@ void Foam::oversetMesh::calcInterpolationMap() const
     labelListList sendDataMap(Pstream::nProcs());
     forAll (sendDataMap, procI)
     {
-        sendDataMap[procI] = sendMap[procI].toc();
+        sendDataMap[procI] = sendMap[procI].sortedToc();
     }
 
     // Gather/scatter number of donors going to each processor from each
