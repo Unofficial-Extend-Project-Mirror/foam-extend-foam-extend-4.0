@@ -24,47 +24,36 @@ solvers
         tolerance       1e-08;
         relTol          0.01;
     }
-
     U
     {
         solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-05;
-        relTol          0.1;
+        relTol          0;
     }
-
     T
     {
         solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-05;
-        relTol          0.1;
+        relTol          0;
     }
-
     k
     {
         solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-05;
-        relTol          0.1;
+        relTol          0;
     }
-
     epsilon
     {
         solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-05;
-        relTol          0.1;
-    }
-
-    R
-    {
-        solver          BiCGStab;
-        preconditioner  DILU;
-        tolerance       1e-05;
-        relTol          0.1;
+        relTol          0;
     }
 }
+
 
 SIMPLE
 {
@@ -81,7 +70,6 @@ relaxationFactors
     T               0.7;
     k               0.7;
     epsilon         0.7;
-    R               0.7;
 }
 
 
