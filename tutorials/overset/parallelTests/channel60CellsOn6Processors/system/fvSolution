@@ -18,15 +18,22 @@ solvers
 {
     "p|pFinal"
     {
-        solver           smoothSolver;
-        smoother         GaussSeidel;
+        solver          amgSolver;
+        cycle           W-cycle;
+        policy          cluster;
+        nPreSweeps      2;
+        nPostSweeps     3;
+        groupSize       4;
+        minCoarseEqns   5;
+        nMaxLevels      100;
+        scale           off;
+        smoother        ILUC0;
 
-        minIter          0;
-        maxIter          1000;
-        tolerance        1e-10;
-        relTol           0;
+        minIter         0;
+        maxIter         100;
+        tolerance       1e-7;
+        relTol          0.0;
     }
-
     U
     {
         solver           smoothSolver;
