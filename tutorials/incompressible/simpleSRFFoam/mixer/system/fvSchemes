@@ -22,8 +22,6 @@ ddtSchemes
 gradSchemes
 {
     default         Gauss linear;
-    grad(p)         Gauss linear;
-    grad(Urel)      Gauss linear;
 }
 
 divSchemes
@@ -33,16 +31,12 @@ divSchemes
     div(phi,k)      Gauss upwind;
     div(phi,epsilon) Gauss upwind;
     div(phi,omega) Gauss upwind;
-    div(phi,R)      Gauss upwind;
-    div(R)          Gauss linear;
-    div(phi,nuTilda) Gauss upwind;
     div((nuEff*dev(T(grad(Urel))))) Gauss linear;
 }
 
 laplacianSchemes
 {
-    default         none;
-    laplacian(nuEff,Urel) Gauss linear corrected;
+    default         Gauss linear corrected;
     laplacian(rAU,p) Gauss linear corrected;
     laplacian(DkEff,k) Gauss linear corrected;
     laplacian(DepsilonEff,epsilon) Gauss linear corrected;
@@ -54,7 +48,6 @@ laplacianSchemes
 interpolationSchemes
 {
     default         linear;
-    interpolate(Urel) linear;
 }
 
 snGradSchemes

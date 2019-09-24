@@ -25,22 +25,20 @@ boundaryField
         type            fixedValue;
         value           uniform 14.855;
     }
-
     outlet
     {
-        type            zeroGradient;
+        type            inletOutlet;
+        inletValue      uniform 14.855;
+        value           uniform 14.855;
     }
-
     innerWall
     {
         type            zeroGradient;
     }
-
     outerWall
     {
         type            zeroGradient;
     }
-
     cyclic
     {
         type            cyclic;

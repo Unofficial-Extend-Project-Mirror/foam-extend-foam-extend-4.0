@@ -21,12 +21,12 @@ solvers
         solver           PCG;
         preconditioner   DIC;
         tolerance        1e-06;
-        relTol           0.01;
+        relTol           0.0;
     }
     Urel
     {
-        solver           smoothSolver;
-        smoother         GaussSeidel;
+        solver           BiCGStab;
+        preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
     }
@@ -51,20 +51,6 @@ solvers
         tolerance        1e-05;
         relTol           0.1;
     }
-    R
-    {
-        solver           BiCGStab;
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0.1;
-    }
-    nuTilda
-    {
-        solver           BiCGStab;
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0.1;
-    }
 }
 
 SIMPLE
@@ -74,13 +60,11 @@ SIMPLE
 
 relaxationFactors
 {
-    p               0.1;
-    Urel            0.5;
+    p               0.3;
+    Urel            0.7;
     k               0.7;
     epsilon         0.7;
     omega           0.7;
-    R               0.7;
-    nuTilda         0.7;
 }
 
 

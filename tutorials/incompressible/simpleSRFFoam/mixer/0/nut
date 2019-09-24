@@ -23,13 +23,11 @@ boundaryField
 {
     inlet
     {
-        type            calculated;
-        value           uniform 0;
+        type            zeroGradient;
     }
     outlet
     {
-        type            calculated;
-        value           uniform 0;
+        type            zeroGradient;
     }
     innerWall
     {
