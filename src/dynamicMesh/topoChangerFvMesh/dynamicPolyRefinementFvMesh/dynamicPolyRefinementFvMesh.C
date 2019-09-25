@@ -122,14 +122,8 @@ Foam::dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh
     if (!topoChanger_.empty())
     {
         // Already initialized, warn the user that we'll neglect it
-        WarningIn
-        (
-            "dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh"
-            "\n("
-            "\n    const IOobject& io"
-            "\n    const word subDictName"
-            "\n)"
-        )  << "Using controls from constant/dynamicMeshDict instead of"
+        WarningInFunction
+           << "Using controls from constant/dynamicMeshDict instead of"
            << " constant/polyMesh/meshModifiers."
            << nl
            << "To supress this warning, delete meshModifiers file."
