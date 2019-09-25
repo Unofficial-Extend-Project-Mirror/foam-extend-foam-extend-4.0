@@ -617,9 +617,10 @@ tensor eigenVectors(const symmTensor& t)
 tensor hinv(const tensor& t)
 {
     static const scalar hinvLarge = 1e10;
-    static const scalar hinvSmall = 1e-10;
 
-    if (det(t) > hinvSmall)
+    // Consistent use of determinant check
+    // HJ, 13/Jun/2019
+    if (det(t) > SMALL)
     {
         return inv(t);
     }
@@ -672,9 +673,10 @@ tensor hinv(const tensor& t)
 symmTensor hinv(const symmTensor& t)
 {
     static const scalar hinvLarge = 1e10;
-    static const scalar hinvSmall = 1e-10;
 
-    if (det(t) > hinvSmall)
+    // Consistent use of determinant check
+    // HJ, 13/Jun/2019
+    if (det(t) > SMALL)
     {
         return inv(t);
     }
