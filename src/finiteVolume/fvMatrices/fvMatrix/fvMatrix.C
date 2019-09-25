@@ -608,15 +608,7 @@ void Foam::fvMatrix<Type>::setReference
 
         if (celli >= diag().size())
         {
-            FatalErrorIn
-            (
-                "fvMatrix<Type>::setReference"
-                "("
-                "const label celli, "
-                "const Type& value, "
-                "const bool forceReference"
-                ")"
-            )
+            FatalErrorInFunction
                 << "celli out of bound"
                 << abort(FatalError);
         }
