@@ -235,7 +235,7 @@ public:
             //  and copying the face-cell addressing
             void combine(const AMGInterface&);
 
-            //- Agglomerating the given fine-level coefficients and return
+            //- Agglomerating given fine-level coefficients
             virtual tmp<scalarField> agglomerateCoeffs
             (
                 const scalarField& fineCoeffs
