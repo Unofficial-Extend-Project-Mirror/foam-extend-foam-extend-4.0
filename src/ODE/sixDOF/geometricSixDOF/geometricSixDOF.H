@@ -197,9 +197,8 @@ public:
         virtual autoPtr<sixDOFODE> clone(const word& name) const;
 
 
-    // Destructor
-
-        virtual ~geometricSixDOF();
+    //- Destructor
+    virtual ~geometricSixDOF();
 
 
     // Member Functions
