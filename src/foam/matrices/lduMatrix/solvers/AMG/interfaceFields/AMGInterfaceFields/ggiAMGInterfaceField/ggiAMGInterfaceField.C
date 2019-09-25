@@ -119,14 +119,14 @@ void Foam::ggiAMGInterfaceField::updateInterfaceMatrix
 
     if (switchToLhs)
     {
-        forAll(faceCells, elemI)
+        forAll (faceCells, elemI)
         {
             result[faceCells[elemI]] += coeffs[elemI]*pnf[elemI];
         }
     }
     else
     {
-        forAll(faceCells, elemI)
+        forAll (faceCells, elemI)
         {
             result[faceCells[elemI]] -= coeffs[elemI]*pnf[elemI];
         }
