@@ -168,9 +168,9 @@ public:
                 if (Mesh::debug)
                 {
                     Info << "Deleting object " << obj.type() << endl;
-
-                    obj.deleteObject();
                 }
+
+                obj.deleteObject();
             }
         }
 
