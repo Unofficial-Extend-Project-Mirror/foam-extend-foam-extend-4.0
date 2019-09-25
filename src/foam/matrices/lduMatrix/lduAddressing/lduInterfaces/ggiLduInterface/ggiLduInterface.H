@@ -81,9 +81,6 @@ public:
 
         //- Construct null
         ggiLduInterface()
-        :
-            labelTransferBuffer_(),
-            fieldTransferBuffer_()
         {}
 
 
