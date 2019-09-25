@@ -53,7 +53,7 @@ Foam::ggiFvPatch::~ggiFvPatch()
 {}
 
 
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
 // Make patch weighting factors
 void Foam::ggiFvPatch::makeWeights(fvsPatchScalarField& w) const
@@ -191,6 +191,8 @@ void Foam::ggiFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
     }
 }
 
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 // Return delta (P to N) vectors across coupled patch
 Foam::tmp<Foam::vectorField> Foam::ggiFvPatch::delta() const
