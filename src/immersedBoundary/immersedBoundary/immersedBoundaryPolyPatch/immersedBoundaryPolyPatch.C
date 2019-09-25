@@ -1232,7 +1232,7 @@ void Foam::immersedBoundaryPolyPatch::calcCorrectedGeometry() const
     const polyMesh& mesh = boundaryMesh().mesh();
 
     // Get mesh geometry references from the MeshObject
-    vectorField& C = correctedFields_.correctedCellCentres();;
+    vectorField& C = correctedFields_.correctedCellCentres();
     vectorField& Cf = correctedFields_.correctedFaceCentres();
     scalarField& V = correctedFields_.correctedCellVolumes();
     vectorField& Sf = correctedFields_.correctedFaceAreas();
