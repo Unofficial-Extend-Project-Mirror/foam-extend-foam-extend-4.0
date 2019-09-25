@@ -120,7 +120,9 @@ reconstruct
     // G  -> G
 
     // Calculate sum of the directional fluxes
-    const surfaceScalarField magSfSqr = sqr(mesh.magSf());
+    const surfaceScalarField magSfSqr =
+        sqr(mesh.magSf() + dimensionedScalar("vsmall", dimArea, 1e-100));
+
     const GeometricField<GradType, fvPatchField, volMesh> fluxTimesNormal =
         surfaceSum((mesh.Sf()/magSfSqr)*ssf);
 
