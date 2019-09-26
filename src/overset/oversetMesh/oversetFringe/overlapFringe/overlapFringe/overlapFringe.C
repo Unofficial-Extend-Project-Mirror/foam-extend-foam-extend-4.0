@@ -906,7 +906,7 @@ const Foam::labelList& Foam::overlapFringe::fringeHoles() const
         cellSet holesSet
         (
             mesh(),
-            "fringeHolesProc" + Pstream::myProcNo() + region().name(),
+            "fringeHolesProc" + name(Pstream::myProcNo()) + region().name(),
             labelHashSet(*fringeHolesPtr_)
         );
 
@@ -932,7 +932,8 @@ const Foam::labelList& Foam::overlapFringe::candidateAcceptors() const
         cellSet candidateAcceptorsSet
         (
             mesh(),
-            "candidateAcceptorsProc" + Pstream::myProcNo() + region().name(),
+            "candidateAcceptorsProc" + name(Pstream::myProcNo())
+          + region().name(),
             labelHashSet(*acceptorsPtr_)
         );
 

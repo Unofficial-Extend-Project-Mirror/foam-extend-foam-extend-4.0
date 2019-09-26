@@ -1138,13 +1138,13 @@ const Foam::labelList& Foam::adaptiveOverlapFringe::fringeHoles() const
     // Debug, write fringe holes as a cell set
     if (oversetMesh::debug())
     {
-        Pout<< "Writing processor fringe holes into a cell set." << endl;
-        Info<< "REGION: " << region().name() << endl;
+        Pout<< "Writing processor fringe holes into a cell set for region"
+            << region().name() << endl;
 
         cellSet holesSet
         (
             mesh(),
-            "fringeHolesProc" + Pstream::myProcNo() + region().name(),
+            "fringeHolesProc" + name(Pstream::myProcNo()) + region().name(),
             labelHashSet(*fringeHolesPtr_)
         );
 
@@ -1165,12 +1165,14 @@ const Foam::labelList& Foam::adaptiveOverlapFringe::candidateAcceptors() const
     // Debug, write candidate acceptors as a cell set
     if (oversetMesh::debug())
     {
-        Pout<< "Writing processor candidate acceptors into a cell set." << endl;
+        Pout<< "Writing processor candidate acceptors into a cell set "
+            << "for region" << region().name() << endl;
 
         cellSet candidateAcceptorsSet
         (
             mesh(),
-            "candidateAcceptorsProc" + Pstream::myProcNo() + region().name(),
+            "candidateAcceptorsProc" + name(Pstream::myProcNo())
+          + region().name(),
             labelHashSet(*acceptorsPtr_)
         );
 
