@@ -206,10 +206,10 @@ void Foam::porousZone::addHeatSource
 
     scalar deltaTAux = (Qaux_ - QSum)/(Maux_*Caux_);
 
-    Info<< "Heat exchanger: " << name_
-        << ": Q = " << QSum
-        << " Taux = " << Taux_
-        << " delta Taux = " << deltaTAux
+    Info<< "Heat exchanger: " << name_ << nl
+        << "Q = " << QSum << nl
+        << "Taux = " << Taux_ << nl
+        << "delta Taux = " << deltaTAux
         << endl;
 
     // Relax the heat source
