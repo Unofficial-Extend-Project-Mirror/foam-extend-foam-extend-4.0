@@ -20,6 +20,8 @@ libs
     "liblduSolvers.so"
 );
 
+application     porousExplicitSourceReactingParcelFoam;
+
 startFoam       startTime;
 
 startTime       0;
