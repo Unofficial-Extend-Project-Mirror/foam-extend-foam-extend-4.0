@@ -115,7 +115,7 @@ public:
         //- Return Poisson's ratio
         virtual tmp<volScalarField> nu() const
         {
-            return nu();
+            return nu(0);
         }
 
         //- Return density
