@@ -54,15 +54,15 @@ Description
 
 int main(int argc, char *argv[])
 {
-    #include "setRootCase.H"
-    #include "createTime.H"
-    #include "createMesh.H"
+#   include "setRootCase.H"
+#   include "createTime.H"
+#   include "createMesh.H"
 
     simpleControl simple(mesh);
 
-    #include "readGravitationalAcceleration.H"
-    #include "createFields.H"
-    #include "initContinuityErrs.H"
+#   include "readGravitationalAcceleration.H"
+#   include "createFields.H"
+#   include "initContinuityErrs.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -74,9 +74,9 @@ int main(int argc, char *argv[])
 
         // Pressure-velocity SIMPLE corrector
         {
-            #include "UEqn.H"
-            #include "TEqn.H"
-            #include "pEqn.H"
+#           include "TEqn.H"
+#           include "UEqn.H"
+#           include "pEqn.H"
         }
 
         turbulence->correct();
