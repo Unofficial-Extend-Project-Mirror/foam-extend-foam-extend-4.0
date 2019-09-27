@@ -1,149 +1,329 @@
-#!/bin/bash
+#!/bin/sh
 #------------------------------------------------------------------------------
 # =========                 |
-# \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     | Version:     4.1
-#   \\  /    A nd           | Web:         http://www.foam-extend.org
-#    \\/     M anipulation  | For copyright notice see file Copyright
-#------------------------------------------------------------------------------
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+#    \\/     M anipulation  | Copyright (C) 2016-2018 OpenCFD Ltd.
+#-------------------------------------------------------------------------------
 # License
-#     This file is part of foam-extend.
-#
-#     foam-extend is free software: you can redistribute it and/or modify it
-#     under the terms of the GNU General Public License as published by the
-#     Free Software Foundation, either version 3 of the License, or (at your
-#     option) any later version.
-#
-#     foam-extend is distributed in the hope that it will be useful, but
-#     WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#     General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+#     This file is part of OpenFOAM, licensed under GNU General Public License
+#     <http://www.gnu.org/licenses/>.
 #
 # Script
 #     paraFoam
 #
 # Description
-#     start paraview with the OpenFOAM libraries
+#     Start paraview with OpenFOAM libraries and reader modules.
 #
+# Note
+#     Combining -block, -vtk, -builtin options with -region option yields
+#     undefined behaviour
 #------------------------------------------------------------------------------
-usage() {
-    while [ "$#" -ge 1 ]; do echo "$1"; shift; done
+printHelp() {
+    # Print usage to stdout so that it can be captured for bash completion
     cat<<USAGE
 
-usage: ${0##*/} [OPTION]
+Usage: ${0##*/} [OPTION] [--] [PARAVIEW_OPTION]
 options:
-  -case   dir    specify alternative case directory
-  -region name   specify mesh region name
-  -touch         only create the .OpenFOAM or .foam file
-  -nativeReader  use the paraview native reader for OpenFOAM
+  -block            Use blockMesh reader (.blockMesh extension)
+  -case <dir>       Specify alternative case directory, default is the cwd
+  -region <name>    Specify alternative mesh region
+  -touch            Create the file (eg, .blockMesh, .OpenFOAM, .foam, ...)
+  -touch-all        Create .blockMesh, .foam, .OpenFOAM files (for all regions)
+  -touch-proc       Same as '-touch' but for each processor
+  -vtk              Use VTK builtin OpenFOAM reader (.foam extension)
+  --help            Display ParaView help
+  -help             Display short help and exit
+  -help-full        Display full help and exit
 
-* start paraview $ParaView_VERSION with the OpenFOAM libraries
+Start paraview with the OpenFOAM libraries and reader modules.
+Note that paraview options begin with double dashes.
+
+Uses paraview=$(command -v paraview)
+
+Equivalent options:
+  -touch-all     -touchAll
+  -vtk           -builtin
 
 USAGE
+    exit 0  # A clean exit
+}
+
+# Report error and exit
+die()
+{
+    exec 1>&2
+    echo
+    echo "Error encountered:"
+    while [ "$#" -ge 1 ]; do echo "    $1"; shift; done
+    echo
+    echo "See '${0##*/} -help' for usage"
+    echo
     exit 1
 }
 
-unset regionName touchOnly useNativeReader
+#-------------------------------------------------------------------------------
 
-# This is needed for systems that are using comma as the decimal separator
-export LC_NUMERIC=C
+# Do a nice exit to give paraview an opportunity to clean up
+unset FOAM_ABORT
 
-# parse options
+# Hack: change all locale to 'C' i.e. using '.' for decimal point. This is
+# only needed temporarily until paraview is locale aware. (git version is
+# already 2010-07)
+export LC_ALL=C
+
+# Reader extension and plugin
+extension=OpenFOAM
+plugin=PVFoamReader
+
+# Parse options
+unset regionName optTouch
 while [ "$#" -gt 0 ]
 do
     case "$1" in
-    -h | -help)
-        usage
+    -h | -help*)
+        printHelp
+        ;;
+    -block*)
+        extension=blockMesh
+        plugin=PVblockMeshReader
+        ;;
+    -vtk | -built*)
+        extension=foam
+        unset plugin
         ;;
     -case)
-        [ "$#" -ge 2 ] || usage "'$1' option requires an argument"
-        cd "$2" 2>/dev/null || usage "directory does not exist:  '$2'"
-        shift 2
+        [ "$#" -ge 2 ] || die "'$1' option requires an argument"
+        cd "$2" 2>/dev/null || die "directory does not exist: '$2'"
+        shift
         ;;
     -region)
-        [ "$#" -ge 2 ] || usage "'$1' option requires an argument"
+        [ "$#" -ge 2 ] || die "'$1' option requires an argument"
         regionName=$2
-        shift 2
+        shift
         ;;
     -touch)
-        touchOnly=true
-        shift
+        optTouch=true
+        unset plugin
         ;;
-    -nativeReader)
-        useNativeReader=true
+    -touch-all | -touchAll)
+        optTouch=all
+        unset plugin
+        ;;
+    -touch-proc*)
+        optTouch=processor
+        unset plugin
+        ;;
+    --)
         shift
+        break    # Stop here, treat balance as paraview options
+        ;;
+    --help)      # Emit paraview help directly
+        exec paraview "$@"
+        echo "Error: could not exec paraview" 1>&2
+        exit 1   # This should not have happened
+        ;;
+    --*)
+        break    # Stop here, treat _this_ and balance as paraview options
         ;;
     *)
-        usage "unknown option/argument: '$*'"
+        die "Unknown option/argument: '$1'"
         ;;
     esac
+    shift
 done
 
-# get a sensible caseName
-caseName=${PWD##*/}
-
-if [ -n "$useNativeReader" ]
+if [ -n "$plugin" ]
 then
-    caseFileExt=".foam"
-else
-    caseFileExt=".OpenFOAM"
+    pluginError="Cannot use ParaView reader module library ($plugin)"
+
+    # Check if requested reader module exists
+    if [ -z "$PV_PLUGIN_PATH" ]
+    then
+        echo "$pluginError" 1>&2
+        echo "The PV_PLUGIN_PATH environment value is not set" 1>&2
+    elif [ -f "$PV_PLUGIN_PATH/lib${plugin}_SM.so" ]
+    then
+        unset pluginError
+    else
+        echo "$pluginError - not built?" 1>&2
+        cat<< NO_PLUGIN 1>&2
+Consider building the reader module
+    cd \$WM_PROJECT_DIR/applications/utilities/postProcessing/graphics/PVReaders
+    ./Allwclean
+    ./Allwmake
+NO_PLUGIN
+    fi
+
+    if [ -n "$pluginError" ]
+    then
+        # Fallback to native reader, if possible
+        if [ "$plugin" = PVFoamReader ]
+        then
+            echo 1>&2
+            echo "Continuing with builtin reader:  paraFoam -vtk" 1>&2
+            echo 1>&2
+            extension=foam
+        else
+            echo 1>&2
+            exit 1
+        fi
+        unset plugin
+    fi
 fi
 
-caseFile="$caseName$caseFileExt"
 
+# Check for --data=... argument
+unset hasData
+for i
+do
+    case "$i" in (--data=*) hasData=true; break;; esac
+done
+
+
+# Get a sensible caseName from the directory name
+caseName="${PWD##*/}"
+caseFile="$caseName.$extension"
 fvControls="system"
 
 if [ -n "$regionName" ]
 then
-    caseFile="$caseName{$regionName}$caseFileExt"
+    [ -d "constant/$regionName" ] || {
+        echo "FATAL ERROR: Region $regionName does not exist" 1>&2
+        exit 1
+    }
+    caseFile="$caseName{$regionName}.$extension"
     fvControls="$fvControls/$regionName"
 fi
 
-if [ -n "$touchOnly" ]
-then
-    touch "$caseFile"
-    echo "created '$caseFile'"
+case "${optTouch:-false}" in
+all)
+    extension=OpenFOAM
+    if [ -f system/blockMeshDict ] || [ -f constant/polyMesh/blockMeshDict ]
+    then
+        touch "$caseName.blockMesh"
+        echo "Created '$caseName.blockMesh'" 1>&2
+    fi
+    touch "$caseName.$extension" "$caseName.foam"
+    echo "Created '$caseName.$extension' '$caseName.foam'" 1>&2
+    # Discover probable regions
+    for region in constant/*
+    do
+        if [ -d "$region" ] && [ -d "$region/polyMesh" ]
+        then
+            regionName="${region##*/}"
+            touch "$caseName{$regionName}.$extension"
+            echo "Created '$caseName{$regionName}.$extension'" 1>&2
+        fi
+    done
     exit 0
-fi
-
-# parent directory for normal or parallel results
-case "$caseName" in
-    processor*) parentDir=".." ;;
-    *)          parentDir="."  ;;
+    ;;
+proc*)
+    for i in processor*
+    do
+    (
+        cd "$i" 2> /dev/null && touch "${caseFile%.*}#${i#processor}.$extension"
+    )
+    done
+    echo "Created '$caseFile' for processor directories" 1>&2
+    exit 0
+    ;;
+true)
+    touch "$caseFile"
+    echo "Created '$caseFile'" 1>&2
+    exit 0
+    ;;
 esac
 
-# check existence of essential files
-for check in system/controlDict $fvControls/fvSchemes $fvControls/fvSolution
-do
-    [ -s "$parentDir/$check" ] || usage "file does not exist:  '$parentDir/$check'"
-done
+
+# Check existence of some essential OpenFOAM files.
+# If caseName appears to be a processor directory, check parent as fallback
+hasFiles() {
+    local warn="Cannot locate OpenFOAM-format case files:"
+    local parent
+    case "$caseName" in (processor*) parent="../" ;; esac
+
+    for file
+    do
+        if [ -s "$file" ]
+        then
+            continue
+        elif [ -n "$parent" ] && [ -s "$parent$file" ]
+        then
+            continue
+        else
+            # Not found
+            [ -n "$warn" ] && echo "$warn" 1>&2
+            unset warn
+            if [ -n "$parent" ]
+            then
+                echo "    $file, or $parent$file" 1>&2
+            else
+                echo "    $file" 1>&2
+            fi
+        fi
+    done
+
+    if [ -n "$warn" ]
+    then
+        return 0        # No warnings were triggered
+    else
+        echo 1>&2       # Emit an additional separator line
+        return 1
+    fi
+}
 
 
-case "$ParaView_VERSION" in
-2*)
-    trap "rm -f paraFoam.pvs $caseFile 2>/dev/null; exit 0" EXIT TERM INT
-    touch "$caseFile"
+if [ "${hasData:-false}" = true ]
+then
 
-    # since we are now in the cwd, %CASE% is '$PWD/$caseFile'
-    sed -e s@%CASE%@$PWD/$caseFile@g \
-        $WM_PROJECT_DIR/bin/tools/paraFoam.pvs > paraFoam.pvs
+    # Has --data=.., send directly to paraview
+    exec paraview "$@"
+    echo "Error: could not exec paraview" 1>&2
+    exit 1   # This should not have happened
 
-    paraview paraFoam.pvs
-    ;;
+else
 
-*)
-    # only create/remove caseFile if it didn't already exist
-    [ -e $caseFile ] || {
-        trap "rm -f $caseFile 2>/dev/null; exit 0" EXIT TERM INT
-        touch "$caseFile"
-        echo "created temporary '$caseFile'"
+    # Check existence of essential files
+    warn=false
+    case "$plugin" in
+        PVblockMeshReader)
+            blockMeshDict=system/blockMeshDict
+            if [ -f constant/polyMesh/blockMeshDict ]
+            then
+                blockMeshDict=constant/polyMesh/blockMeshDict
+            fi
+
+            hasFiles system/controlDict "$blockMeshDict" || warn=true
+            ;;
+
+        PVFoamReader)
+            hasFiles \
+                system/controlDict \
+                "$fvControls/fvSchemes" \
+                "$fvControls/fvSolution" || warn=true
+            ;;
+    esac
+
+    [ "${warn:-false}" = false ] || {
+        echo -n "Would you like to open paraview anyway <Y|n>: "
+        read open
+        case "${open:-y}" in ([Yy]*) paraview ;; esac
+        exit
     }
 
-    paraview --data="$caseFile"
-    ;;
+    # Only create/remove caseFile if it did not previously exist
+    [ -e "$caseFile" ] || {
+        trap "rm -f $caseFile 2>/dev/null; exit 0" EXIT TERM INT
+        touch "$caseFile"
+        echo "Created temporary '$caseFile'" 1>&2
+    }
 
-esac
+    # For now filter out any ld.so errors. Caused by non-system compiler?
+    paraview --data="$caseFile" "$@" 2>&1 \
+        | grep -F -v 'Inconsistency detected'
+fi
+
+
 #------------------------------------------------------------------------------
