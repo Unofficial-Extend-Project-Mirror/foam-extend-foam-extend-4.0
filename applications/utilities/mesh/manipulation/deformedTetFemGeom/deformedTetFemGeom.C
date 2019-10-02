@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
 #   include "addRegionOption.H"
 
     argList::validArgs.append("scaling factor");
+    argList::validOptions.insert("UName", "name");
 
 #   include "setRootCase.H"
 #   include "createTime.H"
@@ -56,6 +57,9 @@ int main(int argc, char *argv[])
 
     scalar scaleFactor(readScalar(IStringStream(args.additionalArgs()[0])()));
 
+    word UName("U");
+    args.optionReadIfPresent("UName", UName);
+    
     instantList timeDirs = timeSelector::select0(runTime, args);
 
     tetPolyMesh tetMesh(mesh);
@@ -72,7 +76,7 @@ int main(int argc, char *argv[])
 
         IOobject Uheader
         (
-            "U",
+            UName,
             runTime.timeName(),
             mesh,
             IOobject::MUST_READ
@@ -81,7 +85,7 @@ int main(int argc, char *argv[])
         // Check U exists
         if (Uheader.headerOk())
         {
-            Info<< "    Reading U" << endl;
+            Info<< "    Reading " << UName << endl;
             tetPointVectorField U(Uheader, tetMesh);
 
             vectorField Uslice
@@ -101,7 +105,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            Info<< "    No U" << endl;
+            Info<< "    No " << UName << endl;
         }
 
         Info<< endl;
