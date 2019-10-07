@@ -35,6 +35,7 @@ Author
 #include "polyPatchID.H"
 #include "ZoneIDs.H"
 #include "objectRegistry.H"
+#include "indirectPrimitivePatch.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -1207,6 +1208,87 @@ void Foam::regionCouplePolyPatch::calcTransforms() const
     forwardT_.setSize(0);
     reverseT_.setSize(0);
     separation_.setSize(0);
+
+    if (debug > 1 && master())
+    {
+        if
+        (
+            !empty()
+         && patchToPatch().uncoveredMasterFaces().size() > 0
+        )
+        {
+            // Write uncovered master faces
+            Info<< "Writing uncovered master faces for patch "
+                << name() << " as VTK." << endl;
+
+            const polyMesh& mesh = boundaryMesh().mesh();
+
+            fileName fvPath(mesh.time().path()/"VTK");
+            mkDir(fvPath);
+
+            indirectPrimitivePatch::writeVTK
+            (
+                fvPath/fileName("uncoveredRegionCoupleFaces" + name()),
+                IndirectList<face>
+                (
+                    localFaces(),
+                    patchToPatch().uncoveredMasterFaces()
+                ),
+                localPoints()
+            );
+        }
+
+        if
+        (
+            !shadow().empty()
+         && patchToPatch().uncoveredSlaveFaces().size() > 0
+        )
+        {
+            // Write uncovered master faces
+            Info<< "Writing uncovered shadow faces for patch "
+                << shadowPatchName() << " as VTK." << endl;
+
+            const polyMesh& mesh = boundaryMesh().mesh();
+
+            fileName fvPath(mesh.time().path()/"VTK");
+            mkDir(fvPath);
+            Pout<< "Patch " << name()
+                << " shadow().localFaces(): " << shadow().localFaces().size()
+                << " patchToPatch().uncoveredSlaveFaces().size(): "
+                << patchToPatch().uncoveredSlaveFaces().size()
+                << " shadow().localPoints(): " << shadow().localPoints().size()
+                << endl;
+
+            indirectPrimitivePatch::writeVTK
+            (
+                fvPath/fileName
+                (
+                    "uncoveredRegionCoupleFaces"
+                  + shadowPatchName()
+                ),
+                IndirectList<face>
+                (
+                    shadow().localFaces(),
+                    patchToPatch().uncoveredSlaveFaces()
+                ),
+                shadow().localPoints()
+            );
+        }
+
+        // Check for bridge overlap
+        if (bridgeOverlap())
+        {
+            InfoInFunction
+                << "regionCouple patch " << name() << " with shadow "
+                << shadowPatchName() << " on region " << shadowRegionName()
+                << " has "
+                << patchToPatch().uncoveredMasterFaces().size()
+                << " uncovered master faces and "
+                << patchToPatch().uncoveredSlaveFaces().size()
+                << " uncovered slave faces.  Bridging is switched on. "
+                << endl;
+        }
+    }
 }
 
 

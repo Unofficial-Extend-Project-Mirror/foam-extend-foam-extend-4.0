@@ -1113,7 +1113,7 @@ void Foam::ggiPolyPatch::updateMesh()
 
 void Foam::ggiPolyPatch::calcTransforms() const
 {
-    // Simplest mixing plane: no transform or separation.  HJ, 24/Oct/2008
+    // Simplest interface: no transform or separation.  HJ, 24/Oct/2008
     forwardT_.setSize(0);
     reverseT_.setSize(0);
     separation_.setSize(0);
@@ -1167,6 +1167,7 @@ void Foam::ggiPolyPatch::calcTransforms() const
                 << patchToPatch().uncoveredSlaveFaces().size()
                 << " shadow().localPoints(): " << shadow().localPoints().size()
                 << endl;
+
             indirectPrimitivePatch::writeVTK
             (
                 fvPath/fileName("uncoveredGgiFaces" + shadowName()),
@@ -1180,31 +1181,7 @@ void Foam::ggiPolyPatch::calcTransforms() const
         }
 
         // Check for bridge overlap
-        if (!bridgeOverlap())
-        {
-            if
-            (
-                (
-                    patchToPatch().uncoveredMasterFaces().size() > 0
-                    && !empty()
-                )
-             || (
-                    !shadow().empty()
-                 && patchToPatch().uncoveredSlaveFaces().size() > 0
-                )
-            )
-            {
-                FatalErrorIn("label ggiPolyPatch::calcTransforms() const")
-                    << "ggi patch " << name() << " with shadow "
-                    << shadowName() << " has "
-                    << patchToPatch().uncoveredMasterFaces().size()
-                    << " uncovered master faces and "
-                    << patchToPatch().uncoveredSlaveFaces().size()
-                    << " uncovered slave faces.  Bridging is switched off. "
-                    << abort(FatalError);
-            }
-        }
-        else
+        if (bridgeOverlap())
         {
             InfoIn("label ggiPolyPatch::calcTransforms() const")
                 << "ggi patch " << name() << " with shadow "
