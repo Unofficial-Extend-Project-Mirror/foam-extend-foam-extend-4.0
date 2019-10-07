@@ -18,10 +18,11 @@ solvers
 {
     D GAMG
     {
+        solver           GAMG;
+        smoother         GaussSeidel;
+
         tolerance        1e-06;
         relTol           0.99;
-
-        smoother         GaussSeidel;
 
         cacheAgglomeration true;
 
@@ -33,10 +34,11 @@ solvers
 
     Dcorr GAMG
     {
+        solver           GAMG;
+        smoother         GaussSeidel;
+
         tolerance        1e-06;
         relTol           0.99;
-
-        smoother         GaussSeidel;
 
         cacheAgglomeration true;
 
