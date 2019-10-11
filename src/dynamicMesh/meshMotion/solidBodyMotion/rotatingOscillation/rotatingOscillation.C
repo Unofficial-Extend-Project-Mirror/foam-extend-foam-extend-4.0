@@ -47,16 +47,6 @@ namespace solidBodyMotionFunctions
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-Foam::vector
-Foam::solidBodyMotionFunctions::rotatingOscillation::calcPosition
-(
-    const scalar t
-) const
-{
-    return amplitude_*sin(2*pi*t/period_);
-}
-
-
 Foam::septernion
 Foam::solidBodyMotionFunctions::rotatingOscillation::calcTransformation
 (

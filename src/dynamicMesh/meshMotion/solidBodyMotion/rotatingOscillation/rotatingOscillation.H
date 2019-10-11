@@ -75,9 +75,6 @@ class rotatingOscillation
         void operator=(const rotatingOscillation&);
 
 
-        //- Calculate position
-        vector calcPosition(const scalar t) const;
-
         //- Calculate tranformation
         septernion calcTransformation(const scalar t) const;
 
