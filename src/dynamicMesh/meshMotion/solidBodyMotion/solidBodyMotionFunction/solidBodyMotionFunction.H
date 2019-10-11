@@ -120,9 +120,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~solidBodyMotionFunction();
+    //- Destructor
+    virtual ~solidBodyMotionFunction();
 
 
     // Member Functions
