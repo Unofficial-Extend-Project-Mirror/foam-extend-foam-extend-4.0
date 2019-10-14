@@ -1,7 +1,0 @@
-New features:
-- merged cfMesh contribution: Franjo Juretic
-
-
-Bug fixes:
-- fixed precunfigured mixing plane boundary files
-- added 0 directories to cfMesh tutorials
