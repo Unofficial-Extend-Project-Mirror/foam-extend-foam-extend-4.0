@@ -270,7 +270,7 @@ void Foam::immersedBoundaryFvPatch::makeDeltaCoeffs
 void Foam::immersedBoundaryFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
 {
     // Set patch non-orthogonality correction to zero
-    cv = vector::zero;
+//    cv = vector::zero;
 
     vectorField& cvIn = const_cast<vectorField&>(cv.internalField());
 
