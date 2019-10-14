@@ -18,15 +18,32 @@ solvers
 {
     p
     {
-         solver            BiCGStab;
-         preconditioner    Cholesky;
+        solver          amgSolver;
+        cycle           V-cycle;
+        policy          cluster;
+        nPreSweeps      1;
+        nPostSweeps     3;
+        groupSize       4;
+        minCoarseEqns   5;
+        nMaxLevels      100;
+        scale           on;
+        smoother        ILUC0;
 
-         minIter           1;
-         maxIter           1000;
-         tolerance         1e-7;
-         relTol            0.0; // Tighter tolerance for conservative overset
+        minIter         0;
+        maxIter         100;
+        tolerance       1e-7;
+        relTol          0.0;
     }
+    // p
+    // {
+    //      solver            BiCGStab;
+    //      preconditioner    Cholesky;
 
+    //      minIter           1;
+    //      maxIter           1000;
+    //      tolerance         1e-7;
+    //      relTol            0.0; // Tighter tolerance for conservative overset
+    // }
     U
     {
         solver           BiCGStab;
@@ -37,7 +54,6 @@ solvers
         minIter          1;
         maxIter          10;
     }
-
     k
     {
         solver           smoothSolver;
@@ -48,7 +64,6 @@ solvers
         minIter          1;
         maxIter          10;
     }
-
     omega
     {
         solver           smoothSolver;
