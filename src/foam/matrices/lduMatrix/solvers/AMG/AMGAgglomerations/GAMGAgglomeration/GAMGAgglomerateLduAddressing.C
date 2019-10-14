@@ -220,7 +220,7 @@ void Foam::GAMGAgglomeration::agglomerateLduAddressing
             {
                 fineInterfaces[inti].initInternalFieldTransfer
                 (
-                    Pstream::blocking,
+                    Pstream::nonBlocking,
                     restrictMap
                 );
             }
@@ -244,13 +244,18 @@ void Foam::GAMGAgglomeration::agglomerateLduAddressing
                     (
                         fineInterfaces[inti].internalFieldTransfer
                         (
-                            Pstream::blocking,
+                            Pstream::nonBlocking,
                             restrictMap
                         )
                     )
                 );
             }
         }
+    }
+
+    if (Pstream::parRun())
+    {
+        Pstream::waitRequests();
     }
 
     // Add the coarse level
