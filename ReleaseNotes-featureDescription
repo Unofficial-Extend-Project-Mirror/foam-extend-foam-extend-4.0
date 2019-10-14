@@ -1,0 +1,101 @@
+Block-coupled pressure velocity solver for steady and transient simulations of incompressible turbulent fluid flow.  Fully implicit handling of porosity and MRF in block-coupled solvers
+
+This is the final release of complete functionality for pressure-based implicit block-coupled solvers steady and transient incompressible turbulent flows.  The pressure and momentum equation are solver in a single linear block with 4x4 coefficients, with full implicit support for multiple frames of reference and porosity.  The linear system is solved using the block-coupled AMG solver (see below).
+
+The code supports implicit interfaces without transformation such as GGI.  For fully implicit treatment of symmetry plane boundaries, please use the blockSymmPlane boundary condition on velocity.
+
+Consistency of p and U boundary conditions is necessary.  The code does not support indeterminate form of pressure matrices, meaning that zero gradient boundary condition on the complete periphery of the domain is not allowed.  At least a single boundary pressure reference point is required.  Consistent treatment of inletOutlet velocity boundary condition requires the equivalent pressure boundary condition to be specified as outletInlet.
+
+The speed-up compared to the segregated solution comes from significant change in relaxation factors.  A typical relaxation factor on velocity is 0.95; for trivial meshes, academic problems and appropriate choice of convection discretisation the solver can also operate without relaxation on U, but for industrial cases this is not recommended.  Typical relaxation factors on turbulence variables is 0.9 or 0.95, depending on the complexity of the case.  Further improvement may be achieved using block-coupled turbulence models (see below).
+
+Significant effect on coupled solver performance is achieved using appropriate linear algebra settings.  It is recommended to use the block-AMG solver with the block-SAMG coarsening and ILUC0 smoothers.
+
+Expected performance of the coupled solver compared to the segregated solver for the same steady state case is a factor of 3 in execution time, at a cost of using triple the amount of RAM memory, due to the storage of the coupled matrix.
+
+Parallel scaling of the coupled solver on a large number of processors is significantly better than the equivalent segregated solver, as the number of MPI messages is reduced, with messages of larger size.  The solver is tested to the levels of hundred of millions of cells and thousands of cores.
+
+In transient simulations, the coupled solver gives advantage over the segregated solver because of its accuracy and because p-U coupling is not dependent on the time-step size or maximum CFL number in the domain.  It is recommended for use in large LES-type simulations, where there is a significant difference between the mean and max CFL number.  Outer iterations in the transient solver can be enabled but are typically not necessary.
+
+For details of the coupled solver and AMG solver technology we recommend the following references:
+
+Uroić, T., Jasak, H.: Block-selective algebraic multigrid for implicitly coupled pressure-velocity system, Computers&Fluids, 2018
+
+Beckstein, P., Galindo, V., Vukčević, V.: Efficient solution of 3D electromagnetic eddy-current problems within the finite volume framework of OpenFOAM, Journal of Computational Physics, Volume 344, 1 September 2017, Pages 623-646
+
+T Uroić, H Jasak, H Rusche: Implicitly coupled pressure–velocity solver OpenFOAM: Proceedings of the 11th Workshop, Springer, 249-267
+
+Fernandes, C., Vukcevic, V., Uroic, T., Simoes, R., Carneiro, O.S., Jasak, H., Nobrega, J.M.: A coupled finite volume flow solver for the solution of incompressible viscoelastic flows, Journal of Non-Newtonian Fluid Mechanics, 2019
+
+
+Immersed Boundary Surface Method.  Support for turbulence, dynamic immersed boundary and adaptive polyhedral refinement on immersed boundary meshes
+
+The new formulation of the Immersed Boundary Method (IBM) is a complete methodology rewrite of the work implemented in foam-extend-3.2 and 4.0.  It was shown that the principle of near-body interpolation is not sufficiently powerful for the flexibility and accuracy required for practical engineering simulation.  On suggestion of dr. Tukovic, the new method performs the actually cutting of the background mesh with the immersed boundary surfaces, modifying internal cells and faces and creating new intersection faces.  The Immersed Boundary (IB) faces exist in their own patch and are not present in the face list belonging to the polyMesh.
+
+Representation of IB in the background mesh is achieved by using the intersection faces of the surface mesh and cells on the background mesh.  The resolution of the original surface mesh does not influence the accuracy of the IBM: this is only influenced by the background mesh.  For cases of "unclean intersection", such as the surface mesh coinciding with the points or faces of the polyMesh, the error mitigation algorithm is implemented: the Marooney Maneouvre.  This will ensure that the cut cell is geometrically closed (sum of face area vectors for the cell equals zero vector) under all circumstances.
+
+The limiting factor of the IBM is the fact that a single background cell mesh can only be cut once.  The limitation is mitigated by the use of adaptive mesh refinement, based on the distance to the IB surface, which is provided as a part of the package.
+
+The background mesh for the IBM calculation can be of arbitrary type: polyhedral cells are fully supported.  The IBM can be combined with other complex mesh operations and interfaces: moving deforming mesh, topological changes and overset mesh.
+
+Post-processing of the immersed patch data is performed separately from the main mesh.  Individual VTK files are written for each field in the time directory, due to the limitations of the current VTK export format.
+
+The method is enabled to support moving deforming immersed surface, optionally operating on a moving deforming mesh.
+
+IBM implementation operates correctly in parallel on an arbitrary mesh decomposition.  Interaction of IBM and processor boundaries is fully supported.
+
+For static mesh simulations, regular static mesh boundary conditions may be used on IBM patches; however, the surface data for IBM patches will not be exported for post-processing.  To achieve this, IBM-specific boundary conditions may be used.  IBM does not carry execution overhead compared to the body-fitted mesh on static mesh cases, beyond the calculation of original IBM intersection.
+
+For dynamic mesh simulations, IBM-specific boundary conditions need to be used in order to handle the interaction of a moving deforming IBM and the background mesh, where the number of intersected cells changes during the simulation.
+
+The best reference for the Immersed Boundary methodology currebly publicly available is:
+
+Robert Anderluh: Validation of the Immersed Boundary Surface Method in Computational Fluid Dynamics, Master Thesis, Faculty of Mechanical Engineering and Naval Architecture, University of Zagreb, 2019
+
+http://cfd.fsb.hr/wp-content/uploads/2019/03/RoberAnderluhMSc_2019.pdfhttp://cfd.fsb.hr/wp-content/uploads/2019/03/RoberAnderluhMSc_2019.pdf
+
+Further publications are under way.
+
+Overset Mesh Method.  New automatic overset mesh fringe calculation algorithms.
+
+Further development of the native implementation of overset mesh includes work on automatic fringe detection and fringe minimisation.  Parallel fringe search algorithm and inter-processor fringe communication have been improved.
+
+
+Polyhedral adaptive mesh refinement and coarsening, working on all cell types, in 2-D and 3-D.
+
+A new adaptive mesh refinement and coarsening algorithm has been developed and deployed.  The algorithm operates on arbitrary polyhedral meshes, offering refinement and coarsening of polyhedral cells.  On hexahedral cell types, refinement is equivalent to 2x2x2 splitting of a hexahedron, while on polyhedra the algorithm regularises the mesh towards hex types.  Mesh coarsening has been executed based on re-assembling the cells from previously refined clusters.  pointLevel and cellLevel fields are no longer needed as a read-input and can be re-created from existing mesh structure.  This allows coarsening of initial locally consistent refined meshes as received from external meshing tools.
+
+In 2-D simulations, the adaptive mesh refinement and coarsening algorithm will correctly recognise the planar/wedge conditions and only operate in live directions.
+
+
+Dynamic load balancing for parallel topologically changing meshes
+
+A native implementation of dynamic load balancing is implemented as a low-level function of a topologically changing mesh.  Load balancing as a function of a topoChangerFvMesh virtual base class, making it available for all types of topological changes (or as a response to external load imbalance for a static mesh).  Implementation uses the tools developed for parallel decomposition/reconstruction with changes needed for Pstream communication.  Balancing action is executed as a global decomposition, assemble of a-b migrated meshes (using decomposition tools), migration via Pstream communication and re-assembly at target processor (using reconstruction tools).  Field data follows the same path, migrating with relevant mesh data.  Load balancing is typically used with adaptive mesh refinement and is thoroughly tested for large parallel decompositions.  Cases of "zero cell at processor" are fully supported; this allows the load balancing tool to be used for initial decomposition or reconstruction., which no longer relies to point/face/cell-ProcAddressing fields.
+
+
+Linear solver and block linear solver improvements
+
+In the search for significant performance improvements on meshes with coupled interfaces and large-scale HPC, significant work has been done on linear algebra.  On preconditioners, Crout-type ILU preconditioners are implemented.  For meshes where there is direct contact between face-neighbours of a cell (virtually all mesh structures, apart full-hex meshes), the diagonal based ILU preconditioning is incorrect, with consequences on solver performance.  To replace this, Crout-type preconditioners and smoothers are implemented both for the segregated and block-coupled solvers.  Variable-level fill-in ILU-Cp and zero fill-in ILU-C0 preconditioners are implemented, with several variants of preconditioning across processor boundaries.  Performance testing of processor-aware ILU-type preconditioners is likely to continue for some time.
+
+On linear solver methodology, major work has been done to improve the performance of the linear algebra package where a number of matrix rows (cells) is excluded from the simulations, such as immersed boundary and overset meshes.  In particular, zero-group-handling in AMG coarsening is implemented.  New agglomeration algorithms resulting from the work at Uni Zagreb have been implemented, including a smart cell clustering algorithm and a generalisation of the Selective AMG work by Stuben et al.  Here, a coarse level of multigrid is created by equation selection (as opposed to agglomeration), based on priority criteria of equation influences.  The algorithms have been generalised on non-M, non-symmetric and non-diagonally dominant matrices.  Parallel handling of coarse level selective AMG interfaces, splitting the triple matrix product coarse level assembly operations to relevant processors has been implemented.  The selective AMG (incredibly) shows theoretical convergence properties of 1-order-of-magnitude residual reaction per V-cycle (theoretically, W-cycle) even on industrial grade meshes.
+
+The block-coupled solver implements both the equation clustering and equation selection operations on a block-matrix system using the appropriate norm of a block-coupled coefficient.  The algorithms mirror the scalar version, and show remarkable convergence characteristics for a block system without diagonal dominance, such as implicitly coupled U-p block matrix.  Again, theoretical convergence behaviour is indicated on industrial strength meshes.
+
+For further information see:
+
+Tessa Uroic: Implicitly Coupled Finite Volume Algorithms, PhD Thesis, Faculty of Mechanical Engineering and Naval Architecture, University of Zagreb, 2019
+
+
+Major performance improvement for parallel overset and GGI interfaces
+
+Performance improvement for GGI and related interfaces (partial overlap, mixing plane) in parallel execution has been implemented by distributing the work on all available processors.
+
+
+Consistent SIMPLE and PISO segregated algorithms, where the solution is independent of time-step size or relaxation parameters
+
+The final and validated version of the consistent handling of relaxation and time-stepping within the SIMPLE-PISO family of algorithms has been deployed.  The code has been validated and shown to remove relaxation- and time-step dependent artefacts in steady and transient solutions
+
+New formulation of buoyant Boussinesq approximation solver
+
+Alternative formulation of the steady Boussinesq approximation solver for buoyant flows has been released, following community comments on the lack of accuracy and instability of the original formulation
+
+Incremental development of the Finite Area Method and liquid film solver

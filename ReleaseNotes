@@ -208,7 +208,7 @@ The code is packaged for Ubuntu-18.04 MAc OSX and Windows 10.
       - Block-coupled k-epsilon and k-omega SST turbulence models for fast non-linear convergence
 
     - Dynamic Mesh Support
-      - Polyhedral adaptive mesh refinement and coarsening, working on all cell types
+      - Polyhedral adaptive mesh refinement and coarsening, working on all cell types, in 2-D and 3-D
       - Dynamic load balancing for parallel topologically changing meshes
       - Rewrite of the 6-DOF ODE solver, working directly on the rotation matrix.  Implementation of constraints and restraints in the 6-DOF solver
 
