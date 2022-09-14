@@ -184,7 +184,7 @@ inline void Foam::FixedList<T, Size>::setSize(const label s)
 template<class T, unsigned Size>
 inline void Foam::FixedList<T, Size>::transfer(const FixedList<T, Size>& lst)
 {
-    for (register unsigned i=0; i<Size; i++)
+    for (unsigned i=0; i<Size; i++)
     {
         v_[i] = lst[i];
     }
@@ -232,9 +232,18 @@ inline const T& Foam::FixedList<T, Size>::operator[](const label i) const
 
 
 template<class T, unsigned Size>
+inline void Foam::FixedList<T, Size>::operator=(const FixedList<T, Size>& lst)
+{
+    for (unsigned i=0; i<Size; i++)
+    {
+        v_[i] = lst[i];
+    }
+}
+
+template<class T, unsigned Size>
 inline void Foam::FixedList<T, Size>::operator=(const T lst[Size])
 {
-    for (register unsigned i=0; i<Size; i++)
+    for (unsigned i=0; i<Size; i++)
     {
         v_[i] = lst[i];
     }

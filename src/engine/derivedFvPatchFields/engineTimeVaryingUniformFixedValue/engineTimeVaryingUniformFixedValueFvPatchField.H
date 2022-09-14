@@ -138,13 +138,13 @@ public:
             //- Return the fluctuation scale
             const graph& timeData() const
             {
-                return timeDataPtr_;
+                return timeDataPtr_();
             }
 
             //- Return reference to the fluctuation scale to allow adjustment
             graph& timeData()
             {
-                return timeDataPtr_;
+                return timeDataPtr_();
             }
 
             const engineTime& engineDB() const

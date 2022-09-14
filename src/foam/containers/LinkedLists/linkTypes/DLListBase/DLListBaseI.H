@@ -53,6 +53,24 @@ inline Foam::DLListBase::DLListBase(link* a)
 }
 
 
+inline Foam::DLListBase::iterator::iterator(const iterator& iter)
+:
+    curList_(iter.curList_),
+    curElmt_(iter.curElmt_),
+    curLink_(iter.curLink_)
+{}
+
+
+inline Foam::DLListBase::const_iterator::const_iterator
+(
+    const const_iterator& iter
+)
+:
+    curList_(iter.curList_),
+    curElmt_(iter.curElmt_)
+{}
+
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 inline Foam::DLListBase::~DLListBase()

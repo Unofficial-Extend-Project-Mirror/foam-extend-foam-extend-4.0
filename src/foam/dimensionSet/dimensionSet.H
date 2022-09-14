@@ -180,6 +180,9 @@ public:
         //- Construct from Istream
         dimensionSet(Istream&);
 
+        //- Construct as copy
+        dimensionSet(const dimensionSet& ds);
+
 
     // Member functions
 

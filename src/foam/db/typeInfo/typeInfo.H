@@ -88,7 +88,7 @@ inline To& dynamicCast(From& r)
     {
         return dynamic_cast<To&>(r);
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast& e)
     {
         FatalErrorIn("dynamicCast<To>(From&)")
             << "Attempt to cast type " << typeid(r).name()
@@ -109,7 +109,7 @@ inline To& refCast(From& r)
     {
         return dynamic_cast<To&>(r);
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast& e)
     {
         FatalErrorIn("refCast<To>(From&)")
             << "Attempt to cast type " << r.type()
@@ -133,7 +133,8 @@ inline bool isType(const Type& t)
 template<class TestType, class Type>
 inline bool isA(const Type& t)
 {
-    return dynamic_cast<const TestType*>(&t);
+    const Type* p = &t;
+    return dynamic_cast<const TestType*>(p);
 }
 
 

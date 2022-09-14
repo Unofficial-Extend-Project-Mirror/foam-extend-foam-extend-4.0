@@ -112,6 +112,9 @@ public:
         //- Construct from Istream
         quaternion(Istream&);
 
+        //- Copy construct
+        quaternion(const quaternion&);
+
 
     // Member functions
 

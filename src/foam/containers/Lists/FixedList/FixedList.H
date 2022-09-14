@@ -205,6 +205,9 @@ public:
         //- Return element of constant FixedList.
         inline const T& operator[](const label) const;
 
+        //- Assignment to a FixedList
+        inline void operator=(const FixedList<T, Size>&);
+
         //- Assignment from array operator. Takes linear time.
         inline void operator=(const T v[Size]);
 

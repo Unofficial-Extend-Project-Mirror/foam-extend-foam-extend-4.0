@@ -212,27 +212,27 @@ public:
             }
 
             //- Return inlet-outlet treatment switch
-            bool inletOutlet() const
+            Switch inletOutlet() const
             {
                 return inletOutlet_;
             }
 
             //- Return reference to inlet-outlet treatment switch
             //  to allow adjustment
-            bool& inletOutlet()
+            Switch& inletOutlet()
             {
                 return inletOutlet_;
             }
 
             //- Return supercritical outlet treatment switch
-            bool correctSupercritical() const
+            Switch correctSupercritical() const
             {
                 return correctSupercritical_;
             }
 
             //- Return reference to supercritical treatment switch
             //  to allow adjustment
-            bool& correctSupercritical()
+            Switch& correctSupercritical()
             {
                 return correctSupercritical_;
             }

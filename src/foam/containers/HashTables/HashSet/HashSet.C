@@ -80,6 +80,21 @@ inline bool Foam::HashSet<Key, Hash>::operator[](const Key& key) const
 
 
 template<class Key, class Hash>
+void Foam::HashSet<Key, Hash>::operator=(const HashSet<Key, Hash>& rhs)
+{
+    // Check for assignment to self
+    if (this == &rhs)
+    {
+        FatalErrorIn("HashSet::operator=(const HashSet& rhs)")
+            << "attempted assignment to self"
+            << abort(FatalError);
+    }
+
+    HashTable<nil, Key, Hash>::operator=(rhs);
+}
+
+
+template<class Key, class Hash>
 bool Foam::HashSet<Key, Hash>::operator==(const HashSet<Key, Hash>& rhs) const
 {
     // Are all lhs elements in rhs?

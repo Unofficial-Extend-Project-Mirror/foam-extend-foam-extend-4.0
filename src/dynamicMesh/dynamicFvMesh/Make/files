@@ -13,6 +13,8 @@ dynamicRefineFvMesh/dynamicRefineFvMesh.C
 
 mixerGgiFvMesh/mixerGgiFvMesh.C
 turboFvMesh/turboFvMesh.C
+multiGgiRotorFvMesh/ggiRotor.C
+multiGgiRotorFvMesh/multiGgiRotorFvMesh.C
 
 fvMeshAdder/fvMeshAdder.C
 fvMeshDistribute/fvMeshDistribute.C

@@ -74,6 +74,12 @@ Foam::dimensionSet::dimensionSet
 }
 
 
+Foam::dimensionSet::dimensionSet(const dimensionSet& ds)
+{
+    reset(ds);
+}
+
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 bool Foam::dimensionSet::dimensionless() const

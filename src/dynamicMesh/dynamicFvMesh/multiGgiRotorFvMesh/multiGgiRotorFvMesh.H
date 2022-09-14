@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     4.1
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -22,20 +22,24 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::Map
+    multiGgiRotorFvMesh
 
 Description
-    A HashTable to objects of type \<T\> with a label key.
+    Mixer mesh with multiple rotors.
 
-See Also
-    PtrMap
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
+
+SourceFiles
+    multiGgiRotorFvMesh.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Map_H
-#define Map_H
+#ifndef multiGgiRotorFvMesh_H
+#define multiGgiRotorFvMesh_H
 
-#include "HashTable.H"
+#include "dynamicFvMesh.H"
+#include "ggiRotor.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -43,61 +47,51 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class Map Declaration
+                       Class multiGgiRotorFvMesh Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class T>
-class Map
+class multiGgiRotorFvMesh
 :
-    public HashTable<T, label, Hash<label> >
+    public dynamicFvMesh
 {
+    // Private data
+
+        //- Motion dictionary
+        dictionary dict_;
+
+        //- Mixer rotors
+        PtrList<ggiRotor> rotors_;
+
+
+    // Private Member Functions
+
+        //- Disallow default bitwise copy construct
+        multiGgiRotorFvMesh(const multiGgiRotorFvMesh&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const multiGgiRotorFvMesh&);
+
 
 public:
 
-    typedef typename HashTable<T, label, Hash<label> >::iterator iterator;
+    //- Runtime type information
+    TypeName("multiGgiRotorFvMesh");
 
-    typedef typename HashTable<T, label, Hash<label> >::const_iterator
-        const_iterator;
 
     // Constructors
 
-        //- Construct given initial size
-        Map(const label size = 128)
-        :
-            HashTable<T, label, Hash<label> >(size)
-        {}
-
-        //- Construct from Istream
-        Map(Istream& is)
-        :
-            HashTable<T, label, Hash<label> >(is)
-        {}
-
-        //- Construct as copy
-        Map(const Map<T>& map)
-        :
-            HashTable<T, label, Hash<label> >(map)
-        {}
-
-        //- Construct by transferring the parameter contents
-        Map(const Xfer<Map<T> >& map)
-        :
-            HashTable<T, label, Hash<label> >(map)
-        {}
-
-        //- Construct by transferring the parameter contents
-        Map(const Xfer<HashTable<T, label, Hash<label> > >& map)
-        :
-            HashTable<T, label, Hash<label> >(map)
-        {}
+        //- Construct from IOobject
+        explicit multiGgiRotorFvMesh(const IOobject& io);
 
 
-    // Member Operators
+    //- Destructor
+    virtual ~multiGgiRotorFvMesh();
 
-        void operator=(const Map<T>& map)
-        {
-            HashTable<T, label, Hash<label>>::operator=(map);
-        }
+
+    // Member Functions
+
+        //- Update the mesh for both mesh motion and topology change
+        virtual bool update();
 };
 
 

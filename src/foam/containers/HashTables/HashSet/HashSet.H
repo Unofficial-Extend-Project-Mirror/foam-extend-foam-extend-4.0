@@ -156,6 +156,9 @@ public:
         //- Return true if the entry exists, same as found()
         inline bool operator[](const Key&) const;
 
+        //- Assignment operator
+        void operator=(const HashSet<Key, Hash>&);
+
         //- Equality. Two hashtables are equal when their contents are equal.
         //  Independent of table size or order.
         bool operator==(const HashSet<Key, Hash>&) const;

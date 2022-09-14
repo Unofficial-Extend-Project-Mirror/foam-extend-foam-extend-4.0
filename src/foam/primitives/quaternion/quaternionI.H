@@ -66,6 +66,11 @@ inline Foam::quaternion::quaternion
     operator*=(quaternion(vector(0, 0, 1), angleZ));
 }
 
+inline Foam::quaternion::quaternion(const quaternion& q)
+:
+    w_(q.w_),
+    v_(q.v_)
+{}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
